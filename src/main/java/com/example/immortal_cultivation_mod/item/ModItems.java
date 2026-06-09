@@ -4,6 +4,7 @@ import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -33,6 +34,21 @@ public class ModItems {
     public static final DeferredItem<Item> BEAM_SCROLL = registerItem("beam_scroll",
             () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.BEAM));
 
+    public static final DeferredItem<Item> EARTH_ESCAPE_SCROLL = registerItem("earth_escape_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.EARTH_ESCAPE));
+
+    public static final DeferredItem<Item> CLEANSE_SCROLL = registerItem("cleanse_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.CLEANSE));
+
+    public static final DeferredItem<Item> QI_GATHERING_SCROLL = registerItem("qi_gathering_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.QI_GATHERING));
+
+    public static final DeferredItem<Item> IGNITE_FLARE_SCROLL = registerItem("ignite_flare_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.IGNITE_FLARE));
+
+    public static final DeferredItem<Item> SPIRIT_SIGHT_SCROLL = registerItem("spirit_sight_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.SPIRIT_SIGHT));
+
     public static final DeferredItem<Item> ENLIGHTENMENT_PILL = registerItem("enlightenment_pill",
             () -> new EnlightenmentPillItem(new Item.Properties().stacksTo(16)));
 
@@ -47,6 +63,12 @@ public class ModItems {
 
     public static final DeferredItem<Item> QI_POUCH = registerItem("qi_pouch",
             () -> new QiPouchItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> DEBUG_STAT_EDITOR = registerItem("debug_stat_editor",
+            () -> new DebugStatEditorItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> FOG_REVEALING_MIRROR = registerItem("fog_revealing_mirror",
+            () -> new FogRevealingMirrorItem(new Item.Properties().stacksTo(1)));
 
     public static DeferredItem<Item> registerItem(String name, Supplier<Item> itemSupplier) {
         return ITEMS.register(name, itemSupplier);
@@ -67,6 +89,24 @@ public class ModItems {
                         new com.example.immortal_cultivation_mod.screen.ScrollLearningScreen(spellId));
             }
             return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide);
+        }
+
+        @Override
+        public Component getName(ItemStack stack) {
+            return super.getName(stack).copy().withStyle(elementNameColor());
+        }
+
+        private ChatFormatting elementNameColor() {
+            return switch (spellId) {
+                case ModSpells.FIREBALL, ModSpells.IGNITE_FLARE -> ChatFormatting.RED;
+                case ModSpells.REGENERATION -> ChatFormatting.GREEN;
+                case ModSpells.CLEANSE -> ChatFormatting.AQUA;
+                case ModSpells.EARTH_ESCAPE -> ChatFormatting.YELLOW;
+                case ModSpells.LINGBENG -> ChatFormatting.LIGHT_PURPLE;
+                case ModSpells.BEAM, ModSpells.SPIRIT_SIGHT -> ChatFormatting.WHITE;
+                case ModSpells.QI_GATHERING -> ChatFormatting.DARK_AQUA;
+                default -> ChatFormatting.GRAY;
+            };
         }
     }
 
@@ -151,4 +191,46 @@ public class ModItems {
             return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
         }
     }
+
+    public static class DebugStatEditorItem extends Item {
+        public DebugStatEditorItem(Properties properties) {
+            super(properties);
+        }
+
+        @Override
+        public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+            if (level.isClientSide) {
+                net.minecraft.client.Minecraft.getInstance().setScreen(
+                        new com.example.immortal_cultivation_mod.screen.DebugStatEditorScreen());
+            }
+            return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide);
+        }
+    }
+
+    public static class FogRevealingMirrorItem extends Item {
+        private static final int QI_COST = 50;
+
+        public FogRevealingMirrorItem(Properties properties) {
+            super(properties);
+        }
+
+        @Override
+        public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+            ItemStack stack = player.getItemInHand(hand);
+            if (!level.isClientSide && player instanceof ServerPlayer sp) {
+                var data = ModAttachments.getData(sp);
+                if (data.qi() < QI_COST) {
+                    sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
+                    return InteractionResultHolder.fail(stack);
+                }
+
+                ModAttachments.setData(sp, data.withQi(data.qi() - QI_COST));
+                int found = com.example.immortal_cultivation_mod.event.ServerEvents.startFogMirrorReveal(sp);
+                sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".fog_mirror_found", found));
+                com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            }
+            return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        }
+    }
+
 }

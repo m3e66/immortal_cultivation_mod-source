@@ -1,0 +1,20 @@
+{
+  "name": "Spell List",
+  "icon": "immortal_cultivation_mod:lingbeng_scroll",
+  "category": "immortal_cultivation_mod:spells",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Fireball: Lianqi Early, fire, costs 10 qi.$(br)Regeneration: Lianqi Middle, wood.$(br)Lingbeng: Lianqi Late, thunder, costs 50 qi.$(br)Beam: costs 30 qi and is visible only to the caster."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Earth Escape: Lianqi Late. Sink underground, move faster, and spend qi over time until you surface.$(br)Cleanse: Lianqi Early, water, clears harmful effects.$(br)Spirit Sight: toggles night vision for 5 qi per second."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Qi Gathering: Lianqi Early. It costs no qi and greatly improves qi regeneration, but you cannot attack or block. Damage taken while gathering qi is tripled.$(br)Ignite Flare: Lianqi Early, fire, ignites the block it hits."
+    }
+  ]
+}

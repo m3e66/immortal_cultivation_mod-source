@@ -1,0 +1,16 @@
+{
+  "name": "Getting Started",
+  "icon": "immortal_cultivation_mod:enlightenment_pill",
+  "category": "immortal_cultivation_mod:basics",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Use an Enlightenment Pill to step from mortal life into Qi Refining.$(br2)The stat menu shows qi, realm, max health, max age, luck, moral, soul, thoughts, spirit roots, and cultivation progress."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Qi appears above the hunger bar. Mortals can still see the qi bar, but they do not naturally regenerate qi.$(br2)Meditation requires standing on the ground and stops movement while active."
+    }
+  ]
+}

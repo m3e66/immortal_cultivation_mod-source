@@ -1,0 +1,20 @@
+{
+  "name": "Spirit Roots",
+  "icon": "minecraft:amethyst_shard",
+  "category": "immortal_cultivation_mod:cultivation",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Spirit roots are generated randomly and can contain one or more elements.$(br2)Five elements: metal, wood, water, fire, earth.$(br)Special roots: thunder, ice, wind, light, dark.$(br)No root or pseudo root cultivates extremely slowly."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Root count changes cultivation speed.$(br)Single root: fastest.$(br)Two roots: good speed.$(br)Three or four roots: slower.$(br)Five roots: slowest, but most compatible with five-element techniques."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Spirit root grades from highest to lowest: Heaven, Earth, Mystic, Yellow.$(br2)Using a spell that matches one of your spirit root elements gives 2x damage or 2x duration, depending on the spell."
+    }
+  ]
+}

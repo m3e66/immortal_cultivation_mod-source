@@ -29,6 +29,7 @@ public class SpellWheelScreen extends Screen {
 
         return data.knownSpells().stream()
                 .map(ModSpells::normalizeId)
+                .filter(ClientData::isSpellVisibleInWheel)
                 .map(ModSpells::get)
                 .filter(Objects::nonNull)
                 .distinct()

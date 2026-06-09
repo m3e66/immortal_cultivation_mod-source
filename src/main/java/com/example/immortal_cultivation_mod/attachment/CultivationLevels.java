@@ -7,6 +7,8 @@ public class CultivationLevels {
     public static final String REALM_MORTAL = "\u51e1\u4eba";
     public static final String REALM_LIANQI = "\u7ec3\u6c14";
     public static final String REALM_ZHUJI = "\u7b51\u57fa";
+    public static final String REALM_JINDAN = "\u91d1\u4e39";
+    public static final String REALM_YUANYING = "\u5143\u5a74";
 
     public static final String STAGE_EARLY = "\u524d\u671f";
     public static final String STAGE_MID = "\u4e2d\u671f";
@@ -34,6 +36,16 @@ public class CultivationLevels {
                     new StageDef(STAGE_EARLY, 150, 130, 200, 2000, 0.01f),
                     new StageDef(STAGE_MID, 180, 150, 300, 5000, 0.01f),
                     new StageDef(STAGE_LATE, 200, 170, 500, 10000, 0.01f)
+            )),
+            REALM_JINDAN, new RealmDef(REALM_JINDAN, List.of(
+                    new StageDef(STAGE_EARLY, 500, 200, 300, 20000, 0.01f),
+                    new StageDef(STAGE_MID, 600, 250, 400, 30000, 0.01f),
+                    new StageDef(STAGE_LATE, 800, 300, 500, 50000, 0.01f)
+            )),
+            REALM_YUANYING, new RealmDef(REALM_YUANYING, List.of(
+                    new StageDef(STAGE_EARLY, 1000, 400, 700, 100000, 0.01f),
+                    new StageDef(STAGE_MID, 1200, 450, 800, 200000, 0.01f),
+                    new StageDef(STAGE_LATE, 1500, 500, 900, 300000, 0.01f)
             ))
     );
 
@@ -108,7 +120,13 @@ public class CultivationLevels {
                 REALM_LIANQI + STAGE_LATE,
                 REALM_ZHUJI + STAGE_EARLY,
                 REALM_ZHUJI + STAGE_MID,
-                REALM_ZHUJI + STAGE_LATE
+                REALM_ZHUJI + STAGE_LATE,
+                REALM_JINDAN + STAGE_EARLY,
+                REALM_JINDAN + STAGE_MID,
+                REALM_JINDAN + STAGE_LATE,
+                REALM_YUANYING + STAGE_EARLY,
+                REALM_YUANYING + STAGE_MID,
+                REALM_YUANYING + STAGE_LATE
         );
     }
 }

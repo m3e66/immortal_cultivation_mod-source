@@ -1,0 +1,16 @@
+{
+  "name": "Learning Spells",
+  "icon": "immortal_cultivation_mod:fireball_scroll",
+  "category": "immortal_cultivation_mod:spells",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Right-click a jade scroll to open its learning screen. The screen shows name, requirement, element, qi cost, and description.$(br2)A scroll is consumed only when the spell is successfully learned."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Press I to choose up to 8 learned spells for the spell wheel. Your selection is saved after closing the world."
+    }
+  ]
+}

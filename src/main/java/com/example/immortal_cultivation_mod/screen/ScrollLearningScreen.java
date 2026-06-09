@@ -47,11 +47,6 @@ public class ScrollLearningScreen extends Screen {
                     b -> learnSpell()
             ).bounds(x + 20, y + 170, 100, 20).build());
         }
-
-        addRenderableWidget(Button.builder(
-                Component.translatable("gui.close"),
-                b -> onClose()
-        ).bounds(x + W - 120, y + 170, 100, 20).build());
     }
 
     private void learnSpell() {
@@ -90,6 +85,10 @@ public class ScrollLearningScreen extends Screen {
 
         g.drawString(mc.font, Component.literal("* ").append(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".requirement_label")), lx, ly, labelColor, true);
         g.drawString(mc.font, Component.literal(spell.requiredLevel()), lx + 100, ly, ChatFormatting.YELLOW.getColor(), true);
+        ly += 16;
+
+        g.drawString(mc.font, Component.literal("* ").append(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".element_label")), lx, ly, labelColor, true);
+        g.drawString(mc.font, Component.literal(spell.element()), lx + 100, ly, 0x88FFCC, true);
         ly += 16;
 
         g.drawString(mc.font, Component.literal("* ").append(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".qi_cost_label")), lx, ly, labelColor, true);

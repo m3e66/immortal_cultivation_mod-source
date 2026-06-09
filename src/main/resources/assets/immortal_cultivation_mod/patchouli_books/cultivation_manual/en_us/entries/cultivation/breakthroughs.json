@@ -1,0 +1,16 @@
+{
+  "name": "Breakthroughs",
+  "icon": "immortal_cultivation_mod:breakthrough_pill",
+  "category": "immortal_cultivation_mod:cultivation",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Cultivation progress builds while meditating. When progress reaches the requirement, use the stat menu breakthrough button.$(br2)Failure resets progress to 0 and deals damage equal to 50% of max health."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Luck controls breakthrough chance directly. For example, 50 luck means a 50% chance to succeed.$(br2)Leveling up grants 10 skill points."
+    }
+  ]
+}

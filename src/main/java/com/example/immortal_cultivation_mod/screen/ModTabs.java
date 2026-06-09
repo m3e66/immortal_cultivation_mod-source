@@ -24,11 +24,18 @@ public class ModTabs {
                         output.accept(ModItems.LINGBENG_SCROLL.get());
                         output.accept(ModItems.REGENERATION_SCROLL.get());
                         output.accept(ModItems.BEAM_SCROLL.get());
+                        output.accept(ModItems.EARTH_ESCAPE_SCROLL.get());
+                        output.accept(ModItems.CLEANSE_SCROLL.get());
+                        output.accept(ModItems.QI_GATHERING_SCROLL.get());
+                        output.accept(ModItems.IGNITE_FLARE_SCROLL.get());
+                        output.accept(ModItems.SPIRIT_SIGHT_SCROLL.get());
                         output.accept(ModItems.ENLIGHTENMENT_PILL.get());
                         output.accept(ModItems.BREAKTHROUGH_PILL.get());
                         output.accept(ModItems.SMALL_LEVEL_UP.get());
                         output.accept(ModItems.BIG_LEVEL_UP.get());
                         output.accept(ModItems.QI_POUCH.get());
+                        output.accept(ModItems.DEBUG_STAT_EDITOR.get());
+                        output.accept(ModItems.FOG_REVEALING_MIRROR.get());
 
                     }).build());
 }

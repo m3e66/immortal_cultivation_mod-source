@@ -1,0 +1,55 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:fireball_scroll",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:lingbeng_scroll",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:regeneration_scroll",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:beam_scroll",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:earth_escape_scroll",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:cleanse_scroll",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:qi_gathering_scroll",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:ignite_flare_scroll",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:spirit_sight_scroll",
+          "weight": 1
+        }
+      ]
+    }
+  ]
+}

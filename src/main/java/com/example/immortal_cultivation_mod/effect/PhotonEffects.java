@@ -19,6 +19,7 @@ public final class PhotonEffects {
     private static final String FIREBALL_FX = "immortal_cultivation_mod:fireball";
     private static final String LINGBENG_FX = "immortal_cultivation_mod:lingbeng";
     private static final String BEAM_FX = "immortal_cultivation_mod:beam";
+    private static final String MEDITATING_FX = "immortal_cultivation_mod:meditating";
     private static final int BEAM_DURATION_TICKS = 20 * 10;
     private static final Map<UUID, BeamRemoval> BEAM_REMOVALS = new ConcurrentHashMap<>();
 
@@ -36,6 +37,10 @@ public final class PhotonEffects {
     }
 
     public static void beamSpell(ServerLevel level, ServerPlayer caster) {
+        beamSpell(level, caster, BEAM_DURATION_TICKS);
+    }
+
+    public static void beamSpell(ServerLevel level, ServerPlayer caster, int durationTicks) {
         if (!ModList.get().isLoaded("photon")) {
             return;
         }
@@ -43,7 +48,26 @@ public final class PhotonEffects {
         List<Entity> entities = level.getEntities(caster, new AABB(caster.blockPosition()).inflate(128.0D), entity -> true);
         entities.add(caster);
         sendEntityEffectToPlayer(caster, BEAM_FX, entities);
-        BEAM_REMOVALS.put(caster.getUUID(), new BeamRemoval(level.getGameTime() + BEAM_DURATION_TICKS, entities));
+        BEAM_REMOVALS.put(caster.getUUID(), new BeamRemoval(level.getGameTime() + durationTicks, entities));
+    }
+
+    public static void meditatingStart(ServerLevel level, ServerPlayer player) {
+        if (!ModList.get().isLoaded("photon")) {
+            return;
+        }
+
+        String command = String.format(Locale.ROOT, "photon fx %s entity @s", MEDITATING_FX);
+        runPhotonCommand(level, player.createCommandSourceStack().withPermission(4).withSuppressedOutput(), command);
+    }
+
+    public static void meditatingStop(ServerPlayer player) {
+        if (!ModList.get().isLoaded("photon")) {
+            return;
+        }
+
+        for (ServerPlayer viewer : player.serverLevel().players()) {
+            sendRemoveEntityEffectToPlayer(viewer, MEDITATING_FX, List.of(player));
+        }
     }
 
     public static void tick(ServerPlayer player) {

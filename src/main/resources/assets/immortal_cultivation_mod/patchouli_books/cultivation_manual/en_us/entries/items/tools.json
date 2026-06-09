@@ -1,0 +1,16 @@
+{
+  "name": "Tools",
+  "icon": "immortal_cultivation_mod:qi_pouch",
+  "category": "immortal_cultivation_mod:items",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Qi Pouch: a storage bag with four times the space of a chest. Opening it costs 10 qi.$(br2)Mystic Bronze Mirror: right-click to spend 50 qi and reveal nearby Magic Ritual fog escape blocks for 3 seconds."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Small Level Up and Big Level Up items add cultivation progress when right-clicked.$(br2)The Debug Stat Editor opens a test GUI for changing player stats during development."
+    }
+  ]
+}

@@ -2,11 +2,13 @@ package com.example.immortal_cultivation_mod.client;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.client.hud.QiBarOverlay;
+import com.example.immortal_cultivation_mod.effect.ModEffects;
 import com.example.immortal_cultivation_mod.client.particle.FireballTrailParticle;
 import com.example.immortal_cultivation_mod.entity.ModEntities;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
 import com.example.immortal_cultivation_mod.particle.ModParticles;
 import com.example.immortal_cultivation_mod.screen.StatMenuScreen;
+import com.example.immortal_cultivation_mod.screen.SpellSelectionScreen;
 import com.example.immortal_cultivation_mod.screen.SpellWheelScreen;
 
 import com.mojang.blaze3d.platform.InputConstants;
@@ -14,6 +16,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.phys.Vec3;
 
 import net.neoforged.api.distmarker.Dist;
@@ -37,6 +41,7 @@ public class ModClientEvents {
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.FIREBALL_PROJECTILE.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.IGNITE_FLARE_PROJECTILE.get(), ThrownItemRenderer::new);
     }
 
     @SubscribeEvent
@@ -49,6 +54,16 @@ public class ModClientEvents {
     public static void registerMenuScreens(RegisterMenuScreensEvent event) {
         event.register(com.example.immortal_cultivation_mod.screen.ModScreens.QI_POUCH.get(),
                 com.example.immortal_cultivation_mod.screen.QiPouchScreen::new);
+    }
+
+    @SubscribeEvent
+    public static void onClientTickPre(ClientTickEvent.Pre event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) {
+            return;
+        }
+
+        applyEarthEscapeMovement(mc);
     }
 
     @SubscribeEvent
@@ -77,6 +92,14 @@ public class ModClientEvents {
                 mc.player.setDeltaMovement(0, movement.y, 0);
             }
             mc.player.setSprinting(false);
+            mc.player.setPose(Pose.SITTING);
+        }
+
+        if (mc.player.hasEffect(ModEffects.EARTH_ESCAPE)) {
+            applyEarthEscapeMovement(mc);
+        } else if (mc.player.noPhysics && !mc.player.isSpectator()) {
+            mc.player.noPhysics = false;
+            mc.player.setNoGravity(false);
         }
 
         if (isHeld && !wasSpellKeyDown) {
@@ -108,8 +131,48 @@ public class ModClientEvents {
             }
         }
 
+        while (ModKeyMappings.OPEN_SPELL_SELECTION.get().consumeClick()) {
+            if (mc.screen instanceof SpellSelectionScreen) {
+                mc.setScreen(null);
+            } else {
+                mc.setScreen(new SpellSelectionScreen());
+            }
+        }
+
         while (ModKeyMappings.MEDITATE.get().consumeClick()) {
             PacketDistributor.sendToServer(new ModPayloads.ServerboundMeditatePayload());
+        }
+    }
+
+    private static void applyEarthEscapeMovement(Minecraft mc) {
+        if (mc.player == null || !mc.player.hasEffect(ModEffects.EARTH_ESCAPE)) {
+            return;
+        }
+
+        mc.player.noPhysics = true;
+        mc.player.setNoGravity(true);
+        mc.player.fallDistance = 0.0F;
+
+        float forward = mc.player.input.forwardImpulse;
+        float left = mc.player.input.leftImpulse;
+        double yaw = Math.toRadians(mc.player.getYRot());
+        double sin = Math.sin(yaw);
+        double cos = Math.cos(yaw);
+        double speed = 0.16D;
+        double dx = (left * cos - forward * sin) * speed;
+        double dz = (forward * cos + left * sin) * speed;
+        double dy = 0.0D;
+        if (mc.player.input.jumping) {
+            dy += speed * 0.75D;
+        }
+        if (mc.player.input.shiftKeyDown) {
+            dy -= speed * 0.75D;
+        }
+
+        Vec3 movement = new Vec3(dx, dy, dz);
+        mc.player.setDeltaMovement(movement);
+        if (movement.lengthSqr() > 0.0D) {
+            mc.player.move(MoverType.SELF, movement);
         }
     }
 }

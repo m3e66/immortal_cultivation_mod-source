@@ -22,6 +22,10 @@ public class ModKeyMappings {
             "key." + ImmortalCultivationMod.MODID + ".open_spell_wheel",
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_TAB, KEY_CATEGORY));
 
+    public static final Lazy<KeyMapping> OPEN_SPELL_SELECTION = Lazy.of(() -> new KeyMapping(
+            "key." + ImmortalCultivationMod.MODID + ".open_spell_selection",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_I, KEY_CATEGORY));
+
     public static final Lazy<KeyMapping> MEDITATE = Lazy.of(() -> new KeyMapping(
             "key." + ImmortalCultivationMod.MODID + ".meditate",
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_C, KEY_CATEGORY));
@@ -30,6 +34,7 @@ public class ModKeyMappings {
     public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
         event.register(OPEN_STAT_MENU.get());
         event.register(OPEN_SPELL_WHEEL.get());
+        event.register(OPEN_SPELL_SELECTION.get());
         event.register(MEDITATE.get());
     }
 }

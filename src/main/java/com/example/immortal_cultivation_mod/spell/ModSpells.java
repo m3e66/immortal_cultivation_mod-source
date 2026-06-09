@@ -2,6 +2,7 @@ package com.example.immortal_cultivation_mod.spell;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
+import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -14,6 +15,11 @@ public class ModSpells {
     public static final String LINGBENG = "lingbeng";
     public static final String REGENERATION = "regeneration";
     public static final String BEAM = "beam";
+    public static final String EARTH_ESCAPE = "earth_escape";
+    public static final String CLEANSE = "cleanse";
+    public static final String QI_GATHERING = "qi_gathering";
+    public static final String IGNITE_FLARE = "ignite_flare";
+    public static final String SPIRIT_SIGHT = "spirit_sight";
 
     private static final Map<String, SpellDef> SPELLS = createSpells();
 
@@ -24,6 +30,7 @@ public class ModSpells {
                 "fireball",
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
                 10,
+                SpiritRoots.FIRE,
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_fireball.png")
         ));
         spells.put(LINGBENG, new SpellDef(
@@ -31,6 +38,7 @@ public class ModSpells {
                 "lingbeng",
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_LATE,
                 50,
+                SpiritRoots.THUNDER,
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_lingbeng.png")
         ));
         spells.put(REGENERATION, new SpellDef(
@@ -38,6 +46,7 @@ public class ModSpells {
                 "regeneration",
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_MID,
                 20,
+                SpiritRoots.WOOD,
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_regeneration.png")
         ));
         spells.put(BEAM, new SpellDef(
@@ -45,7 +54,48 @@ public class ModSpells {
                 "beam",
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
                 30,
+                SpiritRoots.LIGHT,
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_beam.png")
+        ));
+        spells.put(EARTH_ESCAPE, new SpellDef(
+                EARTH_ESCAPE,
+                "earth_escape",
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_LATE,
+                0,
+                SpiritRoots.EARTH,
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_earth_escape.png")
+        ));
+        spells.put(CLEANSE, new SpellDef(
+                CLEANSE,
+                "cleanse",
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
+                10,
+                SpiritRoots.WATER,
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_cleanse.png")
+        ));
+        spells.put(QI_GATHERING, new SpellDef(
+                QI_GATHERING,
+                "qi_gathering",
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
+                0,
+                SpiritRoots.WIND,
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_qi_gathering.png")
+        ));
+        spells.put(IGNITE_FLARE, new SpellDef(
+                IGNITE_FLARE,
+                "ignite_flare",
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
+                10,
+                SpiritRoots.FIRE,
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_ignite_flare.png")
+        ));
+        spells.put(SPIRIT_SIGHT, new SpellDef(
+                SPIRIT_SIGHT,
+                "spirit_sight",
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
+                5,
+                SpiritRoots.LIGHT,
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_spirit_sight.png")
         ));
         return Map.copyOf(spells);
     }
@@ -74,6 +124,21 @@ public class ModSpells {
         if ("Beam".equalsIgnoreCase(id) || "beam".equalsIgnoreCase(id) || "\u5149\u675f\u672f".equals(id)) {
             return BEAM;
         }
+        if ("Movement".equalsIgnoreCase(id) || "earth_escape".equalsIgnoreCase(id) || "earth escape".equalsIgnoreCase(id) || "\u9041\u5730\u672f".equals(id)) {
+            return EARTH_ESCAPE;
+        }
+        if ("Cleanse".equalsIgnoreCase(id) || "cleanse".equalsIgnoreCase(id) || "\u6e05\u6d01\u5492".equals(id)) {
+            return CLEANSE;
+        }
+        if ("QiGathering".equalsIgnoreCase(id) || "qi_gathering".equalsIgnoreCase(id) || "qi gathering".equalsIgnoreCase(id) || "\u5f15\u7075\u8bc0".equals(id)) {
+            return QI_GATHERING;
+        }
+        if ("IgniteFlare".equalsIgnoreCase(id) || "ignite_flare".equalsIgnoreCase(id) || "ignite flare".equalsIgnoreCase(id) || "\u71c3\u706b\u8bc0".equals(id)) {
+            return IGNITE_FLARE;
+        }
+        if ("SpiritSight".equalsIgnoreCase(id) || "spirit_sight".equalsIgnoreCase(id) || "spirit sight".equalsIgnoreCase(id) || "\u7075\u89c6".equals(id)) {
+            return SPIRIT_SIGHT;
+        }
         return id;
     }
 
@@ -81,7 +146,7 @@ public class ModSpells {
         return CultivationLevels.getStageIndex(currentLevel) >= CultivationLevels.getStageIndex(spell.requiredLevel());
     }
 
-    public record SpellDef(String id, String translationKey, String requiredLevel, int qiCost, ResourceLocation icon) {
+    public record SpellDef(String id, String translationKey, String requiredLevel, int qiCost, String element, ResourceLocation icon) {
         public Component name() {
             return Component.translatable("spell." + ImmortalCultivationMod.MODID + "." + translationKey);
         }

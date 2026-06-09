@@ -2,6 +2,7 @@ package com.example.immortal_cultivation_mod.screen;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
+import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import com.example.immortal_cultivation_mod.client.ClientData;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
 import net.minecraft.client.Minecraft;
@@ -16,7 +17,7 @@ import java.util.List;
 
 public class StatMenuScreen extends Screen {
     private static final int WINDOW_W = 340;
-    private static final int WINDOW_H = 238;
+    private static final int WINDOW_H = 292;
 
     private final List<Button> skillButtons = new ArrayList<>();
     private Button breakthroughBtn;
@@ -39,7 +40,7 @@ public class StatMenuScreen extends Screen {
 
         breakthroughBtn = Button.builder(Component.literal(""), b ->
                 PacketDistributor.sendToServer(new ModPayloads.ServerboundRequestBreakthroughPayload())
-        ).bounds(x + 110, y + 206, 120, 20).build();
+        ).bounds(x + 110, y + 260, 120, 20).build();
 
         addRenderableWidget(breakthroughBtn);
     }
@@ -89,9 +90,15 @@ public class StatMenuScreen extends Screen {
         drawSkillLine(g, mc, x, y + 142, "magic", 1, data.magicAttack(), data.magicAttack(), 0xAA88FF);
         drawSkillLine(g, mc, x, y + 164, "mental", 1, data.mentalAttack(), data.mentalAttack(), 0x88FFAA);
 
-        g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".max_age").append(": " + maxAge), x + 12, y + 186, 0xAAAAAA, true);
+        g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".body_type").append(": ").append(data.bodyType()), x + 12, y + 186, 0xAAFFDD, true);
+        g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".moral").append(": " + data.moral()), x + 180, y + 186, 0xDDFFAA, true);
+        g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".luck").append(": " + data.luck()), x + 12, y + 202, 0xFFFFAA, true);
+        g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".soul").append(": " + data.soul()), x + 115, y + 202, 0xDDAAFF, true);
+        g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".thoughts").append(": " + data.thoughts()), x + 220, y + 202, 0xAAFFFF, true);
+        g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".spirit_roots").append(": ").append(SpiritRoots.format(data.spiritRoots(), data.spiritRootGrade())), x + 12, y + 218, 0x88FFCC, true);
+        g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".max_age").append(": " + maxAge), x + 12, y + 234, 0xAAAAAA, true);
         int progressNeeded = CultivationLevels.getTotalQiNeeded(level);
-        g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".cultivation_progress").append(": " + data.cultivationProgress() + "/" + progressNeeded), x + 145, y + 186, 0xFFAA55, true);
+        g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".cultivation_progress").append(": " + data.cultivationProgress() + "/" + progressNeeded), x + 145, y + 234, 0xFFAA55, true);
 
         String nextStage = CultivationLevels.getNextStage(level);
         boolean fullProgress = data.cultivationProgress() >= progressNeeded;
@@ -110,7 +117,7 @@ public class StatMenuScreen extends Screen {
                     : Component.translatable("screen." + ImmortalCultivationMod.MODID + ".breakthrough_button"));
             breakthroughBtn.active = canBreakthrough;
             breakthroughBtn.visible = true;
-            breakthroughBtn.setPosition(x + 110, y + 206);
+            breakthroughBtn.setPosition(x + 110, y + 260);
         } else {
             breakthroughBtn.visible = false;
         }

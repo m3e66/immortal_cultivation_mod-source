@@ -21,5 +21,14 @@ public class ModEntities {
                             .updateInterval(2)
                             .build("fireball_projectile"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<IgniteFlareProjectileEntity>> IGNITE_FLARE_PROJECTILE =
+            ENTITY_TYPES.register("ignite_flare_projectile",
+                    () -> EntityType.Builder.<IgniteFlareProjectileEntity>of(
+                            IgniteFlareProjectileEntity::new, MobCategory.MISC)
+                            .sized(0.35f, 0.35f)
+                            .clientTrackingRange(8)
+                            .updateInterval(1)
+                            .build("ignite_flare_projectile"));
+
     public static void register(IEventBus bus) { ENTITY_TYPES.register(bus); }
 }

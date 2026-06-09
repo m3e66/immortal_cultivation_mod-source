@@ -1,0 +1,12 @@
+{
+  "name": "Skill Points",
+  "icon": "minecraft:experience_bottle",
+  "category": "immortal_cultivation_mod:cultivation",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Every successful level up grants 10 skill points.$(br2)Spend them in the stat menu to raise max health, max qi, max energy, physical attack, magic attack, or mental attack."
+    }
+  ]
+}
