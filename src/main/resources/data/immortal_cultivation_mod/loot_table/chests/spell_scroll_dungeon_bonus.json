@@ -48,6 +48,11 @@
           "type": "minecraft:item",
           "name": "immortal_cultivation_mod:spirit_sight_scroll",
           "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:zhenshan_palm_scroll",
+          "weight": 1
         }
       ]
     }

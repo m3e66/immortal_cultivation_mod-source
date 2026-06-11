@@ -105,6 +105,14 @@ config="${mod_id}.mixins.json"
     side="BOTH"
 
 [[dependencies.${mod_id}]]
+    modId="geckolib"
+    type="required"
+    reason="Uses GeckoLib custom models for cultivation ore and rock blocks."
+    versionRange="[4.7.7,)"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
     modId="patchouli"
     type="optional"
     reason="Adds the Immortal Cultivation guide book when Patchouli is present."

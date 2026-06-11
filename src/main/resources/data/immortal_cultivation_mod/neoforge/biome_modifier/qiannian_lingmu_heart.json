@@ -1,0 +1,6 @@
+{
+        "type":    "neoforge:add_features",
+        "biomes":    "#immortal_cultivation_mod:has_feature/qiannian_lingmu_heart",
+        "features":    "immortal_cultivation_mod:qiannian_lingmu_heart",
+        "step":    "vegetal_decoration"
+}

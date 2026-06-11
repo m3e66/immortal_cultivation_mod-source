@@ -1,0 +1,20 @@
+{
+  "name": "Blood",
+  "icon": "immortal_cultivation_mod:blood",
+  "category": "immortal_cultivation_mod:items",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Any non-player mob can drop blood when it dies, including mobs from other mods. The amount is based on max health divided by 10."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Blood Demon Method unlocks the blood bar. Right-click blood to refine 1 point into the bar, up to 10 times max qi.$(br2)Blood can pay spell and technique costs when qi is not enough."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Blood Demon Method has three versions: Golden Core Late, Nascent Soul Late, and Soul Transformation Late.$(br2)When breakthrough progress is incomplete, stored blood is automatically consumed. Every 10 blood adds 1 progress."
+    }
+  ]
+}

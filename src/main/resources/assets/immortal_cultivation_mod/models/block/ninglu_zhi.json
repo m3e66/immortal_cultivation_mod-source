@@ -1,0 +1,7 @@
+{
+    "parent":  "minecraft:block/cross",
+    "render_type":  "cutout",
+    "textures":  {
+                     "cross":  "immortal_cultivation_mod:block/ninglu_zhi"
+                 }
+}

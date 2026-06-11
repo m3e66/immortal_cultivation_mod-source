@@ -1,0 +1,11 @@
+{
+        "replace":    false,
+        "values":    [
+                                     "minecraft:meadow",
+                                     "minecraft:grove",
+                                     "minecraft:forest",
+                                     "minecraft:river",
+                                     "minecraft:lush_caves",
+                                     "minecraft:old_growth_pine_taiga"
+                             ]
+}

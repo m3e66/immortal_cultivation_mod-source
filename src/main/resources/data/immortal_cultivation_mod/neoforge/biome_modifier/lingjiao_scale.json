@@ -1,0 +1,6 @@
+{
+        "type":    "neoforge:add_features",
+        "biomes":    "#immortal_cultivation_mod:has_feature/lingjiao_scale",
+        "features":    "immortal_cultivation_mod:lingjiao_scale",
+        "step":    "underground_ores"
+}

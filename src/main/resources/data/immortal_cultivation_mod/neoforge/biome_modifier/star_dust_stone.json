@@ -1,0 +1,6 @@
+{
+        "type":    "neoforge:add_features",
+        "biomes":    "#immortal_cultivation_mod:has_feature/star_dust_stone",
+        "features":    "immortal_cultivation_mod:star_dust_stone",
+        "step":    "underground_ores"
+}

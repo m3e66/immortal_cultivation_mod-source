@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod.item;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
+import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
@@ -49,6 +50,12 @@ public class ModItems {
     public static final DeferredItem<Item> SPIRIT_SIGHT_SCROLL = registerItem("spirit_sight_scroll",
             () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.SPIRIT_SIGHT));
 
+    public static final DeferredItem<Item> ZHENSHAN_PALM_SCROLL = registerItem("zhenshan_palm_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.ZHENSHAN_PALM));
+
+    public static final DeferredItem<Item> LIGHT_BEAM_ATTACK_SCROLL = registerItem("light_beam_attack_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.LIGHT_BEAM_ATTACK));
+
     public static final DeferredItem<Item> ENLIGHTENMENT_PILL = registerItem("enlightenment_pill",
             () -> new EnlightenmentPillItem(new Item.Properties().stacksTo(16)));
 
@@ -69,6 +76,24 @@ public class ModItems {
 
     public static final DeferredItem<Item> FOG_REVEALING_MIRROR = registerItem("fog_revealing_mirror",
             () -> new FogRevealingMirrorItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> BLOOD = registerItem("blood",
+            () -> new BloodItem(new Item.Properties().stacksTo(64)));
+
+    public static final DeferredItem<Item> BASIC_BREATHING_METHOD = registerItem("basic_breathing_method",
+            () -> new CultivationMethodItem(new Item.Properties().stacksTo(1), CultivationMethods.BASIC_BREATHING));
+
+    public static final DeferredItem<Item> CLEAR_HEART_METHOD = registerItem("clear_heart_method",
+            () -> new CultivationMethodItem(new Item.Properties().stacksTo(1), CultivationMethods.CLEAR_HEART));
+
+    public static final DeferredItem<Item> BLOOD_DEMON_JINDAN_METHOD = registerItem("blood_demon_jindan_method",
+            () -> new CultivationMethodItem(new Item.Properties().stacksTo(1), CultivationMethods.BLOOD_DEMON_JINDAN));
+
+    public static final DeferredItem<Item> BLOOD_DEMON_YUANYING_METHOD = registerItem("blood_demon_yuanying_method",
+            () -> new CultivationMethodItem(new Item.Properties().stacksTo(1), CultivationMethods.BLOOD_DEMON_YUANYING));
+
+    public static final DeferredItem<Item> BLOOD_DEMON_HUASHEN_METHOD = registerItem("blood_demon_huashen_method",
+            () -> new CultivationMethodItem(new Item.Properties().stacksTo(1), CultivationMethods.BLOOD_DEMON_HUASHEN));
 
     public static DeferredItem<Item> registerItem(String name, Supplier<Item> itemSupplier) {
         return ITEMS.register(name, itemSupplier);
@@ -101,9 +126,9 @@ public class ModItems {
                 case ModSpells.FIREBALL, ModSpells.IGNITE_FLARE -> ChatFormatting.RED;
                 case ModSpells.REGENERATION -> ChatFormatting.GREEN;
                 case ModSpells.CLEANSE -> ChatFormatting.AQUA;
-                case ModSpells.EARTH_ESCAPE -> ChatFormatting.YELLOW;
+                case ModSpells.EARTH_ESCAPE, ModSpells.ZHENSHAN_PALM -> ChatFormatting.YELLOW;
                 case ModSpells.LINGBENG -> ChatFormatting.LIGHT_PURPLE;
-                case ModSpells.BEAM, ModSpells.SPIRIT_SIGHT -> ChatFormatting.WHITE;
+                case ModSpells.BEAM, ModSpells.SPIRIT_SIGHT, ModSpells.LIGHT_BEAM_ATTACK -> ChatFormatting.WHITE;
                 case ModSpells.QI_GATHERING -> ChatFormatting.DARK_AQUA;
                 default -> ChatFormatting.GRAY;
             };
@@ -150,8 +175,8 @@ public class ModItems {
             ItemStack stack = player.getItemInHand(hand);
             if (!level.isClientSide && player instanceof net.minecraft.server.level.ServerPlayer sp) {
                 var data = ModAttachments.getData(sp);
-                int need = CultivationLevels.getTotalQiNeeded(data.cultivationLevel());
-                int progress = fillToRequirement ? need : Math.min(need, data.cultivationProgress() + progressAmount);
+                long need = CultivationLevels.getTotalQiNeeded(data.cultivationLevel());
+                long progress = fillToRequirement ? need : Math.min(need, data.cultivationProgress() + progressAmount);
                 ModAttachments.setData(sp, data.withCultivationProgress(progress));
                 if (!sp.getAbilities().instabuild) {
                     stack.shrink(1);
@@ -175,12 +200,11 @@ public class ModItems {
             ItemStack stack = player.getItemInHand(hand);
             if (!level.isClientSide && player instanceof ServerPlayer sp) {
                 var data = ModAttachments.getData(sp);
-                if (data.qi() < OPEN_COST) {
+                if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, OPEN_COST)) {
                     sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
                     return InteractionResultHolder.fail(stack);
                 }
 
-                ModAttachments.setData(sp, data.withQi(data.qi() - OPEN_COST));
                 com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
                 sp.openMenu(new SimpleMenuProvider(
                         (containerId, inventory, openedPlayer) ->
@@ -207,6 +231,53 @@ public class ModItems {
         }
     }
 
+    public static class CultivationMethodItem extends Item {
+        private final String methodId;
+
+        public CultivationMethodItem(Properties properties, String methodId) {
+            super(properties);
+            this.methodId = methodId;
+        }
+
+        @Override
+        public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+            ItemStack stack = player.getItemInHand(hand);
+            if (level.isClientSide) {
+                net.minecraft.client.Minecraft.getInstance().setScreen(
+                        new com.example.immortal_cultivation_mod.screen.MethodLearningScreen(methodId));
+            }
+            return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        }
+    }
+
+    public static class BloodItem extends Item {
+        public BloodItem(Properties properties) {
+            super(properties);
+        }
+
+        @Override
+        public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+            ItemStack stack = player.getItemInHand(hand);
+            if (!level.isClientSide && player instanceof ServerPlayer sp) {
+                var data = ModAttachments.getData(sp);
+                if (!CultivationMethods.isBloodDemon(data.activeCultivationMethod())) {
+                    sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".blood_need_method"));
+                    return InteractionResultHolder.fail(stack);
+                }
+                int maxBlood = com.example.immortal_cultivation_mod.event.ServerEvents.getMaxBlood(sp);
+                if (data.blood() >= maxBlood) {
+                    return InteractionResultHolder.fail(stack);
+                }
+                ModAttachments.setData(sp, data.withBlood(Math.min(maxBlood, data.blood() + 1)));
+                if (!sp.getAbilities().instabuild) {
+                    stack.shrink(1);
+                }
+                com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            }
+            return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        }
+    }
+
     public static class FogRevealingMirrorItem extends Item {
         private static final int QI_COST = 50;
 
@@ -219,14 +290,15 @@ public class ModItems {
             ItemStack stack = player.getItemInHand(hand);
             if (!level.isClientSide && player instanceof ServerPlayer sp) {
                 var data = ModAttachments.getData(sp);
-                if (data.qi() < QI_COST) {
+                if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, QI_COST)) {
                     sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
                     return InteractionResultHolder.fail(stack);
                 }
 
-                ModAttachments.setData(sp, data.withQi(data.qi() - QI_COST));
                 int found = com.example.immortal_cultivation_mod.event.ServerEvents.startFogMirrorReveal(sp);
-                sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".fog_mirror_found", found));
+                var ambientQi = com.example.immortal_cultivation_mod.event.ServerEvents.refreshAmbientQi(sp);
+                sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".fog_mirror_found",
+                        found, ambientQi.value(), ambientQi.spiritVeinCenters()));
                 com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
             }
             return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);

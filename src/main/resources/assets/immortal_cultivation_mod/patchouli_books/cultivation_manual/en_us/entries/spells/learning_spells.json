@@ -10,7 +10,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "Press I to choose up to 8 learned spells for the spell wheel. Your selection is saved after closing the world."
+      "text": "$(br)Press I to choose up to 8 learned spells for the spell wheel. Your selection is saved after closing the world."
     }
   ]
 }

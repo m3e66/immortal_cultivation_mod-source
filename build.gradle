@@ -32,6 +32,9 @@ sourceSets.main.resources {
 
 repositories {
     // Add here additional repositories if required by some of the dependencies below.
+    maven {
+        url = "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
+    }
 }
 
 base {
@@ -142,6 +145,7 @@ dependencies {
 
     localRuntime files("run/mods/magic_ritual_mod-1.0.0.jar")
     localRuntime files("run/mods/photon-neoforge-1.21.1-2.1.4.jar")
+    implementation "software.bernie.geckolib:geckolib-neoforge-1.21.1:4.7.7"
 
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html

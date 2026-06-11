@@ -19,6 +19,7 @@ public final class PhotonEffects {
     private static final String FIREBALL_FX = "immortal_cultivation_mod:fireball";
     private static final String LINGBENG_FX = "immortal_cultivation_mod:lingbeng";
     private static final String BEAM_FX = "immortal_cultivation_mod:beam";
+    private static final String BALL_FX = "immortal_cultivation_mod:ball";
     private static final String MEDITATING_FX = "immortal_cultivation_mod:meditating";
     private static final int BEAM_DURATION_TICKS = 20 * 10;
     private static final Map<UUID, BeamRemoval> BEAM_REMOVALS = new ConcurrentHashMap<>();
@@ -29,6 +30,12 @@ public final class PhotonEffects {
     public static void fireballProjectile(Entity projectile) {
         if (projectile.level() instanceof ServerLevel serverLevel) {
             playEntityEffect(serverLevel, projectile);
+        }
+    }
+
+    public static void lightBeamProjectile(Entity projectile) {
+        if (projectile.level() instanceof ServerLevel serverLevel) {
+            playLightBeamEntityEffect(serverLevel, projectile);
         }
     }
 
@@ -104,6 +111,22 @@ public final class PhotonEffects {
         String command = String.format(Locale.ROOT,
                 "photon fx %s entity @e[type=immortal_cultivation_mod:fireball_projectile,limit=1,sort=nearest]",
                 FIREBALL_FX);
+
+        var source = entity.createCommandSourceStack()
+                .withPermission(4)
+                .withPosition(entity.position())
+                .withSuppressedOutput();
+        runPhotonCommand(level, source, command);
+    }
+
+    private static void playLightBeamEntityEffect(ServerLevel level, Entity entity) {
+        if (!ModList.get().isLoaded("photon")) {
+            return;
+        }
+
+        String command = String.format(Locale.ROOT,
+                "photon fx %s entity @e[type=immortal_cultivation_mod:light_beam_projectile,limit=1,sort=nearest]",
+                BALL_FX);
 
         var source = entity.createCommandSourceStack()
                 .withPermission(4)

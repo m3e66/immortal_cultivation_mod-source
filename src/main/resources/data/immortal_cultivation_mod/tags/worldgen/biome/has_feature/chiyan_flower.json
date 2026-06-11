@@ -1,0 +1,11 @@
+{
+        "replace":    false,
+        "values":    [
+                                     "minecraft:badlands",
+                                     "minecraft:eroded_badlands",
+                                     "minecraft:wooded_badlands",
+                                     "minecraft:desert",
+                                     "minecraft:basalt_deltas",
+                                     "minecraft:nether_wastes"
+                             ]
+}

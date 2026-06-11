@@ -10,7 +10,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "Qi appears above the hunger bar. Mortals can still see the qi bar, but they do not naturally regenerate qi.$(br2)Meditation requires standing on the ground and stops movement while active."
+      "text": "$(br)Qi appears above the hunger bar. Mortals can still see the qi bar, but they do not naturally regenerate qi.$(br2)Meditation requires standing on the ground and stops movement while active."
     }
   ]
 }

@@ -20,6 +20,8 @@ public class ModSpells {
     public static final String QI_GATHERING = "qi_gathering";
     public static final String IGNITE_FLARE = "ignite_flare";
     public static final String SPIRIT_SIGHT = "spirit_sight";
+    public static final String ZHENSHAN_PALM = "zhenshan_palm";
+    public static final String LIGHT_BEAM_ATTACK = "light_beam_attack";
 
     private static final Map<String, SpellDef> SPELLS = createSpells();
 
@@ -31,6 +33,7 @@ public class ModSpells {
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
                 10,
                 SpiritRoots.FIRE,
+                "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_fireball.png")
         ));
         spells.put(LINGBENG, new SpellDef(
@@ -39,6 +42,7 @@ public class ModSpells {
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_LATE,
                 50,
                 SpiritRoots.THUNDER,
+                "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_lingbeng.png")
         ));
         spells.put(REGENERATION, new SpellDef(
@@ -47,6 +51,7 @@ public class ModSpells {
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_MID,
                 20,
                 SpiritRoots.WOOD,
+                "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_regeneration.png")
         ));
         spells.put(BEAM, new SpellDef(
@@ -55,6 +60,7 @@ public class ModSpells {
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
                 30,
                 SpiritRoots.LIGHT,
+                "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_beam.png")
         ));
         spells.put(EARTH_ESCAPE, new SpellDef(
@@ -63,6 +69,7 @@ public class ModSpells {
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_LATE,
                 0,
                 SpiritRoots.EARTH,
+                "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_earth_escape.png")
         ));
         spells.put(CLEANSE, new SpellDef(
@@ -71,6 +78,7 @@ public class ModSpells {
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
                 10,
                 SpiritRoots.WATER,
+                "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_cleanse.png")
         ));
         spells.put(QI_GATHERING, new SpellDef(
@@ -79,6 +87,7 @@ public class ModSpells {
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
                 0,
                 SpiritRoots.WIND,
+                "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_qi_gathering.png")
         ));
         spells.put(IGNITE_FLARE, new SpellDef(
@@ -87,6 +96,7 @@ public class ModSpells {
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
                 10,
                 SpiritRoots.FIRE,
+                "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_ignite_flare.png")
         ));
         spells.put(SPIRIT_SIGHT, new SpellDef(
@@ -95,7 +105,26 @@ public class ModSpells {
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
                 5,
                 SpiritRoots.LIGHT,
+                "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_spirit_sight.png")
+        ));
+        spells.put(ZHENSHAN_PALM, new SpellDef(
+                ZHENSHAN_PALM,
+                "zhenshan_palm",
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_MID,
+                130,
+                SpiritRoots.EARTH,
+                "earth",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_zhenshan_palm.png")
+        ));
+        spells.put(LIGHT_BEAM_ATTACK, new SpellDef(
+                LIGHT_BEAM_ATTACK,
+                "light_beam_attack",
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE,
+                30,
+                SpiritRoots.LIGHT,
+                "human",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_beam.png")
         ));
         return Map.copyOf(spells);
     }
@@ -139,6 +168,12 @@ public class ModSpells {
         if ("SpiritSight".equalsIgnoreCase(id) || "spirit_sight".equalsIgnoreCase(id) || "spirit sight".equalsIgnoreCase(id) || "\u7075\u89c6".equals(id)) {
             return SPIRIT_SIGHT;
         }
+        if ("ZhenshanPalm".equalsIgnoreCase(id) || "zhenshan_palm".equalsIgnoreCase(id) || "zhenshan palm".equalsIgnoreCase(id) || "\u9707\u5c71\u638c".equals(id)) {
+            return ZHENSHAN_PALM;
+        }
+        if ("LightBeamAttack".equalsIgnoreCase(id) || "light_beam_attack".equalsIgnoreCase(id) || "light beam attack".equalsIgnoreCase(id)) {
+            return LIGHT_BEAM_ATTACK;
+        }
         return id;
     }
 
@@ -146,7 +181,7 @@ public class ModSpells {
         return CultivationLevels.getStageIndex(currentLevel) >= CultivationLevels.getStageIndex(spell.requiredLevel());
     }
 
-    public record SpellDef(String id, String translationKey, String requiredLevel, int qiCost, String element, ResourceLocation icon) {
+    public record SpellDef(String id, String translationKey, String requiredLevel, int qiCost, String element, String tier, ResourceLocation icon) {
         public Component name() {
             return Component.translatable("spell." + ImmortalCultivationMod.MODID + "." + translationKey);
         }

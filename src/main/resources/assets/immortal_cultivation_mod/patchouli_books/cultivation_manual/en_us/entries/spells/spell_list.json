@@ -6,15 +6,47 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Fireball: Lianqi Early, fire, costs 10 qi.$(br)Regeneration: Lianqi Middle, wood.$(br)Lingbeng: Lianqi Late, thunder, costs 50 qi.$(br)Beam: costs 30 qi and is visible only to the caster."
+      "text": "Fireball: Lianqi Early, fire, costs 10 qi.$(br)Shoots a fireball that deals damage and ignites targets."
     },
     {
       "type": "patchouli:text",
-      "text": "Earth Escape: Lianqi Late. Sink underground, move faster, and spend qi over time until you surface.$(br)Cleanse: Lianqi Early, water, clears harmful effects.$(br)Spirit Sight: toggles night vision for 5 qi per second."
+      "text": "$(br)Lingbeng: Lianqi Late, thunder, costs 50 qi.$(br)Enter a breaking-force state. Punch a block or entity to release an explosion. Recasting stacks the radius."
     },
     {
       "type": "patchouli:text",
-      "text": "Qi Gathering: Lianqi Early. It costs no qi and greatly improves qi regeneration, but you cannot attack or block. Damage taken while gathering qi is tripled.$(br)Ignite Flare: Lianqi Early, fire, ignites the block it hits."
+      "text": "$(br)Regeneration: Lianqi Middle, wood, costs 20 qi.$(br)Restores health with a short healing effect."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Beam: Lianqi Early, light, costs 30 qi.$(br)Making you able to see entities near you."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Earth Escape: Lianqi Late, earth.$(br)Sink underground, move faster, and spend qi over time until you surface."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Cleanse: Lianqi Early, water, costs 10 qi.$(br)Clears harmful effects from yourself."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Qi Gathering: Lianqi Early, wind, costs no qi.$(br)Greatly improves qi regeneration, but you cannot attack or block. Damage taken while gathering qi is tripled."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Ignite Flare: Lianqi Early, fire, costs 10 qi.$(br)Shoots a straight flare that ignites the block it hits."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Spirit Sight: Lianqi Early, light, costs 5 qi per second.$(br)Toggles night vision while the effect is active."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Zhenshan Palm: Foundation Establishment Middle, earth, tier Earth, costs 130 qi.$(br)Releases a large hand-shaped earth particle wave for 3 seconds. Blocks touched by the palm are destroyed."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Light Ball: Foundation Establishment Late, light, costs 30 qi to summon and 10 qi per shot.$(br)Summons 6 light balls in a hexagon behind you, stacking up to 3 rings. Punch to release one, or shift-punch to release all. Each shot deals 50 damage and tears through up to 24 blocks."
     }
   ]
 }

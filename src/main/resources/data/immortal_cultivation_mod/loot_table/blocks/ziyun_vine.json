@@ -1,0 +1,19 @@
+{
+        "type":    "minecraft:block",
+        "pools":    [
+                                    {
+                                            "rolls":    1,
+                                            "entries":    [
+                                                                            {
+                                                                                    "type":    "minecraft:item",
+                                                                                    "name":    "immortal_cultivation_mod:ziyun_vine"
+                                                                            }
+                                                                    ],
+                                            "conditions":    [
+                                                                                 {
+                                                                                         "condition":    "minecraft:survives_explosion"
+                                                                                 }
+                                                                         ]
+                                    }
+                            ]
+}

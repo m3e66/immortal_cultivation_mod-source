@@ -1,0 +1,20 @@
+{
+  "name": "Cultivation Methods",
+  "icon": "immortal_cultivation_mod:basic_breathing_method",
+  "category": "immortal_cultivation_mod:cultivation",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Meditation now needs an active cultivation method. Without a method, you can still meditate, but cultivation progress will not increase.$(br2)Right-click a method book to activate it."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Each method has a cultivation limit. Basic Breathing Method and Clear Heart Method stop giving progress after Foundation Establishment Late.$(br2)A method also has a tier: human, earth, heaven, immortal, or divine."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Element methods match spirit roots. A strong match can improve speed, power, and cost. A weak match is usable but weaker. A mismatch is very poor or may fail in later methods."
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+        "type":    "neoforge:add_features",
+        "biomes":    "#immortal_cultivation_mod:has_feature/xuanbing_lotus",
+        "features":    "immortal_cultivation_mod:xuanbing_lotus",
+        "step":    "vegetal_decoration"
+}

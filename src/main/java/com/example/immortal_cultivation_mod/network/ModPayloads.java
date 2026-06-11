@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod.network;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
+import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import com.example.immortal_cultivation_mod.effect.ModEffects;
@@ -16,6 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -41,7 +43,9 @@ public class ModPayloads {
             List<String> spiritRoots,
             String spiritRootGrade,
             int agePenalty,
-            int cultivationProgress,
+            long cultivationProgress,
+            String activeCultivationMethod,
+            int blood,
             List<String> knownSpells,
             boolean isMeditating,
             int skillPoints,
@@ -71,7 +75,9 @@ public class ModPayloads {
                             ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()).encode(buf, data.spiritRoots());
                             ByteBufCodecs.STRING_UTF8.encode(buf, data.spiritRootGrade());
                             ByteBufCodecs.VAR_INT.encode(buf, data.agePenalty());
-                            ByteBufCodecs.VAR_INT.encode(buf, data.cultivationProgress());
+                            buf.writeVarLong(data.cultivationProgress());
+                            ByteBufCodecs.STRING_UTF8.encode(buf, data.activeCultivationMethod());
+                            ByteBufCodecs.VAR_INT.encode(buf, data.blood());
                             ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()).encode(buf, data.knownSpells());
                             ByteBufCodecs.BOOL.encode(buf, data.isMeditating());
                             ByteBufCodecs.VAR_INT.encode(buf, data.skillPoints());
@@ -96,6 +102,8 @@ public class ModPayloads {
                                 ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()).decode(buf),
                                 ByteBufCodecs.STRING_UTF8.decode(buf),
                                 ByteBufCodecs.VAR_INT.decode(buf),
+                                buf.readVarLong(),
+                                ByteBufCodecs.STRING_UTF8.decode(buf),
                                 ByteBufCodecs.VAR_INT.decode(buf),
                                 ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()).decode(buf),
                                 ByteBufCodecs.BOOL.decode(buf),
@@ -157,11 +165,29 @@ public class ModPayloads {
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
 
+    public record ServerboundActivateMethodPayload(String methodId) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ServerboundActivateMethodPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "activate_method"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundActivateMethodPayload> STREAM_CODEC =
+                StreamCodec.composite(ByteBufCodecs.STRING_UTF8, ServerboundActivateMethodPayload::methodId, ServerboundActivateMethodPayload::new);
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
     public record ServerboundCastSpellPayload(String spellName) implements CustomPacketPayload {
         public static final CustomPacketPayload.Type<ServerboundCastSpellPayload> TYPE =
                 new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "cast_spell"));
         public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundCastSpellPayload> STREAM_CODEC =
                 StreamCodec.composite(ByteBufCodecs.STRING_UTF8, ServerboundCastSpellPayload::spellName, ServerboundCastSpellPayload::new);
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
+    public record ServerboundLightBeamAirPunchPayload(boolean shootAll) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ServerboundLightBeamAirPunchPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "light_beam_air_punch"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundLightBeamAirPunchPayload> STREAM_CODEC =
+                StreamCodec.composite(ByteBufCodecs.BOOL, ServerboundLightBeamAirPunchPayload::shootAll, ServerboundLightBeamAirPunchPayload::new);
         @Override
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
@@ -197,9 +223,27 @@ public class ModPayloads {
             registrar.playToServer(ServerboundRequestBreakthroughPayload.TYPE, ServerboundRequestBreakthroughPayload.STREAM_CODEC, ModPayloadsHandler::handleBreakthroughOnServer);
             registrar.playToServer(ServerboundSpendSkillPointPayload.TYPE, ServerboundSpendSkillPointPayload.STREAM_CODEC, ModPayloadsHandler::handleSpendSkillPointOnServer);
             registrar.playToServer(ServerboundLearnSpellPayload.TYPE, ServerboundLearnSpellPayload.STREAM_CODEC, ModPayloadsHandler::handleLearnSpellOnServer);
+            registrar.playToServer(ServerboundActivateMethodPayload.TYPE, ServerboundActivateMethodPayload.STREAM_CODEC, ModPayloadsHandler::handleActivateMethodOnServer);
             registrar.playToServer(ServerboundCastSpellPayload.TYPE, ServerboundCastSpellPayload.STREAM_CODEC, ModPayloadsHandler::handleCastSpellOnServer);
+            registrar.playToServer(ServerboundLightBeamAirPunchPayload.TYPE, ServerboundLightBeamAirPunchPayload.STREAM_CODEC, ModPayloadsHandler::handleLightBeamAirPunchOnServer);
             registrar.playToServer(ServerboundMeditatePayload.TYPE, ServerboundMeditatePayload.STREAM_CODEC, ModPayloadsHandler::handleMeditateOnServer);
             registrar.playToServer(ServerboundDebugAdjustStatPayload.TYPE, ServerboundDebugAdjustStatPayload.STREAM_CODEC, ModPayloadsHandler::handleDebugAdjustStatOnServer);
+        }
+
+        private static void handleActivateMethodOnServer(ServerboundActivateMethodPayload payload, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                if (ctx.player() instanceof ServerPlayer sp) {
+                    var def = CultivationMethods.get(payload.methodId());
+                    if (def == null) {
+                        return;
+                    }
+                    var data = ModAttachments.getData(sp).withActiveCultivationMethod(payload.methodId());
+                    ModAttachments.setData(sp, data);
+                    sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".method_activated",
+                            Component.translatable(def.nameKey())));
+                    com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+                }
+            });
         }
 
         private static void handleDebugAdjustStatOnServer(ServerboundDebugAdjustStatPayload payload, IPayloadContext ctx) {
@@ -243,21 +287,7 @@ public class ModPayloads {
         }
 
         private static String nextCultivationLevel(String current, int direction) {
-            List<String> values = List.of(
-                    com.example.immortal_cultivation_mod.attachment.CultivationLevels.REALM_MORTAL,
-                    com.example.immortal_cultivation_mod.attachment.CultivationLevels.REALM_LIANQI + com.example.immortal_cultivation_mod.attachment.CultivationLevels.STAGE_EARLY,
-                    com.example.immortal_cultivation_mod.attachment.CultivationLevels.REALM_LIANQI + com.example.immortal_cultivation_mod.attachment.CultivationLevels.STAGE_MID,
-                    com.example.immortal_cultivation_mod.attachment.CultivationLevels.REALM_LIANQI + com.example.immortal_cultivation_mod.attachment.CultivationLevels.STAGE_LATE,
-                    com.example.immortal_cultivation_mod.attachment.CultivationLevels.REALM_ZHUJI + com.example.immortal_cultivation_mod.attachment.CultivationLevels.STAGE_EARLY,
-                    com.example.immortal_cultivation_mod.attachment.CultivationLevels.REALM_ZHUJI + com.example.immortal_cultivation_mod.attachment.CultivationLevels.STAGE_MID,
-                    com.example.immortal_cultivation_mod.attachment.CultivationLevels.REALM_ZHUJI + com.example.immortal_cultivation_mod.attachment.CultivationLevels.STAGE_LATE,
-                    com.example.immortal_cultivation_mod.attachment.CultivationLevels.REALM_JINDAN + com.example.immortal_cultivation_mod.attachment.CultivationLevels.STAGE_EARLY,
-                    com.example.immortal_cultivation_mod.attachment.CultivationLevels.REALM_JINDAN + com.example.immortal_cultivation_mod.attachment.CultivationLevels.STAGE_MID,
-                    com.example.immortal_cultivation_mod.attachment.CultivationLevels.REALM_JINDAN + com.example.immortal_cultivation_mod.attachment.CultivationLevels.STAGE_LATE,
-                    com.example.immortal_cultivation_mod.attachment.CultivationLevels.REALM_YUANYING + com.example.immortal_cultivation_mod.attachment.CultivationLevels.STAGE_EARLY,
-                    com.example.immortal_cultivation_mod.attachment.CultivationLevels.REALM_YUANYING + com.example.immortal_cultivation_mod.attachment.CultivationLevels.STAGE_MID,
-                    com.example.immortal_cultivation_mod.attachment.CultivationLevels.REALM_YUANYING + com.example.immortal_cultivation_mod.attachment.CultivationLevels.STAGE_LATE
-            );
+            List<String> values = com.example.immortal_cultivation_mod.attachment.CultivationLevels.allLevels();
             int index = values.indexOf(current);
             if (index < 0) {
                 index = 0;
@@ -310,6 +340,8 @@ public class ModPayloads {
                 case ModSpells.QI_GATHERING -> ModItems.QI_GATHERING_SCROLL.get();
                 case ModSpells.IGNITE_FLARE -> ModItems.IGNITE_FLARE_SCROLL.get();
                 case ModSpells.SPIRIT_SIGHT -> ModItems.SPIRIT_SIGHT_SCROLL.get();
+                case ModSpells.ZHENSHAN_PALM -> ModItems.ZHENSHAN_PALM_SCROLL.get();
+                case ModSpells.LIGHT_BEAM_ATTACK -> ModItems.LIGHT_BEAM_ATTACK_SCROLL.get();
                 default -> null;
             };
             if (scroll == null) {
@@ -346,6 +378,8 @@ public class ModPayloads {
                         payload.spiritRootGrade(),
                         payload.agePenalty(),
                         payload.cultivationProgress(),
+                        payload.activeCultivationMethod(),
+                        payload.blood(),
                         payload.knownSpells(),
                         payload.isMeditating(),
                         payload.skillPoints(),
@@ -434,17 +468,39 @@ public class ModPayloads {
                         castIgniteFlare(sp, data, spell);
                     } else if (ModSpells.SPIRIT_SIGHT.equals(spellId)) {
                         com.example.immortal_cultivation_mod.event.ServerEvents.toggleSpiritSight(sp);
+                    } else if (ModSpells.ZHENSHAN_PALM.equals(spellId)) {
+                        castZhenshanPalm(sp, data, spell);
+                    } else if (ModSpells.LIGHT_BEAM_ATTACK.equals(spellId)) {
+                        com.example.immortal_cultivation_mod.spell.LightBeamAttack.cast(sp);
                     }
                 }
             });
         }
 
-        private static void castCleanse(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
-            if (data.qi() < spell.qiCost()) {
+        private static void handleLightBeamAirPunchOnServer(ServerboundLightBeamAirPunchPayload payload, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                if (ctx.player() instanceof ServerPlayer sp && !sp.hasEffect(ModEffects.QI_GATHERING) && !sp.hasEffect(ModEffects.EARTH_ESCAPE)) {
+                    Vec3 target = sp.getEyePosition().add(sp.getLookAngle().scale(64.0D));
+                    com.example.immortal_cultivation_mod.spell.LightBeamAttack.shoot(sp, target, payload.shootAll());
+                }
+            });
+        }
+
+        private static void castZhenshanPalm(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
+            if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, spell.qiCost())) {
                 sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
                 return;
             }
-            ModAttachments.setData(sp, data.withQi(data.qi() - spell.qiCost()));
+            var palm = new com.example.immortal_cultivation_mod.entity.ZhenshanPalmEntity(sp.level(), sp);
+            sp.level().addFreshEntity(palm);
+            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+        }
+
+        private static void castCleanse(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
+            if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, spell.qiCost())) {
+                sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
+                return;
+            }
             var harmful = sp.getActiveEffects().stream()
                     .filter(effect -> effect.getEffect().value().getCategory() == net.minecraft.world.effect.MobEffectCategory.HARMFUL)
                     .map(MobEffectInstance::getEffect)
@@ -464,11 +520,10 @@ public class ModPayloads {
         }
 
         private static void castIgniteFlare(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
-            if (data.qi() < spell.qiCost()) {
+            if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, spell.qiCost())) {
                 sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
                 return;
             }
-            ModAttachments.setData(sp, data.withQi(data.qi() - spell.qiCost()));
             var projectile = new com.example.immortal_cultivation_mod.entity.IgniteFlareProjectileEntity(sp.level(), sp);
             projectile.shootFromRotation(sp, sp.getXRot(), sp.getYRot(), 0, 1.8f, 0.0f);
             sp.level().addFreshEntity(projectile);
@@ -479,7 +534,7 @@ public class ModPayloads {
             if (sp.hasEffect(ModEffects.EARTH_ESCAPE)) {
                 return;
             }
-            if (data.qi() < 5) {
+            if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, 5)) {
                 sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
                 return;
             }
@@ -491,11 +546,11 @@ public class ModPayloads {
         }
 
         private static void castLingbeng(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
-            if (data.qi() < spell.qiCost()) {
+            if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, spell.qiCost())) {
                 sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
                 return;
             }
-            ModAttachments.setData(sp, data.withQi(data.qi() - spell.qiCost()));
+            data = ModAttachments.getData(sp);
             var current = sp.getEffect(ModEffects.LINGBENG);
             int amplifier = current == null ? 0 : Math.min(9, current.getAmplifier() + 1);
             int duration = SpiritRoots.effectDuration(data, spell, 20 * (45 + data.mentalAttack()));
@@ -508,11 +563,11 @@ public class ModPayloads {
         }
 
         private static void castBeam(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
-            if (data.qi() < spell.qiCost()) {
+            if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, spell.qiCost())) {
                 sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
                 return;
             }
-            ModAttachments.setData(sp, data.withQi(data.qi() - spell.qiCost()));
+            data = ModAttachments.getData(sp);
             if (sp.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
                 PhotonEffects.beamSpell(serverLevel, sp, SpiritRoots.effectDuration(data, spell, 20 * 10));
             }
@@ -520,21 +575,19 @@ public class ModPayloads {
         }
 
         private static void castRegeneration(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
-            if (data.qi() < spell.qiCost()) {
+            if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, spell.qiCost())) {
                 sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
                 return;
             }
-            ModAttachments.setData(sp, data.withQi(data.qi() - spell.qiCost()));
             sp.addEffect(new MobEffectInstance(MobEffects.HEAL, 20 * 1, 0));
             com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
         }
 
         private static void castFireball(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
-            if (data.qi() < spell.qiCost()) {
+            if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, spell.qiCost())) {
                 sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
                 return;
             }
-            ModAttachments.setData(sp, data.withQi(data.qi() - spell.qiCost()));
             var projectile = new com.example.immortal_cultivation_mod.entity.FireballProjectileEntity(sp.level(), sp);
             projectile.shootFromRotation(sp, sp.getXRot(), sp.getYRot(), 0, 1.5f, 1.0f);
             sp.level().addFreshEntity(projectile);

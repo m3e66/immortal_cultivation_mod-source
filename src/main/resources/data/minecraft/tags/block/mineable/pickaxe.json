@@ -1,0 +1,14 @@
+{
+    "replace":  false,
+    "values":  [
+                   "immortal_cultivation_mod:jingtie_motherstone",
+                   "immortal_cultivation_mod:yunwen_silver_crystal",
+                   "immortal_cultivation_mod:chitong_sui",
+                   "immortal_cultivation_mod:hanpo_jade",
+                   "immortal_cultivation_mod:moxuan_iron",
+                   "immortal_cultivation_mod:liujin_sand",
+                   "immortal_cultivation_mod:bisui_stone",
+                   "immortal_cultivation_mod:lingjiao_scale",
+                   "immortal_cultivation_mod:star_dust_stone"
+               ]
+}

@@ -30,5 +30,23 @@ public class ModEntities {
                             .updateInterval(1)
                             .build("ignite_flare_projectile"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<LightBeamProjectileEntity>> LIGHT_BEAM_PROJECTILE =
+            ENTITY_TYPES.register("light_beam_projectile",
+                    () -> EntityType.Builder.<LightBeamProjectileEntity>of(
+                            LightBeamProjectileEntity::new, MobCategory.MISC)
+                            .sized(0.3f, 0.3f)
+                            .clientTrackingRange(10)
+                            .updateInterval(1)
+                            .build("light_beam_projectile"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ZhenshanPalmEntity>> ZHENSHAN_PALM =
+            ENTITY_TYPES.register("zhenshan_palm",
+                    () -> EntityType.Builder.<ZhenshanPalmEntity>of(
+                            ZhenshanPalmEntity::new, MobCategory.MISC)
+                            .sized(2.5f, 2.5f)
+                            .clientTrackingRange(10)
+                            .updateInterval(1)
+                            .build("zhenshan_palm"));
+
     public static void register(IEventBus bus) { ENTITY_TYPES.register(bus); }
 }

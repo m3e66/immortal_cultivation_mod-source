@@ -2,6 +2,7 @@ package com.example.immortal_cultivation_mod.screen;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
+import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import com.example.immortal_cultivation_mod.client.ClientData;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
@@ -96,9 +97,12 @@ public class StatMenuScreen extends Screen {
         g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".soul").append(": " + data.soul()), x + 115, y + 202, 0xDDAAFF, true);
         g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".thoughts").append(": " + data.thoughts()), x + 220, y + 202, 0xAAFFFF, true);
         g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".spirit_roots").append(": ").append(SpiritRoots.format(data.spiritRoots(), data.spiritRootGrade())), x + 12, y + 218, 0x88FFCC, true);
-        g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".max_age").append(": " + maxAge), x + 12, y + 234, 0xAAAAAA, true);
-        int progressNeeded = CultivationLevels.getTotalQiNeeded(level);
-        g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".cultivation_progress").append(": " + data.cultivationProgress() + "/" + progressNeeded), x + 145, y + 234, 0xFFAA55, true);
+        var method = CultivationMethods.get(data.activeCultivationMethod());
+        Component methodName = method == null ? Component.translatable("screen." + ImmortalCultivationMod.MODID + ".none") : Component.translatable(method.nameKey());
+        g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".cultivation_method").append(": ").append(methodName), x + 12, y + 234, 0xFFDD88, true);
+        g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".max_age").append(": " + maxAge), x + 12, y + 250, 0xAAAAAA, true);
+        long progressNeeded = CultivationLevels.getTotalQiNeeded(level);
+        g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".cultivation_progress").append(": " + data.cultivationProgress() + "/" + progressNeeded), x + 145, y + 250, 0xFFAA55, true);
 
         String nextStage = CultivationLevels.getNextStage(level);
         boolean fullProgress = data.cultivationProgress() >= progressNeeded;

@@ -6,11 +6,11 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Qi Pouch: a storage bag with four times the space of a chest. Opening it costs 10 qi.$(br2)Mystic Bronze Mirror: right-click to spend 50 qi and reveal nearby Magic Ritual fog escape blocks for 3 seconds."
+      "text": "Qi Pouch: a storage bag with four times the space of a chest. Opening it costs 10 qi.$(br2)Mystic Bronze Mirror: right-click to spend 50 qi and scan nearby hidden formations, ambient qi, and spirit vein centers for 3 seconds."
     },
     {
       "type": "patchouli:text",
-      "text": "Small Level Up and Big Level Up items add cultivation progress when right-clicked.$(br2)The Debug Stat Editor opens a test GUI for changing player stats during development."
+      "text": "$(br)Small Level Up and Big Level Up items add cultivation progress when right-clicked.$(br2)The Debug Stat Editor opens a test GUI for changing player stats during development."
     }
   ]
 }

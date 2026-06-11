@@ -10,7 +10,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "Luck controls breakthrough chance directly. For example, 50 luck means a 50% chance to succeed.$(br2)Leveling up grants 10 skill points."
+      "text": "$(br)Luck controls breakthrough chance directly. For example, 50 luck means a 50% chance to succeed.$(br2)Leveling up grants 10 skill points."
     }
   ]
 }

@@ -2,12 +2,14 @@ package com.example.immortal_cultivation_mod.event;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
+import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import com.example.immortal_cultivation_mod.effect.ModEffects;
 import com.example.immortal_cultivation_mod.effect.PhotonEffects;
 import com.example.immortal_cultivation_mod.item.ModItems;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
+import com.example.immortal_cultivation_mod.spell.LightBeamAttack;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,11 +47,15 @@ import net.neoforged.neoforge.network.PacketDistributor;
 public class ServerEvents {
     private static final ResourceLocation MAGIC_RITUAL_SPIRIT_STONE =
             ResourceLocation.fromNamespaceAndPath("magic_ritual_mod", "spirit_stone");
+    private static final int AMBIENT_QI_SCAN_RADIUS = 48;
+    private static final int AMBIENT_QI_PER_SPIRIT_VEIN_CENTER = 25;
+    private static final int AMBIENT_QI_CACHE_TICKS = 100;
     private static final Map<UUID, Vec3> MEDITATION_ANCHORS = new ConcurrentHashMap<>();
     private static final Map<UUID, Integer> EARTH_ESCAPE_GRACE_TICKS = new ConcurrentHashMap<>();
     private static final Map<UUID, Vec3> QI_GATHERING_ANCHORS = new ConcurrentHashMap<>();
     private static final Map<UUID, Boolean> SPIRIT_SIGHT_ACTIVE = new ConcurrentHashMap<>();
     private static final Map<UUID, FogReveal> FOG_REVEALS = new ConcurrentHashMap<>();
+    private static final Map<UUID, AmbientQi> AMBIENT_QI_CACHE = new ConcurrentHashMap<>();
 
     @SubscribeEvent
     public static void onPlayerTickPre(PlayerTickEvent.Pre event) {
@@ -129,7 +135,9 @@ public class ServerEvents {
         }
 
         if (!CultivationLevels.isMortal(data.cultivationLevel()) && maxQi > 0 && data.qi() < maxQi && player.tickCount % 20 == 0) {
+            AmbientQi ambientQi = getAmbientQi(player);
             int regen = Math.max(1, player.hasEffect(ModEffects.QI_GATHERING) ? maxQi * 5 / 100 : maxQi / 100);
+            regen += ambientQi.value() / AMBIENT_QI_PER_SPIRIT_VEIN_CENTER;
             ModAttachments.setData(player, data.withQi(Math.min(maxQi, data.qi() + regen)));
             data = ModAttachments.getData(player);
         }
@@ -140,12 +148,15 @@ public class ServerEvents {
         }
 
         if (data.isMeditating() && maxQi > 0 && player.tickCount % 20 == 0) {
-            int need = CultivationLevels.getTotalQiNeeded(data.cultivationLevel());
-            if (data.qi() >= 10 && data.cultivationProgress() < need) {
-                int progressGain = SpiritRoots.cultivationProgressGain(data, 10);
+            long need = CultivationLevels.getTotalQiNeeded(data.cultivationLevel());
+            if (data.cultivationProgress() < need
+                    && CultivationMethods.canGainProgress(data.activeCultivationMethod(), data.cultivationLevel())
+                    && spendQiOrBlood(player, data, 10)) {
+                data = ModAttachments.getData(player);
+                int baseGain = SpiritRoots.cultivationProgressGain(data, 10);
+                int progressGain = Math.max(1, baseGain * CultivationMethods.progressMultiplierPercent(data) / 100);
                 ModAttachments.setData(player,
-                        data.withQi(data.qi() - 10)
-                                .withCultivationProgress(Math.min(need, data.cultivationProgress() + progressGain)));
+                        data.withCultivationProgress(Math.min(need, data.cultivationProgress() + progressGain)));
             }
         }
 
@@ -177,12 +188,21 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onPlayerDeath(LivingDeathEvent event) {
+        if (!event.getEntity().level().isClientSide && !(event.getEntity() instanceof Player)) {
+            int amount = Math.max(1, (int) (event.getEntity().getMaxHealth() / 10.0F));
+            while (amount > 0) {
+                int count = Math.min(64, amount);
+                event.getEntity().spawnAtLocation(new net.minecraft.world.item.ItemStack(ModItems.BLOOD.get(), count));
+                amount -= count;
+            }
+        }
         if (event.getEntity() instanceof ServerPlayer player) {
             MEDITATION_ANCHORS.remove(player.getUUID());
             QI_GATHERING_ANCHORS.remove(player.getUUID());
             EARTH_ESCAPE_GRACE_TICKS.remove(player.getUUID());
             SPIRIT_SIGHT_ACTIVE.remove(player.getUUID());
             FOG_REVEALS.remove(player.getUUID());
+            AMBIENT_QI_CACHE.remove(player.getUUID());
             var data = ModAttachments.getData(player);
             int maxQi = getEffectiveMaxQi(data, CultivationLevels.getLevelDef(data.cultivationLevel()));
             ModAttachments.setData(player, data.withAgePenalty(data.agePenalty() + 10).withQi(maxQi));
@@ -207,6 +227,7 @@ public class ServerEvents {
             EARTH_ESCAPE_GRACE_TICKS.remove(sp.getUUID());
             SPIRIT_SIGHT_ACTIVE.remove(sp.getUUID());
             FOG_REVEALS.remove(sp.getUUID());
+            AMBIENT_QI_CACHE.remove(sp.getUUID());
             syncPlayerData(sp);
         }
     }
@@ -245,6 +266,11 @@ public class ServerEvents {
                 event.setCanceled(true);
                 return;
             }
+            Vec3 target = event.getTarget().position().add(0.0D, event.getTarget().getBbHeight() * 0.5D, 0.0D);
+            if (LightBeamAttack.shoot(player, target, player.isShiftKeyDown())) {
+                event.setCanceled(true);
+                return;
+            }
             triggerLingbeng(player, event.getTarget().getX(), event.getTarget().getY(), event.getTarget().getZ());
             var data = ModAttachments.getData(player);
             if (data.physicalAttack() > 0) {
@@ -255,7 +281,19 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
-        if (event.getLevel().isClientSide || !(event.getEntity() instanceof ServerPlayer player)) {
+        if (!(event.getEntity() instanceof Player clicker)) {
+            return;
+        }
+
+        boolean releasingLightBeam = LightBeamAttack.hasWaiting(clicker);
+        if (event.getLevel().isClientSide) {
+            if (releasingLightBeam) {
+                event.setCanceled(true);
+            }
+            return;
+        }
+
+        if (!(clicker instanceof ServerPlayer player)) {
             return;
         }
 
@@ -270,6 +308,12 @@ public class ServerEvents {
         }
 
         var pos = event.getPos();
+        Vec3 target = Vec3.atCenterOf(pos);
+        if (releasingLightBeam) {
+            LightBeamAttack.shoot(player, target, player.isShiftKeyDown());
+            event.setCanceled(true);
+            return;
+        }
         triggerLingbeng(player, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D);
     }
 
@@ -296,13 +340,12 @@ public class ServerEvents {
 
         var data = ModAttachments.getData(player);
         int cost = 50;
-        if (data.qi() < cost) {
+        if (!spendQiOrBlood(player, data, cost)) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return;
         }
 
         var lingbeng = player.getEffect(ModEffects.LINGBENG);
-        ModAttachments.setData(player, data.withQi(data.qi() - cost));
         float radius = 2.0F + Math.min(9, lingbeng == null ? 0 : lingbeng.getAmplifier());
         player.removeEffect(ModEffects.LINGBENG);
         if (player.level() instanceof ServerLevel serverLevel) {
@@ -333,6 +376,8 @@ public class ServerEvents {
                         data.spiritRootGrade(),
                         data.agePenalty(),
                         data.cultivationProgress(),
+                        data.activeCultivationMethod(),
+                        data.blood(),
                         data.knownSpells(),
                         data.isMeditating(),
                         data.skillPoints(),
@@ -357,7 +402,21 @@ public class ServerEvents {
 
         var levelDef = CultivationLevels.getLevelDef(data.cultivationLevel());
         int maxQi = getEffectiveMaxQi(data, levelDef);
-        int need = CultivationLevels.getTotalQiNeeded(data.cultivationLevel());
+        long need = CultivationLevels.getTotalQiNeeded(data.cultivationLevel());
+
+        if (CultivationMethods.isAtOrPastLimit(data.activeCultivationMethod(), data.cultivationLevel())) {
+            player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".method_limit_reached"));
+            return;
+        }
+
+        if (data.cultivationProgress() < need && CultivationMethods.isBloodDemon(data.activeCultivationMethod()) && data.blood() >= 10) {
+            long missing = need - data.cultivationProgress();
+            long progressFromBlood = Math.min(missing, data.blood() / 10L);
+            int bloodToUse = (int) (progressFromBlood * 10L);
+            data = data.withBlood(data.blood() - bloodToUse)
+                    .withCultivationProgress(Math.min(need, data.cultivationProgress() + progressFromBlood));
+            ModAttachments.setData(player, data);
+        }
 
         if (data.qi() < maxQi || data.cultivationProgress() < need) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".breakthrough_requirements_missing"));
@@ -453,7 +512,7 @@ public class ServerEvents {
             return;
         }
 
-        if (data.qi() < 5) {
+        if (!spendQiOrBlood(sp, data, 5)) {
             sp.removeEffect(ModEffects.EARTH_ESCAPE);
             sp.noPhysics = false;
             sp.setNoGravity(false);
@@ -462,7 +521,6 @@ public class ServerEvents {
             return;
         }
 
-        ModAttachments.setData(sp, data.withQi(data.qi() - 5));
         syncPlayerData(sp);
     }
 
@@ -483,6 +541,24 @@ public class ServerEvents {
 
     private static int getEffectiveMaxQi(ModAttachments.CultivationData data, CultivationLevels.LevelDef levelDef) {
         return Math.max(1, levelDef.maxQi() + data.maxQiBonus());
+    }
+
+    public static int getMaxBlood(Player player) {
+        var data = ModAttachments.getData(player);
+        return getEffectiveMaxQi(data, CultivationLevels.getLevelDef(data.cultivationLevel())) * 10;
+    }
+
+    public static boolean spendQiOrBlood(Player player, ModAttachments.CultivationData data, int cost) {
+        if (data.qi() >= cost) {
+            ModAttachments.setData(player, data.withQi(data.qi() - cost));
+            return true;
+        }
+        int missing = cost - data.qi();
+        if (CultivationMethods.isBloodDemon(data.activeCultivationMethod()) && data.blood() >= missing) {
+            ModAttachments.setData(player, data.withQi(0).withBlood(data.blood() - missing));
+            return true;
+        }
+        return false;
     }
 
     public static void handleToggleMeditate(ServerPlayer player) {
@@ -523,7 +599,7 @@ public class ServerEvents {
         }
 
         var data = ModAttachments.getData(player);
-        if (data.qi() < 5) {
+        if (!spendQiOrBlood(player, data, 5)) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return;
         }
@@ -539,7 +615,7 @@ public class ServerEvents {
             return;
         }
 
-        if (data.qi() < 5) {
+        if (!spendQiOrBlood(player, data, 5)) {
             SPIRIT_SIGHT_ACTIVE.remove(player.getUUID());
             player.removeEffect(MobEffects.NIGHT_VISION);
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
@@ -547,7 +623,6 @@ public class ServerEvents {
             return;
         }
 
-        ModAttachments.setData(player, data.withQi(data.qi() - 5));
         syncPlayerData(player);
     }
 
@@ -557,6 +632,40 @@ public class ServerEvents {
             FOG_REVEALS.put(player.getUUID(), new FogReveal(positions, 60));
         }
         return positions.size();
+    }
+
+    public static AmbientQi refreshAmbientQi(ServerPlayer player) {
+        AmbientQi ambientQi = scanAmbientQi(player, AMBIENT_QI_SCAN_RADIUS, player.tickCount);
+        AMBIENT_QI_CACHE.put(player.getUUID(), ambientQi);
+        return ambientQi;
+    }
+
+    private static AmbientQi getAmbientQi(Player player) {
+        AmbientQi cached = AMBIENT_QI_CACHE.get(player.getUUID());
+        if (cached != null && player.tickCount - cached.lastScanTick() < AMBIENT_QI_CACHE_TICKS) {
+            return cached;
+        }
+
+        AmbientQi ambientQi = scanAmbientQi(player, AMBIENT_QI_SCAN_RADIUS, player.tickCount);
+        AMBIENT_QI_CACHE.put(player.getUUID(), ambientQi);
+        return ambientQi;
+    }
+
+    private static AmbientQi scanAmbientQi(Player player, int radius, int tickCount) {
+        int centers = countSpiritVeinCenters(player.level(), player.blockPosition(), radius);
+        return new AmbientQi(centers * AMBIENT_QI_PER_SPIRIT_VEIN_CENTER, centers, tickCount);
+    }
+
+    private static int countSpiritVeinCenters(Level level, BlockPos center, int radius) {
+        int count = 0;
+        BlockPos min = center.offset(-radius, -radius, -radius);
+        BlockPos max = center.offset(radius, radius, radius);
+        for (BlockPos pos : BlockPos.betweenClosed(min, max)) {
+            if (level.isLoaded(pos) && isSpiritVeinCenter(level.getBlockState(pos))) {
+                count++;
+            }
+        }
+        return count;
     }
 
     private static List<BlockPos> findFogEscapeBlocks(ServerPlayer player, int radius) {
@@ -590,6 +699,11 @@ public class ServerEvents {
         return false;
     }
 
+    private static boolean isSpiritVeinCenter(net.minecraft.world.level.block.state.BlockState state) {
+        ResourceLocation key = BuiltInRegistries.BLOCK.getKey(state.getBlock());
+        return key != null && "magic_ritual_mod".equals(key.getNamespace()) && "spirit_vein_center".equals(key.getPath());
+    }
+
     private static void tickFogReveal(ServerPlayer player) {
         FogReveal reveal = FOG_REVEALS.get(player.getUUID());
         if (reveal == null) {
@@ -615,6 +729,8 @@ public class ServerEvents {
     }
 
     private record FogReveal(List<BlockPos> positions, int ticksLeft) {}
+
+    public record AmbientQi(int value, int spiritVeinCenters, int lastScanTick) {}
 
     private static void broadcastMeditationState(ServerPlayer player, boolean meditating) {
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(player,

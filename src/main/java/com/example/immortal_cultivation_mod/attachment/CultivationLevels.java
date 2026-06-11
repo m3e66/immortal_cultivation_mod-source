@@ -9,14 +9,19 @@ public class CultivationLevels {
     public static final String REALM_ZHUJI = "\u7b51\u57fa";
     public static final String REALM_JINDAN = "\u91d1\u4e39";
     public static final String REALM_YUANYING = "\u5143\u5a74";
+    public static final String REALM_HUASHEN = "\u5316\u795e";
+    public static final String REALM_LIANXU = "\u70bc\u865a";
+    public static final String REALM_HETI = "\u5408\u4f53";
+    public static final String REALM_DACHENG = "\u5927\u4e58";
+    public static final String REALM_DUJIE = "\u6e21\u52ab";
 
     public static final String STAGE_EARLY = "\u524d\u671f";
     public static final String STAGE_MID = "\u4e2d\u671f";
     public static final String STAGE_LATE = "\u540e\u671f";
 
-    public static final LevelDef LEVEL_MORTAL = new LevelDef(REALM_MORTAL, "", 20, 100, 20, 10);
+    public static final LevelDef LEVEL_MORTAL = new LevelDef(REALM_MORTAL, "", 20, 100, 20, 10L);
 
-    public record StageDef(String stage, int maxHp, int maxAge, int maxQi, int qiNeeded, float breakthroughFailMultiplier) {}
+    public record StageDef(String stage, int maxHp, int maxAge, int maxQi, long qiNeeded, float breakthroughFailMultiplier) {}
 
     public record RealmDef(String realm, List<StageDef> stages) {
         public StageDef getStage(String stage) {
@@ -24,7 +29,7 @@ public class CultivationLevels {
         }
     }
 
-    public record LevelDef(String realm, String stage, int maxHp, int maxAge, int maxQi, int qiNeeded) {}
+    public record LevelDef(String realm, String stage, int maxHp, int maxAge, int maxQi, long qiNeeded) {}
 
     private static final Map<String, RealmDef> REALMS = Map.of(
             REALM_LIANQI, new RealmDef(REALM_LIANQI, List.of(
@@ -46,6 +51,31 @@ public class CultivationLevels {
                     new StageDef(STAGE_EARLY, 1000, 400, 700, 100000, 0.01f),
                     new StageDef(STAGE_MID, 1200, 450, 800, 200000, 0.01f),
                     new StageDef(STAGE_LATE, 1500, 500, 900, 300000, 0.01f)
+            )),
+            REALM_HUASHEN, new RealmDef(REALM_HUASHEN, List.of(
+                    new StageDef(STAGE_EARLY, 5000, 1200, 5000, 1000000L, 0.01f),
+                    new StageDef(STAGE_MID, 7000, 1600, 7000, 2000000L, 0.01f),
+                    new StageDef(STAGE_LATE, 10000, 2200, 10000, 4000000L, 0.01f)
+            )),
+            REALM_LIANXU, new RealmDef(REALM_LIANXU, List.of(
+                    new StageDef(STAGE_EARLY, 15000, 3000, 20000, 8000000L, 0.01f),
+                    new StageDef(STAGE_MID, 22000, 4500, 30000, 16000000L, 0.01f),
+                    new StageDef(STAGE_LATE, 32000, 6000, 45000, 32000000L, 0.01f)
+            )),
+            REALM_HETI, new RealmDef(REALM_HETI, List.of(
+                    new StageDef(STAGE_EARLY, 50000, 8000, 80000, 60000000L, 0.01f),
+                    new StageDef(STAGE_MID, 70000, 12000, 120000, 120000000L, 0.01f),
+                    new StageDef(STAGE_LATE, 100000, 18000, 180000, 240000000L, 0.01f)
+            )),
+            REALM_DACHENG, new RealmDef(REALM_DACHENG, List.of(
+                    new StageDef(STAGE_EARLY, 150000, 30000, 300000, 500000000L, 0.01f),
+                    new StageDef(STAGE_MID, 220000, 50000, 500000, 1000000000L, 0.01f),
+                    new StageDef(STAGE_LATE, 320000, 80000, 800000, 2000000000L, 0.01f)
+            )),
+            REALM_DUJIE, new RealmDef(REALM_DUJIE, List.of(
+                    new StageDef(STAGE_EARLY, 500000, 100000, 1200000, 5000000000L, 0.01f),
+                    new StageDef(STAGE_MID, 800000, 200000, 2000000, 10000000000L, 0.01f),
+                    new StageDef(STAGE_LATE, 1200000, 500000, 3500000, 20000000000L, 0.01f)
             ))
     );
 
@@ -93,9 +123,9 @@ public class CultivationLevels {
         return idx < 0 ? 0 : idx + 1;
     }
 
-    public static int getTotalQiNeeded(String currentLevel) {
+    public static long getTotalQiNeeded(String currentLevel) {
         if (isMortal(currentLevel)) {
-            return 10;
+            return 10L;
         }
         return getLevelDef(currentLevel).qiNeeded();
     }
@@ -126,7 +156,29 @@ public class CultivationLevels {
                 REALM_JINDAN + STAGE_LATE,
                 REALM_YUANYING + STAGE_EARLY,
                 REALM_YUANYING + STAGE_MID,
-                REALM_YUANYING + STAGE_LATE
+                REALM_YUANYING + STAGE_LATE,
+                REALM_HUASHEN + STAGE_EARLY,
+                REALM_HUASHEN + STAGE_MID,
+                REALM_HUASHEN + STAGE_LATE,
+                REALM_LIANXU + STAGE_EARLY,
+                REALM_LIANXU + STAGE_MID,
+                REALM_LIANXU + STAGE_LATE,
+                REALM_HETI + STAGE_EARLY,
+                REALM_HETI + STAGE_MID,
+                REALM_HETI + STAGE_LATE,
+                REALM_DACHENG + STAGE_EARLY,
+                REALM_DACHENG + STAGE_MID,
+                REALM_DACHENG + STAGE_LATE,
+                REALM_DUJIE + STAGE_EARLY,
+                REALM_DUJIE + STAGE_MID,
+                REALM_DUJIE + STAGE_LATE
         );
+    }
+
+    public static List<String> allLevels() {
+        java.util.ArrayList<String> levels = new java.util.ArrayList<>();
+        levels.add(REALM_MORTAL);
+        levels.addAll(allStages());
+        return levels;
     }
 }

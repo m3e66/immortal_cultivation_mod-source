@@ -1,6 +1,8 @@
 package com.example.immortal_cultivation_mod;
 
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
+import com.example.immortal_cultivation_mod.block.ModBlockEntities;
+import com.example.immortal_cultivation_mod.block.ModBlocks;
 import com.example.immortal_cultivation_mod.effect.ModEffects;
 import com.example.immortal_cultivation_mod.item.ModItems;
 import com.example.immortal_cultivation_mod.entity.ModEntities;
@@ -18,6 +20,8 @@ public class ImmortalCultivationMod {
     public ImmortalCultivationMod(IEventBus modEventBus) {
         ModAttachments.register(modEventBus);
         ModEffects.register(modEventBus);
+        ModBlocks.BLOCKS.register(modEventBus);
+        ModBlockEntities.BLOCK_ENTITIES.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
         ModEntities.ENTITY_TYPES.register(modEventBus);
         ModParticles.PARTICLE_TYPES.register(modEventBus);

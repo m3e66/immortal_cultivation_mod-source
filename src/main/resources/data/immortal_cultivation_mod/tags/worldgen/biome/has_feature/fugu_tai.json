@@ -1,0 +1,9 @@
+{
+        "replace":    false,
+        "values":    [
+                                     "minecraft:dripstone_caves",
+                                     "minecraft:deep_dark",
+                                     "minecraft:swamp",
+                                     "minecraft:mangrove_swamp"
+                             ]
+}

@@ -1,7 +1,10 @@
 package com.example.immortal_cultivation_mod.client;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
+import com.example.immortal_cultivation_mod.block.ModBlockEntities;
 import com.example.immortal_cultivation_mod.client.hud.QiBarOverlay;
+import com.example.immortal_cultivation_mod.client.renderer.EmptyEntityRenderer;
+import com.example.immortal_cultivation_mod.client.renderer.GeoRockBlockRenderer;
 import com.example.immortal_cultivation_mod.effect.ModEffects;
 import com.example.immortal_cultivation_mod.client.particle.FireballTrailParticle;
 import com.example.immortal_cultivation_mod.entity.ModEntities;
@@ -18,6 +21,7 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 import net.neoforged.api.distmarker.Dist;
@@ -32,6 +36,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 public class ModClientEvents {
 
     private static boolean wasSpellKeyDown = false;
+    private static boolean wasAttackKeyDown = false;
 
     @SubscribeEvent
     public static void registerGuiLayers(RegisterGuiLayersEvent event) {
@@ -42,6 +47,9 @@ public class ModClientEvents {
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.FIREBALL_PROJECTILE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(ModEntities.IGNITE_FLARE_PROJECTILE.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.LIGHT_BEAM_PROJECTILE.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.ZHENSHAN_PALM.get(), EmptyEntityRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.GEO_ROCK.get(), GeoRockBlockRenderer::new);
     }
 
     @SubscribeEvent
@@ -79,6 +87,7 @@ public class ModClientEvents {
 
         if (typing) {
             wasSpellKeyDown = false;
+            wasAttackKeyDown = false;
             return;
         }
 
@@ -142,6 +151,13 @@ public class ModClientEvents {
         while (ModKeyMappings.MEDITATE.get().consumeClick()) {
             PacketDistributor.sendToServer(new ModPayloads.ServerboundMeditatePayload());
         }
+
+        boolean attackDown = mc.options.keyAttack.isDown();
+        if (attackDown && !wasAttackKeyDown && mc.screen == null
+                && (mc.hitResult == null || mc.hitResult.getType() == HitResult.Type.MISS)) {
+            PacketDistributor.sendToServer(new ModPayloads.ServerboundLightBeamAirPunchPayload(mc.player.isShiftKeyDown()));
+        }
+        wasAttackKeyDown = attackDown;
     }
 
     private static void applyEarthEscapeMovement(Minecraft mc) {

@@ -91,6 +91,10 @@ public class ScrollLearningScreen extends Screen {
         g.drawString(mc.font, Component.literal(spell.element()), lx + 100, ly, 0x88FFCC, true);
         ly += 16;
 
+        g.drawString(mc.font, Component.literal("* ").append(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".method_tier_label")), lx, ly, labelColor, true);
+        g.drawString(mc.font, Component.translatable("method_tier." + ImmortalCultivationMod.MODID + "." + spell.tier()), lx + 100, ly, 0xFFDD88, true);
+        ly += 16;
+
         g.drawString(mc.font, Component.literal("* ").append(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".qi_cost_label")), lx, ly, labelColor, true);
         g.drawString(mc.font, Component.literal(String.valueOf(spell.qiCost())), lx + 100, ly, ChatFormatting.AQUA.getColor(), true);
         ly += 22;

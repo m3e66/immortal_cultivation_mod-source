@@ -1,1 +1,6 @@
-{"parent":"minecraft:item/generated","textures":{"layer0":"immortal_cultivation_mod:item/cleanse_scroll"}}
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "immortal_cultivation_mod:item/scroll_water"
+  }
+}
