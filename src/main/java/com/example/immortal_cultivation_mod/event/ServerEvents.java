@@ -9,7 +9,9 @@ import com.example.immortal_cultivation_mod.effect.ModEffects;
 import com.example.immortal_cultivation_mod.effect.PhotonEffects;
 import com.example.immortal_cultivation_mod.item.ModItems;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
+import com.example.immortal_cultivation_mod.spell.DielangShield;
 import com.example.immortal_cultivation_mod.spell.LightBeamAttack;
+import com.example.immortal_cultivation_mod.spell.WindStep;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -165,6 +167,8 @@ public class ServerEvents {
         }
 
         if (player instanceof ServerPlayer sp) {
+            WindStep.tick(sp);
+            DielangShield.tick(sp);
             PhotonEffects.tick(sp);
             tickFogReveal(sp);
             if (data.isMeditating() && player.tickCount % 40 == 0) {
@@ -203,6 +207,7 @@ public class ServerEvents {
             SPIRIT_SIGHT_ACTIVE.remove(player.getUUID());
             FOG_REVEALS.remove(player.getUUID());
             AMBIENT_QI_CACHE.remove(player.getUUID());
+            WindStep.clear(player);
             var data = ModAttachments.getData(player);
             int maxQi = getEffectiveMaxQi(data, CultivationLevels.getLevelDef(data.cultivationLevel()));
             ModAttachments.setData(player, data.withAgePenalty(data.agePenalty() + 10).withQi(maxQi));
@@ -228,6 +233,7 @@ public class ServerEvents {
             SPIRIT_SIGHT_ACTIVE.remove(sp.getUUID());
             FOG_REVEALS.remove(sp.getUUID());
             AMBIENT_QI_CACHE.remove(sp.getUUID());
+            WindStep.clear(sp);
             syncPlayerData(sp);
         }
     }
@@ -321,6 +327,9 @@ public class ServerEvents {
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && player.hasEffect(ModEffects.QI_GATHERING)) {
             event.setAmount(event.getAmount() * 3.0F);
+        }
+        if (event.getEntity() instanceof ServerPlayer player) {
+            event.setAmount(DielangShield.absorb(player, event.getAmount()));
         }
     }
 

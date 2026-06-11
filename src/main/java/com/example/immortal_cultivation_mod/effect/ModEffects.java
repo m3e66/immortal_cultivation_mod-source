@@ -20,6 +20,9 @@ public class ModEffects {
     public static final DeferredHolder<MobEffect, MobEffect> QI_GATHERING =
             MOB_EFFECTS.register("qi_gathering", QiGatheringEffect::new);
 
+    public static final DeferredHolder<MobEffect, MobEffect> WIND_STEP =
+            MOB_EFFECTS.register("wind_step", WindStepEffect::new);
+
     public static void register(IEventBus bus) {
         MOB_EFFECTS.register(bus);
     }

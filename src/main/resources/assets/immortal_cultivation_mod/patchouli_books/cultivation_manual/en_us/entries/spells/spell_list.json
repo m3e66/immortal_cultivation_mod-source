@@ -34,6 +34,22 @@
     },
     {
       "type": "patchouli:text",
+      "text": "$(br)Lingzhi Bullet: Lianqi Early, wind, costs 5 qi.$(br)Condenses a small amount of qi at the fingertip and fires it forward. Deals 5 damage and breaks up to 3 blocks."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Wind Blade: Lianqi Early, wind, costs 5 qi.$(br)Condenses a small wind blade that cuts and strikes a target for 8 damage."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Wind Step: Lianqi Early, wind, costs 5 qi per second.$(br)Toggle spell. Wraps wind around your feet, gives Speed II, and allows one double jump before landing."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Smoke Art: Lianqi Early, wind, costs 15 qi.$(br)Shoots a smoke projectile that blocks sight by giving the target Blindness for 10 seconds."
+    },
+    {
+      "type": "patchouli:text",
       "text": "$(br)Ignite Flare: Lianqi Early, fire, costs 10 qi.$(br)Shoots a straight flare that ignites the block it hits."
     },
     {
@@ -47,6 +63,10 @@
     {
       "type": "patchouli:text",
       "text": "$(br)Light Ball: Foundation Establishment Late, light, costs 30 qi to summon and 10 qi per shot.$(br)Summons 6 light balls in a hexagon behind you, stacking up to 3 rings. Punch to release one, or shift-punch to release all. Each shot deals 50 damage and tears through up to 24 blocks."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Dielang Shield: Lianqi Late, water, tier Earth.$(br)Stacks up to 3 times. Stack 1 costs 30 qi, uses water1.fx, and blocks 10 damage. Stack 2 costs 60 qi, uses water2.fx, and blocks 30 damage. Stack 3 costs 90 qi, uses water3.fx, and blocks 90 damage. Leftover shield strength remains after partial hits."
     }
   ]
 }

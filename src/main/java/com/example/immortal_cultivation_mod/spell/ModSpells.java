@@ -22,6 +22,11 @@ public class ModSpells {
     public static final String SPIRIT_SIGHT = "spirit_sight";
     public static final String ZHENSHAN_PALM = "zhenshan_palm";
     public static final String LIGHT_BEAM_ATTACK = "light_beam_attack";
+    public static final String DIELANG_SHIELD = "dielang_shield";
+    public static final String LINGZHI_BULLET = "lingzhi_bullet";
+    public static final String WIND_BLADE = "wind_blade";
+    public static final String WIND_STEP = "wind_step";
+    public static final String SMOKE_ART = "smoke_art";
 
     private static final Map<String, SpellDef> SPELLS = createSpells();
 
@@ -90,6 +95,42 @@ public class ModSpells {
                 "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_qi_gathering.png")
         ));
+        spells.put(LINGZHI_BULLET, new SpellDef(
+                LINGZHI_BULLET,
+                "lingzhi_bullet",
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
+                5,
+                SpiritRoots.WIND,
+                "human",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_qi_gathering.png")
+        ));
+        spells.put(WIND_BLADE, new SpellDef(
+                WIND_BLADE,
+                "wind_blade",
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
+                5,
+                SpiritRoots.WIND,
+                "human",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_qi_gathering.png")
+        ));
+        spells.put(WIND_STEP, new SpellDef(
+                WIND_STEP,
+                "wind_step",
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
+                5,
+                SpiritRoots.WIND,
+                "human",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_qi_gathering.png")
+        ));
+        spells.put(SMOKE_ART, new SpellDef(
+                SMOKE_ART,
+                "smoke_art",
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
+                15,
+                SpiritRoots.WIND,
+                "human",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_qi_gathering.png")
+        ));
         spells.put(IGNITE_FLARE, new SpellDef(
                 IGNITE_FLARE,
                 "ignite_flare",
@@ -125,6 +166,15 @@ public class ModSpells {
                 SpiritRoots.LIGHT,
                 "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_beam.png")
+        ));
+        spells.put(DIELANG_SHIELD, new SpellDef(
+                DIELANG_SHIELD,
+                "dielang_shield",
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_LATE,
+                30,
+                SpiritRoots.WATER,
+                "earth",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_cleanse.png")
         ));
         return Map.copyOf(spells);
     }
@@ -162,6 +212,18 @@ public class ModSpells {
         if ("QiGathering".equalsIgnoreCase(id) || "qi_gathering".equalsIgnoreCase(id) || "qi gathering".equalsIgnoreCase(id) || "\u5f15\u7075\u8bc0".equals(id)) {
             return QI_GATHERING;
         }
+        if ("LingzhiBullet".equalsIgnoreCase(id) || "lingzhi_bullet".equalsIgnoreCase(id) || "lingzhi bullet".equalsIgnoreCase(id) || "\u7075\u6307\u5f39".equals(id)) {
+            return LINGZHI_BULLET;
+        }
+        if ("WindBlade".equalsIgnoreCase(id) || "wind_blade".equalsIgnoreCase(id) || "wind blade".equalsIgnoreCase(id) || "\u98ce\u5203".equals(id)) {
+            return WIND_BLADE;
+        }
+        if ("WindStep".equalsIgnoreCase(id) || "wind_step".equalsIgnoreCase(id) || "wind step".equalsIgnoreCase(id) || "\u8e0f\u98ce\u6b65".equals(id)) {
+            return WIND_STEP;
+        }
+        if ("SmokeArt".equalsIgnoreCase(id) || "smoke_art".equalsIgnoreCase(id) || "smoke art".equalsIgnoreCase(id) || "\u8ff7\u70df\u672f".equals(id)) {
+            return SMOKE_ART;
+        }
         if ("IgniteFlare".equalsIgnoreCase(id) || "ignite_flare".equalsIgnoreCase(id) || "ignite flare".equalsIgnoreCase(id) || "\u71c3\u706b\u8bc0".equals(id)) {
             return IGNITE_FLARE;
         }
@@ -173,6 +235,9 @@ public class ModSpells {
         }
         if ("LightBeamAttack".equalsIgnoreCase(id) || "light_beam_attack".equalsIgnoreCase(id) || "light beam attack".equalsIgnoreCase(id)) {
             return LIGHT_BEAM_ATTACK;
+        }
+        if ("DielangShield".equalsIgnoreCase(id) || "dielang_shield".equalsIgnoreCase(id) || "dielang shield".equalsIgnoreCase(id) || "\u53e0\u6d6a\u76fe".equals(id)) {
+            return DIELANG_SHIELD;
         }
         return id;
     }

@@ -56,6 +56,21 @@ public class ModItems {
     public static final DeferredItem<Item> LIGHT_BEAM_ATTACK_SCROLL = registerItem("light_beam_attack_scroll",
             () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.LIGHT_BEAM_ATTACK));
 
+    public static final DeferredItem<Item> DIELANG_SHIELD_SCROLL = registerItem("dielang_shield_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.DIELANG_SHIELD));
+
+    public static final DeferredItem<Item> LINGZHI_BULLET_SCROLL = registerItem("lingzhi_bullet_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.LINGZHI_BULLET));
+
+    public static final DeferredItem<Item> WIND_BLADE_SCROLL = registerItem("wind_blade_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.WIND_BLADE));
+
+    public static final DeferredItem<Item> WIND_STEP_SCROLL = registerItem("wind_step_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.WIND_STEP));
+
+    public static final DeferredItem<Item> SMOKE_ART_SCROLL = registerItem("smoke_art_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.SMOKE_ART));
+
     public static final DeferredItem<Item> ENLIGHTENMENT_PILL = registerItem("enlightenment_pill",
             () -> new EnlightenmentPillItem(new Item.Properties().stacksTo(16)));
 
@@ -125,11 +140,12 @@ public class ModItems {
             return switch (spellId) {
                 case ModSpells.FIREBALL, ModSpells.IGNITE_FLARE -> ChatFormatting.RED;
                 case ModSpells.REGENERATION -> ChatFormatting.GREEN;
-                case ModSpells.CLEANSE -> ChatFormatting.AQUA;
+                case ModSpells.CLEANSE, ModSpells.DIELANG_SHIELD -> ChatFormatting.AQUA;
                 case ModSpells.EARTH_ESCAPE, ModSpells.ZHENSHAN_PALM -> ChatFormatting.YELLOW;
                 case ModSpells.LINGBENG -> ChatFormatting.LIGHT_PURPLE;
                 case ModSpells.BEAM, ModSpells.SPIRIT_SIGHT, ModSpells.LIGHT_BEAM_ATTACK -> ChatFormatting.WHITE;
-                case ModSpells.QI_GATHERING -> ChatFormatting.DARK_AQUA;
+                case ModSpells.QI_GATHERING, ModSpells.LINGZHI_BULLET, ModSpells.WIND_BLADE,
+                     ModSpells.WIND_STEP, ModSpells.SMOKE_ART -> ChatFormatting.DARK_AQUA;
                 default -> ChatFormatting.GRAY;
             };
         }

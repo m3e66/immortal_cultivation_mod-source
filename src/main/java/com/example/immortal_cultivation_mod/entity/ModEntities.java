@@ -39,6 +39,33 @@ public class ModEntities {
                             .updateInterval(1)
                             .build("light_beam_projectile"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<LingzhiBulletProjectileEntity>> LINGZHI_BULLET_PROJECTILE =
+            ENTITY_TYPES.register("lingzhi_bullet_projectile",
+                    () -> EntityType.Builder.<LingzhiBulletProjectileEntity>of(
+                            LingzhiBulletProjectileEntity::new, MobCategory.MISC)
+                            .sized(0.25f, 0.25f)
+                            .clientTrackingRange(8)
+                            .updateInterval(1)
+                            .build("lingzhi_bullet_projectile"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<WindBladeProjectileEntity>> WIND_BLADE_PROJECTILE =
+            ENTITY_TYPES.register("wind_blade_projectile",
+                    () -> EntityType.Builder.<WindBladeProjectileEntity>of(
+                            WindBladeProjectileEntity::new, MobCategory.MISC)
+                            .sized(0.45f, 0.45f)
+                            .clientTrackingRange(8)
+                            .updateInterval(1)
+                            .build("wind_blade_projectile"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<SmokeProjectileEntity>> SMOKE_PROJECTILE =
+            ENTITY_TYPES.register("smoke_projectile",
+                    () -> EntityType.Builder.<SmokeProjectileEntity>of(
+                            SmokeProjectileEntity::new, MobCategory.MISC)
+                            .sized(0.45f, 0.45f)
+                            .clientTrackingRange(8)
+                            .updateInterval(1)
+                            .build("smoke_projectile"));
+
     public static final DeferredHolder<EntityType<?>, EntityType<ZhenshanPalmEntity>> ZHENSHAN_PALM =
             ENTITY_TYPES.register("zhenshan_palm",
                     () -> EntityType.Builder.<ZhenshanPalmEntity>of(

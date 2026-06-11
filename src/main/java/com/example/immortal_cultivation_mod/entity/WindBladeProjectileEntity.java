@@ -1,0 +1,53 @@
+package com.example.immortal_cultivation_mod.entity;
+
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+
+public class WindBladeProjectileEntity extends ThrowableItemProjectile {
+    public WindBladeProjectileEntity(EntityType<? extends ThrowableItemProjectile> entityType, Level level) {
+        super(entityType, level);
+        setNoGravity(true);
+    }
+
+    public WindBladeProjectileEntity(Level level, LivingEntity shooter) {
+        super(ModEntities.WIND_BLADE_PROJECTILE.get(), shooter, level);
+        setNoGravity(true);
+    }
+
+    @Override
+    protected Item getDefaultItem() {
+        return Items.IRON_SWORD;
+    }
+
+    @Override
+    public void tick() {
+        setNoGravity(true);
+        super.tick();
+        if (level().isClientSide) {
+            var movement = getDeltaMovement();
+            level().addParticle(ParticleTypes.SWEEP_ATTACK,
+                    getX(), getY(), getZ(),
+                    movement.x * 0.02D, movement.y * 0.02D, movement.z * 0.02D);
+        }
+    }
+
+    @Override
+    protected void onHit(HitResult result) {
+        super.onHit(result);
+        if (!level().isClientSide) {
+            discard();
+        }
+    }
+
+    @Override
+    protected void onHitEntity(EntityHitResult result) {
+        result.getEntity().hurt(damageSources().thrown(this, getOwner()), 8.0F);
+    }
+}

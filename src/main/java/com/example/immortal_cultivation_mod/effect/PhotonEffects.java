@@ -21,6 +21,7 @@ public final class PhotonEffects {
     private static final String BEAM_FX = "immortal_cultivation_mod:beam";
     private static final String BALL_FX = "immortal_cultivation_mod:ball";
     private static final String MEDITATING_FX = "immortal_cultivation_mod:meditating";
+    private static final String WATER_SHIELD_FX_PREFIX = "immortal_cultivation_mod:water";
     private static final int BEAM_DURATION_TICKS = 20 * 10;
     private static final Map<UUID, BeamRemoval> BEAM_REMOVALS = new ConcurrentHashMap<>();
 
@@ -65,6 +66,31 @@ public final class PhotonEffects {
 
         String command = String.format(Locale.ROOT, "photon fx %s entity @s", MEDITATING_FX);
         runPhotonCommand(level, player.createCommandSourceStack().withPermission(4).withSuppressedOutput(), command);
+    }
+
+    public static void waterShield(ServerPlayer player, int stack) {
+        if (!ModList.get().isLoaded("photon")) {
+            return;
+        }
+
+        int clamped = Math.max(1, Math.min(3, stack));
+        removeWaterShield(player);
+        String fx = WATER_SHIELD_FX_PREFIX + clamped;
+        for (ServerPlayer viewer : player.serverLevel().players()) {
+            sendEntityEffectToPlayer(viewer, fx, List.of(player));
+        }
+    }
+
+    public static void removeWaterShield(ServerPlayer player) {
+        if (!ModList.get().isLoaded("photon")) {
+            return;
+        }
+
+        for (ServerPlayer viewer : player.serverLevel().players()) {
+            for (int stack = 1; stack <= 3; stack++) {
+                sendRemoveEntityEffectToPlayer(viewer, WATER_SHIELD_FX_PREFIX + stack, List.of(player));
+            }
+        }
     }
 
     public static void meditatingStop(ServerPlayer player) {

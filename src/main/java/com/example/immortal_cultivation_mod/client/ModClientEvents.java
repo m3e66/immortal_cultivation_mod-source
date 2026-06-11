@@ -37,6 +37,7 @@ public class ModClientEvents {
 
     private static boolean wasSpellKeyDown = false;
     private static boolean wasAttackKeyDown = false;
+    private static boolean wasJumpKeyDown = false;
 
     @SubscribeEvent
     public static void registerGuiLayers(RegisterGuiLayersEvent event) {
@@ -48,6 +49,9 @@ public class ModClientEvents {
         event.registerEntityRenderer(ModEntities.FIREBALL_PROJECTILE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(ModEntities.IGNITE_FLARE_PROJECTILE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(ModEntities.LIGHT_BEAM_PROJECTILE.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.LINGZHI_BULLET_PROJECTILE.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.WIND_BLADE_PROJECTILE.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.SMOKE_PROJECTILE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(ModEntities.ZHENSHAN_PALM.get(), EmptyEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.GEO_ROCK.get(), GeoRockBlockRenderer::new);
     }
@@ -88,6 +92,7 @@ public class ModClientEvents {
         if (typing) {
             wasSpellKeyDown = false;
             wasAttackKeyDown = false;
+            wasJumpKeyDown = false;
             return;
         }
 
@@ -151,6 +156,15 @@ public class ModClientEvents {
         while (ModKeyMappings.MEDITATE.get().consumeClick()) {
             PacketDistributor.sendToServer(new ModPayloads.ServerboundMeditatePayload());
         }
+
+        boolean jumpDown = mc.options.keyJump.isDown();
+        if (jumpDown && !wasJumpKeyDown && mc.player.hasEffect(ModEffects.WIND_STEP) && !mc.player.onGround()) {
+            PacketDistributor.sendToServer(new ModPayloads.ServerboundWindStepJumpPayload());
+            Vec3 movement = mc.player.getDeltaMovement();
+            mc.player.setDeltaMovement(movement.x, 0.65D, movement.z);
+            mc.player.fallDistance = 0.0F;
+        }
+        wasJumpKeyDown = jumpDown;
 
         boolean attackDown = mc.options.keyAttack.isDown();
         if (attackDown && !wasAttackKeyDown && mc.screen == null

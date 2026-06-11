@@ -32,6 +32,11 @@ public class ModTabs {
                         output.accept(ModItems.SPIRIT_SIGHT_SCROLL.get());
                         output.accept(ModItems.ZHENSHAN_PALM_SCROLL.get());
                         output.accept(ModItems.LIGHT_BEAM_ATTACK_SCROLL.get());
+                        output.accept(ModItems.DIELANG_SHIELD_SCROLL.get());
+                        output.accept(ModItems.LINGZHI_BULLET_SCROLL.get());
+                        output.accept(ModItems.WIND_BLADE_SCROLL.get());
+                        output.accept(ModItems.WIND_STEP_SCROLL.get());
+                        output.accept(ModItems.SMOKE_ART_SCROLL.get());
                         output.accept(ModItems.ENLIGHTENMENT_PILL.get());
                         output.accept(ModItems.BREAKTHROUGH_PILL.get());
                         output.accept(ModItems.SMALL_LEVEL_UP.get());
