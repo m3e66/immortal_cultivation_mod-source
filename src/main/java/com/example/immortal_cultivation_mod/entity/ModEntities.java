@@ -66,6 +66,15 @@ public class ModEntities {
                             .updateInterval(1)
                             .build("smoke_projectile"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<SlidingWaterProjectileEntity>> SLIDING_WATER_PROJECTILE =
+            ENTITY_TYPES.register("sliding_water_projectile",
+                    () -> EntityType.Builder.<SlidingWaterProjectileEntity>of(
+                            SlidingWaterProjectileEntity::new, MobCategory.MISC)
+                            .sized(0.4f, 0.4f)
+                            .clientTrackingRange(8)
+                            .updateInterval(1)
+                            .build("sliding_water_projectile"));
+
     public static final DeferredHolder<EntityType<?>, EntityType<ZhenshanPalmEntity>> ZHENSHAN_PALM =
             ENTITY_TYPES.register("zhenshan_palm",
                     () -> EntityType.Builder.<ZhenshanPalmEntity>of(

@@ -27,6 +27,7 @@ public class ModSpells {
     public static final String WIND_BLADE = "wind_blade";
     public static final String WIND_STEP = "wind_step";
     public static final String SMOKE_ART = "smoke_art";
+    public static final String SLIDING_WATER = "sliding_water";
 
     private static final Map<String, SpellDef> SPELLS = createSpells();
 
@@ -120,7 +121,7 @@ public class ModSpells {
                 5,
                 SpiritRoots.WIND,
                 "human",
-                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_qi_gathering.png")
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_wind_step.png")
         ));
         spells.put(SMOKE_ART, new SpellDef(
                 SMOKE_ART,
@@ -130,6 +131,15 @@ public class ModSpells {
                 SpiritRoots.WIND,
                 "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_qi_gathering.png")
+        ));
+        spells.put(SLIDING_WATER, new SpellDef(
+                SLIDING_WATER,
+                "sliding_water",
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
+                30,
+                SpiritRoots.WATER,
+                "human",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_cleanse.png")
         ));
         spells.put(IGNITE_FLARE, new SpellDef(
                 IGNITE_FLARE,
@@ -223,6 +233,9 @@ public class ModSpells {
         }
         if ("SmokeArt".equalsIgnoreCase(id) || "smoke_art".equalsIgnoreCase(id) || "smoke art".equalsIgnoreCase(id) || "\u8ff7\u70df\u672f".equals(id)) {
             return SMOKE_ART;
+        }
+        if ("SlidingWater".equalsIgnoreCase(id) || "sliding_water".equalsIgnoreCase(id) || "sliding water".equalsIgnoreCase(id) || "\u6ed1\u6c34\u672f".equals(id)) {
+            return SLIDING_WATER;
         }
         if ("IgniteFlare".equalsIgnoreCase(id) || "ignite_flare".equalsIgnoreCase(id) || "ignite flare".equalsIgnoreCase(id) || "\u71c3\u706b\u8bc0".equals(id)) {
             return IGNITE_FLARE;

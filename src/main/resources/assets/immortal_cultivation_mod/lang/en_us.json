@@ -14,6 +14,7 @@
     "item.immortal_cultivation_mod.wind_blade_scroll": "Wind Blade Scroll",
     "item.immortal_cultivation_mod.wind_step_scroll": "Wind Step Scroll",
     "item.immortal_cultivation_mod.smoke_art_scroll": "Smoke Art Scroll",
+    "item.immortal_cultivation_mod.sliding_water_scroll": "Sliding Water Scroll",
     "item.immortal_cultivation_mod.enlightenment_pill": "Enlightenment Pill",
     "item.immortal_cultivation_mod.breakthrough_pill": "Breakthrough Pill",
     "item.immortal_cultivation_mod.small_level_up": "Small Level Up",
@@ -100,6 +101,8 @@
     "spell.immortal_cultivation_mod.wind_step.description": "Toggle wind around your feet, gaining Speed II and one double jump while spending 5 qi per second.",
     "spell.immortal_cultivation_mod.smoke_art": "Smoke Art",
     "spell.immortal_cultivation_mod.smoke_art.description": "Shoot a smoke projectile that blinds the target for 10 seconds.",
+    "spell.immortal_cultivation_mod.sliding_water": "Sliding Water",
+    "spell.immortal_cultivation_mod.sliding_water.description": "Shoot a water projectile. When it hits a block, it creates a shallow puddle with puddle.fx one block above the hit block. Stepping on the puddle applies Magic Ritual inverted controls.",
     "spell.immortal_cultivation_mod.ignite_flare": "Ignite Flare",
     "spell.immortal_cultivation_mod.ignite_flare.description": "Shoot a straight flare that ignites the block it hits.",
     "spell.immortal_cultivation_mod.spirit_sight": "Spirit Sight",
@@ -227,5 +230,11 @@
     "spell.immortal_cultivation_mod.wind_step.cooldown": "Toggle",
     "spell.immortal_cultivation_mod.smoke_art.damage": "Blindness for 10 seconds",
     "spell.immortal_cultivation_mod.smoke_art.qi_cost": "15 qi",
-    "spell.immortal_cultivation_mod.smoke_art.cooldown": "Short"
+    "spell.immortal_cultivation_mod.smoke_art.cooldown": "Short",
+    "spell.immortal_cultivation_mod.sliding_water.damage": "Puddle trap",
+    "spell.immortal_cultivation_mod.sliding_water.qi_cost": "30 qi",
+    "spell.immortal_cultivation_mod.sliding_water.cooldown": "Short",
+    "item.immortal_cultivation_mod.jiuhu": "Jiuhu",
+    "effect.immortal_cultivation_mod.spell_damage_boost": "Spell Damage Boost",
+    "message.immortal_cultivation_mod.jiuhu_empowered": "Jiuhu empowered your spell damage."
 }

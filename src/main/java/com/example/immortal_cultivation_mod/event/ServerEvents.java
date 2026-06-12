@@ -11,6 +11,7 @@ import com.example.immortal_cultivation_mod.item.ModItems;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
 import com.example.immortal_cultivation_mod.spell.DielangShield;
 import com.example.immortal_cultivation_mod.spell.LightBeamAttack;
+import com.example.immortal_cultivation_mod.spell.SlidingWater;
 import com.example.immortal_cultivation_mod.spell.WindStep;
 import java.util.ArrayList;
 import java.util.List;
@@ -168,6 +169,7 @@ public class ServerEvents {
 
         if (player instanceof ServerPlayer sp) {
             WindStep.tick(sp);
+            SlidingWater.tick(sp);
             DielangShield.tick(sp);
             PhotonEffects.tick(sp);
             tickFogReveal(sp);

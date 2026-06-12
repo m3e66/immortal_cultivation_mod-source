@@ -23,6 +23,9 @@ public class ModEffects {
     public static final DeferredHolder<MobEffect, MobEffect> WIND_STEP =
             MOB_EFFECTS.register("wind_step", WindStepEffect::new);
 
+    public static final DeferredHolder<MobEffect, MobEffect> SPELL_DAMAGE_BOOST =
+            MOB_EFFECTS.register("spell_damage_boost", SpellDamageBoostEffect::new);
+
     public static void register(IEventBus bus) {
         MOB_EFFECTS.register(bus);
     }

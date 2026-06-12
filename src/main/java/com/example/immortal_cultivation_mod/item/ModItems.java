@@ -4,6 +4,7 @@ import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
+import com.example.immortal_cultivation_mod.effect.ModEffects;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -11,6 +12,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -71,6 +73,9 @@ public class ModItems {
     public static final DeferredItem<Item> SMOKE_ART_SCROLL = registerItem("smoke_art_scroll",
             () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.SMOKE_ART));
 
+    public static final DeferredItem<Item> SLIDING_WATER_SCROLL = registerItem("sliding_water_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.SLIDING_WATER));
+
     public static final DeferredItem<Item> ENLIGHTENMENT_PILL = registerItem("enlightenment_pill",
             () -> new EnlightenmentPillItem(new Item.Properties().stacksTo(16)));
 
@@ -110,6 +115,12 @@ public class ModItems {
     public static final DeferredItem<Item> BLOOD_DEMON_HUASHEN_METHOD = registerItem("blood_demon_huashen_method",
             () -> new CultivationMethodItem(new Item.Properties().stacksTo(1), CultivationMethods.BLOOD_DEMON_HUASHEN));
 
+    public static final DeferredItem<Item> LINGJIAO_SCALE = registerItem("lingjiao_scale",
+            () -> new Item(new Item.Properties()));
+
+    public static final DeferredItem<Item> JIUHU = registerItem("jiuhu",
+            () -> new com.example.immortal_cultivation_mod.item.JiuhuItem(new Item.Properties().stacksTo(1)));
+
     public static DeferredItem<Item> registerItem(String name, Supplier<Item> itemSupplier) {
         return ITEMS.register(name, itemSupplier);
     }
@@ -140,7 +151,7 @@ public class ModItems {
             return switch (spellId) {
                 case ModSpells.FIREBALL, ModSpells.IGNITE_FLARE -> ChatFormatting.RED;
                 case ModSpells.REGENERATION -> ChatFormatting.GREEN;
-                case ModSpells.CLEANSE, ModSpells.DIELANG_SHIELD -> ChatFormatting.AQUA;
+                case ModSpells.CLEANSE, ModSpells.DIELANG_SHIELD, ModSpells.SLIDING_WATER -> ChatFormatting.AQUA;
                 case ModSpells.EARTH_ESCAPE, ModSpells.ZHENSHAN_PALM -> ChatFormatting.YELLOW;
                 case ModSpells.LINGBENG -> ChatFormatting.LIGHT_PURPLE;
                 case ModSpells.BEAM, ModSpells.SPIRIT_SIGHT, ModSpells.LIGHT_BEAM_ATTACK -> ChatFormatting.WHITE;

@@ -30,6 +30,10 @@
     },
     {
       "type": "patchouli:text",
+      "text": "$(br)Sliding Water: Lianqi Early, water, costs 30 qi.$(br)Shoots a water projectile. When it hits a block, it creates a shallow puddle with puddle.fx one block above the hit block. Stepping on the puddle applies Magic Ritual inverted controls."
+    },
+    {
+      "type": "patchouli:text",
       "text": "$(br)Qi Gathering: Lianqi Early, wind, costs no qi.$(br)Greatly improves qi regeneration, but you cannot attack or block. Damage taken while gathering qi is tripled."
     },
     {

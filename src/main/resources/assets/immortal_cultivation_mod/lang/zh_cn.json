@@ -14,6 +14,7 @@
     "item.immortal_cultivation_mod.wind_blade_scroll": "\u98ce\u5203\u7389\u7b80",
     "item.immortal_cultivation_mod.wind_step_scroll": "\u8e0f\u98ce\u6b65\u7389\u7b80",
     "item.immortal_cultivation_mod.smoke_art_scroll": "\u8ff7\u70df\u672f\u7389\u7b80",
+    "item.immortal_cultivation_mod.sliding_water_scroll": "\u6ed1\u6c34\u672f\u7389\u7b80",
     "item.immortal_cultivation_mod.enlightenment_pill": "\u542f\u8499\u4e39",
     "item.immortal_cultivation_mod.breakthrough_pill": "\u7a81\u7834\u4e39",
     "item.immortal_cultivation_mod.small_level_up": "\u5c0f\u4fee\u4e3a\u4e39",
@@ -100,6 +101,8 @@
     "spell.immortal_cultivation_mod.wind_step.description": "\u5f00\u5173\u5f0f\u6cd5\u672f\uff0c\u811a\u6b65\u88f9\u98ce\uff0c\u83b7\u5f97\u901f\u5ea6II\u548c\u4e00\u6b21\u4e8c\u6bb5\u8df3\uff0c\u6bcf\u79d2\u6d88\u80175\u7075\u6c14\u3002",
     "spell.immortal_cultivation_mod.smoke_art": "\u8ff7\u70df\u672f",
     "spell.immortal_cultivation_mod.smoke_art.description": "\u51dd\u805a\u6de1\u70df\u5c04\u51fa\u70df\u96fe\u5f39\uff0c\u547d\u4e2d\u540e\u4f7f\u76ee\u6807\u5931\u660e10\u79d2\u3002",
+    "spell.immortal_cultivation_mod.sliding_water": "\u6ed1\u6c34\u672f",
+    "spell.immortal_cultivation_mod.sliding_water.description": "\u5c04\u51fa\u6c34\u5f39\uff0c\u547d\u4e2d\u65b9\u5757\u540e\u5728\u65b9\u5757\u4e0a\u65b9\u751f\u6210 puddle.fx \u6d45\u6c34\u6ee9\u3002\u8e29\u4e0a\u53bb\u4f1a\u83b7\u5f97 Magic Ritual \u7684\u53cd\u5411\u64cd\u4f5c\u6548\u679c\u3002",
     "spell.immortal_cultivation_mod.ignite_flare": "\u71c3\u706b\u8bc0",
     "spell.immortal_cultivation_mod.ignite_flare.description": "\u5c04\u51fa\u76f4\u7ebf\u706b\u5149\uff0c\u547d\u4e2d\u65b9\u5757\u540e\u70b9\u71c3\u5b83\u3002",
     "spell.immortal_cultivation_mod.spirit_sight": "\u7075\u89c6",
@@ -130,7 +133,7 @@
     "subtitles.immortal_cultivation_mod.fireball_cast": "\u706b\u7403\u672f\u91ca\u653e",
     "subtitles.immortal_cultivation_mod.qi_regen": "\u7075\u6c14\u6062\u590d",
     "itemGroup.immortal_cultivation_mod": "\u4fee\u4ed9",
-    "itemGroup.immortal_cultivation_mod.blocks": "\u4e0d\u673d\u4fee\u4ed9\uff1a\u7075\u6750\u65b9\u5757",
+    "itemGroup.immortal_cultivation_mod.blocks": "\u4fee\u4ed9\u65b9\u5757",
     "block.immortal_cultivation_mod.qingling_grass": "\u9752\u7075\u8349",
     "item.immortal_cultivation_mod.qingling_grass": "\u9752\u7075\u8349",
     "block.immortal_cultivation_mod.chiyan_flower": "\u8d64\u7130\u82b1",
@@ -227,5 +230,11 @@
     "spell.immortal_cultivation_mod.wind_step.cooldown": "\u5f00\u5173",
     "spell.immortal_cultivation_mod.smoke_art.damage": "\u5931\u660e10\u79d2",
     "spell.immortal_cultivation_mod.smoke_art.qi_cost": "15 \u7075\u6c14",
-    "spell.immortal_cultivation_mod.smoke_art.cooldown": "\u77ed"
+    "spell.immortal_cultivation_mod.smoke_art.cooldown": "\u77ed",
+    "spell.immortal_cultivation_mod.sliding_water.damage": "\u6d45\u6c34\u9677\u9631",
+    "spell.immortal_cultivation_mod.sliding_water.qi_cost": "30 \u7075\u6c14",
+    "spell.immortal_cultivation_mod.sliding_water.cooldown": "\u77ed",
+    "item.immortal_cultivation_mod.jiuhu": "酒壶",
+    "effect.immortal_cultivation_mod.spell_damage_boost": "法术增伤",
+    "message.immortal_cultivation_mod.jiuhu_empowered": "酒壶强化了你的法术伤害。"
 }

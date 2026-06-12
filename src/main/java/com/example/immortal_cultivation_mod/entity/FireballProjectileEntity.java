@@ -59,7 +59,11 @@ public class FireballProjectileEntity extends ThrowableItemProjectile {
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
-        float damage = 10.0f;
+        float damage = com.example.immortal_cultivation_mod.spell.SpellDamageHelper.damage(
+                getOwner(),
+                10.0F,
+                ModSpells.get(ModSpells.FIREBALL)
+        );
         if (getOwner() instanceof net.minecraft.world.entity.player.Player player) {
             var data = ModAttachments.getData(player);
             damage += data.magicAttack();

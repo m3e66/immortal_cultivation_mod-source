@@ -37,6 +37,7 @@ public class ModTabs {
                         output.accept(ModItems.WIND_BLADE_SCROLL.get());
                         output.accept(ModItems.WIND_STEP_SCROLL.get());
                         output.accept(ModItems.SMOKE_ART_SCROLL.get());
+                        output.accept(ModItems.SLIDING_WATER_SCROLL.get());
                         output.accept(ModItems.ENLIGHTENMENT_PILL.get());
                         output.accept(ModItems.BREAKTHROUGH_PILL.get());
                         output.accept(ModItems.SMALL_LEVEL_UP.get());
@@ -50,6 +51,7 @@ public class ModTabs {
                         output.accept(ModItems.BLOOD_DEMON_JINDAN_METHOD.get());
                         output.accept(ModItems.BLOOD_DEMON_YUANYING_METHOD.get());
                         output.accept(ModItems.BLOOD_DEMON_HUASHEN_METHOD.get());
+                        output.accept(ModItems.JIUHU.get());
 
                     }).build());
 
@@ -77,7 +79,7 @@ public class ModTabs {
                         output.accept(ModBlocks.MOXUAN_IRON.get());
                         output.accept(ModBlocks.LIUJIN_SAND.get());
                         output.accept(ModBlocks.BISUI_STONE.get());
-                        output.accept(ModBlocks.LINGJIAO_SCALE.get());
+                        output.accept(ModItems.LINGJIAO_SCALE.get());
                         output.accept(ModBlocks.STAR_DUST_STONE.get());
 
                     }).build());

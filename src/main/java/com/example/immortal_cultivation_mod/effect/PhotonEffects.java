@@ -7,10 +7,12 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -20,6 +22,7 @@ public final class PhotonEffects {
     private static final String LINGBENG_FX = "immortal_cultivation_mod:lingbeng";
     private static final String BEAM_FX = "immortal_cultivation_mod:beam";
     private static final String BALL_FX = "immortal_cultivation_mod:ball";
+    private static final String PUDDLE_FX = "immortal_cultivation_mod:puddle";
     private static final String MEDITATING_FX = "immortal_cultivation_mod:meditating";
     private static final String WATER_SHIELD_FX_PREFIX = "immortal_cultivation_mod:water";
     private static final int BEAM_DURATION_TICKS = 20 * 10;
@@ -42,6 +45,14 @@ public final class PhotonEffects {
 
     public static void lingbengExplosion(ServerLevel level, double x, double y, double z) {
         playBlockEffect(level, LINGBENG_FX, x, y, z, 1.6D);
+    }
+
+    public static void puddle(ServerLevel level, double x, double y, double z) {
+        playSimpleBlockEffect(level, PUDDLE_FX, x, y, z);
+    }
+
+    public static void removePuddle(ServerLevel level, BlockPos pos) {
+        removeBlockEffect(level, pos);
     }
 
     public static void beamSpell(ServerLevel level, ServerPlayer caster) {
@@ -129,6 +140,19 @@ public final class PhotonEffects {
         runPhotonCommand(level, source, command);
     }
 
+    private static void playSimpleBlockEffect(ServerLevel level, String fx, double x, double y, double z) {
+        if (!ModList.get().isLoaded("photon")) {
+            return;
+        }
+
+        String command = String.format(Locale.ROOT, "photon fx %s block ~ ~ ~", fx);
+        var source = level.getServer().createCommandSourceStack()
+                .withPermission(4)
+                .withPosition(new net.minecraft.world.phys.Vec3(x, y, z))
+                .withSuppressedOutput();
+        runPhotonCommand(level, source, command);
+    }
+
     private static void playEntityEffect(ServerLevel level, Entity entity) {
         if (!ModList.get().isLoaded("photon")) {
             return;
@@ -192,6 +216,19 @@ public final class PhotonEffects {
             PacketDistributor.sendToPlayer(player, (CustomPacketPayload) command);
         } catch (ReflectiveOperationException | ClassCastException ignored) {
         }
+    }
+
+    private static void removeBlockEffect(ServerLevel level, BlockPos pos) {
+        if (!ModList.get().isLoaded("photon")) {
+            return;
+        }
+
+        String command = "photon fx remove block ~ ~ ~";
+        var source = level.getServer().createCommandSourceStack()
+                .withPermission(4)
+                .withPosition(new net.minecraft.world.phys.Vec3(pos.getX(), pos.getY(), pos.getZ()))
+                .withSuppressedOutput();
+        runPhotonCommand(level, source, command);
     }
 
     private static String vec(double x, double y, double z) {

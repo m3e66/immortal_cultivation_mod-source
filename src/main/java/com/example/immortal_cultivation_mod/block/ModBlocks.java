@@ -13,29 +13,69 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.function.Supplier;
 
 public class ModBlocks {
-    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(ImmortalCultivationMod.MODID);
+    public static final DeferredRegister.Blocks BLOCKS =
+            DeferredRegister.createBlocks(ImmortalCultivationMod.MODID);
 
     public static final DeferredBlock<Block> QINGLING_GRASS = registerPlant("qingling_grass");
     public static final DeferredBlock<Block> CHIYAN_FLOWER = registerPlant("chiyan_flower");
     public static final DeferredBlock<Block> NINGLU_ZHI = registerPlant("ninglu_zhi");
     public static final DeferredBlock<Block> XUANBING_LOTUS = registerPlant("xuanbing_lotus");
     public static final DeferredBlock<Block> ZIYUN_VINE = registerPlant("ziyun_vine");
-    public static final DeferredBlock<Block> JINWEN_FRUIT = registerPlant("jinwen_fruit");
     public static final DeferredBlock<Block> SHIHUN_GRASS = registerPlant("shihun_grass");
     public static final DeferredBlock<Block> JIUYE_XIANLAN = registerPlant("jiuye_xianlan");
-    public static final DeferredBlock<Block> FUGU_TAI = registerPlant("fugu_tai");
-    public static final DeferredBlock<Block> HUANXIA_SI = registerPlant("huanxia_si");
 
-    public static final DeferredBlock<Block> QIANNIAN_LINGMU_HEART = registerMaterial("qiannian_lingmu_heart", 2.0F, SoundType.WOOD);
-    public static final DeferredBlock<Block> JINGTIE_MOTHERSTONE = registerOre("jingtie_motherstone", 3.0F);
-    public static final DeferredBlock<Block> YUNWEN_SILVER_CRYSTAL = registerOre("yunwen_silver_crystal", 2.0F);
-    public static final DeferredBlock<Block> CHITONG_SUI = registerOre("chitong_sui", 3.0F);
-    public static final DeferredBlock<Block> HANPO_JADE = registerOre("hanpo_jade", 2.5F);
-    public static final DeferredBlock<Block> MOXUAN_IRON = registerOre("moxuan_iron", 5.0F);
-    public static final DeferredBlock<Block> LIUJIN_SAND = registerOre("liujin_sand", 1.0F);
-    public static final DeferredBlock<Block> BISUI_STONE = registerOre("bisui_stone", 2.5F);
-    public static final DeferredBlock<Block> LINGJIAO_SCALE = registerOre("lingjiao_scale", 3.0F);
-    public static final DeferredBlock<Block> STAR_DUST_STONE = registerOre("star_dust_stone", 2.0F);
+    public static final DeferredBlock<Block> FUGU_TAI = registerBlock("fugu_tai",
+            () -> new CultivationVineBlock(BlockBehaviour.Properties.of()
+                    .strength(0.2F)
+                    .sound(SoundType.VINE)
+                    .noCollission()
+                    .noOcclusion()
+                    .replaceable()));
+
+    public static final DeferredBlock<Block> HUANXIA_SI = registerBlock("huanxia_si",
+            () -> new CultivationVineBlock(BlockBehaviour.Properties.of()
+                    .strength(0.2F)
+                    .sound(SoundType.VINE)
+                    .noCollission()
+                    .noOcclusion()
+                    .replaceable()));
+
+    public static final DeferredBlock<Block> JINWEN_FRUIT = registerBlock("jinwen_fruit",
+            () -> new GeoRockBlock(BlockBehaviour.Properties.of()
+                    .strength(1.0F)
+                    .sound(SoundType.WOOD)
+                    .noOcclusion()));
+
+    public static final DeferredBlock<Block> QIANNIAN_LINGMU_HEART =
+            registerMaterial("qiannian_lingmu_heart", 2.0F, SoundType.WOOD);
+
+    public static final DeferredBlock<Block> JINGTIE_MOTHERSTONE =
+            registerOre("jingtie_motherstone", 3.0F);
+
+    public static final DeferredBlock<Block> YUNWEN_SILVER_CRYSTAL =
+            registerOre("yunwen_silver_crystal", 2.0F);
+
+    public static final DeferredBlock<Block> CHITONG_SUI =
+            registerOre("chitong_sui", 3.0F);
+
+    public static final DeferredBlock<Block> HANPO_JADE =
+            registerOre("hanpo_jade", 2.5F);
+
+    public static final DeferredBlock<Block> MOXUAN_IRON =
+            registerOre("moxuan_iron", 5.0F);
+
+    public static final DeferredBlock<Block> LIUJIN_SAND = registerBlock("liujin_sand",
+            () -> new FlowingGoldSandBlock(BlockBehaviour.Properties.of()
+                    .strength(0.2F)
+                    .sound(SoundType.SAND)
+                    .noOcclusion()
+                    .replaceable()));
+
+    public static final DeferredBlock<Block> BISUI_STONE =
+            registerOre("bisui_stone", 2.5F);
+
+    public static final DeferredBlock<Block> STAR_DUST_STONE =
+            registerOre("star_dust_stone", 2.0F);
 
     private static DeferredBlock<Block> registerPlant(String name) {
         return registerBlock(name, () -> new CultivationPlantBlock(BlockBehaviour.Properties.of()

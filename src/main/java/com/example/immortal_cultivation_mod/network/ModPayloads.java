@@ -357,6 +357,7 @@ public class ModPayloads {
                 case ModSpells.WIND_BLADE -> ModItems.WIND_BLADE_SCROLL.get();
                 case ModSpells.WIND_STEP -> ModItems.WIND_STEP_SCROLL.get();
                 case ModSpells.SMOKE_ART -> ModItems.SMOKE_ART_SCROLL.get();
+                case ModSpells.SLIDING_WATER -> ModItems.SLIDING_WATER_SCROLL.get();
                 default -> null;
             };
             if (scroll == null) {
@@ -497,6 +498,8 @@ public class ModPayloads {
                         com.example.immortal_cultivation_mod.spell.WindStep.toggle(sp);
                     } else if (ModSpells.SMOKE_ART.equals(spellId)) {
                         castSmokeArt(sp, data, spell);
+                    } else if (ModSpells.SLIDING_WATER.equals(spellId)) {
+                        castSlidingWater(sp, data, spell);
                     }
                 }
             });
@@ -548,6 +551,17 @@ public class ModPayloads {
             }
             var projectile = new com.example.immortal_cultivation_mod.entity.SmokeProjectileEntity(sp.level(), sp);
             projectile.shootFromRotation(sp, sp.getXRot(), sp.getYRot(), 0, 1.4f, 0.2f);
+            sp.level().addFreshEntity(projectile);
+            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+        }
+
+        private static void castSlidingWater(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
+            if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, spell.qiCost())) {
+                sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
+                return;
+            }
+            var projectile = new com.example.immortal_cultivation_mod.entity.SlidingWaterProjectileEntity(sp.level(), sp);
+            projectile.shootFromRotation(sp, sp.getXRot(), sp.getYRot(), 0, 1.6f, 0.0f);
             sp.level().addFreshEntity(projectile);
             com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
         }

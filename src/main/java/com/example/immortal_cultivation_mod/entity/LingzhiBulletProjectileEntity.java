@@ -1,5 +1,6 @@
 package com.example.immortal_cultivation_mod.entity;
 
+import com.example.immortal_cultivation_mod.spell.ModSpells;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.EntityType;
@@ -51,7 +52,12 @@ public class LingzhiBulletProjectileEntity extends ThrowableItemProjectile {
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
-        result.getEntity().hurt(damageSources().thrown(this, getOwner()), 5.0F);
+        float damage = com.example.immortal_cultivation_mod.spell.SpellDamageHelper.damage(
+                getOwner(),
+                5.0F,
+                ModSpells.get(ModSpells.LINGZHI_BULLET)
+        );
+        result.getEntity().hurt(damageSources().thrown(this, getOwner()), damage);
     }
 
     @Override

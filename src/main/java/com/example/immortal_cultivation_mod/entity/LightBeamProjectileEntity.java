@@ -141,7 +141,11 @@ public class LightBeamProjectileEntity extends ThrowableItemProjectile {
             return;
         }
 
-        float damage = 50.0F;
+        float damage = com.example.immortal_cultivation_mod.spell.SpellDamageHelper.damage(
+                getOwner(),
+                50.0F,
+                ModSpells.get(ModSpells.LIGHT_BEAM_ATTACK)
+        );
         if (getOwner() instanceof net.minecraft.world.entity.player.Player player) {
             var data = ModAttachments.getData(player);
             damage += data.magicAttack();

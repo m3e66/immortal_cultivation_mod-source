@@ -1,46 +1,57 @@
 {
-        "type":    "minecraft:random_patch",
-        "config":    {
-                                     "tries":    24,
-                                     "xz_spread":    7,
-                                     "y_spread":    3,
-                                     "feature":    {
-                                                                     "feature":    {
-                                                                                                     "type":    "minecraft:simple_block",
-                                                                                                     "config":    {
-                                                                                                                                    "to_place":    {
-                                                                                                                                                                     "type":    "minecraft:simple_state_provider",
-                                                                                                                                                                     "state":    {
-                                                                                                                                                                                                 "Name":    "immortal_cultivation_mod:qiannian_lingmu_heart"
-                                                                                                                                                                                         }
-                                                                                                                                                             }
-                                                                                                                            }
-                                                                                             },
-                                                                     "placement":    [
-                                                                                                         {
-                                                                                                                 "type":    "minecraft:block_predicate_filter",
-                                                                                                                 "predicate":    {
-                                                                                                                                                     "type":    "minecraft:matching_blocks",
-                                                                                                                                                     "offset":    [
-                                                                                                                                                                                    0,
-                                                                                                                                                                                    -1,
-                                                                                                                                                                                    0
-                                                                                                                                                                            ],
-                                                                                                                                                     "blocks":    [
-                                                                                                                                                                                    "minecraft:grass_block",
-                                                                                                                                                                                    "minecraft:dirt",
-                                                                                                                                                                                    "minecraft:podzol",
-                                                                                                                                                                                    "minecraft:rooted_dirt",
-                                                                                                                                                                                    "minecraft:moss_block",
-                                                                                                                                                                                    "minecraft:stone",
-                                                                                                                                                                                    "minecraft:netherrack",
-                                                                                                                                                                                    "minecraft:sand",
-                                                                                                                                                                                    "minecraft:snow_block",
-                                                                                                                                                                                    "minecraft:ice"
-                                                                                                                                                                            ]
-                                                                                                                                             }
-                                                                                                         }
-                                                                                                 ]
-                                                             }
-                             }
+    "type":  "minecraft:random_patch",
+    "config":  {
+                   "tries":  24,
+                   "xz_spread":  7,
+                   "y_spread":  3,
+                   "feature":  {
+                                   "feature":  {
+                                                   "type":  "minecraft:simple_block",
+                                                   "config":  {
+                                                                  "to_place":  {
+                                                                                   "type":  "minecraft:simple_state_provider",
+                                                                                   "state":  {
+                                                                                                 "Name":  "immortal_cultivation_mod:qiannian_lingmu_heart"
+                                                                                             }
+                                                                               }
+                                                              }
+                                               },
+                                   "placement":  [
+                                                     {
+                                                         "type":  "minecraft:block_predicate_filter",
+                                                         "predicate":  {
+                                                                           "type":  "minecraft:matching_blocks",
+                                                                           "blocks":  [
+                                                                                          "minecraft:air",
+                                                                                          "minecraft:cave_air",
+                                                                                          "minecraft:void_air"
+                                                                                      ]
+                                                                       }
+                                                     },
+                                                     {
+                                                         "type":  "minecraft:block_predicate_filter",
+                                                         "predicate":  {
+                                                                           "type":  "minecraft:matching_blocks",
+                                                                           "offset":  [
+                                                                                          0,
+                                                                                          -1,
+                                                                                          0
+                                                                                      ],
+                                                                           "blocks":  [
+                                                                                          "minecraft:grass_block",
+                                                                                          "minecraft:dirt",
+                                                                                          "minecraft:podzol",
+                                                                                          "minecraft:rooted_dirt",
+                                                                                          "minecraft:moss_block",
+                                                                                          "minecraft:stone",
+                                                                                          "minecraft:netherrack",
+                                                                                          "minecraft:sand",
+                                                                                          "minecraft:snow_block",
+                                                                                          "minecraft:ice"
+                                                                                      ]
+                                                                       }
+                                                     }
+                                                 ]
+                               }
+               }
 }

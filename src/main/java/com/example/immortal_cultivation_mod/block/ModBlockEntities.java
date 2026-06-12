@@ -19,9 +19,8 @@ public class ModBlockEntities {
                     ModBlocks.CHITONG_SUI.get(),
                     ModBlocks.HANPO_JADE.get(),
                     ModBlocks.MOXUAN_IRON.get(),
-                    ModBlocks.LIUJIN_SAND.get(),
                     ModBlocks.BISUI_STONE.get(),
-                    ModBlocks.LINGJIAO_SCALE.get(),
-                    ModBlocks.STAR_DUST_STONE.get()
+                    ModBlocks.STAR_DUST_STONE.get(),
+                    ModBlocks.JINWEN_FRUIT.get()
             ).build(null));
 }

@@ -38,6 +38,7 @@ public class ModClientEvents {
     private static boolean wasSpellKeyDown = false;
     private static boolean wasAttackKeyDown = false;
     private static boolean wasJumpKeyDown = false;
+    private static boolean windStepDoubleJumpUsed = false;
 
     @SubscribeEvent
     public static void registerGuiLayers(RegisterGuiLayersEvent event) {
@@ -52,6 +53,7 @@ public class ModClientEvents {
         event.registerEntityRenderer(ModEntities.LINGZHI_BULLET_PROJECTILE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(ModEntities.WIND_BLADE_PROJECTILE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(ModEntities.SMOKE_PROJECTILE.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.SLIDING_WATER_PROJECTILE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(ModEntities.ZHENSHAN_PALM.get(), EmptyEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.GEO_ROCK.get(), GeoRockBlockRenderer::new);
     }
@@ -93,6 +95,7 @@ public class ModClientEvents {
             wasSpellKeyDown = false;
             wasAttackKeyDown = false;
             wasJumpKeyDown = false;
+            windStepDoubleJumpUsed = false;
             return;
         }
 
@@ -157,12 +160,17 @@ public class ModClientEvents {
             PacketDistributor.sendToServer(new ModPayloads.ServerboundMeditatePayload());
         }
 
+        if (mc.player.onGround() || !mc.player.hasEffect(ModEffects.WIND_STEP)) {
+            windStepDoubleJumpUsed = false;
+        }
+
         boolean jumpDown = mc.options.keyJump.isDown();
-        if (jumpDown && !wasJumpKeyDown && mc.player.hasEffect(ModEffects.WIND_STEP) && !mc.player.onGround()) {
+        if (jumpDown && !wasJumpKeyDown && mc.player.hasEffect(ModEffects.WIND_STEP) && !mc.player.onGround() && !windStepDoubleJumpUsed) {
             PacketDistributor.sendToServer(new ModPayloads.ServerboundWindStepJumpPayload());
             Vec3 movement = mc.player.getDeltaMovement();
             mc.player.setDeltaMovement(movement.x, 0.65D, movement.z);
             mc.player.fallDistance = 0.0F;
+            windStepDoubleJumpUsed = true;
         }
         wasJumpKeyDown = jumpDown;
 
