@@ -15,6 +15,14 @@
     {
       "type": "patchouli:text",
       "text": "$(br)Element methods match spirit roots. A strong match can improve speed, power, and cost. A weak match is usable but weaker. A mismatch is very poor or may fail in later methods."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Reincarnation True Art: dark, heaven tier, limit Soul Transformation Late.$(br)This method automatically grants Absorb, a projectile spell that steals cultivation progress from lower-level players."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Heaven Devouring Demon Art: dark, heaven tier, limit Soul Transformation Late.$(br)This method automatically grants Devour Heaven, which consumes blocks and slain life into fast cultivation progress."
     }
   ]
 }

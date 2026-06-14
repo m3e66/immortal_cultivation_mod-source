@@ -2,6 +2,8 @@ package com.example.immortal_cultivation_mod.spell;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
+import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
+import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -26,8 +28,15 @@ public class ModSpells {
     public static final String LINGZHI_BULLET = "lingzhi_bullet";
     public static final String WIND_BLADE = "wind_blade";
     public static final String WIND_STEP = "wind_step";
+    public static final String YUFENG_JUE = "yufeng_jue";
     public static final String SMOKE_ART = "smoke_art";
     public static final String SLIDING_WATER = "sliding_water";
+    public static final String WEIYA = "weiya";
+    public static final String ABSORB_CULTIVATION = "absorb_cultivation";
+    public static final String TUNTIAN = "tuntian";
+    public static final String DINGSHEN = "dingshen";
+    public static final String YINLEI_JUE = "yinlei_jue";
+    public static final String WULEI_ZHENGFA = "wulei_zhengfa";
 
     private static final Map<String, SpellDef> SPELLS = createSpells();
 
@@ -42,20 +51,74 @@ public class ModSpells {
                 "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_fireball.png")
         ));
+        spells.put(WEIYA, new SpellDef(
+                WEIYA,
+                "weiya",
+                "",
+                0,
+                SpiritRoots.DARK,
+                "human",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_lingbeng.png")
+        ));
+        spells.put(ABSORB_CULTIVATION, new SpellDef(
+                ABSORB_CULTIVATION,
+                "absorb_cultivation",
+                "",
+                80,
+                SpiritRoots.DARK,
+                "heaven",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_lingbeng.png")
+        ));
+        spells.put(TUNTIAN, new SpellDef(
+                TUNTIAN,
+                "tuntian",
+                "",
+                0,
+                SpiritRoots.DARK,
+                "heaven",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_tuntian.png")
+        ));
+        spells.put(DINGSHEN, new SpellDef(
+                DINGSHEN,
+                "dingshen",
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE,
+                200,
+                SpiritRoots.METAL,
+                "earth",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_dingshen.png")
+        ));
         spells.put(LINGBENG, new SpellDef(
                 LINGBENG,
                 "lingbeng",
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_LATE,
-                50,
+                85,
                 SpiritRoots.THUNDER,
                 "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_lingbeng.png")
+        ));
+        spells.put(YINLEI_JUE, new SpellDef(
+                YINLEI_JUE,
+                "yinlei_jue",
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_LATE,
+                40,
+                SpiritRoots.THUNDER,
+                "human",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_yinlei_jue.png")
+        ));
+        spells.put(WULEI_ZHENGFA, new SpellDef(
+                WULEI_ZHENGFA,
+                "wulei_zhengfa",
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_MID,
+                120,
+                SpiritRoots.THUNDER,
+                "earth",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_wulei_zhengfa.png")
         ));
         spells.put(REGENERATION, new SpellDef(
                 REGENERATION,
                 "regeneration",
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_MID,
-                20,
+                24,
                 SpiritRoots.WOOD,
                 "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_regeneration.png")
@@ -123,6 +186,15 @@ public class ModSpells {
                 "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_wind_step.png")
         ));
+        spells.put(YUFENG_JUE, new SpellDef(
+                YUFENG_JUE,
+                "yufeng_jue",
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_LATE,
+                30,
+                SpiritRoots.WIND,
+                "human",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_yufeng_jue.png")
+        ));
         spells.put(SMOKE_ART, new SpellDef(
                 SMOKE_ART,
                 "smoke_art",
@@ -163,7 +235,7 @@ public class ModSpells {
                 ZHENSHAN_PALM,
                 "zhenshan_palm",
                 CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_MID,
-                130,
+                390,
                 SpiritRoots.EARTH,
                 "earth",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_zhenshan_palm.png")
@@ -172,7 +244,7 @@ public class ModSpells {
                 LIGHT_BEAM_ATTACK,
                 "light_beam_attack",
                 CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE,
-                30,
+                90,
                 SpiritRoots.LIGHT,
                 "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_beam.png")
@@ -181,7 +253,7 @@ public class ModSpells {
                 DIELANG_SHIELD,
                 "dielang_shield",
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_LATE,
-                30,
+                50,
                 SpiritRoots.WATER,
                 "earth",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_cleanse.png")
@@ -231,11 +303,32 @@ public class ModSpells {
         if ("WindStep".equalsIgnoreCase(id) || "wind_step".equalsIgnoreCase(id) || "wind step".equalsIgnoreCase(id) || "\u8e0f\u98ce\u6b65".equals(id)) {
             return WIND_STEP;
         }
+        if ("YufengJue".equalsIgnoreCase(id) || "yufeng_jue".equalsIgnoreCase(id) || "yufeng jue".equalsIgnoreCase(id) || "\u5fa1\u98ce\u8bc0".equals(id)) {
+            return YUFENG_JUE;
+        }
         if ("SmokeArt".equalsIgnoreCase(id) || "smoke_art".equalsIgnoreCase(id) || "smoke art".equalsIgnoreCase(id) || "\u8ff7\u70df\u672f".equals(id)) {
             return SMOKE_ART;
         }
         if ("SlidingWater".equalsIgnoreCase(id) || "sliding_water".equalsIgnoreCase(id) || "sliding water".equalsIgnoreCase(id) || "\u6ed1\u6c34\u672f".equals(id)) {
             return SLIDING_WATER;
+        }
+        if ("Weiya".equalsIgnoreCase(id) || "weiya".equalsIgnoreCase(id) || "\u5a01\u538b".equals(id)) {
+            return WEIYA;
+        }
+        if ("AbsorbCultivation".equalsIgnoreCase(id) || "absorb_cultivation".equalsIgnoreCase(id) || "absorb cultivation".equalsIgnoreCase(id) || "\u5438\u53d6".equals(id)) {
+            return ABSORB_CULTIVATION;
+        }
+        if ("Tuntian".equalsIgnoreCase(id) || "tuntian".equalsIgnoreCase(id) || "\u541e\u5929".equals(id)) {
+            return TUNTIAN;
+        }
+        if ("Dingshen".equalsIgnoreCase(id) || "dingshen".equalsIgnoreCase(id) || "ding shen".equalsIgnoreCase(id) || "\u5b9a\u8eab\u5492".equals(id)) {
+            return DINGSHEN;
+        }
+        if ("YinleiJue".equalsIgnoreCase(id) || "yinlei_jue".equalsIgnoreCase(id) || "yinlei jue".equalsIgnoreCase(id) || "\u5f15\u96f7\u8bc0".equals(id)) {
+            return YINLEI_JUE;
+        }
+        if ("WuleiZhengfa".equalsIgnoreCase(id) || "wulei_zhengfa".equalsIgnoreCase(id) || "wulei zhengfa".equalsIgnoreCase(id) || "\u4e94\u96f7\u6b63\u6cd5".equals(id)) {
+            return WULEI_ZHENGFA;
         }
         if ("IgniteFlare".equalsIgnoreCase(id) || "ignite_flare".equalsIgnoreCase(id) || "ignite flare".equalsIgnoreCase(id) || "\u71c3\u706b\u8bc0".equals(id)) {
             return IGNITE_FLARE;
@@ -256,7 +349,34 @@ public class ModSpells {
     }
 
     public static boolean meetsRequirement(String currentLevel, SpellDef spell) {
+        if (WEIYA.equals(spell.id())) {
+            return !CultivationLevels.isMortal(currentLevel);
+        }
+        if (ABSORB_CULTIVATION.equals(spell.id())) {
+            return !CultivationLevels.isMortal(currentLevel);
+        }
+        if (TUNTIAN.equals(spell.id())) {
+            return !CultivationLevels.isMortal(currentLevel);
+        }
         return CultivationLevels.getStageIndex(currentLevel) >= CultivationLevels.getStageIndex(spell.requiredLevel());
+    }
+
+    public static boolean isInnateKnown(String spellId, String currentLevel) {
+        return WEIYA.equals(normalizeId(spellId)) && !CultivationLevels.isMortal(currentLevel);
+    }
+
+    public static boolean isInnateKnown(String spellId, ModAttachments.CultivationData data) {
+        String normalized = normalizeId(spellId);
+        if (WEIYA.equals(normalized)) {
+            return data != null && !CultivationLevels.isMortal(data.cultivationLevel());
+        }
+        if (data == null) {
+            return false;
+        }
+        if (ABSORB_CULTIVATION.equals(normalized)) {
+            return CultivationMethods.isReincarnationTrueArt(data.activeCultivationMethod());
+        }
+        return TUNTIAN.equals(normalized) && CultivationMethods.isTuntianDemonArt(data.activeCultivationMethod());
     }
 
     public record SpellDef(String id, String translationKey, String requiredLevel, int qiCost, String element, String tier, ResourceLocation icon) {

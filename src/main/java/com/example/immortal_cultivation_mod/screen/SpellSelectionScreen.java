@@ -11,6 +11,7 @@ import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,11 +51,18 @@ public class SpellSelectionScreen extends Screen {
 
     private static List<ModSpells.SpellDef> getKnownSpells() {
         var data = ClientData.cultivationData;
-        if (data == null || data.knownSpells() == null || data.knownSpells().isEmpty()) {
+        if (data == null) {
             return List.of();
         }
 
-        return data.knownSpells().stream()
+        ArrayList<String> spellIds = new ArrayList<>(data.knownSpells() == null ? List.of() : data.knownSpells());
+        for (String spellId : List.of(ModSpells.WEIYA, ModSpells.ABSORB_CULTIVATION, ModSpells.TUNTIAN)) {
+            if (ModSpells.isInnateKnown(spellId, data)) {
+                spellIds.add(spellId);
+            }
+        }
+
+        return spellIds.stream()
                 .map(ModSpells::normalizeId)
                 .map(ModSpells::get)
                 .filter(Objects::nonNull)
@@ -149,7 +157,7 @@ public class SpellSelectionScreen extends Screen {
             guiGraphics.drawString(font, marker, left + 4, top + 2, markerColor, true);
             guiGraphics.drawString(font, spell.name(), left + 34, top + 2, 0xFFFFFF, true);
 
-            String requirement = spell.requiredLevel() + " / " + spell.qiCost() + " qi";
+            String requirement = ModSpells.WEIYA.equals(spell.id()) ? "Innate / 1% qi per second" : spell.requiredLevel() + " / " + spell.qiCost() + " qi";
             guiGraphics.drawString(font, requirement, left + 34, top + 13, 0xFF888888, false);
         }
 

@@ -263,6 +263,11 @@ public class ModPayloads {
                     var updated = switch (payload.stat()) {
                         case "cultivation_level" -> data.withCultivationLevel(nextCultivationLevel(data.cultivationLevel(), payload.delta()));
                         case "body_type" -> data.withBodyType(nextBodyType(data.bodyType(), payload.delta()));
+                        case "age" -> data.withAgePenalty(clamp(
+                                data.agePenalty() - payload.delta(),
+                                0,
+                                Math.max(0, com.example.immortal_cultivation_mod.attachment.CultivationLevels.getLevelDef(data.cultivationLevel()).maxAge() - 1)
+                        ));
                         case "moral" -> data.withMoral(clamp(data.moral() + payload.delta(), 0, 100));
                         case "luck" -> data.withLuck(clamp(data.luck() + payload.delta(), 0, 100));
                         case "soul" -> data.withSoul(clamp(data.soul() + payload.delta(), 0, 1000));
@@ -356,8 +361,12 @@ public class ModPayloads {
                 case ModSpells.LINGZHI_BULLET -> ModItems.LINGZHI_BULLET_SCROLL.get();
                 case ModSpells.WIND_BLADE -> ModItems.WIND_BLADE_SCROLL.get();
                 case ModSpells.WIND_STEP -> ModItems.WIND_STEP_SCROLL.get();
+                case ModSpells.YUFENG_JUE -> ModItems.YUFENG_JUE_SCROLL.get();
                 case ModSpells.SMOKE_ART -> ModItems.SMOKE_ART_SCROLL.get();
                 case ModSpells.SLIDING_WATER -> ModItems.SLIDING_WATER_SCROLL.get();
+                case ModSpells.DINGSHEN -> ModItems.DINGSHEN_SCROLL.get();
+                case ModSpells.YINLEI_JUE -> ModItems.YINLEI_JUE_SCROLL.get();
+                case ModSpells.WULEI_ZHENGFA -> ModItems.WULEI_ZHENGFA_SCROLL.get();
                 default -> null;
             };
             if (scroll == null) {
@@ -455,10 +464,14 @@ public class ModPayloads {
                         return;
                     }
                     var data = ModAttachments.getData(sp);
+                    if (com.example.immortal_cultivation_mod.spell.Weiya.isSuppressed(sp)) {
+                        return;
+                    }
                     if (sp.hasEffect(ModEffects.QI_GATHERING) && !ModSpells.QI_GATHERING.equals(spellId)) {
                         return;
                     }
-                    if (!data.knownSpells().stream().map(ModSpells::normalizeId).toList().contains(spellId)) {
+                    boolean innateKnown = ModSpells.isInnateKnown(spellId, data);
+                    if (!innateKnown && !data.knownSpells().stream().map(ModSpells::normalizeId).toList().contains(spellId)) {
                         sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".spell_not_learned"));
                         return;
                     }
@@ -496,10 +509,24 @@ public class ModPayloads {
                         castWindBlade(sp, data, spell);
                     } else if (ModSpells.WIND_STEP.equals(spellId)) {
                         com.example.immortal_cultivation_mod.spell.WindStep.toggle(sp);
+                    } else if (ModSpells.YUFENG_JUE.equals(spellId)) {
+                        com.example.immortal_cultivation_mod.spell.YufengJue.toggle(sp);
                     } else if (ModSpells.SMOKE_ART.equals(spellId)) {
                         castSmokeArt(sp, data, spell);
                     } else if (ModSpells.SLIDING_WATER.equals(spellId)) {
                         castSlidingWater(sp, data, spell);
+                    } else if (ModSpells.WEIYA.equals(spellId)) {
+                        com.example.immortal_cultivation_mod.spell.Weiya.toggle(sp);
+                    } else if (ModSpells.ABSORB_CULTIVATION.equals(spellId)) {
+                        castAbsorbCultivation(sp, data, spell);
+                    } else if (ModSpells.TUNTIAN.equals(spellId)) {
+                        castTuntian(sp, data);
+                    } else if (ModSpells.DINGSHEN.equals(spellId)) {
+                        castDingshen(sp, data, spell);
+                    } else if (ModSpells.YINLEI_JUE.equals(spellId)) {
+                        castLightning(sp, data, spell, false);
+                    } else if (ModSpells.WULEI_ZHENGFA.equals(spellId)) {
+                        castLightning(sp, data, spell, true);
                     }
                 }
             });
@@ -566,6 +593,103 @@ public class ModPayloads {
             com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
         }
 
+        private static void castAbsorbCultivation(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
+            if (!com.example.immortal_cultivation_mod.attachment.CultivationMethods.isReincarnationTrueArt(data.activeCultivationMethod())) {
+                return;
+            }
+            if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, spell.qiCost())) {
+                sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
+                return;
+            }
+            var projectile = new com.example.immortal_cultivation_mod.entity.AbsorbCultivationProjectileEntity(sp.level(), sp);
+            projectile.shootFromRotation(sp, sp.getXRot(), sp.getYRot(), 0, 1.8f, 0.0f);
+            sp.level().addFreshEntity(projectile);
+            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+        }
+
+        private static void castTuntian(ServerPlayer sp, ModAttachments.CultivationData data) {
+            if (!com.example.immortal_cultivation_mod.attachment.CultivationMethods.isTuntianDemonArt(data.activeCultivationMethod())) {
+                return;
+            }
+            if (!(sp.level() instanceof net.minecraft.server.level.ServerLevel serverLevel)) {
+                return;
+            }
+
+            final int radius = 5;
+            int consumedBlocks = 0;
+            net.minecraft.core.BlockPos center = sp.blockPosition();
+            net.minecraft.world.phys.Vec3 centerVec = sp.position().add(0.0D, sp.getBbHeight() * 0.5D, 0.0D);
+            for (net.minecraft.core.BlockPos pos : net.minecraft.core.BlockPos.betweenClosed(center.offset(-radius, -radius, -radius), center.offset(radius, radius, radius))) {
+                if (pos.distSqr(center) > radius * radius) {
+                    continue;
+                }
+                var state = serverLevel.getBlockState(pos);
+                if (state.isAir() || state.getDestroySpeed(serverLevel, pos) < 0.0F) {
+                    continue;
+                }
+                if (serverLevel.destroyBlock(pos, false, sp)) {
+                    consumedBlocks++;
+                    serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL,
+                            pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
+                            3, 0.25D, 0.25D, 0.25D, 0.05D);
+                }
+            }
+
+            long progressGain = consumedBlocks * 10L;
+            var targets = serverLevel.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class,
+                    new net.minecraft.world.phys.AABB(centerVec, centerVec).inflate(radius),
+                    entity -> entity.isAlive() && !entity.getUUID().equals(sp.getUUID()));
+            for (var target : targets) {
+                if (target.distanceToSqr(centerVec) > radius * radius) {
+                    continue;
+                }
+                float maxHealth = target.getMaxHealth();
+                target.hurt(sp.damageSources().magic(), 100.0F);
+                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.WITCH,
+                        target.getX(), target.getY() + target.getBbHeight() * 0.5D, target.getZ(),
+                        24, 0.35D, 0.35D, 0.35D, 0.08D);
+                if (!target.isAlive() || target.isDeadOrDying()) {
+                    progressGain += Math.max(0L, (long) (maxHealth / 50.0F)) * 20L;
+                }
+            }
+
+            serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.SCULK_SOUL,
+                    centerVec.x, centerVec.y, centerVec.z, 70, radius * 0.45D, 1.4D, radius * 0.45D, 0.12D);
+            serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE,
+                    centerVec.x, centerVec.y, centerVec.z, 45, radius * 0.35D, 0.8D, radius * 0.35D, 0.04D);
+
+            if (progressGain > 0L) {
+                long need = Math.max(1L, com.example.immortal_cultivation_mod.attachment.CultivationLevels.getTotalQiNeeded(data.cultivationLevel()));
+                ModAttachments.setData(sp, data.withCultivationProgress(Math.min(need, data.cultivationProgress() + progressGain)));
+            }
+            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+        }
+
+        private static void castDingshen(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
+            if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, spell.qiCost())) {
+                sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
+                return;
+            }
+            var projectile = new com.example.immortal_cultivation_mod.entity.DingshenProjectileEntity(sp.level(), sp);
+            projectile.shootFromRotation(sp, sp.getXRot(), sp.getYRot(), 0, 1.9f, 0.0f);
+            sp.level().addFreshEntity(projectile);
+            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+        }
+
+        private static void castLightning(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, boolean greater) {
+            if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, spell.qiCost())) {
+                sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
+                return;
+            }
+            var projectile = new com.example.immortal_cultivation_mod.entity.LightningProjectileEntity(sp.level(), sp, greater);
+            projectile.shootFromRotation(sp, sp.getXRot(), sp.getYRot(), 0.0F, greater ? 3.2F : 2.4F, greater ? 0.2F : 0.4F);
+            sp.level().addFreshEntity(projectile);
+            if (sp.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                com.example.immortal_cultivation_mod.entity.SpellImpactParticles.lightning(serverLevel, sp.getEyePosition().add(sp.getLookAngle().scale(0.9D)));
+            }
+            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+        }
+
         private static void castZhenshanPalm(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
             if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, spell.qiCost())) {
                 sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
@@ -614,7 +738,7 @@ public class ModPayloads {
             if (sp.hasEffect(ModEffects.EARTH_ESCAPE)) {
                 return;
             }
-            if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, 5)) {
+            if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, 8)) {
                 sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
                 return;
             }

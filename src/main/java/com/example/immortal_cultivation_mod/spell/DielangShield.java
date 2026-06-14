@@ -13,8 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class DielangShield {
     private static final int MAX_STACK = 3;
-    private static final int[] COSTS = {30, 60, 90};
-    private static final float[] CAPACITY = {10.0F, 30.0F, 90.0F};
+    private static final int[] COSTS = {50, 100, 150};
+    private static final float[] CAPACITY = {12.0F, 36.0F, 108.0F};
     private static final Map<UUID, ShieldState> SHIELDS = new ConcurrentHashMap<>();
 
     private DielangShield() {

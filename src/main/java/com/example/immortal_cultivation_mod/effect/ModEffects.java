@@ -26,6 +26,15 @@ public class ModEffects {
     public static final DeferredHolder<MobEffect, MobEffect> SPELL_DAMAGE_BOOST =
             MOB_EFFECTS.register("spell_damage_boost", SpellDamageBoostEffect::new);
 
+    public static final DeferredHolder<MobEffect, MobEffect> WEIYA =
+            MOB_EFFECTS.register("weiya", WeiyaEffect::new);
+
+    public static final DeferredHolder<MobEffect, MobEffect> WEIYA_SUPPRESSED =
+            MOB_EFFECTS.register("weiya_suppressed", WeiyaSuppressedEffect::new);
+
+    public static final DeferredHolder<MobEffect, MobEffect> DINGSHEN =
+            MOB_EFFECTS.register("dingshen", DingshenEffect::new);
+
     public static void register(IEventBus bus) {
         MOB_EFFECTS.register(bus);
     }

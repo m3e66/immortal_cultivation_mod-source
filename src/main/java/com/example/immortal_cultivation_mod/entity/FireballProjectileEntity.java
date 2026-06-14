@@ -5,6 +5,7 @@ import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import com.example.immortal_cultivation_mod.effect.PhotonEffects;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
@@ -42,6 +43,13 @@ public class FireballProjectileEntity extends ThrowableItemProjectile {
                     -getDeltaMovement().x * 0.08D,
                     -getDeltaMovement().y * 0.08D,
                     -getDeltaMovement().z * 0.08D);
+            level().addParticle(ParticleTypes.FLAME,
+                    getX() + (random.nextDouble() - 0.5D) * 0.12D,
+                    getY() + (random.nextDouble() - 0.5D) * 0.12D,
+                    getZ() + (random.nextDouble() - 0.5D) * 0.12D,
+                    -getDeltaMovement().x * 0.03D,
+                    -getDeltaMovement().y * 0.03D,
+                    -getDeltaMovement().z * 0.03D);
         }
         if (!level().isClientSide && photonEffectAttempts < 5) {
             photonEffectAttempts++;
@@ -53,6 +61,9 @@ public class FireballProjectileEntity extends ThrowableItemProjectile {
     protected void onHit(HitResult result) {
         super.onHit(result);
         if (level().isClientSide) return;
+        if (level() instanceof ServerLevel serverLevel) {
+            SpellImpactParticles.fire(serverLevel, result.getLocation());
+        }
         level().explode(this, getX(), getY(), getZ(), 2.0f, false, Level.ExplosionInteraction.NONE);
         discard();
     }

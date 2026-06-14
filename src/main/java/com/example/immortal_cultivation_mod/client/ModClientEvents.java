@@ -54,6 +54,9 @@ public class ModClientEvents {
         event.registerEntityRenderer(ModEntities.WIND_BLADE_PROJECTILE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(ModEntities.SMOKE_PROJECTILE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(ModEntities.SLIDING_WATER_PROJECTILE.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.ABSORB_CULTIVATION_PROJECTILE.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.DINGSHEN_PROJECTILE.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.LIGHTNING_PROJECTILE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(ModEntities.ZHENSHAN_PALM.get(), EmptyEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.GEO_ROCK.get(), GeoRockBlockRenderer::new);
     }

@@ -10,7 +10,15 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Lingbeng: Lianqi Late, thunder, costs 50 qi.$(br)Enter a breaking-force state. Punch a block or entity to release an explosion. Recasting stacks the radius."
+      "text": "$(br)Lingbeng: Lianqi Late, thunder, costs 85 qi.$(br)Enter a breaking-force state. Punch a block or entity to release an explosion. Recasting stacks the radius."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Lightning Invocation: Lianqi Late, thunder, costs 40 qi.$(br)Shoots a crackling thunder projectile. On hit, lightning falls onto the target for 20 damage."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Five Thunder Orthodoxy: Foundation Establishment Middle, thunder, costs 120 qi.$(br)An orthodox thunder art that fires a stronger projectile and calls five lightning columns for 100 damage."
     },
     {
       "type": "patchouli:text",
@@ -50,6 +58,10 @@
     },
     {
       "type": "patchouli:text",
+      "text": "$(br)Wind Riding Art: Lianqi Late, wind, costs 30 qi per second.$(br)Toggle spell. Grants creative-style low-altitude flight, but flight ends and you fall if no solid block is within 20 blocks below."
+    },
+    {
+      "type": "patchouli:text",
       "text": "$(br)Smoke Art: Lianqi Early, wind, costs 15 qi.$(br)Shoots a smoke projectile that blocks sight by giving the target Blindness for 10 seconds."
     },
     {
@@ -62,15 +74,31 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Zhenshan Palm: Foundation Establishment Middle, earth, tier Earth, costs 130 qi.$(br)Releases a large hand-shaped earth particle wave for 3 seconds. Blocks touched by the palm are destroyed."
+      "text": "$(br)Zhenshan Palm: Foundation Establishment Middle, earth, tier Earth, costs 390 qi.$(br)Releases a large hand-shaped earth particle wave for 3 seconds. Blocks touched by the palm are destroyed."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Light Ball: Foundation Establishment Late, light, costs 30 qi to summon and 10 qi per shot.$(br)Summons 6 light balls in a hexagon behind you, stacking up to 3 rings. Punch to release one, or shift-punch to release all. Each shot deals 50 damage and tears through up to 24 blocks."
+      "text": "$(br)Light Ball: Foundation Establishment Late, light, costs 90 qi to summon and 30 qi per shot.$(br)Summons 6 light balls in a hexagon behind you, stacking up to 3 rings. Punch to release one, or shift-punch to release all. Each shot deals 175 damage and tears through up to 24 blocks."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Dielang Shield: Lianqi Late, water, tier Earth.$(br)Stacks up to 3 times. Stack 1 costs 30 qi, uses water1.fx, and blocks 10 damage. Stack 2 costs 60 qi, uses water2.fx, and blocks 30 damage. Stack 3 costs 90 qi, uses water3.fx, and blocks 90 damage. Leftover shield strength remains after partial hits."
+      "text": "$(br)Dielang Shield: Lianqi Late, water, tier Earth.$(br)Stacks up to 3 times. Stack 1 costs 50 qi and blocks 12 damage. Stack 2 costs 100 qi and blocks 36 damage. Stack 3 costs 150 qi and blocks 108 damage. Leftover shield strength remains after partial hits."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Weiya: innate for non-mortals, dark, toggle spell.$(br)Costs 1% max qi each second and suppresses weaker mobs nearby with slowness, weakness, and spell lock at large level gaps."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Absorb: granted by Reincarnation True Art, dark, costs 80 qi.$(br)Shoots a projectile that steals cultivation progress from a lower-level player and sends stolen progress back to the caster."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Devour Heaven: granted by Heaven Devouring Demon Art, dark.$(br)Consumes blocks in a 5-block radius without drops for 10 progress each. Deals 100 damage to nearby entities and gains 20 progress per 50 max health from kills."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Binding Spell: Foundation Establishment Late, metal, costs 200 qi.$(br)Shoots a binding projectile. Lower-level targets are immobilized for 3, 5, or 10 seconds depending on the level gap."
     }
   ]
 }

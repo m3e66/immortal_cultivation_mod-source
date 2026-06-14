@@ -3,6 +3,7 @@ package com.example.immortal_cultivation_mod.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
@@ -45,6 +46,13 @@ public class IgniteFlareProjectileEntity extends ThrowableItemProjectile {
                         movement.x * 0.02D,
                         movement.y * 0.02D,
                         movement.z * 0.02D);
+                if (i == 0) {
+                    level().addParticle(ParticleTypes.SMALL_FLAME,
+                            getX() - movement.x * back,
+                            getY() - movement.y * back,
+                            getZ() - movement.z * back,
+                            0.0D, 0.01D, 0.0D);
+                }
             }
         }
     }
@@ -53,6 +61,9 @@ public class IgniteFlareProjectileEntity extends ThrowableItemProjectile {
     protected void onHit(HitResult result) {
         super.onHit(result);
         if (!level().isClientSide) {
+            if (level() instanceof ServerLevel serverLevel) {
+                SpellImpactParticles.flare(serverLevel, result.getLocation());
+            }
             discard();
         }
     }

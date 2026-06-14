@@ -36,8 +36,12 @@ public class ModTabs {
                         output.accept(ModItems.LINGZHI_BULLET_SCROLL.get());
                         output.accept(ModItems.WIND_BLADE_SCROLL.get());
                         output.accept(ModItems.WIND_STEP_SCROLL.get());
+                        output.accept(ModItems.YUFENG_JUE_SCROLL.get());
                         output.accept(ModItems.SMOKE_ART_SCROLL.get());
                         output.accept(ModItems.SLIDING_WATER_SCROLL.get());
+                        output.accept(ModItems.DINGSHEN_SCROLL.get());
+                        output.accept(ModItems.YINLEI_JUE_SCROLL.get());
+                        output.accept(ModItems.WULEI_ZHENGFA_SCROLL.get());
                         output.accept(ModItems.ENLIGHTENMENT_PILL.get());
                         output.accept(ModItems.BREAKTHROUGH_PILL.get());
                         output.accept(ModItems.SMALL_LEVEL_UP.get());
@@ -51,6 +55,8 @@ public class ModTabs {
                         output.accept(ModItems.BLOOD_DEMON_JINDAN_METHOD.get());
                         output.accept(ModItems.BLOOD_DEMON_YUANYING_METHOD.get());
                         output.accept(ModItems.BLOOD_DEMON_HUASHEN_METHOD.get());
+                        output.accept(ModItems.REINCARNATION_TRUE_ART_METHOD.get());
+                        output.accept(ModItems.TUNTIAN_DEMON_ART_METHOD.get());
                         output.accept(ModItems.JIUHU.get());
 
                     }).build());

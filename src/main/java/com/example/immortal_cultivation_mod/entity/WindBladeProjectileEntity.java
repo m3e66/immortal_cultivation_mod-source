@@ -2,6 +2,7 @@ package com.example.immortal_cultivation_mod.entity;
 
 import com.example.immortal_cultivation_mod.spell.ModSpells;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
@@ -36,6 +37,11 @@ public class WindBladeProjectileEntity extends ThrowableItemProjectile {
             level().addParticle(ParticleTypes.SWEEP_ATTACK,
                     getX(), getY(), getZ(),
                     movement.x * 0.02D, movement.y * 0.02D, movement.z * 0.02D);
+            level().addParticle(ParticleTypes.CLOUD,
+                    getX() - movement.x * 0.16D,
+                    getY() - movement.y * 0.16D,
+                    getZ() - movement.z * 0.16D,
+                    movement.x * 0.01D, movement.y * 0.01D, movement.z * 0.01D);
         }
     }
 
@@ -43,6 +49,9 @@ public class WindBladeProjectileEntity extends ThrowableItemProjectile {
     protected void onHit(HitResult result) {
         super.onHit(result);
         if (!level().isClientSide) {
+            if (level() instanceof ServerLevel serverLevel) {
+                SpellImpactParticles.wind(serverLevel, result.getLocation());
+            }
             discard();
         }
     }

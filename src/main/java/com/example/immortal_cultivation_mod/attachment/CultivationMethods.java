@@ -9,6 +9,8 @@ public class CultivationMethods {
     public static final String BLOOD_DEMON_JINDAN = "blood_demon_jindan";
     public static final String BLOOD_DEMON_YUANYING = "blood_demon_yuanying";
     public static final String BLOOD_DEMON_HUASHEN = "blood_demon_huashen";
+    public static final String REINCARNATION_TRUE_ART = "reincarnation_true_art";
+    public static final String TUNTIAN_DEMON_ART = "tuntian_demon_art";
 
     public record MethodDef(String id, String nameKey, String element, String tier, String limitLevel, boolean bloodDemon) {}
 
@@ -22,7 +24,11 @@ public class CultivationMethods {
             BLOOD_DEMON_YUANYING, new MethodDef(BLOOD_DEMON_YUANYING, "method.immortal_cultivation_mod.blood_demon_yuanying", "any", "earth",
                     CultivationLevels.REALM_YUANYING + CultivationLevels.STAGE_LATE, true),
             BLOOD_DEMON_HUASHEN, new MethodDef(BLOOD_DEMON_HUASHEN, "method.immortal_cultivation_mod.blood_demon_huashen", "any", "heaven",
-                    CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_LATE, true)
+                    CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_LATE, true),
+            REINCARNATION_TRUE_ART, new MethodDef(REINCARNATION_TRUE_ART, "method.immortal_cultivation_mod.reincarnation_true_art", SpiritRoots.DARK, "heaven",
+                    CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_LATE, false),
+            TUNTIAN_DEMON_ART, new MethodDef(TUNTIAN_DEMON_ART, "method.immortal_cultivation_mod.tuntian_demon_art", SpiritRoots.DARK, "heaven",
+                    CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_LATE, false)
     );
 
     public static MethodDef get(String id) {
@@ -32,6 +38,14 @@ public class CultivationMethods {
     public static boolean isBloodDemon(String id) {
         MethodDef def = get(id);
         return def != null && def.bloodDemon();
+    }
+
+    public static boolean isReincarnationTrueArt(String id) {
+        return REINCARNATION_TRUE_ART.equals(id);
+    }
+
+    public static boolean isTuntianDemonArt(String id) {
+        return TUNTIAN_DEMON_ART.equals(id);
     }
 
     public static boolean canGainProgress(String methodId, String cultivationLevel) {

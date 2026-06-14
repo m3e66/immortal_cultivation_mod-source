@@ -1,7 +1,9 @@
 {
-    "variants":  {
-                     "":  {
-                              "model":  "immortal_cultivation_mod:block/fugu_tai"
-                          }
-                 }
+  "multipart": [
+    { "when": { "up": "true" }, "apply": { "model": "immortal_cultivation_mod:block/fugu_tai", "x": 270 } },
+    { "when": { "north": "true" }, "apply": { "model": "immortal_cultivation_mod:block/fugu_tai" } },
+    { "when": { "east": "true" }, "apply": { "model": "immortal_cultivation_mod:block/fugu_tai", "y": 90 } },
+    { "when": { "south": "true" }, "apply": { "model": "immortal_cultivation_mod:block/fugu_tai", "y": 180 } },
+    { "when": { "west": "true" }, "apply": { "model": "immortal_cultivation_mod:block/fugu_tai", "y": 270 } }
+  ]
 }

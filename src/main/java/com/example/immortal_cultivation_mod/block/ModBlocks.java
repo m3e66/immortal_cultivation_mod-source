@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod.block;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
+import com.example.immortal_cultivation_mod.item.GeoRockBlockItem;
 import com.example.immortal_cultivation_mod.item.ModItems;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -44,7 +45,8 @@ public class ModBlocks {
             () -> new GeoRockBlock(BlockBehaviour.Properties.of()
                     .strength(1.0F)
                     .sound(SoundType.WOOD)
-                    .noOcclusion()));
+                    .noOcclusion()),
+            true);
 
     public static final DeferredBlock<Block> QIANNIAN_LINGMU_HEART =
             registerMaterial("qiannian_lingmu_heart", 2.0F, SoundType.WOOD);
@@ -62,7 +64,7 @@ public class ModBlocks {
             registerOre("hanpo_jade", 2.5F);
 
     public static final DeferredBlock<Block> MOXUAN_IRON =
-            registerOre("moxuan_iron", 5.0F);
+            registerOre("moxuan_iron", 5.0F, false);
 
     public static final DeferredBlock<Block> LIUJIN_SAND = registerBlock("liujin_sand",
             () -> new FlowingGoldSandBlock(BlockBehaviour.Properties.of()
@@ -86,23 +88,33 @@ public class ModBlocks {
     }
 
     private static DeferredBlock<Block> registerOre(String name, float strength) {
+        return registerOre(name, strength, true);
+    }
+
+    private static DeferredBlock<Block> registerOre(String name, float strength, boolean geoInventoryModel) {
         return registerBlock(name, () -> new GeoRockBlock(BlockBehaviour.Properties.of()
                 .strength(strength, strength + 2.0F)
                 .sound(SoundType.STONE)
                 .noOcclusion()
-                .requiresCorrectToolForDrops()));
+                .requiresCorrectToolForDrops()), geoInventoryModel);
     }
 
     private static DeferredBlock<Block> registerMaterial(String name, float strength, SoundType soundType) {
         return registerBlock(name, () -> new GeoRockBlock(BlockBehaviour.Properties.of()
                 .strength(strength, strength + 2.0F)
                 .noOcclusion()
-                .sound(soundType)));
+                .sound(soundType)), true);
     }
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> blockSupplier) {
+        return registerBlock(name, blockSupplier, false);
+    }
+
+    private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> blockSupplier, boolean geoInventoryModel) {
         DeferredBlock<T> block = BLOCKS.register(name, blockSupplier);
-        ModItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
+        ModItems.ITEMS.register(name, () -> geoInventoryModel
+                ? new GeoRockBlockItem(block.get(), new Item.Properties())
+                : new BlockItem(block.get(), new Item.Properties()));
         return block;
     }
 }

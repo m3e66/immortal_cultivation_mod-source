@@ -4,7 +4,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -13,19 +16,37 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class ZhenshanPalmEntity extends Entity {
+public class ZhenshanPalmEntity extends Entity implements GeoEntity {
+    private static final EntityDataAccessor<Float> DATA_FORWARD_X =
+            SynchedEntityData.defineId(ZhenshanPalmEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> DATA_FORWARD_Y =
+            SynchedEntityData.defineId(ZhenshanPalmEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> DATA_FORWARD_Z =
+            SynchedEntityData.defineId(ZhenshanPalmEntity.class, EntityDataSerializers.FLOAT);
     private static final int LIFETIME = 100;
-    private static final float DAMAGE = 100.0F;
+    private static final float DAMAGE = 225.0F;
     private static final int PARTICLE_BLOCK_HIT_LIMIT = 3;
     private static final double PARTICLE_TOUCH_RADIUS = 0.34D;
     private static final int STARTUP_GRACE_TICKS = 3;
-    private static final double HAND_WIDTH_SCALE = 6.0D;
-    private static final double HAND_HEIGHT_SCALE = 4.65D;
+    public static final double HAND_WIDTH_SCALE = 6.0D;
+    public static final double HAND_HEIGHT_SCALE = 4.65D;
+    public static final double HAND_POINT_MIN_X = -2.16D;
+    public static final double HAND_POINT_MAX_X = 2.31D;
+    public static final double HAND_POINT_MIN_Y = -0.39D;
+    public static final double HAND_POINT_MAX_Y = 2.75D;
+    private static final int DUST_PARTICLE_INTERVAL = 3;
+    private static final int SERVER_PARTICLE_INTERVAL = 6;
+    private static final int FINGER_DUST_PARTICLE_INTERVAL = 1;
+    private static final int EARTH_BURSTS_PER_TICK = 1;
 
     private static final double[][] PALM_POINTS = {
             {0.300D, 2.750D},
@@ -2518,6 +2539,7 @@ public class ZhenshanPalmEntity extends Entity {
 
     private final Set<UUID> damagedMobs = new HashSet<>();
     private final int[] particleBlockHits = new int[PALM_POINTS.length];
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private UUID casterId;
 
     public ZhenshanPalmEntity(EntityType<? extends ZhenshanPalmEntity> entityType, Level level) {
@@ -2533,6 +2555,8 @@ public class ZhenshanPalmEntity extends Entity {
         Vec3 start = caster.position().add(0.0D, caster.getEyeHeight() - 0.25D, 0.0D).add(look.scale(2.6D));
         moveTo(start.x, start.y, start.z, caster.getYRot(), caster.getXRot());
         setDeltaMovement(look.scale(0.85D));
+        setForward(look);
+        updateRotationFromMovement(look);
     }
 
     @Override
@@ -2541,16 +2565,14 @@ public class ZhenshanPalmEntity extends Entity {
         setNoGravity(true);
         super.tick();
         setPos(getX() + getDeltaMovement().x, getY() + getDeltaMovement().y, getZ() + getDeltaMovement().z);
+        updateRotationFromMovement(forward());
 
         if (tickCount > LIFETIME) {
             discard();
             return;
         }
 
-        Vec3 forward = getDeltaMovement().normalize();
-        if (forward.lengthSqr() < 0.001D) {
-            forward = new Vec3(0.0D, 0.0D, 1.0D);
-        }
+        Vec3 forward = forward();
         Vec3 up = new Vec3(0.0D, 1.0D, 0.0D);
         Vec3 right = forward.cross(up).normalize();
         if (right.lengthSqr() < 0.001D) {
@@ -2577,18 +2599,31 @@ public class ZhenshanPalmEntity extends Entity {
                         continue;
                     }
                 }
-                level().addParticle(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DIRT.defaultBlockState()),
-                        pos.x, pos.y, pos.z,
-                        (random.nextDouble() - 0.5D) * 0.08D,
-                        (random.nextDouble() - 0.5D) * 0.08D,
-                        (random.nextDouble() - 0.5D) * 0.08D);
-                if (random.nextFloat() < 0.25F) {
-                    level().addParticle(ParticleTypes.CLOUD, pos.x, pos.y, pos.z, 0.0D, 0.02D, 0.0D);
+                if ((i + tickCount) % DUST_PARTICLE_INTERVAL == 0) {
+                    level().addParticle(earthParticle(i),
+                            pos.x, pos.y, pos.z,
+                            (random.nextDouble() - 0.5D) * 0.04D,
+                            (random.nextDouble() - 0.5D) * 0.04D,
+                            (random.nextDouble() - 0.5D) * 0.04D);
+                    if ((i + tickCount) % 9 == 0) {
+                        level().addParticle(ParticleTypes.POOF,
+                                pos.x, pos.y, pos.z,
+                                (random.nextDouble() - 0.5D) * 0.025D,
+                                0.01D,
+                                (random.nextDouble() - 0.5D) * 0.025D);
+                    }
                 }
             } else {
                 if (touchesBlock) {
                     touchedBlocksThisTick.add(blockPos);
                     particleBlockHits[i]++;
+                }
+                if (level() instanceof ServerLevel serverLevel && (i + tickCount) % SERVER_PARTICLE_INTERVAL == 0) {
+                    serverLevel.sendParticles(earthParticle(i),
+                            pos.x, pos.y, pos.z,
+                            1,
+                            0.01D, 0.01D, 0.01D,
+                            0.01D);
                 }
                 if (tickCount > STARTUP_GRACE_TICKS) {
                     damageTouchedMob(pos);
@@ -2597,26 +2632,58 @@ public class ZhenshanPalmEntity extends Entity {
         }
 
         if (!level().isClientSide && !touchedBlocksThisTick.isEmpty()) {
+            int earthBursts = 0;
             for (BlockPos pos : touchedBlocksThisTick) {
-                breakTouchedBlock(pos);
+                if (breakTouchedBlock(pos, earthBursts < EARTH_BURSTS_PER_TICK)) {
+                    earthBursts++;
+                }
             }
         }
 
         if (level().isClientSide) {
-            for (double[] point : FINGER_TIPS) {
+            for (int i = 0; i < FINGER_TIPS.length; i++) {
+                double[] point = FINGER_TIPS[i];
                 if (isParticlePointDisabled(point)) {
                     continue;
                 }
                 Vec3 pos = handPoint(point, right, up);
-                level().addParticle(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.SAND.defaultBlockState()),
-                        pos.x, pos.y, pos.z,
-                        (random.nextDouble() - 0.5D) * 0.04D,
-                        0.02D,
-                        (random.nextDouble() - 0.5D) * 0.04D);
+                if ((i + tickCount) % FINGER_DUST_PARTICLE_INTERVAL == 0) {
+                    level().addParticle(fingerParticle(i),
+                            pos.x, pos.y, pos.z,
+                            (random.nextDouble() - 0.5D) * 0.04D,
+                            0.02D,
+                            (random.nextDouble() - 0.5D) * 0.04D);
+                    if ((i + tickCount) % 5 == 0) {
+                        level().addParticle(ParticleTypes.CLOUD,
+                                pos.x, pos.y, pos.z,
+                                (random.nextDouble() - 0.5D) * 0.02D,
+                                0.01D,
+                                (random.nextDouble() - 0.5D) * 0.02D);
+                    }
+                }
             }
         } else if (activeParticles == 0) {
             discard();
         }
+    }
+
+    private BlockParticleOption earthParticle(int index) {
+        return switch (Math.floorMod(index + tickCount, 5)) {
+            case 0 -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DIRT.defaultBlockState());
+            case 1 -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.COARSE_DIRT.defaultBlockState());
+            case 2 -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.GRAVEL.defaultBlockState());
+            case 3 -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.MUD.defaultBlockState());
+            default -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.SAND.defaultBlockState());
+        };
+    }
+
+    private BlockParticleOption fingerParticle(int index) {
+        return switch (Math.floorMod(index + tickCount, 4)) {
+            case 0 -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.SAND.defaultBlockState());
+            case 1 -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.RED_SAND.defaultBlockState());
+            case 2 -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.GRAVEL.defaultBlockState());
+            default -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DIRT.defaultBlockState());
+        };
     }
 
     private boolean isParticlePointDisabled(double[] point) {
@@ -2630,6 +2697,38 @@ public class ZhenshanPalmEntity extends Entity {
 
     private Vec3 handPoint(double[] point, Vec3 right, Vec3 up) {
         return position().add(right.scale(point[0] * HAND_WIDTH_SCALE)).add(up.scale(point[1] * HAND_HEIGHT_SCALE));
+    }
+
+    public Vec3 forward() {
+        Vec3 forward = new Vec3(entityData.get(DATA_FORWARD_X), entityData.get(DATA_FORWARD_Y), entityData.get(DATA_FORWARD_Z));
+        if (forward.lengthSqr() < 0.001D) {
+            forward = getDeltaMovement();
+        }
+        if (forward.lengthSqr() < 0.001D) {
+            return new Vec3(0.0D, 0.0D, 1.0D);
+        }
+        return forward.normalize();
+    }
+
+    private void setForward(Vec3 forward) {
+        Vec3 normalized = forward.lengthSqr() < 0.001D ? new Vec3(0.0D, 0.0D, 1.0D) : forward.normalize();
+        entityData.set(DATA_FORWARD_X, (float) normalized.x);
+        entityData.set(DATA_FORWARD_Y, (float) normalized.y);
+        entityData.set(DATA_FORWARD_Z, (float) normalized.z);
+    }
+
+    private void updateRotationFromMovement(Vec3 movement) {
+        if (movement.lengthSqr() < 0.001D) {
+            return;
+        }
+
+        Vec3 direction = movement.normalize();
+        float yaw = (float) Math.toDegrees(Math.atan2(direction.x, direction.z));
+        float pitch = (float) -Math.toDegrees(Math.atan2(direction.y, Math.sqrt(direction.x * direction.x + direction.z * direction.z)));
+        setYRot(yaw);
+        setXRot(pitch);
+        yRotO = yaw;
+        xRotO = pitch;
     }
 
     private boolean damageTouchedMob(Vec3 pos) {
@@ -2651,14 +2750,24 @@ public class ZhenshanPalmEntity extends Entity {
             }
 
             mob.hurt(damageSources().magic(), damage);
+            if (level() instanceof ServerLevel serverLevel) {
+                SpellImpactParticles.earth(serverLevel, pos);
+            }
             return true;
         }
         return false;
     }
 
     private boolean breakTouchedBlock(BlockPos pos) {
+        return breakTouchedBlock(pos, true);
+    }
+
+    private boolean breakTouchedBlock(BlockPos pos, boolean showImpactParticles) {
         if (!touchesBreakableBlock(pos)) {
             return false;
+        }
+        if (showImpactParticles && level() instanceof ServerLevel serverLevel) {
+            SpellImpactParticles.earth(serverLevel, Vec3.atCenterOf(pos));
         }
         level().destroyBlock(pos, true, this);
         return true;
@@ -2671,6 +2780,9 @@ public class ZhenshanPalmEntity extends Entity {
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_FORWARD_X, 0.0F);
+        builder.define(DATA_FORWARD_Y, 0.0F);
+        builder.define(DATA_FORWARD_Z, 1.0F);
     }
 
     @Override
@@ -2679,5 +2791,14 @@ public class ZhenshanPalmEntity extends Entity {
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

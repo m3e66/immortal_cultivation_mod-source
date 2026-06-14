@@ -103,7 +103,13 @@ public class MethodLearningScreen extends Screen {
 
         g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".special_effect_label"), lx, ly, labelColor, true);
         ly += 12;
-        String effectKey = method.bloodDemon() ? "method_special." + ImmortalCultivationMod.MODID + ".blood_demon" : "method_special." + ImmortalCultivationMod.MODID + ".none";
+        String effectKey = method.bloodDemon()
+                ? "method_special." + ImmortalCultivationMod.MODID + ".blood_demon"
+                : CultivationMethods.isReincarnationTrueArt(methodId)
+                ? "method_special." + ImmortalCultivationMod.MODID + ".reincarnation_true_art"
+                : CultivationMethods.isTuntianDemonArt(methodId)
+                ? "method_special." + ImmortalCultivationMod.MODID + ".tuntian_demon_art"
+                : "method_special." + ImmortalCultivationMod.MODID + ".none";
         g.drawString(mc.font, Component.translatable(effectKey), lx, ly, 0xAAAAAA, true);
 
         if (ClientData.cultivationData.activeCultivationMethod().equals(methodId)) {

@@ -3,6 +3,7 @@ package com.example.immortal_cultivation_mod.entity;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
@@ -39,6 +40,13 @@ public class LingzhiBulletProjectileEntity extends ThrowableItemProjectile {
                     -getDeltaMovement().x * 0.05D,
                     -getDeltaMovement().y * 0.05D,
                     -getDeltaMovement().z * 0.05D);
+            level().addParticle(ParticleTypes.HAPPY_VILLAGER,
+                    getX() + (random.nextDouble() - 0.5D) * 0.10D,
+                    getY() + (random.nextDouble() - 0.5D) * 0.10D,
+                    getZ() + (random.nextDouble() - 0.5D) * 0.10D,
+                    -getDeltaMovement().x * 0.02D,
+                    -getDeltaMovement().y * 0.02D,
+                    -getDeltaMovement().z * 0.02D);
         }
     }
 
@@ -46,6 +54,9 @@ public class LingzhiBulletProjectileEntity extends ThrowableItemProjectile {
     protected void onHit(HitResult result) {
         super.onHit(result);
         if (!level().isClientSide) {
+            if (level() instanceof ServerLevel serverLevel) {
+                SpellImpactParticles.wood(serverLevel, result.getLocation());
+            }
             discard();
         }
     }

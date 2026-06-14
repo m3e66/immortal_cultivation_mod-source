@@ -1,0 +1,34 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.immortal_cultivation_mod.zhenshan_palm",
+        "texture_width": 16,
+        "texture_height": 16,
+        "visible_bounds_width": 30,
+        "visible_bounds_height": 30,
+        "visible_bounds_offset": [0, 6, 0]
+      },
+      "bones": [
+        {
+          "name": "root",
+          "pivot": [0, 0, 0],
+          "cubes": [
+            { "name": "palm_core", "origin": [-11, -8, -1], "size": [22, 21, 2], "uv": [0, 0] },
+            { "name": "thumb_base", "origin": [-23, -3, -1], "size": [13, 7, 2], "pivot": [-11, 0, 0], "rotation": [0, 0, -25], "uv": [0, 0] },
+            { "name": "thumb_tip", "origin": [-30, -1, -1], "size": [8, 5, 2], "pivot": [-24, 1, 0], "rotation": [0, 0, -12], "uv": [0, 0] },
+            { "name": "index_finger", "origin": [-9, 12, -1], "size": [5, 20, 2], "uv": [0, 0] },
+            { "name": "middle_finger", "origin": [-3, 13, -1], "size": [6, 23, 2], "uv": [0, 0] },
+            { "name": "ring_finger", "origin": [4, 12, -1], "size": [5, 19, 2], "uv": [0, 0] },
+            { "name": "little_finger", "origin": [10, 8, -1], "size": [5, 15, 2], "pivot": [11, 9, 0], "rotation": [0, 0, -10], "uv": [0, 0] },
+            { "name": "wrist", "origin": [-9, -20, -1], "size": [18, 13, 2], "uv": [0, 0] },
+            { "name": "earth_ridge_left", "origin": [-8, -5, -2], "size": [3, 14, 1], "uv": [0, 0] },
+            { "name": "earth_ridge_center", "origin": [-1, -4, -2], "size": [3, 15, 1], "uv": [0, 0] },
+            { "name": "earth_ridge_right", "origin": [6, -5, -2], "size": [3, 13, 1], "uv": [0, 0] }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -16,8 +16,8 @@ import java.util.Comparator;
 import java.util.List;
 
 public final class LightBeamAttack {
-    private static final int CAST_COST = 30;
-    private static final int SHOOT_COST = 10;
+    private static final int CAST_COST = 90;
+    private static final int SHOOT_COST = 30;
 
     private LightBeamAttack() {
     }

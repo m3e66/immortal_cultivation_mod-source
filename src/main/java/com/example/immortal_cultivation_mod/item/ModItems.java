@@ -70,11 +70,23 @@ public class ModItems {
     public static final DeferredItem<Item> WIND_STEP_SCROLL = registerItem("wind_step_scroll",
             () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.WIND_STEP));
 
+    public static final DeferredItem<Item> YUFENG_JUE_SCROLL = registerItem("yufeng_jue_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.YUFENG_JUE));
+
     public static final DeferredItem<Item> SMOKE_ART_SCROLL = registerItem("smoke_art_scroll",
             () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.SMOKE_ART));
 
     public static final DeferredItem<Item> SLIDING_WATER_SCROLL = registerItem("sliding_water_scroll",
             () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.SLIDING_WATER));
+
+    public static final DeferredItem<Item> DINGSHEN_SCROLL = registerItem("dingshen_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.DINGSHEN));
+
+    public static final DeferredItem<Item> YINLEI_JUE_SCROLL = registerItem("yinlei_jue_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.YINLEI_JUE));
+
+    public static final DeferredItem<Item> WULEI_ZHENGFA_SCROLL = registerItem("wulei_zhengfa_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.WULEI_ZHENGFA));
 
     public static final DeferredItem<Item> ENLIGHTENMENT_PILL = registerItem("enlightenment_pill",
             () -> new EnlightenmentPillItem(new Item.Properties().stacksTo(16)));
@@ -115,6 +127,12 @@ public class ModItems {
     public static final DeferredItem<Item> BLOOD_DEMON_HUASHEN_METHOD = registerItem("blood_demon_huashen_method",
             () -> new CultivationMethodItem(new Item.Properties().stacksTo(1), CultivationMethods.BLOOD_DEMON_HUASHEN));
 
+    public static final DeferredItem<Item> REINCARNATION_TRUE_ART_METHOD = registerItem("reincarnation_true_art_method",
+            () -> new CultivationMethodItem(new Item.Properties().stacksTo(1), CultivationMethods.REINCARNATION_TRUE_ART));
+
+    public static final DeferredItem<Item> TUNTIAN_DEMON_ART_METHOD = registerItem("tuntian_demon_art_method",
+            () -> new CultivationMethodItem(new Item.Properties().stacksTo(1), CultivationMethods.TUNTIAN_DEMON_ART));
+
     public static final DeferredItem<Item> LINGJIAO_SCALE = registerItem("lingjiao_scale",
             () -> new Item(new Item.Properties()));
 
@@ -152,11 +170,12 @@ public class ModItems {
                 case ModSpells.FIREBALL, ModSpells.IGNITE_FLARE -> ChatFormatting.RED;
                 case ModSpells.REGENERATION -> ChatFormatting.GREEN;
                 case ModSpells.CLEANSE, ModSpells.DIELANG_SHIELD, ModSpells.SLIDING_WATER -> ChatFormatting.AQUA;
-                case ModSpells.EARTH_ESCAPE, ModSpells.ZHENSHAN_PALM -> ChatFormatting.YELLOW;
-                case ModSpells.LINGBENG -> ChatFormatting.LIGHT_PURPLE;
+                case ModSpells.EARTH_ESCAPE, ModSpells.ZHENSHAN_PALM, ModSpells.DINGSHEN -> ChatFormatting.YELLOW;
+                case ModSpells.LINGBENG, ModSpells.YINLEI_JUE, ModSpells.WULEI_ZHENGFA,
+                     ModSpells.ABSORB_CULTIVATION, ModSpells.TUNTIAN -> ChatFormatting.LIGHT_PURPLE;
                 case ModSpells.BEAM, ModSpells.SPIRIT_SIGHT, ModSpells.LIGHT_BEAM_ATTACK -> ChatFormatting.WHITE;
                 case ModSpells.QI_GATHERING, ModSpells.LINGZHI_BULLET, ModSpells.WIND_BLADE,
-                     ModSpells.WIND_STEP, ModSpells.SMOKE_ART -> ChatFormatting.DARK_AQUA;
+                     ModSpells.WIND_STEP, ModSpells.YUFENG_JUE, ModSpells.SMOKE_ART -> ChatFormatting.DARK_AQUA;
                 default -> ChatFormatting.GRAY;
             };
         }

@@ -1,1 +1,6 @@
-{ "parent": "minecraft:item/generated", "textures": { "layer0": "immortal_cultivation_mod:item/basic_breathing_method" } }
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "immortal_cultivation_mod:item/scroll_ice"
+  }
+}

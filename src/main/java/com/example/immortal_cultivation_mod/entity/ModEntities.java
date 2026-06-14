@@ -75,6 +75,33 @@ public class ModEntities {
                             .updateInterval(1)
                             .build("sliding_water_projectile"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<AbsorbCultivationProjectileEntity>> ABSORB_CULTIVATION_PROJECTILE =
+            ENTITY_TYPES.register("absorb_cultivation_projectile",
+                    () -> EntityType.Builder.<AbsorbCultivationProjectileEntity>of(
+                            AbsorbCultivationProjectileEntity::new, MobCategory.MISC)
+                            .sized(0.35f, 0.35f)
+                            .clientTrackingRange(10)
+                            .updateInterval(1)
+                            .build("absorb_cultivation_projectile"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<DingshenProjectileEntity>> DINGSHEN_PROJECTILE =
+            ENTITY_TYPES.register("dingshen_projectile",
+                    () -> EntityType.Builder.<DingshenProjectileEntity>of(
+                            DingshenProjectileEntity::new, MobCategory.MISC)
+                            .sized(0.35f, 0.35f)
+                            .clientTrackingRange(10)
+                            .updateInterval(1)
+                            .build("dingshen_projectile"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<LightningProjectileEntity>> LIGHTNING_PROJECTILE =
+            ENTITY_TYPES.register("lightning_projectile",
+                    () -> EntityType.Builder.<LightningProjectileEntity>of(
+                            LightningProjectileEntity::new, MobCategory.MISC)
+                            .sized(0.35f, 0.35f)
+                            .clientTrackingRange(12)
+                            .updateInterval(1)
+                            .build("lightning_projectile"));
+
     public static final DeferredHolder<EntityType<?>, EntityType<ZhenshanPalmEntity>> ZHENSHAN_PALM =
             ENTITY_TYPES.register("zhenshan_palm",
                     () -> EntityType.Builder.<ZhenshanPalmEntity>of(

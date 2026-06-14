@@ -76,7 +76,7 @@ public class StatMenuScreen extends Screen {
 
         String level = CultivationLevels.isMortal(data.cultivationLevel()) ? CultivationLevels.REALM_MORTAL : data.cultivationLevel();
         var levelDef = CultivationLevels.getLevelDef(level);
-        int maxHp = levelDef.maxHp() + data.maxHpBonus();
+        int maxHp = Math.max(1, levelDef.maxHp() + data.maxHpBonus());
         int maxQi = levelDef.maxQi() + data.maxQiBonus();
         int maxAge = Math.max(1, levelDef.maxAge() - data.agePenalty());
 

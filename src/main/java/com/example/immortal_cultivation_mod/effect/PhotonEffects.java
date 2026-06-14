@@ -10,8 +10,10 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.fml.ModList;
@@ -24,9 +26,13 @@ public final class PhotonEffects {
     private static final String BALL_FX = "immortal_cultivation_mod:ball";
     private static final String PUDDLE_FX = "immortal_cultivation_mod:puddle";
     private static final String MEDITATING_FX = "immortal_cultivation_mod:meditating";
+    private static final String WEIYA_FX = "immortal_cultivation_mod:rage3";
     private static final String WATER_SHIELD_FX_PREFIX = "immortal_cultivation_mod:water";
     private static final int BEAM_DURATION_TICKS = 20 * 10;
+    private static final int LINGBENG_AURA_TICKS = 6;
     private static final Map<UUID, BeamRemoval> BEAM_REMOVALS = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> LINGBENG_AURAS = new ConcurrentHashMap<>();
+    private static final Map<BlockEffectLocation, Long> LINGBENG_BLOCK_REMOVALS = new ConcurrentHashMap<>();
 
     private PhotonEffects() {
     }
@@ -44,7 +50,29 @@ public final class PhotonEffects {
     }
 
     public static void lingbengExplosion(ServerLevel level, double x, double y, double z) {
-        playBlockEffect(level, LINGBENG_FX, x, y, z, 1.6D);
+        playSimpleBlockEffect(level, LINGBENG_FX, x, y, z);
+        LINGBENG_BLOCK_REMOVALS.put(new BlockEffectLocation(level.dimension(), x, y, z), level.getGameTime() + LINGBENG_AURA_TICKS);
+    }
+
+    public static void lingbengStart(ServerPlayer player) {
+        if (!ModList.get().isLoaded("photon")) {
+            return;
+        }
+
+        LINGBENG_AURAS.put(player.getUUID(), player.level().getGameTime() + LINGBENG_AURA_TICKS);
+        String command = String.format(Locale.ROOT, "photon fx %s entity @s", LINGBENG_FX);
+        runPhotonCommand(player.serverLevel(), player.createCommandSourceStack().withPermission(4).withSuppressedOutput(), command);
+    }
+
+    public static void lingbengStop(ServerPlayer player) {
+        if (!ModList.get().isLoaded("photon")) {
+            return;
+        }
+
+        LINGBENG_AURAS.remove(player.getUUID());
+        for (ServerPlayer viewer : player.serverLevel().players()) {
+            sendRemoveEntityEffectToPlayer(viewer, LINGBENG_FX, List.of(player));
+        }
     }
 
     public static void puddle(ServerLevel level, double x, double y, double z) {
@@ -92,6 +120,26 @@ public final class PhotonEffects {
         }
     }
 
+    public static void weiyaStart(ServerPlayer player) {
+        if (!ModList.get().isLoaded("photon")) {
+            return;
+        }
+
+        for (ServerPlayer viewer : player.serverLevel().players()) {
+            sendEntityEffectToPlayer(viewer, WEIYA_FX, List.of(player));
+        }
+    }
+
+    public static void weiyaStop(ServerPlayer player) {
+        if (!ModList.get().isLoaded("photon")) {
+            return;
+        }
+
+        for (ServerPlayer viewer : player.serverLevel().players()) {
+            sendRemoveEntityEffectToPlayer(viewer, WEIYA_FX, List.of(player));
+        }
+    }
+
     public static void removeWaterShield(ServerPlayer player) {
         if (!ModList.get().isLoaded("photon")) {
             return;
@@ -115,6 +163,12 @@ public final class PhotonEffects {
     }
 
     public static void tick(ServerPlayer player) {
+        Long lingbengAuraEnd = LINGBENG_AURAS.get(player.getUUID());
+        if (lingbengAuraEnd != null && (!player.hasEffect(ModEffects.LINGBENG) || player.level().getGameTime() >= lingbengAuraEnd)) {
+            lingbengStop(player);
+        }
+        tickLingbengBlockRemovals(player);
+
         BeamRemoval removal = BEAM_REMOVALS.get(player.getUUID());
         if (removal == null || player.level().getGameTime() < removal.removeAtGameTime()) {
             return;
@@ -122,6 +176,18 @@ public final class PhotonEffects {
 
         BEAM_REMOVALS.remove(player.getUUID());
         sendRemoveEntityEffectToPlayer(player, BEAM_FX, removal.entities());
+    }
+
+    private static void tickLingbengBlockRemovals(ServerPlayer player) {
+        long gameTime = player.level().getGameTime();
+        ResourceKey<Level> dimension = player.level().dimension();
+        LINGBENG_BLOCK_REMOVALS.entrySet().removeIf(entry -> {
+            if (gameTime < entry.getValue() || !entry.getKey().dimension().equals(dimension)) {
+                return false;
+            }
+            removeBlockEffect(player.serverLevel(), entry.getKey().x(), entry.getKey().y(), entry.getKey().z());
+            return true;
+        });
     }
 
     private static void playBlockEffect(ServerLevel level, String fx, double x, double y, double z, double scale) {
@@ -219,6 +285,10 @@ public final class PhotonEffects {
     }
 
     private static void removeBlockEffect(ServerLevel level, BlockPos pos) {
+        removeBlockEffect(level, pos.getX(), pos.getY(), pos.getZ());
+    }
+
+    private static void removeBlockEffect(ServerLevel level, double x, double y, double z) {
         if (!ModList.get().isLoaded("photon")) {
             return;
         }
@@ -226,7 +296,7 @@ public final class PhotonEffects {
         String command = "photon fx remove block ~ ~ ~";
         var source = level.getServer().createCommandSourceStack()
                 .withPermission(4)
-                .withPosition(new net.minecraft.world.phys.Vec3(pos.getX(), pos.getY(), pos.getZ()))
+                .withPosition(new net.minecraft.world.phys.Vec3(x, y, z))
                 .withSuppressedOutput();
         runPhotonCommand(level, source, command);
     }
@@ -236,5 +306,8 @@ public final class PhotonEffects {
     }
 
     private record BeamRemoval(long removeAtGameTime, List<Entity> entities) {
+    }
+
+    private record BlockEffectLocation(ResourceKey<Level> dimension, double x, double y, double z) {
     }
 }

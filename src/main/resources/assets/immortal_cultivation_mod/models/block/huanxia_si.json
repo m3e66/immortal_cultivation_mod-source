@@ -1,7 +1,7 @@
 {
-    "parent":  "minecraft:block/cross",
-    "render_type":  "cutout",
-    "textures":  {
-                     "cross":  "immortal_cultivation_mod:block/huanxia_si"
-                 }
+  "parent": "minecraft:block/vine",
+  "render_type": "cutout",
+  "textures": {
+    "vine": "immortal_cultivation_mod:block/huanxia_si"
+  }
 }

@@ -186,9 +186,9 @@ public class ModAttachments {
                 case "skill_points" -> copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
                         Math.max(0, skillPoints + delta), maxHpBonus, maxQiBonus, maxEnergyBonus, physicalAttack, magicAttack, mentalAttack);
                 case "max_hp" -> copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
-                        skillPoints, Math.max(0, maxHpBonus + delta), maxQiBonus, maxEnergyBonus, physicalAttack, magicAttack, mentalAttack);
+                        skillPoints, Math.max(1 - CultivationLevels.getLevelDef(cultivationLevel).maxHp(), maxHpBonus + delta), maxQiBonus, maxEnergyBonus, physicalAttack, magicAttack, mentalAttack);
                 case "max_qi" -> copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
-                        skillPoints, maxHpBonus, Math.max(0, maxQiBonus + delta), maxEnergyBonus, physicalAttack, magicAttack, mentalAttack);
+                        skillPoints, maxHpBonus, Math.max(1 - CultivationLevels.getLevelDef(cultivationLevel).maxQi(), maxQiBonus + delta), maxEnergyBonus, physicalAttack, magicAttack, mentalAttack);
                 case "max_energy" -> copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
                         skillPoints, maxHpBonus, maxQiBonus, Math.max(0, maxEnergyBonus + delta), physicalAttack, magicAttack, mentalAttack);
                 case "physical" -> copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
@@ -197,6 +197,26 @@ public class ModAttachments {
                         skillPoints, maxHpBonus, maxQiBonus, maxEnergyBonus, physicalAttack, Math.max(0, magicAttack + delta), mentalAttack);
                 case "mental" -> copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
                         skillPoints, maxHpBonus, maxQiBonus, maxEnergyBonus, physicalAttack, magicAttack, Math.max(0, mentalAttack + delta));
+                default -> this;
+            };
+        }
+
+        public CultivationData debugSetStat(String stat, int value, CultivationLevels.LevelDef levelDef) {
+            return switch (stat) {
+                case "skill_points" -> copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
+                        Math.max(0, value), maxHpBonus, maxQiBonus, maxEnergyBonus, physicalAttack, magicAttack, mentalAttack);
+                case "max_hp" -> copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
+                        skillPoints, value - levelDef.maxHp(), maxQiBonus, maxEnergyBonus, physicalAttack, magicAttack, mentalAttack);
+                case "max_qi" -> copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
+                        skillPoints, maxHpBonus, value - levelDef.maxQi(), maxEnergyBonus, physicalAttack, magicAttack, mentalAttack);
+                case "max_energy" -> copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
+                        skillPoints, maxHpBonus, maxQiBonus, Math.max(0, value), physicalAttack, magicAttack, mentalAttack);
+                case "physical" -> copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
+                        skillPoints, maxHpBonus, maxQiBonus, maxEnergyBonus, Math.max(0, value), magicAttack, mentalAttack);
+                case "magic" -> copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
+                        skillPoints, maxHpBonus, maxQiBonus, maxEnergyBonus, physicalAttack, Math.max(0, value), mentalAttack);
+                case "mental" -> copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
+                        skillPoints, maxHpBonus, maxQiBonus, maxEnergyBonus, physicalAttack, magicAttack, Math.max(0, value));
                 default -> this;
             };
         }

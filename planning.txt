@@ -1,0 +1,108 @@
+        轮回真决：南宫婉功法，可以吸取他人修为。
+        Cultivation limit: HUASHEN late
+        Element: 暗
+        Special effect: gain a new spell that is auto added called 吸取 (it shoot a projroctilce out and if hit player take 1/10 of their max progress (if current progress - 1/10 of their max progress = negative progress then lower their level and there current progess after lowering a level is maxed and then minus the remaining progress off of that) (only work if target levle is lower than caster)and give it to the caster)
+        the effect are
+        particle for shooting at target and if steal progress successful then add a particle from the target to fly back at the caster
+
+
+        定身咒：默念法诀，令目标短时间内身体僵住无法动弹。
+        REALM_ZHUJI late
+        Element 金
+        Cost 200
+        shoot a projectile and after hit a mob or player it give a effect that stop them from moving
+        if lower than caster level by 1 small level effect for 3
+        if lower than caster level by 1 big level effect for 5
+        if anything else lower then slowness 10 effect for 10
+        if higher than caster level no effect
+
+
+破妄眼：短暂看破幻象、伪装，直视事物本源。
+
+
+        引雷诀：沟通天地灵气，引落雷光轰击目标。
+        Lianqi late
+        Element 雷
+        Cost 40
+        Dmg 20
+
+        • 五雷正法：正统雷法，掌心雷、天雷降世，克制邪祟。
+        REALM_ZHUJI middle
+        Element 雷
+        Cost 120
+        Dmg 100
+
+
+• 万剑诀：御剑术巅峰，千剑齐发、剑域笼罩。
+Lianqi early
+Element 金,风
+Cost
+Dmg
+
+
+• 青元剑诀（凡人）：攻防一体，剑芒、剑盾、剑阵俱全。
+Lianqi early
+Element 金,风
+Cost
+Dmg
+
+• 龟息术：闭气、隐藏气息、抗毒，保命神技。
+
+• 元罡罩：灵气化盾，硬扛法宝法术。
+Lianqi early
+Element 风
+Cost
+Dmg
+
+        • 御风诀：踏风而行，低空飞行、灵活闪避。
+        Lianqi late
+        Element 风
+        Cost 30 per sec
+        give creative flight
+        if 20 block from block fall down
+
+• 法天象地：化身万丈，巨力碾压，神魔常用。
+Lianqi early
+Element none
+Cost
+Dmg
+
+• 撒豆成兵：豆子变兵，数量压制、辅助围杀。
+Lianqi early
+Element 木,土
+Cost
+Dmg
+
+• 呼风唤雨：操控天气，水攻、风扰、雷降。
+Lianqi early
+Element 水,风
+Cost
+Dmg
+
+• 炼神术（凡人）：神识暴涨几十倍，透支后世天赋。
+Lianqi early
+Element none
+Cost
+Dmg
+
+        • 吞天魔功：吞噬万灵本源，成长极快、血腥霸道。
+        Cultivation limit: HUASHEN late
+        Element: 暗
+        Special effect: gain a new spell that is auto added called 吞天
+        after using the spell consume blcoks in a 5 block radius ((dont drop blocks)for every block there is add 10 progress) and do 100 dmg to entity in 5 block radius if killed entity then for every 50 max hp the entity have add 20 progress
+
+air attack
+Cultivation limit: REALM_JINDAN late
+Element: 风
+Special effect: gain a new toggle spell that is auto added called
+
+长青诀
+Cultivation limit: REALM_JINDAN late
+Element: 水,土
+Special effect: grow plants near the player but no tall grass
+
+焚天续命功
+Cultivation limit: REALM_JINDAN late
+Element: 火
+Special effect: when die go into specator mode, but cant teleport to other player, goes back to survival mode with 1 heart in 1 min (if die again then die for real this time, the revive count will reset when player get back to full health)
+when in this state have a fiery trail with the player

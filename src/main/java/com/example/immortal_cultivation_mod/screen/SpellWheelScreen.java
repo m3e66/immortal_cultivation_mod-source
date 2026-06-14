@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,11 +24,18 @@ public class SpellWheelScreen extends Screen {
     private List<ModSpells.SpellDef> getSpells() {
         var data = ClientData.cultivationData;
 
-        if (data == null || data.knownSpells() == null || data.knownSpells().isEmpty()) {
+        if (data == null) {
             return List.of();
         }
 
-        return data.knownSpells().stream()
+        ArrayList<String> spellIds = new ArrayList<>(data.knownSpells() == null ? List.of() : data.knownSpells());
+        for (String spellId : List.of(ModSpells.WEIYA, ModSpells.ABSORB_CULTIVATION, ModSpells.TUNTIAN)) {
+            if (ModSpells.isInnateKnown(spellId, data)) {
+                spellIds.add(spellId);
+            }
+        }
+
+        return spellIds.stream()
                 .map(ModSpells::normalizeId)
                 .filter(ClientData::isSpellVisibleInWheel)
                 .map(ModSpells::get)

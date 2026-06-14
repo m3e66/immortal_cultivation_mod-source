@@ -1,7 +1,9 @@
 {
-    "variants":  {
-                     "":  {
-                              "model":  "immortal_cultivation_mod:block/huanxia_si"
-                          }
-                 }
+  "multipart": [
+    { "when": { "up": "true" }, "apply": { "model": "immortal_cultivation_mod:block/huanxia_si", "x": 270 } },
+    { "when": { "north": "true" }, "apply": { "model": "immortal_cultivation_mod:block/huanxia_si" } },
+    { "when": { "east": "true" }, "apply": { "model": "immortal_cultivation_mod:block/huanxia_si", "y": 90 } },
+    { "when": { "south": "true" }, "apply": { "model": "immortal_cultivation_mod:block/huanxia_si", "y": 180 } },
+    { "when": { "west": "true" }, "apply": { "model": "immortal_cultivation_mod:block/huanxia_si", "y": 270 } }
+  ]
 }

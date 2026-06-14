@@ -1,5 +1,7 @@
 package com.example.immortal_cultivation_mod.event;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
@@ -12,8 +14,11 @@ import com.example.immortal_cultivation_mod.network.ModPayloads;
 import com.example.immortal_cultivation_mod.spell.DielangShield;
 import com.example.immortal_cultivation_mod.spell.LightBeamAttack;
 import com.example.immortal_cultivation_mod.spell.SlidingWater;
+import com.example.immortal_cultivation_mod.spell.Weiya;
 import com.example.immortal_cultivation_mod.spell.WindStep;
+import com.example.immortal_cultivation_mod.spell.YufengJue;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -21,11 +26,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.Pose;
@@ -43,6 +54,8 @@ import net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -50,6 +63,8 @@ import net.neoforged.neoforge.network.PacketDistributor;
 public class ServerEvents {
     private static final ResourceLocation MAGIC_RITUAL_SPIRIT_STONE =
             ResourceLocation.fromNamespaceAndPath("magic_ritual_mod", "spirit_stone");
+    private static final ResourceLocation CULTIVATION_MAX_HEALTH_MODIFIER =
+            ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "cultivation_max_health");
     private static final int AMBIENT_QI_SCAN_RADIUS = 48;
     private static final int AMBIENT_QI_PER_SPIRIT_VEIN_CENTER = 25;
     private static final int AMBIENT_QI_CACHE_TICKS = 100;
@@ -59,6 +74,71 @@ public class ServerEvents {
     private static final Map<UUID, Boolean> SPIRIT_SIGHT_ACTIVE = new ConcurrentHashMap<>();
     private static final Map<UUID, FogReveal> FOG_REVEALS = new ConcurrentHashMap<>();
     private static final Map<UUID, AmbientQi> AMBIENT_QI_CACHE = new ConcurrentHashMap<>();
+    private static final List<String> DEBUG_STATS = List.of(
+            "cultivation_level",
+            "age",
+            "moral",
+            "luck",
+            "soul",
+            "thoughts",
+            "spirit_roots",
+            "spirit_root_grade",
+            "skill_points",
+            "max_hp",
+            "max_qi",
+            "max_energy",
+            "physical",
+            "magic",
+            "mental",
+            "body_type"
+    );
+    private static final List<String> SETTABLE_DEBUG_STATS = List.of(
+            "age",
+            "moral",
+            "luck",
+            "soul",
+            "thoughts",
+            "skill_points",
+            "max_hp",
+            "max_qi",
+            "max_energy",
+            "physical",
+            "magic",
+            "mental"
+    );
+    private static final List<String> BODY_TYPES = List.of(
+            CultivationLevels.REALM_MORTAL,
+            CultivationLevels.REALM_LIANQI,
+            CultivationLevels.REALM_ZHUJI,
+            CultivationLevels.REALM_JINDAN,
+            CultivationLevels.REALM_YUANYING
+    );
+
+    @SubscribeEvent
+    public static void onRegisterCommands(RegisterCommandsEvent event) {
+        event.getDispatcher().register(Commands.literal("cultivationdebug")
+                .requires(source -> source.hasPermission(2))
+                .then(Commands.literal("adjust")
+                        .then(Commands.argument("targets", EntityArgument.players())
+                                .then(Commands.argument("stat", StringArgumentType.word())
+                                        .suggests((context, builder) -> SharedSuggestionProvider.suggest(DEBUG_STATS, builder))
+                                        .then(Commands.argument("delta", IntegerArgumentType.integer())
+                                                .executes(context -> adjustDebugStat(
+                                                        context.getSource(),
+                                                        EntityArgument.getPlayers(context, "targets"),
+                                                        StringArgumentType.getString(context, "stat"),
+                                                        IntegerArgumentType.getInteger(context, "delta")))))))
+                .then(Commands.literal("set")
+                        .then(Commands.argument("targets", EntityArgument.players())
+                                .then(Commands.argument("stat", StringArgumentType.word())
+                                        .suggests((context, builder) -> SharedSuggestionProvider.suggest(SETTABLE_DEBUG_STATS, builder))
+                                        .then(Commands.argument("value", IntegerArgumentType.integer())
+                                                .executes(context -> setDebugStat(
+                                                        context.getSource(),
+                                                        EntityArgument.getPlayers(context, "targets"),
+                                                        StringArgumentType.getString(context, "stat"),
+                                                        IntegerArgumentType.getInteger(context, "value"))))))));
+    }
 
     @SubscribeEvent
     public static void onPlayerTickPre(PlayerTickEvent.Pre event) {
@@ -108,6 +188,30 @@ public class ServerEvents {
             }
         } else {
             QI_GATHERING_ANCHORS.remove(player.getUUID());
+        }
+    }
+
+    @SubscribeEvent
+    public static void onEntityTickPost(EntityTickEvent.Post event) {
+        if (event.getEntity().level().isClientSide || !(event.getEntity() instanceof LivingEntity living)) {
+            return;
+        }
+        if (!living.hasEffect(ModEffects.DINGSHEN)) {
+            return;
+        }
+
+        living.setDeltaMovement(Vec3.ZERO);
+        living.fallDistance = 0.0F;
+        living.resetFallDistance();
+        living.hurtMarked = true;
+        if (living instanceof Player player) {
+            player.xxa = 0.0F;
+            player.yya = 0.0F;
+            player.zza = 0.0F;
+            player.setSprinting(false);
+        }
+        if (living instanceof net.minecraft.world.entity.Mob mob) {
+            mob.getNavigation().stop();
         }
     }
 
@@ -169,6 +273,8 @@ public class ServerEvents {
 
         if (player instanceof ServerPlayer sp) {
             WindStep.tick(sp);
+            YufengJue.tick(sp);
+            Weiya.tick(sp);
             SlidingWater.tick(sp);
             DielangShield.tick(sp);
             PhotonEffects.tick(sp);
@@ -210,6 +316,7 @@ public class ServerEvents {
             FOG_REVEALS.remove(player.getUUID());
             AMBIENT_QI_CACHE.remove(player.getUUID());
             WindStep.clear(player);
+            YufengJue.clear(player);
             var data = ModAttachments.getData(player);
             int maxQi = getEffectiveMaxQi(data, CultivationLevels.getLevelDef(data.cultivationLevel()));
             ModAttachments.setData(player, data.withAgePenalty(data.agePenalty() + 10).withQi(maxQi));
@@ -236,6 +343,7 @@ public class ServerEvents {
             FOG_REVEALS.remove(sp.getUUID());
             AMBIENT_QI_CACHE.remove(sp.getUUID());
             WindStep.clear(sp);
+            YufengJue.clear(sp);
             syncPlayerData(sp);
         }
     }
@@ -322,7 +430,11 @@ public class ServerEvents {
             event.setCanceled(true);
             return;
         }
-        triggerLingbeng(player, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D);
+        Vec3 hit = Vec3.atCenterOf(pos);
+        if (event.getFace() != null) {
+            hit = hit.add(Vec3.atLowerCornerOf(event.getFace().getNormal()).scale(0.55D));
+        }
+        triggerLingbeng(player, hit.x, hit.y, hit.z);
     }
 
     @SubscribeEvent
@@ -350,7 +462,7 @@ public class ServerEvents {
         }
 
         var data = ModAttachments.getData(player);
-        int cost = 50;
+        int cost = 85;
         if (!spendQiOrBlood(player, data, cost)) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return;
@@ -359,11 +471,112 @@ public class ServerEvents {
         var lingbeng = player.getEffect(ModEffects.LINGBENG);
         float radius = 2.0F + Math.min(9, lingbeng == null ? 0 : lingbeng.getAmplifier());
         player.removeEffect(ModEffects.LINGBENG);
+        PhotonEffects.lingbengStop(player);
         if (player.level() instanceof ServerLevel serverLevel) {
             PhotonEffects.lingbengExplosion(serverLevel, x, y, z);
         }
         player.level().explode(player, x, y, z, radius, Level.ExplosionInteraction.BLOCK);
         syncPlayerData(player);
+    }
+
+    private static int adjustDebugStat(CommandSourceStack source, Collection<ServerPlayer> targets, String stat, int delta) {
+        if (!DEBUG_STATS.contains(stat)) {
+            source.sendFailure(Component.literal("Unknown cultivation debug stat: " + stat));
+            return 0;
+        }
+
+        int changed = 0;
+        for (ServerPlayer target : targets) {
+            var data = ModAttachments.getData(target);
+            var updated = adjustDebugData(data, stat, delta);
+            if (!updated.equals(data)) {
+                ModAttachments.setData(target, updated);
+                syncPlayerData(target);
+                changed++;
+            }
+        }
+
+        int changedCount = changed;
+        source.sendSuccess(() -> Component.literal("Adjusted " + stat + " by " + delta + " for " + changedCount + " player(s)."), true);
+        return changed;
+    }
+
+    private static int setDebugStat(CommandSourceStack source, Collection<ServerPlayer> targets, String stat, int value) {
+        if (!SETTABLE_DEBUG_STATS.contains(stat)) {
+            source.sendFailure(Component.literal("Set only supports numeric debug stats: " + String.join(", ", SETTABLE_DEBUG_STATS)));
+            return 0;
+        }
+
+        int changed = 0;
+        for (ServerPlayer target : targets) {
+            var data = ModAttachments.getData(target);
+            var updated = setDebugData(data, stat, value);
+            if (!updated.equals(data)) {
+                ModAttachments.setData(target, updated);
+                syncPlayerData(target);
+                changed++;
+            }
+        }
+
+        int changedCount = changed;
+        source.sendSuccess(() -> Component.literal("Set " + stat + " to " + value + " for " + changedCount + " player(s)."), true);
+        return changed;
+    }
+
+    private static ModAttachments.CultivationData adjustDebugData(ModAttachments.CultivationData data, String stat, int delta) {
+        return switch (stat) {
+            case "cultivation_level" -> data.withCultivationLevel(nextCultivationLevel(data.cultivationLevel(), delta));
+            case "body_type" -> data.withBodyType(nextBodyType(data.bodyType(), delta));
+            case "age" -> data.withAgePenalty(clamp(
+                    data.agePenalty() - delta,
+                    0,
+                    Math.max(0, CultivationLevels.getLevelDef(data.cultivationLevel()).maxAge() - 1)
+            ));
+            case "moral" -> data.withMoral(clamp(data.moral() + delta, 0, 100));
+            case "luck" -> data.withLuck(clamp(data.luck() + delta, 0, 100));
+            case "soul" -> data.withSoul(clamp(data.soul() + delta, 0, 1000));
+            case "thoughts" -> data.withThoughts(clamp(data.thoughts() + delta, 0, 1000));
+            case "spirit_roots" -> data.withSpiritRoots(SpiritRoots.nextRootSet(data.spiritRoots(), delta), data.spiritRootGrade());
+            case "spirit_root_grade" -> data.withSpiritRoots(data.spiritRoots(), SpiritRoots.nextGrade(data.spiritRootGrade(), delta));
+            case "skill_points", "max_hp", "max_qi", "max_energy", "physical", "magic", "mental" -> data.debugAdjustStat(stat, delta);
+            default -> data;
+        };
+    }
+
+    private static ModAttachments.CultivationData setDebugData(ModAttachments.CultivationData data, String stat, int value) {
+        var levelDef = CultivationLevels.getLevelDef(data.cultivationLevel());
+        return switch (stat) {
+            case "age" -> data.withAgePenalty(clamp(levelDef.maxAge() - value, 0, Math.max(0, levelDef.maxAge() - 1)));
+            case "moral" -> data.withMoral(clamp(value, 0, 100));
+            case "luck" -> data.withLuck(clamp(value, 0, 100));
+            case "soul" -> data.withSoul(clamp(value, 0, 1000));
+            case "thoughts" -> data.withThoughts(clamp(value, 0, 1000));
+            case "skill_points", "max_hp", "max_qi", "max_energy", "physical", "magic", "mental" -> data.debugSetStat(stat, value, levelDef);
+            default -> data;
+        };
+    }
+
+    private static String nextBodyType(String current, int direction) {
+        int index = BODY_TYPES.indexOf(current);
+        if (index < 0) {
+            index = 0;
+        }
+        int next = Math.floorMod(index + (direction < 0 ? -1 : 1), BODY_TYPES.size());
+        return BODY_TYPES.get(next);
+    }
+
+    private static String nextCultivationLevel(String current, int direction) {
+        List<String> values = CultivationLevels.allLevels();
+        int index = values.indexOf(current);
+        if (index < 0) {
+            index = 0;
+        }
+        int next = Math.floorMod(index + (direction < 0 ? -1 : 1), values.size());
+        return values.get(next);
+    }
+
+    private static int clamp(int value, int min, int max) {
+        return Math.max(min, Math.min(max, value));
     }
 
     public static void syncPlayerData(ServerPlayer player) {
@@ -475,18 +688,29 @@ public class ServerEvents {
     }
 
     private static void applyLevelStats(Player player, ModAttachments.CultivationData data, CultivationLevels.LevelDef levelDef) {
+        ImmortalCultivationMod.raiseMaxHealthAttributeLimit();
         int maxHp = getEffectiveMaxHp(data, levelDef);
         AttributeInstance maxHealth = player.getAttribute(Attributes.MAX_HEALTH);
         if (maxHealth != null) {
-            double previousMax = maxHealth.getBaseValue();
-            if (previousMax != maxHp) {
-                maxHealth.setBaseValue(maxHp);
+            double previousMax = maxHealth.getValue();
+            maxHealth.removeModifier(CULTIVATION_MAX_HEALTH_MODIFIER);
+            if (maxHealth.getBaseValue() > 20.0D) {
+                maxHealth.setBaseValue(20.0D);
+            }
+            double cultivationBonus = maxHp - 20.0D;
+            if (Math.abs(cultivationBonus) > 0.001D) {
+                maxHealth.addPermanentModifier(new AttributeModifier(
+                        CULTIVATION_MAX_HEALTH_MODIFIER,
+                        cultivationBonus,
+                        AttributeModifier.Operation.ADD_VALUE
+                ));
             }
 
-            if (player.getHealth() > maxHp) {
-                player.setHealth(maxHp);
+            double currentMax = maxHealth.getValue();
+            if (player.getHealth() > currentMax) {
+                player.setHealth((float) currentMax);
             } else if (previousMax <= 1.0D && player.getHealth() <= 1.0F) {
-                player.setHealth(maxHp);
+                player.setHealth((float) currentMax);
             }
         }
 
@@ -523,7 +747,7 @@ public class ServerEvents {
             return;
         }
 
-        if (!spendQiOrBlood(sp, data, 5)) {
+        if (!spendQiOrBlood(sp, data, 8)) {
             sp.removeEffect(ModEffects.EARTH_ESCAPE);
             sp.noPhysics = false;
             sp.setNoGravity(false);

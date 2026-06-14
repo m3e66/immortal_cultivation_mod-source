@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod.entity;
 
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
@@ -40,6 +41,9 @@ public class SmokeProjectileEntity extends ThrowableItemProjectile {
                         getZ() + (random.nextDouble() - 0.5D) * 0.35D,
                         0.0D, 0.01D, 0.0D);
             }
+            level().addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE,
+                    getX(), getY(), getZ(),
+                    0.0D, 0.01D, 0.0D);
         }
     }
 
@@ -47,6 +51,9 @@ public class SmokeProjectileEntity extends ThrowableItemProjectile {
     protected void onHit(HitResult result) {
         super.onHit(result);
         if (!level().isClientSide) {
+            if (level() instanceof ServerLevel serverLevel) {
+                SpellImpactParticles.smoke(serverLevel, result.getLocation());
+            }
             discard();
         }
     }

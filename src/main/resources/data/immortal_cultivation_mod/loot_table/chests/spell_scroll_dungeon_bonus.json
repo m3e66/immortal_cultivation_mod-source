@@ -5,53 +5,122 @@
       "rolls": 1,
       "entries": [
         {
+          "type": "minecraft:empty",
+          "weight": 450
+        },
+        {
           "type": "minecraft:item",
           "name": "immortal_cultivation_mod:fireball_scroll",
-          "weight": 1
-        },
-        {
-          "type": "minecraft:item",
-          "name": "immortal_cultivation_mod:lingbeng_scroll",
-          "weight": 1
-        },
-        {
-          "type": "minecraft:item",
-          "name": "immortal_cultivation_mod:regeneration_scroll",
-          "weight": 1
+          "weight": 6
         },
         {
           "type": "minecraft:item",
           "name": "immortal_cultivation_mod:beam_scroll",
-          "weight": 1
-        },
-        {
-          "type": "minecraft:item",
-          "name": "immortal_cultivation_mod:earth_escape_scroll",
-          "weight": 1
+          "weight": 6
         },
         {
           "type": "minecraft:item",
           "name": "immortal_cultivation_mod:cleanse_scroll",
-          "weight": 1
+          "weight": 6
         },
         {
           "type": "minecraft:item",
           "name": "immortal_cultivation_mod:qi_gathering_scroll",
-          "weight": 1
+          "weight": 6
         },
         {
           "type": "minecraft:item",
           "name": "immortal_cultivation_mod:ignite_flare_scroll",
-          "weight": 1
+          "weight": 6
         },
         {
           "type": "minecraft:item",
           "name": "immortal_cultivation_mod:spirit_sight_scroll",
-          "weight": 1
+          "weight": 6
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:lingzhi_bullet_scroll",
+          "weight": 6
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:wind_blade_scroll",
+          "weight": 6
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:wind_step_scroll",
+          "weight": 6
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:yufeng_jue_scroll",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:smoke_art_scroll",
+          "weight": 6
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:sliding_water_scroll",
+          "weight": 6
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:regeneration_scroll",
+          "weight": 3
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:lingbeng_scroll",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:yinlei_jue_scroll",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:earth_escape_scroll",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:dielang_shield_scroll",
+          "weight": 2
         },
         {
           "type": "minecraft:item",
           "name": "immortal_cultivation_mod:zhenshan_palm_scroll",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:light_beam_attack_scroll",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:dingshen_scroll",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:wulei_zhengfa_scroll",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:reincarnation_true_art_method",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:tuntian_demon_art_method",
           "weight": 1
         }
       ]

@@ -1,7 +1,12 @@
 {
-    "variants":  {
-                     "":  {
-                              "model":  "immortal_cultivation_mod:block/liujin_sand"
-                          }
-                 }
+  "variants": {
+    "layers=1": { "model": "immortal_cultivation_mod:block/liujin_sand_height2" },
+    "layers=2": { "model": "immortal_cultivation_mod:block/liujin_sand_height4" },
+    "layers=3": { "model": "immortal_cultivation_mod:block/liujin_sand_height6" },
+    "layers=4": { "model": "immortal_cultivation_mod:block/liujin_sand_height8" },
+    "layers=5": { "model": "immortal_cultivation_mod:block/liujin_sand_height10" },
+    "layers=6": { "model": "immortal_cultivation_mod:block/liujin_sand_height12" },
+    "layers=7": { "model": "immortal_cultivation_mod:block/liujin_sand_height14" },
+    "layers=8": { "model": "immortal_cultivation_mod:block/liujin_sand_block" }
+  }
 }

@@ -38,6 +38,11 @@ public class SlidingWaterProjectileEntity extends ThrowableItemProjectile {
                     -getDeltaMovement().x * 0.04D,
                     -getDeltaMovement().y * 0.04D,
                     -getDeltaMovement().z * 0.04D);
+            level().addParticle(ParticleTypes.FALLING_WATER,
+                    getX() + (random.nextDouble() - 0.5D) * 0.12D,
+                    getY() + (random.nextDouble() - 0.5D) * 0.12D,
+                    getZ() + (random.nextDouble() - 0.5D) * 0.12D,
+                    0.0D, 0.0D, 0.0D);
         }
     }
 
@@ -45,6 +50,9 @@ public class SlidingWaterProjectileEntity extends ThrowableItemProjectile {
     protected void onHit(HitResult result) {
         super.onHit(result);
         if (!level().isClientSide) {
+            if (level() instanceof ServerLevel serverLevel) {
+                SpellImpactParticles.water(serverLevel, result.getLocation());
+            }
             discard();
         }
     }

@@ -66,6 +66,11 @@ public class ClientData {
             for (String spell : knownSpells) {
                 known.add(ModSpells.normalizeId(spell));
             }
+            for (String spellId : List.of(ModSpells.WEIYA, ModSpells.ABSORB_CULTIVATION, ModSpells.TUNTIAN)) {
+                if (ModSpells.isInnateKnown(spellId, cultivationData)) {
+                    known.add(spellId);
+                }
+            }
             SELECTED_WHEEL_SPELLS.removeIf(spell -> !known.contains(spell));
             if (!wheelSelectionFileExists && SELECTED_WHEEL_SPELLS.isEmpty()) {
                 for (String spell : knownSpells) {
@@ -75,6 +80,11 @@ public class ClientData {
                     String normalized = ModSpells.normalizeId(spell);
                     if (ModSpells.get(normalized) != null) {
                         SELECTED_WHEEL_SPELLS.add(normalized);
+                    }
+                }
+                for (String spellId : List.of(ModSpells.WEIYA, ModSpells.ABSORB_CULTIVATION, ModSpells.TUNTIAN)) {
+                    if (SELECTED_WHEEL_SPELLS.size() < MAX_WHEEL_SPELLS && known.contains(spellId)) {
+                        SELECTED_WHEEL_SPELLS.add(spellId);
                     }
                 }
             }
