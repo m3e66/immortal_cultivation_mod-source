@@ -23,6 +23,12 @@ public class ModEffects {
     public static final DeferredHolder<MobEffect, MobEffect> WIND_STEP =
             MOB_EFFECTS.register("wind_step", WindStepEffect::new);
 
+    public static final DeferredHolder<MobEffect, MobEffect> YUFENG_JUE =
+            MOB_EFFECTS.register("yufeng_jue", YufengJueEffect::new);
+
+    public static final DeferredHolder<MobEffect, MobEffect> SPIRIT_SIGHT =
+            MOB_EFFECTS.register("spirit_sight", SpiritSightEffect::new);
+
     public static final DeferredHolder<MobEffect, MobEffect> SPELL_DAMAGE_BOOST =
             MOB_EFFECTS.register("spell_damage_boost", SpellDamageBoostEffect::new);
 
@@ -34,6 +40,9 @@ public class ModEffects {
 
     public static final DeferredHolder<MobEffect, MobEffect> DINGSHEN =
             MOB_EFFECTS.register("dingshen", DingshenEffect::new);
+
+    public static final DeferredHolder<MobEffect, MobEffect> FENGYA =
+            MOB_EFFECTS.register("fengya", FengyaEffect::new);
 
     public static void register(IEventBus bus) {
         MOB_EFFECTS.register(bus);

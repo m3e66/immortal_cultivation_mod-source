@@ -29,17 +29,20 @@ public final class Weiya {
 
     public static void toggle(ServerPlayer player) {
         UUID id = player.getUUID();
+
         if (ACTIVE.remove(id) != null) {
             stop(player);
             return;
         }
 
         var data = ModAttachments.getData(player);
+
         if (CultivationLevels.isMortal(data.cultivationLevel())) {
             return;
         }
 
         int cost = qiCostPerSecond(data);
+
         if (!ServerEvents.spendQiOrBlood(player, data, cost)) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return;
@@ -47,7 +50,10 @@ public final class Weiya {
 
         ACTIVE.put(id, true);
         refreshCaster(player);
+
+        PhotonEffects.weiyaStop(player);
         PhotonEffects.weiyaStart(player);
+
         ServerEvents.syncPlayerData(player);
     }
 
@@ -57,6 +63,7 @@ public final class Weiya {
         }
 
         var data = ModAttachments.getData(player);
+
         if (CultivationLevels.isMortal(data.cultivationLevel())) {
             stop(player);
             return;
@@ -64,10 +71,6 @@ public final class Weiya {
 
         refreshCaster(player);
         applyPressure(player, data.cultivationLevel());
-
-        if (player.tickCount % REFRESH_TICKS == 0) {
-            PhotonEffects.weiyaStart(player);
-        }
 
         if (player.tickCount % 20 != 0) {
             return;
@@ -102,18 +105,22 @@ public final class Weiya {
     }
 
     private static void applyPressure(ServerPlayer caster, String casterLevel) {
-        List<LivingEntity> targets = caster.level().getEntitiesOfClass(LivingEntity.class,
+        List<LivingEntity> targets = caster.level().getEntitiesOfClass(
+                LivingEntity.class,
                 new AABB(caster.blockPosition()).inflate(RADIUS),
-                target -> target != caster && target.isAlive());
+                target -> target != caster && target.isAlive()
+        );
 
         for (LivingEntity target : targets) {
             PressureStrength strength = pressureStrength(casterLevel, targetLevel(target));
+
             if (strength == PressureStrength.NONE) {
                 continue;
             }
 
             target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, REFRESH_TICKS, strength.slownessAmplifier(), false, false, true));
             target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, REFRESH_TICKS, strength.weaknessAmplifier(), false, false, true));
+
             if (strength.suppressesSpells() && target instanceof Player player) {
                 player.addEffect(new MobEffectInstance(ModEffects.WEIYA_SUPPRESSED, REFRESH_TICKS, 0, false, false, true));
             }
@@ -124,29 +131,34 @@ public final class Weiya {
         if (target instanceof Player player) {
             return ModAttachments.getData(player).cultivationLevel();
         }
+
         return CultivationLevels.REALM_MORTAL;
     }
 
     private static PressureStrength pressureStrength(String casterLevel, String targetLevel) {
         int casterStage = CultivationLevels.getStageIndex(casterLevel);
         int targetStage = CultivationLevels.getStageIndex(targetLevel);
+
         if (targetStage >= casterStage) {
             return PressureStrength.NONE;
         }
 
         int realmDiff = CultivationLevels.getRealmIndex(casterLevel) - CultivationLevels.getRealmIndex(targetLevel);
+
         if (realmDiff == 1) {
             return PressureStrength.BIG_LEVEL;
         }
+
         if (realmDiff == 0 && casterStage - targetStage == 1) {
             return PressureStrength.SMALL_LEVEL;
         }
+
         return PressureStrength.OVERWHELMING;
     }
 
     private static int qiCostPerSecond(ModAttachments.CultivationData data) {
         int maxQi = Math.max(1, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
-        return Math.max(1, (int) Math.ceil(maxQi * 0.01D));
+        return Math.max(1, (int) Math.ceil(maxQi * 0.10D));
     }
 
     private enum PressureStrength {

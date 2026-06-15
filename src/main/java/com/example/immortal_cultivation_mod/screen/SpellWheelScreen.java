@@ -29,7 +29,7 @@ public class SpellWheelScreen extends Screen {
         }
 
         ArrayList<String> spellIds = new ArrayList<>(data.knownSpells() == null ? List.of() : data.knownSpells());
-        for (String spellId : List.of(ModSpells.WEIYA, ModSpells.ABSORB_CULTIVATION, ModSpells.TUNTIAN)) {
+        for (String spellId : List.of(ModSpells.WEIYA, ModSpells.ABSORB_CULTIVATION, ModSpells.TUNTIAN, ModSpells.FENGYA)) {
             if (ModSpells.isInnateKnown(spellId, data)) {
                 spellIds.add(spellId);
             }

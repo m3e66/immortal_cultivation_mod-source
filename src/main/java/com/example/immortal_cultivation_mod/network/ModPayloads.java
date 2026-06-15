@@ -1,6 +1,8 @@
 package com.example.immortal_cultivation_mod.network;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
+import com.example.immortal_cultivation_mod.attachment.BodyTypes;
+import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
@@ -222,6 +224,42 @@ public class ModPayloads {
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
 
+    public record ServerboundDebugSetSpiritRootsPayload(List<String> roots, String grade) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ServerboundDebugSetSpiritRootsPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "debug_set_spirit_roots"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundDebugSetSpiritRootsPayload> STREAM_CODEC =
+                StreamCodec.of(
+                        (buf, data) -> {
+                            ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()).encode(buf, data.roots());
+                            ByteBufCodecs.STRING_UTF8.encode(buf, data.grade());
+                        },
+                        buf -> new ServerboundDebugSetSpiritRootsPayload(
+                                ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()).decode(buf),
+                                ByteBufCodecs.STRING_UTF8.decode(buf)
+                        ));
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
+    public record ServerboundCompleteEnlightenmentPayload(List<String> roots, String grade, String bodyType) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ServerboundCompleteEnlightenmentPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "complete_enlightenment"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundCompleteEnlightenmentPayload> STREAM_CODEC =
+                StreamCodec.of(
+                        (buf, data) -> {
+                            ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()).encode(buf, data.roots());
+                            ByteBufCodecs.STRING_UTF8.encode(buf, data.grade());
+                            ByteBufCodecs.STRING_UTF8.encode(buf, data.bodyType());
+                        },
+                        buf -> new ServerboundCompleteEnlightenmentPayload(
+                                ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()).decode(buf),
+                                ByteBufCodecs.STRING_UTF8.decode(buf),
+                                ByteBufCodecs.STRING_UTF8.decode(buf)
+                        ));
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
     @EventBusSubscriber(modid = ImmortalCultivationMod.MODID, bus = EventBusSubscriber.Bus.MOD)
     public static class ModPayloadsHandler {
         @SubscribeEvent
@@ -238,6 +276,8 @@ public class ModPayloads {
             registrar.playToServer(ServerboundWindStepJumpPayload.TYPE, ServerboundWindStepJumpPayload.STREAM_CODEC, ModPayloadsHandler::handleWindStepJumpOnServer);
             registrar.playToServer(ServerboundMeditatePayload.TYPE, ServerboundMeditatePayload.STREAM_CODEC, ModPayloadsHandler::handleMeditateOnServer);
             registrar.playToServer(ServerboundDebugAdjustStatPayload.TYPE, ServerboundDebugAdjustStatPayload.STREAM_CODEC, ModPayloadsHandler::handleDebugAdjustStatOnServer);
+            registrar.playToServer(ServerboundDebugSetSpiritRootsPayload.TYPE, ServerboundDebugSetSpiritRootsPayload.STREAM_CODEC, ModPayloadsHandler::handleDebugSetSpiritRootsOnServer);
+            registrar.playToServer(ServerboundCompleteEnlightenmentPayload.TYPE, ServerboundCompleteEnlightenmentPayload.STREAM_CODEC, ModPayloadsHandler::handleCompleteEnlightenmentOnServer);
         }
 
         private static void handleActivateMethodOnServer(ServerboundActivateMethodPayload payload, IPayloadContext ctx) {
@@ -262,7 +302,7 @@ public class ModPayloads {
                     var data = ModAttachments.getData(sp);
                     var updated = switch (payload.stat()) {
                         case "cultivation_level" -> data.withCultivationLevel(nextCultivationLevel(data.cultivationLevel(), payload.delta()));
-                        case "body_type" -> data.withBodyType(nextBodyType(data.bodyType(), payload.delta()));
+                        case "body_type" -> data.withBodyType(BodyTypes.next(data.bodyType(), payload.delta()));
                         case "age" -> data.withAgePenalty(clamp(
                                 data.agePenalty() - payload.delta(),
                                 0,
@@ -285,20 +325,16 @@ public class ModPayloads {
             });
         }
 
-        private static String nextBodyType(String current, int direction) {
-            List<String> values = List.of(
-                    com.example.immortal_cultivation_mod.attachment.CultivationLevels.REALM_MORTAL,
-                    com.example.immortal_cultivation_mod.attachment.CultivationLevels.REALM_LIANQI,
-                    com.example.immortal_cultivation_mod.attachment.CultivationLevels.REALM_ZHUJI,
-                    com.example.immortal_cultivation_mod.attachment.CultivationLevels.REALM_JINDAN,
-                    com.example.immortal_cultivation_mod.attachment.CultivationLevels.REALM_YUANYING
-            );
-            int index = values.indexOf(current);
-            if (index < 0) {
-                index = 0;
-            }
-            int next = Math.floorMod(index + (direction < 0 ? -1 : 1), values.size());
-            return values.get(next);
+        private static void handleDebugSetSpiritRootsOnServer(ServerboundDebugSetSpiritRootsPayload payload, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                if (ctx.player() instanceof ServerPlayer sp) {
+                    var data = ModAttachments.getData(sp);
+                    var roots = SpiritRoots.sanitizeRootList(payload.roots());
+                    String grade = SpiritRoots.sanitizeGrade(payload.grade());
+                    ModAttachments.setData(sp, data.withSpiritRoots(roots, grade));
+                    com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+                }
+            });
         }
 
         private static String nextCultivationLevel(String current, int direction) {
@@ -309,6 +345,57 @@ public class ModPayloads {
             }
             int next = Math.floorMod(index + (direction < 0 ? -1 : 1), values.size());
             return values.get(next);
+        }
+
+        private static void handleCompleteEnlightenmentOnServer(ServerboundCompleteEnlightenmentPayload payload, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                if (ctx.player() instanceof ServerPlayer sp) {
+                    var data = ModAttachments.getData(sp);
+                    if (!CultivationLevels.isMortal(data.cultivationLevel())) {
+                        sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".enlightenment_already_cultivating"));
+                        return;
+                    }
+                    if (!consumeEnlightenmentPill(sp)) {
+                        return;
+                    }
+
+                    var roots = SpiritRoots.sanitizeRootList(payload.roots());
+                    if (roots.isEmpty()) {
+                        roots = List.of(SpiritRoots.METAL);
+                    }
+                    String grade = SpiritRoots.sanitizeGrade(payload.grade());
+                    String bodyType = BodyTypes.sanitize(payload.bodyType());
+                    var updated = data
+                            .withCultivationLevel(CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY)
+                            .withSpiritRoots(roots, grade)
+                            .withBodyType(bodyType);
+                    ModAttachments.setData(sp, updated);
+                    sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".enlightenment_success"));
+                    com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+                }
+            });
+        }
+
+        private static boolean consumeEnlightenmentPill(ServerPlayer sp) {
+            if (sp.getAbilities().instabuild) {
+                return true;
+            }
+            var pill = ModItems.ENLIGHTENMENT_PILL.get();
+            if (sp.getMainHandItem().is(pill)) {
+                sp.getMainHandItem().shrink(1);
+                return true;
+            }
+            if (sp.getOffhandItem().is(pill)) {
+                sp.getOffhandItem().shrink(1);
+                return true;
+            }
+            for (var stack : sp.getInventory().items) {
+                if (stack.is(pill)) {
+                    stack.shrink(1);
+                    return true;
+                }
+            }
+            return false;
         }
 
         private static int clamp(int value, int min, int max) {
@@ -521,6 +608,8 @@ public class ModPayloads {
                         castAbsorbCultivation(sp, data, spell);
                     } else if (ModSpells.TUNTIAN.equals(spellId)) {
                         castTuntian(sp, data);
+                    } else if (ModSpells.FENGYA.equals(spellId)) {
+                        com.example.immortal_cultivation_mod.spell.Fengya.toggle(sp);
                     } else if (ModSpells.DINGSHEN.equals(spellId)) {
                         castDingshen(sp, data, spell);
                     } else if (ModSpells.YINLEI_JUE.equals(spellId)) {
@@ -536,7 +625,12 @@ public class ModPayloads {
             ctx.enqueueWork(() -> {
                 if (ctx.player() instanceof ServerPlayer sp && !sp.hasEffect(ModEffects.QI_GATHERING) && !sp.hasEffect(ModEffects.EARTH_ESCAPE)) {
                     Vec3 target = sp.getEyePosition().add(sp.getLookAngle().scale(64.0D));
-                    com.example.immortal_cultivation_mod.spell.LightBeamAttack.shoot(sp, target, payload.shootAll());
+                    if (!com.example.immortal_cultivation_mod.spell.LightBeamAttack.shoot(sp, target, payload.shootAll())) {
+                        com.example.immortal_cultivation_mod.spell.Fengya.release(
+                                sp,
+                                sp.getEyePosition().add(sp.getLookAngle().scale(8.0D)),
+                                payload.shootAll());
+                    }
                 }
             });
         }

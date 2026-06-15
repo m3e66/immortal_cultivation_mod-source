@@ -57,6 +57,9 @@ public class ModTabs {
                         output.accept(ModItems.BLOOD_DEMON_HUASHEN_METHOD.get());
                         output.accept(ModItems.REINCARNATION_TRUE_ART_METHOD.get());
                         output.accept(ModItems.TUNTIAN_DEMON_ART_METHOD.get());
+                        output.accept(ModItems.POKONG_JUE_METHOD.get());
+                        output.accept(ModItems.CHANGQING_JUE_METHOD.get());
+                        output.accept(ModItems.FENTIAN_LIFE_RENEWAL_METHOD.get());
                         output.accept(ModItems.JIUHU.get());
 
                     }).build());

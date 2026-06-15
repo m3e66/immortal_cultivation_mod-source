@@ -10,7 +10,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Each method has a cultivation limit. Basic Breathing Method and Clear Heart Method stop giving progress after Foundation Establishment Late.$(br2)A method also has a tier: human, earth, heaven, immortal, or divine."
+      "text": "$(br)Each method has a cultivation limit. Basic Breathing Method and Clear Heart Method stop giving progress after Foundation Establishment Late.$(br2)Method tiers are: Mortal, Yellow, Mysterious, Earth, Heaven, and Immortal."
     },
     {
       "type": "patchouli:text",
@@ -23,6 +23,18 @@
     {
       "type": "patchouli:text",
       "text": "$(br)Heaven Devouring Demon Art: dark, heaven tier, limit Soul Transformation Late.$(br)This method automatically grants Devour Heaven, which consumes blocks and slain life into fast cultivation progress."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Void Breaking Art: wind, earth tier, limit Golden Core Late.$(br)Automatically grants Wind Pressure, a toggle spell that lets punches carve blocks in an air cone."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Evergreen Art: water/earth, earth tier, limit Golden Core Late.$(br)Passively grows nearby plants without creating tall grass."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Heaven Burning Life Renewal Art: fire, earth tier, limit Golden Core Late.$(br)First death becomes a 1-minute spectator rebirth state with a fiery trail, then returns to survival with 1 heart. The charge resets at full health."
     }
   ]
 }

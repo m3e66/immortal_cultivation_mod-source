@@ -2,12 +2,14 @@ package com.example.immortal_cultivation_mod.spell;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
+import com.example.immortal_cultivation_mod.effect.ModEffects;
 import com.example.immortal_cultivation_mod.event.ServerEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -39,6 +41,7 @@ public final class YufengJue {
 
         ACTIVE.put(id, true);
         enableFlight(player);
+        refreshEffect(player);
         ServerEvents.syncPlayerData(player);
     }
 
@@ -53,6 +56,7 @@ public final class YufengJue {
         }
 
         enableFlight(player);
+        refreshEffect(player);
         addWindParticles(player);
         player.fallDistance = 0.0F;
         player.resetFallDistance();
@@ -73,6 +77,7 @@ public final class YufengJue {
 
     public static void clear(ServerPlayer player) {
         ACTIVE.remove(player.getUUID());
+        player.removeEffect(ModEffects.YUFENG_JUE);
         disableFlight(player);
     }
 
@@ -88,6 +93,10 @@ public final class YufengJue {
         }
         player.getAbilities().flying = true;
         player.onUpdateAbilities();
+    }
+
+    private static void refreshEffect(ServerPlayer player) {
+        player.addEffect(new MobEffectInstance(ModEffects.YUFENG_JUE, 40, 0, false, false, true));
     }
 
     private static void disableFlight(ServerPlayer player) {

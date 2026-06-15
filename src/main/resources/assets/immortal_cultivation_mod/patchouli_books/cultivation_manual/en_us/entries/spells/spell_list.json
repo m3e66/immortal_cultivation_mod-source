@@ -6,99 +6,103 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Fireball: Lianqi Early, fire, costs 10 qi.$(br)Shoots a fireball that deals damage and ignites targets."
+      "text": "Fireball: Lianqi Early, fire, costs 10 qi.$(br)Gather spiritual qi within your palm and shape it into a blazing fireball, hurling it forth to burn foes and scorch all in its path."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Lingbeng: Lianqi Late, thunder, costs 85 qi.$(br)Enter a breaking-force state. Punch a block or entity to release an explosion. Recasting stacks the radius."
+      "text": "$(br)Lingbeng: Lianqi Late, thunder, costs 85 qi.$(br)Circulate spiritual power to enter the Lingbeng state. Activating it again prolongs its effects and expands the explosive flames. This technique may be stacked up to ten layers."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Lightning Invocation: Lianqi Late, thunder, costs 40 qi.$(br)Shoots a crackling thunder projectile. On hit, lightning falls onto the target for 20 damage."
+      "text": "$(br)Lightning Invocation: Lianqi Late, thunder, costs 40 qi.$(br)Commune with the spiritual energies of heaven and earth, launch a lightning talisman, and call down heavenly lightning to strike the target."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Five Thunder Orthodoxy: Foundation Establishment Middle, thunder, costs 120 qi.$(br)An orthodox thunder art that fires a stronger projectile and calls five lightning columns for 100 damage."
+      "text": "$(br)Five Thunder Orthodoxy: Foundation Establishment Middle, thunder, costs 120 qi.$(br)An orthodox Daoist lightning art. Palm lightning and heavenly thunder descend together as five mighty lightning pillars, specializing in the destruction of evil spirits and demonic beings."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Regeneration: Lianqi Middle, wood, costs 20 qi.$(br)Restores health with a short healing effect."
+      "text": "$(br)Regeneration: Lianqi Middle, wood, costs 20 qi.$(br)Guide spiritual qi to nourish the body. For three breaths, vitality continuously flows through the flesh, steadily healing wounds."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Beam: Lianqi Early, light, costs 30 qi.$(br)Making you able to see entities near you."
+      "text": "$(br)Beam: Lianqi Early, light, costs 30 qi.$(br)Condense spiritual power into a unique streak of light visible only to the caster. The phenomenon lingers for ten breaths before fading."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Earth Escape: Lianqi Late, earth.$(br)Sink underground, move faster, and spend qi over time until you surface."
+      "text": "$(br)Earth Escape: Lianqi Late, earth.$(br)Sink into the earth and travel through soil and stone while greatly increasing movement speed. Consumes 8 qi each second underground and ends upon returning to the surface."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Cleanse: Lianqi Early, water, costs 10 qi.$(br)Clears harmful effects from yourself."
+      "text": "$(br)Cleanse: Lianqi Early, water, costs 10 qi.$(br)Recite a cleansing incantation to wash over the body, removing all lingering curses, afflictions, and negative effects."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Sliding Water: Lianqi Early, water, costs 30 qi.$(br)Shoots a water projectile. When it hits a block, it creates a shallow puddle with puddle.fx one block above the hit block. Stepping on the puddle applies Magic Ritual inverted controls."
+      "text": "$(br)Sliding Water: Lianqi Early, water, costs 30 qi.$(br)Launch a condensed water orb that forms a shallow pool upon impact. Those who step into it find their movements distorted and their controls reversed."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Qi Gathering: Lianqi Early, wind, costs no qi.$(br)Greatly improves qi regeneration, but you cannot attack or block. Damage taken while gathering qi is tripled."
+      "text": "$(br)Qi Gathering: Lianqi Early, wind, costs no qi.$(br)Focus solely on absorbing the qi of heaven and earth. While active, you possess no offensive or defensive abilities, and all damage received is tripled."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Lingzhi Bullet: Lianqi Early, wind, costs 5 qi.$(br)Condenses a small amount of qi at the fingertip and fires it forward. Deals 5 damage and breaks up to 3 blocks."
+      "text": "$(br)Lingzhi Bullet: Lianqi Early, wind, costs 5 qi.$(br)Condense a thread of spiritual power at your fingertip and release it with a light flick. The qi cost is minimal, yet it can wound enemies and shatter up to three blocks of stone."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Wind Blade: Lianqi Early, wind, costs 5 qi.$(br)Condenses a small wind blade that cuts and strikes a target for 8 damage."
+      "text": "$(br)Wind Blade: Lianqi Early, wind, costs 5 qi.$(br)Gather fierce winds into a razor-sharp blade. Whether slashing, cutting, or piercing, its edge can grievously wound an enemy."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Wind Step: Lianqi Early, wind, costs 5 qi per second.$(br)Toggle spell. Wraps wind around your feet, gives Speed II, and allows one double jump before landing."
+      "text": "$(br)Wind Step: Lianqi Early, wind, costs 5 qi per second.$(br)A movement technique that may be toggled at will. Winds gather beneath your feet, greatly increasing speed and granting an additional midair jump. Consumes 5 qi per second."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Wind Riding Art: Lianqi Late, wind, costs 30 qi per second.$(br)Toggle spell. Grants creative-style low-altitude flight, but flight ends and you fall if no solid block is within 20 blocks below."
+      "text": "$(br)Wind Riding Art: Lianqi Late, wind, costs 30 qi per second.$(br)Ride the winds and drift through the air at low altitude. Consumes 30 qi per second. If no solid ground exists within twenty meters below, the power of flight is lost."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Smoke Art: Lianqi Early, wind, costs 15 qi.$(br)Shoots a smoke projectile that blocks sight by giving the target Blindness for 10 seconds."
+      "text": "$(br)Smoke Art: Lianqi Early, wind, costs 15 qi.$(br)Condense mist into a projectile and launch it forward. Those caught within the spreading smoke are blinded and unable to see for ten breaths."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Ignite Flare: Lianqi Early, fire, costs 10 qi.$(br)Shoots a straight flare that ignites the block it hits."
+      "text": "$(br)Ignite Flare: Lianqi Early, fire, costs 10 qi.$(br)Channel true fire into a blazing streak that races forward. Grass, wood, stone, and all it touches are set aflame."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Spirit Sight: Lianqi Early, light, costs 5 qi per second.$(br)Toggles night vision while the effect is active."
+      "text": "$(br)Spirit Sight: Lianqi Early, light, costs 5 qi per second.$(br)A spiritual eye technique that may be freely toggled. When active, night appears as bright as day. Consumes 5 qi per second."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Zhenshan Palm: Foundation Establishment Middle, earth, tier Earth, costs 390 qi.$(br)Releases a large hand-shaped earth particle wave for 3 seconds. Blocks touched by the palm are destroyed."
+      "text": "$(br)Zhenshan Palm: Foundation Establishment Middle, earth, tier Earth, costs 390 qi.$(br)Gather the power of earth and stone into a colossal palm strike. The palm persists for three breaths, crushing all rock and soil in its path."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Light Ball: Foundation Establishment Late, light, costs 90 qi to summon and 30 qi per shot.$(br)Summons 6 light balls in a hexagon behind you, stacking up to 3 rings. Punch to release one, or shift-punch to release all. Each shot deals 175 damage and tears through up to 24 blocks."
+      "text": "$(br)Light Ball: Foundation Establishment Late, light, costs 90 qi to summon and 30 qi per shot.$(br)Expend 90 qi to summon six hexagonal spirit orbs behind you, stacking up to three layers. A punch fires a single orb, while a concealed strike releases them all at once. Each orb possesses immense destructive power, capable of devastating powerful foes and shattering large areas of terrain."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Dielang Shield: Lianqi Late, water, tier Earth.$(br)Stacks up to 3 times. Stack 1 costs 50 qi and blocks 12 damage. Stack 2 costs 100 qi and blocks 36 damage. Stack 3 costs 150 qi and blocks 108 damage. Leftover shield strength remains after partial hits."
+      "text": "$(br)Dielang Shield: Lianqi Late, water, tier Earth.$(br)Condense layers of water-aspected spiritual power into protective shields. One layer costs 50 qi and blocks 12 damage; two layers cost 100 qi and block 36 damage; three layers cost 150 qi and withstand 108 damage."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Weiya: innate for non-mortals, dark, toggle spell.$(br)Costs 1% max qi each second and suppresses weaker mobs nearby with slowness, weakness, and spell lock at large level gaps."
+      "text": "$(br)Weiya: innate for non-mortals, dark, toggle spell.$(br)A pressure aura technique that may be activated at will. Vast cultivation pressure radiates from your body, consuming 10% of your total qi each second while suppressing creatures whose cultivation is below your own."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Absorb: granted by Reincarnation True Art, dark, costs 80 qi.$(br)Shoots a projectile that steals cultivation progress from a lower-level player and sends stolen progress back to the caster."
+      "text": "$(br)Absorb: granted by Reincarnation True Art, dark, costs 80 qi.$(br)Launch a dark-aspected spirit projectile. If it strikes someone with lower cultivation, one-tenth of their cultivation progress is extracted and added to your own."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Devour Heaven: granted by Heaven Devouring Demon Art, dark.$(br)Consumes blocks in a 5-block radius without drops for 10 progress each. Deals 100 damage to nearby entities and gains 20 progress per 50 max health from kills."
+      "text": "$(br)Devour Heaven: granted by Heaven Devouring Demon Art, dark.$(br)Devour all earth and stone within a five-meter radius, leaving nothing behind. Each block consumed advances your cultivation. The technique also devastates nearby living beings, and slain foes have their essence absorbed to greatly increase your cultivation."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Binding Spell: Foundation Establishment Late, metal, costs 200 qi.$(br)Shoots a binding projectile. Lower-level targets are immobilized for 3, 5, or 10 seconds depending on the level gap."
+      "text": "$(br)Wind Pressure: granted by Void Breaking Art, wind.$(br)A toggleable secret technique. After channeling power, every punch—whether through the air, against stone, or at an enemy—unleashes a spiraling cone of compressed wind. Upon reaching the Jindan Realm, concealed punches can summon a far larger wind cone."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Binding Spell: Foundation Establishment Late, metal, costs 200 qi.$(br)Silently recite an arcane incantation and launch a metal-aspected spirit projectile. Targets with lower cultivation become rigid and unable to move for a short time."
     }
   ]
 }

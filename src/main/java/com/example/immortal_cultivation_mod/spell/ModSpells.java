@@ -34,6 +34,7 @@ public class ModSpells {
     public static final String WEIYA = "weiya";
     public static final String ABSORB_CULTIVATION = "absorb_cultivation";
     public static final String TUNTIAN = "tuntian";
+    public static final String FENGYA = "fengya";
     public static final String DINGSHEN = "dingshen";
     public static final String YINLEI_JUE = "yinlei_jue";
     public static final String WULEI_ZHENGFA = "wulei_zhengfa";
@@ -77,6 +78,15 @@ public class ModSpells {
                 SpiritRoots.DARK,
                 "heaven",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_tuntian.png")
+        ));
+        spells.put(FENGYA, new SpellDef(
+                FENGYA,
+                "fengya",
+                "",
+                0,
+                SpiritRoots.WIND,
+                "earth",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_fengya.png")
         ));
         spells.put(DINGSHEN, new SpellDef(
                 DINGSHEN,
@@ -321,6 +331,9 @@ public class ModSpells {
         if ("Tuntian".equalsIgnoreCase(id) || "tuntian".equalsIgnoreCase(id) || "\u541e\u5929".equals(id)) {
             return TUNTIAN;
         }
+        if ("Fengya".equalsIgnoreCase(id) || "fengya".equalsIgnoreCase(id) || "\u98ce\u538b".equals(id)) {
+            return FENGYA;
+        }
         if ("Dingshen".equalsIgnoreCase(id) || "dingshen".equalsIgnoreCase(id) || "ding shen".equalsIgnoreCase(id) || "\u5b9a\u8eab\u5492".equals(id)) {
             return DINGSHEN;
         }
@@ -358,6 +371,9 @@ public class ModSpells {
         if (TUNTIAN.equals(spell.id())) {
             return !CultivationLevels.isMortal(currentLevel);
         }
+        if (FENGYA.equals(spell.id())) {
+            return !CultivationLevels.isMortal(currentLevel);
+        }
         return CultivationLevels.getStageIndex(currentLevel) >= CultivationLevels.getStageIndex(spell.requiredLevel());
     }
 
@@ -376,7 +392,10 @@ public class ModSpells {
         if (ABSORB_CULTIVATION.equals(normalized)) {
             return CultivationMethods.isReincarnationTrueArt(data.activeCultivationMethod());
         }
-        return TUNTIAN.equals(normalized) && CultivationMethods.isTuntianDemonArt(data.activeCultivationMethod());
+        if (TUNTIAN.equals(normalized)) {
+            return CultivationMethods.isTuntianDemonArt(data.activeCultivationMethod());
+        }
+        return FENGYA.equals(normalized) && CultivationMethods.isPokongJue(data.activeCultivationMethod());
     }
 
     public record SpellDef(String id, String translationKey, String requiredLevel, int qiCost, String element, String tier, ResourceLocation icon) {

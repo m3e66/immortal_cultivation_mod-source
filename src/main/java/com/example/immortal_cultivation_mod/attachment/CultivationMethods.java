@@ -1,5 +1,6 @@
 package com.example.immortal_cultivation_mod.attachment;
 
+import java.util.List;
 import java.util.Map;
 
 public class CultivationMethods {
@@ -11,24 +12,43 @@ public class CultivationMethods {
     public static final String BLOOD_DEMON_HUASHEN = "blood_demon_huashen";
     public static final String REINCARNATION_TRUE_ART = "reincarnation_true_art";
     public static final String TUNTIAN_DEMON_ART = "tuntian_demon_art";
+    public static final String POKONG_JUE = "pokong_jue";
+    public static final String CHANGQING_JUE = "changqing_jue";
+    public static final String FENTIAN_LIFE_RENEWAL = "fentian_life_renewal";
 
     public record MethodDef(String id, String nameKey, String element, String tier, String limitLevel, boolean bloodDemon) {}
 
-    private static final Map<String, MethodDef> METHODS = Map.of(
+    private static final Map<String, MethodDef> METHODS = Map.ofEntries(
+            Map.entry(
             BASIC_BREATHING, new MethodDef(BASIC_BREATHING, "method.immortal_cultivation_mod.basic_breathing", "any", "human",
-                    CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE, false),
+                    CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE, false)),
+            Map.entry(
             CLEAR_HEART, new MethodDef(CLEAR_HEART, "method.immortal_cultivation_mod.clear_heart", "any", "earth",
-                    CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE, false),
+                    CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE, false)),
+            Map.entry(
             BLOOD_DEMON_JINDAN, new MethodDef(BLOOD_DEMON_JINDAN, "method.immortal_cultivation_mod.blood_demon_jindan", "any", "human",
-                    CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE, true),
+                    CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE, true)),
+            Map.entry(
             BLOOD_DEMON_YUANYING, new MethodDef(BLOOD_DEMON_YUANYING, "method.immortal_cultivation_mod.blood_demon_yuanying", "any", "earth",
-                    CultivationLevels.REALM_YUANYING + CultivationLevels.STAGE_LATE, true),
+                    CultivationLevels.REALM_YUANYING + CultivationLevels.STAGE_LATE, true)),
+            Map.entry(
             BLOOD_DEMON_HUASHEN, new MethodDef(BLOOD_DEMON_HUASHEN, "method.immortal_cultivation_mod.blood_demon_huashen", "any", "heaven",
-                    CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_LATE, true),
+                    CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_LATE, true)),
+            Map.entry(
             REINCARNATION_TRUE_ART, new MethodDef(REINCARNATION_TRUE_ART, "method.immortal_cultivation_mod.reincarnation_true_art", SpiritRoots.DARK, "heaven",
-                    CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_LATE, false),
+                    CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_LATE, false)),
+            Map.entry(
             TUNTIAN_DEMON_ART, new MethodDef(TUNTIAN_DEMON_ART, "method.immortal_cultivation_mod.tuntian_demon_art", SpiritRoots.DARK, "heaven",
-                    CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_LATE, false)
+                    CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_LATE, false)),
+            Map.entry(
+            POKONG_JUE, new MethodDef(POKONG_JUE, "method.immortal_cultivation_mod.pokong_jue", SpiritRoots.WIND, "earth",
+                    CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE, false)),
+            Map.entry(
+            CHANGQING_JUE, new MethodDef(CHANGQING_JUE, "method.immortal_cultivation_mod.changqing_jue", SpiritRoots.WATER + "," + SpiritRoots.EARTH, "earth",
+                    CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE, false)),
+            Map.entry(
+            FENTIAN_LIFE_RENEWAL, new MethodDef(FENTIAN_LIFE_RENEWAL, "method.immortal_cultivation_mod.fentian_life_renewal", SpiritRoots.FIRE, "earth",
+                    CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE, false))
     );
 
     public static MethodDef get(String id) {
@@ -46,6 +66,18 @@ public class CultivationMethods {
 
     public static boolean isTuntianDemonArt(String id) {
         return TUNTIAN_DEMON_ART.equals(id);
+    }
+
+    public static boolean isPokongJue(String id) {
+        return POKONG_JUE.equals(id);
+    }
+
+    public static boolean isChangqingJue(String id) {
+        return CHANGQING_JUE.equals(id);
+    }
+
+    public static boolean isFentianLifeRenewal(String id) {
+        return FENTIAN_LIFE_RENEWAL.equals(id);
     }
 
     public static boolean canGainProgress(String methodId, String cultivationLevel) {
@@ -78,10 +110,11 @@ public class CultivationMethods {
                 default -> 100;
             };
         }
-        if (data.spiritRoots().size() == 1 && data.spiritRoots().contains(def.element())) {
+        List<String> elements = List.of(def.element().split(","));
+        if (data.spiritRoots().size() == 1 && elements.contains(data.spiritRoots().getFirst())) {
             return 200;
         }
-        if (data.spiritRoots().contains(def.element())) {
+        if (data.spiritRoots().stream().anyMatch(elements::contains)) {
             return 100;
         }
         return 10;

@@ -1,100 +1,108 @@
 {
-  "name": "\u6cd5\u672f\u5217\u8868",
+  "name": "法术列表",
   "icon": "immortal_cultivation_mod:lingbeng_scroll",
   "category": "immortal_cultivation_mod:spells",
   "sortnum": 1,
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "\u706b\u7403\u672f\uff1a\u7ec3\u6c14\u524d\u671f\uff0c\u706b\u5c5e\u6027\uff0c\u6d88\u801710\u7075\u6c14\u3002$(br)\u5c04\u51fa\u706b\u7403\uff0c\u9020\u6210\u4f24\u5bb3\u5e76\u70b9\u71c3\u76ee\u6807\u3002"
+      "text": "火球术：练气前期，火属性，消耗10灵气。$(br)凝自身灵气于掌间，化作炽热火球掷出，焚敌伤物。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u7075\u5d29\uff1a\u7ec3\u6c14\u540e\u671f\uff0c\u96f7\u5c5e\u6027\uff0c\u6d88\u801785\u7075\u6c14\u3002$(br)\u8fdb\u5165\u5d29\u52b2\u72b6\u6001\u3002\u62f3\u51fb\u65b9\u5757\u6216\u5b9e\u4f53\u91ca\u653e\u7206\u70b8\uff0c\u91cd\u590d\u65bd\u653e\u53ef\u589e\u52a0\u534a\u5f84\u3002"
+      "text": "$(br)灵崩：练气后期，雷属性，消耗85灵气。$(br)运转灵力进入崩劲之态，二次催动可延绵法效、扩涨爆炎范围，功法最多叠至十重。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u5f15\u96f7\u8bc0\uff1a\u7ec3\u6c14\u540e\u671f\uff0c\u96f7\u5c5e\u6027\uff0c\u6d88\u801740\u7075\u6c14\u3002$(br)\u5c04\u51fa\u96f7\u7b26\u98de\u5f39\uff0c\u547d\u4e2d\u540e\u5f15\u843d\u96f7\u5149\u8f70\u51fb\u76ee\u6807\uff0c\u9020\u621020\u4f24\u5bb3\u3002"
+      "text": "$(br)引雷诀：练气后期，雷属性，消耗40灵气。$(br)沟通天地灵机，凝雷符飞射，引九天雷光坠落，轰杀目标。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u4e94\u96f7\u6b63\u6cd5\uff1a\u7b51\u57fa\u4e2d\u671f\uff0c\u96f7\u5c5e\u6027\uff0c\u6d88\u8017120\u7075\u6c14\u3002$(br)\u6b63\u7edf\u96f7\u6cd5\uff0c\u5c04\u51fa\u66f4\u5f3a\u96f7\u6cd5\u98de\u5f39\uff0c\u964d\u4e0b\u4e94\u9053\u96f7\u67f1\uff0c\u9020\u6210100\u4f24\u5bb3\u3002"
+      "text": "$(br)五雷正法：筑基中期，雷属性，消耗120灵气。$(br)道门正统雷法，掌心雷与九天神雷齐落，五道雷柱纵横，专克世间邪祟妖邪。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u56de\u6625\u672f\uff1a\u7ec3\u6c14\u4e2d\u671f\uff0c\u6728\u5c5e\u6027\uff0c\u6d88\u801720\u7075\u6c14\u3002$(br)\u4ee5\u77ed\u6682\u6cbb\u7597\u6548\u679c\u6062\u590d\u751f\u547d\u3002"
+      "text": "$(br)回春术：练气中期，木属性，消耗20灵气。$(br)引灵气滋养肉身，三息之内肉身生机源源不断，持续修复伤势。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u5149\u675f\u672f\uff1a\u7ec3\u6c14\u524d\u671f\uff0c\u5149\u5c5e\u6027\uff0c\u6d88\u801730\u7075\u6c14\u3002$(br)\u8ba9\u4f60\u80fd\u591f\u611f\u77e5\u9644\u8fd1\u7684\u5b9e\u4f53\u3002"
+      "text": "$(br)光束术：练气前期，光属性，消耗30灵气。$(br)凝灵化作独有光痕异象，唯施术者可见，异象绵延十息方散。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u9041\u5730\u672f\uff1a\u7ec3\u6c14\u540e\u671f\uff0c\u571f\u5c5e\u6027\u3002$(br)\u6f5c\u5165\u5730\u4e0b\u3001\u52a0\u901f\u79fb\u52a8\uff0c\u9732\u51fa\u5730\u9762\u524d\u6301\u7eed\u6d88\u8017\u7075\u6c14\u3002"
+      "text": "$(br)遁地术：练气后期，土属性。$(br)敛身入地，可穿行土石之间，步履亦愈发迅捷。行于地下每息耗损八点灵气，现身地面则法印自解。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u6e05\u6d01\u5492\uff1a\u7ec3\u6c14\u524d\u671f\uff0c\u6c34\u5c5e\u6027\uff0c\u6d88\u801710\u7075\u6c14\u3002$(br)\u6e05\u9664\u81ea\u8eab\u7684\u8d1f\u9762\u6548\u679c\u3002"
+      "text": "$(br)清洁咒：练气前期，水属性，消耗10灵气。$(br)诵动咒文涤荡周身，尽数驱散缠身各类邪异负面状态。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u6ed1\u6c34\u672f\uff1a\u7ec3\u6c14\u524d\u671f\uff0c\u6c34\u5c5e\u6027\uff0c\u6d88\u801730\u7075\u6c14\u3002$(br)\u5c04\u51fa\u6c34\u5f39\u3002\u547d\u4e2d\u65b9\u5757\u540e\uff0c\u5728\u547d\u4e2d\u65b9\u5757\u4e0a\u65b9\u751f\u6210 puddle.fx \u6d45\u6c34\u6ee9\u3002\u8e29\u4e0a\u53bb\u4f1a\u83b7\u5f97 Magic Ritual \u7684\u53cd\u5411\u64cd\u4f5c\u6548\u679c\u3002"
+      "text": "$(br)滑水术：练气前期，水属性，消耗30灵气。$(br)催水凝弹轰出，落于地面便化作浅滩积水，踏足其上者身形操控错乱，行动相悖。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u5f15\u7075\u8bc0\uff1a\u7ec3\u6c14\u524d\u671f\uff0c\u98ce\u5c5e\u6027\uff0c\u4e0d\u6d88\u8017\u7075\u6c14\u3002$(br)\u5927\u5e45\u63d0\u9ad8\u7075\u6c14\u56de\u590d\uff0c\u4f46\u4e0d\u80fd\u653b\u51fb\u6216\u9632\u5fa1\uff0c\u53d7\u5230\u4f24\u5bb3\u53d8\u4e3a3\u500d\u3002"
+      "text": "$(br)引灵诀：练气前期，风属性，不消耗灵气。$(br)纯以心法吸纳天地灵气，无攻防之能；身遭攻击时，所受伤害会翻至三倍。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u7075\u6307\u5f39\uff1a\u7ec3\u6c14\u524d\u671f\uff0c\u98ce\u5c5e\u6027\uff0c\u6d88\u80175\u7075\u6c14\u3002$(br)\u6307\u5c16\u51dd\u5c11\u91cf\u7075\u529b\u5411\u524d\u70b9\u5c04\uff0c\u9020\u62105\u4f24\u5bb3\uff0c\u6700\u591a\u7834\u574f3\u4e2a\u65b9\u5757\u3002"
+      "text": "$(br)灵指弹：练气前期，风属性，消耗5灵气。$(br)指尖凝一缕细碎灵力轻点而出，灵力耗损微末，可伤敌破障，能击碎至多三方土石。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u98ce\u5203\uff1a\u7ec3\u6c14\u524d\u671f\uff0c\u98ce\u5c5e\u6027\uff0c\u6d88\u80175\u7075\u6c14\u3002$(br)\u51dd\u805a\u5c0f\u98ce\u5203\uff0c\u5207\u5272\u3001\u51fb\u6253\u76ee\u6807\uff0c\u9020\u62108\u4f24\u5bb3\u3002"
+      "text": "$(br)风刃：练气前期，风属性，消耗5灵气。$(br)聚劲风凝为风刃，斩击劈刺皆可，锋锐之气能重创敌手。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u8e0f\u98ce\u6b65\uff1a\u7ec3\u6c14\u524d\u671f\uff0c\u98ce\u5c5e\u6027\uff0c\u6bcf\u79d2\u6d88\u80175\u7075\u6c14\u3002$(br)\u5f00\u5173\u5f0f\u6cd5\u672f\u3002\u811a\u6b65\u88f9\u98ce\uff0c\u83b7\u5f97\u901f\u5ea6II\uff0c\u843d\u5730\u524d\u53ef\u4e8c\u6bb5\u8df3\u4e00\u6b21\u3002"
+      "text": "$(br)踏风步：练气前期，风属性，每秒消耗5灵气。$(br)启闭随心的身法秘术，足下缠裹清风，身法陡然增速，更可凌空再跃一次，每息耗损五点灵气。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u5fa1\u98ce\u8bc0\uff1a\u7ec3\u6c14\u540e\u671f\uff0c\u98ce\u5c5e\u6027\uff0c\u6bcf\u79d2\u6d88\u801730\u7075\u6c14\u3002$(br)\u5f00\u5173\u5f0f\u6cd5\u672f\u3002\u8e0f\u98ce\u4f4e\u7a7a\u98de\u884c\uff0c\u4e0b\u65b920\u683c\u5185\u6ca1\u6709\u5b9e\u4f53\u65b9\u5757\u65f6\u4f1a\u5931\u53bb\u98de\u884c\u5e76\u4e0b\u843d\u3002"
+      "text": "$(br)御风诀：练气后期，风属性，每秒消耗30灵气。$(br)御长风凌空慢行，得以低空浮行。每息耗损三十点灵气，若脚下二十丈内无实地依托，便会坠落失却御风之能。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u8ff7\u70df\u672f\uff1a\u7ec3\u6c14\u524d\u671f\uff0c\u98ce\u5c5e\u6027\uff0c\u6d88\u801715\u7075\u6c14\u3002$(br)\u5c04\u51fa\u70df\u96fe\u5f39\u906e\u6321\u89c6\u7ebf\uff0c\u547d\u4e2d\u76ee\u6807\u540e\u4f7f\u5176\u5931\u660e10\u79d2\u3002"
+      "text": "$(br)迷烟术：练气前期，风属性，消耗15灵气。$(br)凝雾成弹激射而出，烟雾漫延之处，中招者双目蒙蔽，十息之内视物皆无。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u71c3\u706b\u8bc0\uff1a\u7ec3\u6c14\u524d\u671f\uff0c\u706b\u5c5e\u6027\uff0c\u6d88\u801710\u7075\u6c14\u3002$(br)\u5c04\u51fa\u76f4\u7ebf\u706b\u5149\uff0c\u547d\u4e2d\u65b9\u5757\u540e\u70b9\u71c3\u5b83\u3002"
+      "text": "$(br)燃火诀：练气前期，火属性，消耗10灵气。$(br)引真火化作火线直掠而去，触碰到草木土石，便会燃起明火。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u7075\u89c6\uff1a\u7ec3\u6c14\u524d\u671f\uff0c\u5149\u5c5e\u6027\uff0c\u6bcf\u79d2\u6d88\u80175\u7075\u6c14\u3002$(br)\u5f00\u5173\u5f0f\u591c\u89c6\uff0c\u6548\u679c\u6fc0\u6d3b\u65f6\u6301\u7eed\u6d88\u8017\u7075\u6c14\u3002"
+      "text": "$(br)灵视：练气前期，光属性，每秒消耗5灵气。$(br)可自由启闭的灵目之术，开启后黑夜亦如白昼，每息消耗五点灵气。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u9707\u5c71\u638c\uff1a\u7b51\u57fa\u4e2d\u671f\uff0c\u571f\u5c5e\u6027\uff0c\u5730\u9636\uff0c\u6d88\u8017390\u7075\u6c14\u3002$(br)\u91ca\u653e\u5de8\u5927\u638c\u5f62\u571f\u884c\u7c92\u5b50\u6ce2\uff0c\u6301\u7eed3\u79d2\u3002\u638c\u5370\u89e6\u78b0\u7684\u65b9\u5757\u4f1a\u88ab\u9707\u788e\u3002"
+      "text": "$(br)震山掌：筑基中期，土属性，地阶，消耗390灵气。$(br)引大地厚土之力凝于掌印，掌势绵延三息，所过之处土石尽数崩碎。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u5149\u7403\u672f\uff1a\u7b51\u57fa\u540e\u671f\uff0c\u5149\u5c5e\u6027\uff0c\u53ec\u5524\u6d88\u801790\u7075\u6c14\uff0c\u53d1\u5c04\u6bcf\u679a\u6d88\u801730\u7075\u6c14\u3002$(br)\u5728\u8eab\u540e\u53ec\u55246\u679a\u516d\u8fb9\u5f62\u5149\u7403\uff0c\u6700\u591a\u53e0\u52a03\u5c42\u3002\u62f3\u51fb\u53d1\u5c041\u679a\uff0c\u6f5c\u884c\u62f3\u51fb\u53d1\u5c04\u5168\u90e8\u3002\u6bcf\u679a\u9020\u6210175\u70b9\u4f24\u5bb3\u5e76\u6700\u591a\u7834\u574f24\u4e2a\u65b9\u5757\u3002"
+      "text": "$(br)光球术：筑基后期，光属性，召唤消耗90灵气，发射每枚消耗30灵气。$(br)倾尽九十点灵气，于身后召出六枚六边形灵光球，法相最多叠加三重。挥拳可单发一球，敛息出拳便能尽数轰出，每枚光球威力极强，既能重创强敌，亦可崩碎大片土石。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u53e0\u6d6a\u76fe\uff1a\u7ec3\u6c14\u540e\u671f\uff0c\u6c34\u5c5e\u6027\uff0c\u5730\u9636\u3002$(br)\u6700\u591a\u53e0\u52a03\u5c42\u30021\u5c42\u6d88\u801750\u7075\u6c14\uff0c\u62b5\u632112\u4f24\u5bb3\u30022\u5c42\u6d88\u8017100\u7075\u6c14\uff0c\u62b5\u632136\u4f24\u5bb3\u30023\u5c42\u6d88\u8017150\u7075\u6c14\uff0c\u62b5\u6321108\u4f24\u5bb3\u3002\u672a\u7528\u5b8c\u7684\u62a4\u76fe\u503c\u4f1a\u4fdd\u7559\u3002"
+      "text": "$(br)叠浪盾：练气后期，水属性，地阶。$(br)以水行灵力层层凝盾护身。一重水盾耗灵五十，可挡十二分攻势；二重水盾耗灵百点，能抵御三十六分伤害；三重水盾耗灵一百五十，坚盾可挡百零八重打击。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u5a01\u538b\uff1a\u975e\u51e1\u4eba\u5929\u751f\u62e5\u6709\uff0c\u6697\u5c5e\u6027\uff0c\u5f00\u5173\u5f0f\u6cd5\u672f\u3002$(br)\u6bcf\u79d2\u6d88\u80171%\u7075\u6c14\u4e0a\u9650\uff0c\u538b\u5236\u9644\u8fd1\u4fee\u4e3a\u66f4\u4f4e\u7684\u751f\u7075\u3002"
+      "text": "$(br)威压：非凡人天生拥有，暗属性，开关式法术。$(br)随心启闭的气场秘术，周身散出磅礴修为威压，每息耗损自身灵气总量的一成，可震慑修为不及自身的生灵，压制其行动与修为。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u5438\u53d6\uff1a\u8f6e\u56de\u771f\u51b3\u81ea\u52a8\u83b7\u5f97\uff0c\u6697\u5c5e\u6027\uff0c\u6d88\u801780\u7075\u6c14\u3002$(br)\u5c04\u51fa\u98de\u5f39\uff0c\u547d\u4e2d\u4fee\u4e3a\u4f4e\u4e8e\u81ea\u8eab\u7684\u73a9\u5bb6\u65f6\u593a\u53d6\u5176\u4fee\u4e3a\u8fdb\u5ea6\u3002"
+      "text": "$(br)吸取：轮回真诀自动获得，暗属性，消耗80灵气。$(br)凝暗属性灵弹飞射而出，若命中修为低于己身之人，便可抽取对方一成境界修为，纳为己用。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u5b9a\u8eab\u5492\uff1a\u7b51\u57fa\u540e\u671f\uff0c\u91d1\u5c5e\u6027\uff0c\u6d88\u8017200\u7075\u6c14\u3002$(br)\u5c04\u51fa\u5b9a\u8eab\u98de\u5f39\u3002\u4fee\u4e3a\u66f4\u4f4e\u7684\u76ee\u6807\u4f1a\u6309\u5883\u754c\u5dee\u8ddd\u88ab\u5b9a\u8eab3\u30015\u621610\u79d2\u3002"
+      "text": "$(br)吞天：吞天魔功自动获得，暗属性。$(br)施术可吞噬周遭五丈范围土石，被吞之物不留残渣，每吞一方土石皆能精进修为；术法亦会冲击周遭生灵，造成重创，若斩杀敌手，更能汲取其本源大增修为。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)风压：破空诀自动获得，风属性。$(br)启闭式秘术，运功之后挥拳出击，无论隔空、击石、攻敌，皆会掀起倒卷风锥。踏入金丹境界后，敛息出拳，便可唤出范围更广的巨型风锥。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)定身咒：筑基后期，金属性，消耗200灵气。$(br)默诵玄咒，凝金行灵弹击向敌手，修为不及自身者中招后，身躯僵滞，一时动弹不得。"
     }
   ]
 }

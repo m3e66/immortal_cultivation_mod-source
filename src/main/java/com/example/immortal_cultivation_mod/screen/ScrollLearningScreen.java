@@ -42,10 +42,14 @@ public class ScrollLearningScreen extends Screen {
         int y = (height - H) / 2;
 
         if (!alreadyLearned) {
-            addRenderableWidget(Button.builder(
+            addRenderableWidget(new StyledButton(
+                    x + 20,
+                    y + 170,
+                    100,
+                    20,
                     Component.translatable("screen." + ImmortalCultivationMod.MODID + ".learn_button"),
                     b -> learnSpell()
-            ).bounds(x + 20, y + 170, 100, 20).build());
+            ));
         }
     }
 
@@ -71,7 +75,8 @@ public class ScrollLearningScreen extends Screen {
         g.blit(BG_ER, x + W - 5, y + 5, 0, 0, 5, H - 10, 5, 1);
 
         Minecraft mc = Minecraft.getInstance();
-        int lx = x + 15, ly = y + 12;
+        int lx = x + 15;
+        int ly = y + 12;
 
         g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".scroll_learning"), x + W / 2 - 40, ly, 0xEECC66, true);
         ly += 20;
@@ -116,5 +121,35 @@ public class ScrollLearningScreen extends Screen {
     }
 
     @Override
-    public boolean isPauseScreen() { return false; }
+    public boolean isPauseScreen() {
+        return false;
+    }
+
+    private static class StyledButton extends Button {
+        StyledButton(int x, int y, int width, int height, Component message, OnPress onPress) {
+            super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
+        }
+
+        @Override
+        protected void renderWidget(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+            int x = getX();
+            int y = getY();
+            int bg = active ? 0xCC202020 : 0x88404040;
+            int top = isHoveredOrFocused() && active ? 0xFF8FFFFF : 0xFF55DDFF;
+            int bottom = active ? 0xFF1E6F7A : 0xFF555555;
+            int text = active ? 0xFFEAFDFF : 0xFF999999;
+
+            g.fill(x, y, x + width, y + height, bg);
+            g.fill(x, y, x + width, y + 1, top);
+            g.fill(x, y, x + 1, y + height, top);
+            g.fill(x, y + height - 1, x + width, y + height, bottom);
+            g.fill(x + width - 1, y, x + width, y + height, bottom);
+
+            var font = Minecraft.getInstance().font;
+            Component message = getMessage();
+            int tx = x + (width - font.width(message)) / 2;
+            int ty = y + (height - 8) / 2;
+            g.drawString(font, message, tx, ty, text, false);
+        }
+    }
 }

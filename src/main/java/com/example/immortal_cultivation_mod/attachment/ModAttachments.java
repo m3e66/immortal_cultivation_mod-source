@@ -65,7 +65,7 @@ public class ModAttachments {
                         Codec.STRING.optionalFieldOf("cultivationLevel", CultivationLevels.REALM_MORTAL).forGetter(CultivationData::cultivationLevel),
                         Codec.INT.optionalFieldOf("luck", 50).forGetter(CultivationData::luck),
                         Codec.INT.optionalFieldOf("moral", 50).forGetter(CultivationData::moral),
-                        Codec.STRING.optionalFieldOf("bodyType", CultivationLevels.REALM_MORTAL).forGetter(CultivationData::bodyType),
+                        Codec.STRING.optionalFieldOf("bodyType", BodyTypes.MORTAL_BODY).forGetter(CultivationData::bodyType),
                         Codec.INT.optionalFieldOf("soul", 100).forGetter(CultivationData::soul),
                         Codec.INT.optionalFieldOf("thoughts", 100).forGetter(CultivationData::thoughts),
                         Codec.STRING.listOf().optionalFieldOf("spiritRoots", List.of()).forGetter(CultivationData::spiritRoots),

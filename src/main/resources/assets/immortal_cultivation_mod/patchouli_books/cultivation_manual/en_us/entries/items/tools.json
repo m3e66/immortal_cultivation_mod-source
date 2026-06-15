@@ -11,6 +11,10 @@
     {
       "type": "patchouli:text",
       "text": "$(br)Small Level Up and Big Level Up items add cultivation progress when right-clicked.$(br2)The Debug Stat Editor opens a test GUI for changing player stats during development."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Magic Ritual Spirit Stones restore qi when used: low grade restores 10 qi, middle grade restores 100 qi, and high grade restores 1000 qi."
     }
   ]
 }

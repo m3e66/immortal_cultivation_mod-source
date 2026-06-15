@@ -91,10 +91,12 @@ Dmg
         Special effect: gain a new spell that is auto added called 吞天
         after using the spell consume blcoks in a 5 block radius ((dont drop blocks)for every block there is add 10 progress) and do 100 dmg to entity in 5 block radius if killed entity then for every 50 max hp the entity have add 20 progress
 
-air attack
+破空诀
 Cultivation limit: REALM_JINDAN late
 Element: 风
-Special effect: gain a new toggle spell that is auto added called
+Special effect: gain a new toggle spell that is auto added called 风压 (which give the effect 风压)
+if you have 风压 when you punch air or blocks or mobs destroy the block in front of them (depending of the big level of the player it is 8 / 32 / 128 block) in a upside down cone shape
+add air particles
 
 长青诀
 Cultivation limit: REALM_JINDAN late

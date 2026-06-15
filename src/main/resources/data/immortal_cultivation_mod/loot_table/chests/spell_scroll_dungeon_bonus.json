@@ -122,6 +122,46 @@
           "type": "minecraft:item",
           "name": "immortal_cultivation_mod:tuntian_demon_art_method",
           "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:pokong_jue_method",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:changqing_jue_method",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:fentian_life_renewal_method",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:basic_breathing_method",
+          "weight": 6
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:clear_heart_method",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:blood_demon_jindan_method",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:blood_demon_yuanying_method",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:blood_demon_huashen_method",
+          "weight": 1
         }
       ]
     }

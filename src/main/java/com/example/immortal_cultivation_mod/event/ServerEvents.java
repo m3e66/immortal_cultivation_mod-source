@@ -3,6 +3,7 @@ package com.example.immortal_cultivation_mod.event;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
+import com.example.immortal_cultivation_mod.attachment.BodyTypes;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
@@ -11,7 +12,10 @@ import com.example.immortal_cultivation_mod.effect.ModEffects;
 import com.example.immortal_cultivation_mod.effect.PhotonEffects;
 import com.example.immortal_cultivation_mod.item.ModItems;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
+import com.example.immortal_cultivation_mod.spell.ChangqingJue;
 import com.example.immortal_cultivation_mod.spell.DielangShield;
+import com.example.immortal_cultivation_mod.spell.FentianLifeRenewal;
+import com.example.immortal_cultivation_mod.spell.Fengya;
 import com.example.immortal_cultivation_mod.spell.LightBeamAttack;
 import com.example.immortal_cultivation_mod.spell.SlidingWater;
 import com.example.immortal_cultivation_mod.spell.Weiya;
@@ -61,8 +65,6 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 @EventBusSubscriber(modid = ImmortalCultivationMod.MODID)
 public class ServerEvents {
-    private static final ResourceLocation MAGIC_RITUAL_SPIRIT_STONE =
-            ResourceLocation.fromNamespaceAndPath("magic_ritual_mod", "spirit_stone");
     private static final ResourceLocation CULTIVATION_MAX_HEALTH_MODIFIER =
             ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "cultivation_max_health");
     private static final int AMBIENT_QI_SCAN_RADIUS = 48;
@@ -106,14 +108,6 @@ public class ServerEvents {
             "magic",
             "mental"
     );
-    private static final List<String> BODY_TYPES = List.of(
-            CultivationLevels.REALM_MORTAL,
-            CultivationLevels.REALM_LIANQI,
-            CultivationLevels.REALM_ZHUJI,
-            CultivationLevels.REALM_JINDAN,
-            CultivationLevels.REALM_YUANYING
-    );
-
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         event.getDispatcher().register(Commands.literal("cultivationdebug")
@@ -274,6 +268,8 @@ public class ServerEvents {
         if (player instanceof ServerPlayer sp) {
             WindStep.tick(sp);
             YufengJue.tick(sp);
+            ChangqingJue.tick(sp);
+            FentianLifeRenewal.tick(sp);
             Weiya.tick(sp);
             SlidingWater.tick(sp);
             DielangShield.tick(sp);
@@ -309,14 +305,20 @@ public class ServerEvents {
             }
         }
         if (event.getEntity() instanceof ServerPlayer player) {
+            if (FentianLifeRenewal.tryCatchDeath(player)) {
+                event.setCanceled(true);
+                return;
+            }
             MEDITATION_ANCHORS.remove(player.getUUID());
             QI_GATHERING_ANCHORS.remove(player.getUUID());
             EARTH_ESCAPE_GRACE_TICKS.remove(player.getUUID());
             SPIRIT_SIGHT_ACTIVE.remove(player.getUUID());
+            player.removeEffect(ModEffects.SPIRIT_SIGHT);
             FOG_REVEALS.remove(player.getUUID());
             AMBIENT_QI_CACHE.remove(player.getUUID());
             WindStep.clear(player);
             YufengJue.clear(player);
+            FentianLifeRenewal.clear(player);
             var data = ModAttachments.getData(player);
             int maxQi = getEffectiveMaxQi(data, CultivationLevels.getLevelDef(data.cultivationLevel()));
             ModAttachments.setData(player, data.withAgePenalty(data.agePenalty() + 10).withQi(maxQi));
@@ -340,10 +342,12 @@ public class ServerEvents {
             QI_GATHERING_ANCHORS.remove(sp.getUUID());
             EARTH_ESCAPE_GRACE_TICKS.remove(sp.getUUID());
             SPIRIT_SIGHT_ACTIVE.remove(sp.getUUID());
+            sp.removeEffect(ModEffects.SPIRIT_SIGHT);
             FOG_REVEALS.remove(sp.getUUID());
             AMBIENT_QI_CACHE.remove(sp.getUUID());
             WindStep.clear(sp);
             YufengJue.clear(sp);
+            FentianLifeRenewal.clear(sp);
             syncPlayerData(sp);
         }
     }
@@ -355,7 +359,8 @@ public class ServerEvents {
         }
 
         Item item = event.getItemStack().getItem();
-        if (!MAGIC_RITUAL_SPIRIT_STONE.equals(BuiltInRegistries.ITEM.getKey(item))) {
+        int restoreAmount = magicRitualSpiritStoneRestoreAmount(BuiltInRegistries.ITEM.getKey(item));
+        if (restoreAmount <= 0) {
             return;
         }
 
@@ -365,7 +370,7 @@ public class ServerEvents {
             return;
         }
 
-        ModAttachments.setData(player, data.withQi(Math.min(maxQi, data.qi() + 10)));
+        ModAttachments.setData(player, data.withQi(Math.min(maxQi, data.qi() + restoreAmount)));
         if (!player.getAbilities().instabuild) {
             event.getItemStack().shrink(1);
         }
@@ -373,6 +378,18 @@ public class ServerEvents {
 
         event.setCancellationResult(InteractionResult.SUCCESS);
         event.setCanceled(true);
+    }
+
+    private static int magicRitualSpiritStoneRestoreAmount(ResourceLocation itemKey) {
+        if (itemKey == null || !"magic_ritual_mod".equals(itemKey.getNamespace())) {
+            return 0;
+        }
+        return switch (itemKey.getPath()) {
+            case "spirit_stone", "low_grade_spirit_stone", "low_spirit_stone", "lower_grade_spirit_stone" -> 10;
+            case "middle_grade_spirit_stone", "medium_grade_spirit_stone", "mid_grade_spirit_stone", "middle_spirit_stone", "medium_spirit_stone" -> 100;
+            case "high_grade_spirit_stone", "high_spirit_stone", "upper_grade_spirit_stone", "upper_spirit_stone" -> 1000;
+            default -> 0;
+        };
     }
 
     @SubscribeEvent
@@ -384,6 +401,10 @@ public class ServerEvents {
             }
             Vec3 target = event.getTarget().position().add(0.0D, event.getTarget().getBbHeight() * 0.5D, 0.0D);
             if (LightBeamAttack.shoot(player, target, player.isShiftKeyDown())) {
+                event.setCanceled(true);
+                return;
+            }
+            if (Fengya.release(player, target, player.isShiftKeyDown())) {
                 event.setCanceled(true);
                 return;
             }
@@ -433,6 +454,10 @@ public class ServerEvents {
         Vec3 hit = Vec3.atCenterOf(pos);
         if (event.getFace() != null) {
             hit = hit.add(Vec3.atLowerCornerOf(event.getFace().getNormal()).scale(0.55D));
+        }
+        if (Fengya.release(player, hit, player.isShiftKeyDown())) {
+            event.setCanceled(true);
+            return;
         }
         triggerLingbeng(player, hit.x, hit.y, hit.z);
     }
@@ -526,7 +551,7 @@ public class ServerEvents {
     private static ModAttachments.CultivationData adjustDebugData(ModAttachments.CultivationData data, String stat, int delta) {
         return switch (stat) {
             case "cultivation_level" -> data.withCultivationLevel(nextCultivationLevel(data.cultivationLevel(), delta));
-            case "body_type" -> data.withBodyType(nextBodyType(data.bodyType(), delta));
+            case "body_type" -> data.withBodyType(BodyTypes.next(data.bodyType(), delta));
             case "age" -> data.withAgePenalty(clamp(
                     data.agePenalty() - delta,
                     0,
@@ -554,15 +579,6 @@ public class ServerEvents {
             case "skill_points", "max_hp", "max_qi", "max_energy", "physical", "magic", "mental" -> data.debugSetStat(stat, value, levelDef);
             default -> data;
         };
-    }
-
-    private static String nextBodyType(String current, int direction) {
-        int index = BODY_TYPES.indexOf(current);
-        if (index < 0) {
-            index = 0;
-        }
-        int next = Math.floorMod(index + (direction < 0 ? -1 : 1), BODY_TYPES.size());
-        return BODY_TYPES.get(next);
     }
 
     private static String nextCultivationLevel(String current, int direction) {
@@ -829,6 +845,7 @@ public class ServerEvents {
         UUID id = player.getUUID();
         if (SPIRIT_SIGHT_ACTIVE.remove(id) != null) {
             player.removeEffect(MobEffects.NIGHT_VISION);
+            player.removeEffect(ModEffects.SPIRIT_SIGHT);
             syncPlayerData(player);
             return;
         }
@@ -841,11 +858,13 @@ public class ServerEvents {
 
         SPIRIT_SIGHT_ACTIVE.put(id, true);
         player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 260, 0, false, false, true));
+        player.addEffect(new MobEffectInstance(ModEffects.SPIRIT_SIGHT, 260, 0, false, false, true));
         syncPlayerData(player);
     }
 
     private static void handleSpiritSightTick(ServerPlayer player, ModAttachments.CultivationData data) {
         player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 260, 0, false, false, true));
+        player.addEffect(new MobEffectInstance(ModEffects.SPIRIT_SIGHT, 260, 0, false, false, true));
         if (player.tickCount % 20 != 0) {
             return;
         }
@@ -853,6 +872,7 @@ public class ServerEvents {
         if (!spendQiOrBlood(player, data, 5)) {
             SPIRIT_SIGHT_ACTIVE.remove(player.getUUID());
             player.removeEffect(MobEffects.NIGHT_VISION);
+            player.removeEffect(ModEffects.SPIRIT_SIGHT);
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             syncPlayerData(player);
             return;

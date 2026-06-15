@@ -19,16 +19,15 @@ public final class SpiritRoots {
     public static final String LIGHT = "\u5149";
     public static final String DARK = "\u6697";
     public static final String NONE = "\u65e0\u7075\u6839";
-    public static final String PSEUDO = "\u4f2a\u7075\u6839";
 
     public static final String GRADE_HEAVEN = "\u5929";
     public static final String GRADE_EARTH = "\u5730";
     public static final String GRADE_MYSTIC = "\u7384";
     public static final String GRADE_YELLOW = "\u9ec4";
 
-    private static final List<String> NORMAL_ELEMENTS = List.of(METAL, WOOD, WATER, FIRE, EARTH);
-    private static final List<String> ALL_ELEMENTS = List.of(METAL, WOOD, WATER, FIRE, EARTH, THUNDER, ICE, WIND, LIGHT, DARK);
-    private static final List<String> GRADES = List.of(GRADE_HEAVEN, GRADE_EARTH, GRADE_MYSTIC, GRADE_YELLOW);
+    public static final List<String> NORMAL_ELEMENTS = List.of(METAL, WOOD, WATER, FIRE, EARTH);
+    public static final List<String> ALL_ELEMENTS = List.of(METAL, WOOD, WATER, FIRE, EARTH, THUNDER, WIND, ICE, LIGHT, DARK);
+    public static final List<String> GRADES = List.of(GRADE_HEAVEN, GRADE_EARTH, GRADE_MYSTIC, GRADE_YELLOW);
 
     private SpiritRoots() {
     }
@@ -37,9 +36,6 @@ public final class SpiritRoots {
         int special = random.nextInt(100);
         if (special < 3) {
             return new RootData(List.of(NONE), GRADE_YELLOW);
-        }
-        if (special < 8) {
-            return new RootData(List.of(PSEUDO), GRADE_YELLOW);
         }
 
         int roll = random.nextInt(100);
@@ -68,9 +64,38 @@ public final class SpiritRoots {
 
     public static String format(List<String> roots, String grade) {
         if (roots == null || roots.isEmpty()) {
-            return NONE + " / " + GRADE_YELLOW;
+            return NONE + "/" + GRADE_YELLOW;
         }
-        return String.join("", roots) + " / " + grade;
+        return rootTypeName(roots) + "/" + String.join("", roots) + "/" + sanitizeGrade(grade);
+    }
+
+    public static String rootTypeName(List<String> roots) {
+        int count = roots == null ? 0 : roots.size();
+        return switch (count) {
+            case 1 -> "\u5355\u7075\u6839";
+            case 2 -> "\u53cc\u7075\u6839";
+            case 3 -> "\u4e09\u7075\u6839";
+            case 4 -> "\u56db\u7075\u6839";
+            case 5 -> "\u4e94\u7075\u6839";
+            default -> NONE;
+        };
+    }
+
+    public static String sanitizeGrade(String grade) {
+        return GRADES.contains(grade) ? grade : GRADE_YELLOW;
+    }
+
+    public static List<String> sanitizeRootList(List<String> roots) {
+        if (roots == null || roots.isEmpty()) {
+            return List.of();
+        }
+        List<String> clean = new ArrayList<>();
+        for (String root : roots) {
+            if (ALL_ELEMENTS.contains(root) && !clean.contains(root) && clean.size() < 5) {
+                clean.add(root);
+            }
+        }
+        return List.copyOf(clean);
     }
 
     public static boolean hasMatchingRoot(ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
@@ -90,7 +115,7 @@ public final class SpiritRoots {
     }
 
     public static int cultivationProgressGain(ModAttachments.CultivationData data, int baseGain) {
-        if (data.spiritRoots() == null || data.spiritRoots().isEmpty() || data.spiritRoots().contains(NONE) || data.spiritRoots().contains(PSEUDO)) {
+        if (data.spiritRoots() == null || data.spiritRoots().isEmpty() || data.spiritRoots().contains(NONE)) {
             return 1;
         }
 
@@ -113,7 +138,6 @@ public final class SpiritRoots {
     public static List<String> nextRootSet(List<String> current, int direction) {
         List<List<String>> options = List.of(
                 List.of(NONE),
-                List.of(PSEUDO),
                 List.of(METAL),
                 List.of(WOOD),
                 List.of(WATER),

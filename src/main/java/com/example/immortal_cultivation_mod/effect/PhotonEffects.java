@@ -267,7 +267,7 @@ public final class PhotonEffects {
             Object command = Class.forName("com.lowdragmc.photon.command.EntityEffectCommand").getConstructor().newInstance();
             command.getClass().getMethod("setLocation", ResourceLocation.class).invoke(command, ResourceLocation.parse(fx));
             command.getClass().getMethod("setEntities", List.class).invoke(command, entities);
-            command.getClass().getMethod("setAllowMulti", boolean.class).invoke(command, true);
+            command.getClass().getMethod("setAllowMulti", boolean.class).invoke(command, false);
             PacketDistributor.sendToPlayer(player, (CustomPacketPayload) command);
         } catch (ReflectiveOperationException | ClassCastException ignored) {
         }

@@ -41,11 +41,16 @@ public class MethodLearningScreen extends Screen {
         int x = (width - W) / 2;
         int y = (height - H) / 2;
         boolean active = ClientData.cultivationData.activeCultivationMethod().equals(methodId);
+
         if (method != null && !active) {
-            addRenderableWidget(Button.builder(
+            addRenderableWidget(new StyledButton(
+                    x + 20,
+                    y + 170,
+                    110,
+                    20,
                     Component.translatable("screen." + ImmortalCultivationMod.MODID + ".activate_method_button"),
                     b -> activateMethod()
-            ).bounds(x + 20, y + 170, 110, 20).build());
+            ));
         }
     }
 
@@ -103,13 +108,21 @@ public class MethodLearningScreen extends Screen {
 
         g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".special_effect_label"), lx, ly, labelColor, true);
         ly += 12;
+
         String effectKey = method.bloodDemon()
                 ? "method_special." + ImmortalCultivationMod.MODID + ".blood_demon"
                 : CultivationMethods.isReincarnationTrueArt(methodId)
                 ? "method_special." + ImmortalCultivationMod.MODID + ".reincarnation_true_art"
                 : CultivationMethods.isTuntianDemonArt(methodId)
                 ? "method_special." + ImmortalCultivationMod.MODID + ".tuntian_demon_art"
+                : CultivationMethods.isPokongJue(methodId)
+                ? "method_special." + ImmortalCultivationMod.MODID + ".pokong_jue"
+                : CultivationMethods.isChangqingJue(methodId)
+                ? "method_special." + ImmortalCultivationMod.MODID + ".changqing_jue"
+                : CultivationMethods.isFentianLifeRenewal(methodId)
+                ? "method_special." + ImmortalCultivationMod.MODID + ".fentian_life_renewal"
                 : "method_special." + ImmortalCultivationMod.MODID + ".none";
+
         g.drawString(mc.font, Component.translatable(effectKey), lx, ly, 0xAAAAAA, true);
 
         if (ClientData.cultivationData.activeCultivationMethod().equals(methodId)) {
@@ -127,5 +140,33 @@ public class MethodLearningScreen extends Screen {
     @Override
     public boolean isPauseScreen() {
         return false;
+    }
+
+    private static class StyledButton extends Button {
+        StyledButton(int x, int y, int width, int height, Component message, OnPress onPress) {
+            super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
+        }
+
+        @Override
+        protected void renderWidget(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+            int x = getX();
+            int y = getY();
+            int bg = active ? 0xCC202020 : 0x88404040;
+            int top = isHoveredOrFocused() && active ? 0xFF8FFFFF : 0xFF55DDFF;
+            int bottom = active ? 0xFF1E6F7A : 0xFF555555;
+            int text = active ? 0xFFEAFDFF : 0xFF999999;
+
+            g.fill(x, y, x + width, y + height, bg);
+            g.fill(x, y, x + width, y + 1, top);
+            g.fill(x, y, x + 1, y + height, top);
+            g.fill(x, y + height - 1, x + width, y + height, bottom);
+            g.fill(x + width - 1, y, x + width, y + height, bottom);
+
+            var font = Minecraft.getInstance().font;
+            Component message = getMessage();
+            int tx = x + (width - font.width(message)) / 2;
+            int ty = y + (height - 8) / 2;
+            g.drawString(font, message, tx, ty, text, false);
+        }
     }
 }

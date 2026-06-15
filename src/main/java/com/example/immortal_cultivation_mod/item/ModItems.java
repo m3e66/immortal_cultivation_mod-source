@@ -133,6 +133,15 @@ public class ModItems {
     public static final DeferredItem<Item> TUNTIAN_DEMON_ART_METHOD = registerItem("tuntian_demon_art_method",
             () -> new CultivationMethodItem(new Item.Properties().stacksTo(1), CultivationMethods.TUNTIAN_DEMON_ART));
 
+    public static final DeferredItem<Item> POKONG_JUE_METHOD = registerItem("pokong_jue_method",
+            () -> new CultivationMethodItem(new Item.Properties().stacksTo(1), CultivationMethods.POKONG_JUE));
+
+    public static final DeferredItem<Item> CHANGQING_JUE_METHOD = registerItem("changqing_jue_method",
+            () -> new CultivationMethodItem(new Item.Properties().stacksTo(1), CultivationMethods.CHANGQING_JUE));
+
+    public static final DeferredItem<Item> FENTIAN_LIFE_RENEWAL_METHOD = registerItem("fentian_life_renewal_method",
+            () -> new CultivationMethodItem(new Item.Properties().stacksTo(1), CultivationMethods.FENTIAN_LIFE_RENEWAL));
+
     public static final DeferredItem<Item> LINGJIAO_SCALE = registerItem("lingjiao_scale",
             () -> new Item(new Item.Properties()));
 
@@ -175,7 +184,7 @@ public class ModItems {
                      ModSpells.ABSORB_CULTIVATION, ModSpells.TUNTIAN -> ChatFormatting.LIGHT_PURPLE;
                 case ModSpells.BEAM, ModSpells.SPIRIT_SIGHT, ModSpells.LIGHT_BEAM_ATTACK -> ChatFormatting.WHITE;
                 case ModSpells.QI_GATHERING, ModSpells.LINGZHI_BULLET, ModSpells.WIND_BLADE,
-                     ModSpells.WIND_STEP, ModSpells.YUFENG_JUE, ModSpells.SMOKE_ART -> ChatFormatting.DARK_AQUA;
+                     ModSpells.WIND_STEP, ModSpells.YUFENG_JUE, ModSpells.FENGYA, ModSpells.SMOKE_ART -> ChatFormatting.DARK_AQUA;
                 default -> ChatFormatting.GRAY;
             };
         }
@@ -189,17 +198,13 @@ public class ModItems {
         @Override
         public InteractionResultHolder<ItemStack> use(Level level, Player player, net.minecraft.world.InteractionHand hand) {
             ItemStack stack = player.getItemInHand(hand);
-            if (!level.isClientSide && player instanceof net.minecraft.server.level.ServerPlayer sp) {
-                var data = ModAttachments.getData(sp);
-                if (CultivationLevels.isMortal(data.cultivationLevel())) {
-                    ModAttachments.setData(sp, data.withCultivationLevel(CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY));
-                    if (!sp.getAbilities().instabuild) {
-                        stack.shrink(1);
-                    }
-                    sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".enlightenment_success"));
-                    com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            if (level.isClientSide) {
+                var data = com.example.immortal_cultivation_mod.client.ClientData.cultivationData;
+                if (data == null || CultivationLevels.isMortal(data.cultivationLevel())) {
+                    net.minecraft.client.Minecraft.getInstance().setScreen(
+                            new com.example.immortal_cultivation_mod.screen.SpiritRootSelectionScreen());
                 } else {
-                    sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".enlightenment_already_cultivating"));
+                    player.displayClientMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".enlightenment_already_cultivating"), true);
                 }
             }
             return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
