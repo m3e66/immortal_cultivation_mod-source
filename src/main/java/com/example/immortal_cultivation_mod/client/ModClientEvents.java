@@ -122,26 +122,32 @@ public class ModClientEvents {
             mc.player.setNoGravity(false);
         }
 
-        if (isHeld && !wasSpellKeyDown) {
-            mc.setScreen(new SpellWheelScreen());
-        }
+        boolean spellWheelOpen = mc.screen instanceof SpellWheelScreen;
+        boolean normalWorldView = mc.screen == null || spellWheelOpen;
+        if (normalWorldView) {
+            if (isHeld && !wasSpellKeyDown && mc.screen == null) {
+                mc.setScreen(new SpellWheelScreen());
+            }
 
-        if (!isHeld && wasSpellKeyDown) {
-            if (mc.screen instanceof SpellWheelScreen sws) {
-                String spell = sws.getSelectedSpell();
-                if (spell != null && mc.getConnection() != null) {
-                    PacketDistributor.sendToServer(
-                            new ModPayloads.ServerboundCastSpellPayload(spell)
-                    );
+            if (!isHeld && wasSpellKeyDown) {
+                if (mc.screen instanceof SpellWheelScreen sws) {
+                    String spell = sws.getSelectedSpell();
+                    if (spell != null && mc.getConnection() != null) {
+                        PacketDistributor.sendToServer(
+                                new ModPayloads.ServerboundCastSpellPayload(spell)
+                        );
+                    }
+                }
+
+                if (mc.screen instanceof SpellWheelScreen) {
+                    mc.setScreen(null);
                 }
             }
 
-            if (mc.screen instanceof SpellWheelScreen) {
-                mc.setScreen(null);
-            }
+            wasSpellKeyDown = isHeld;
+        } else {
+            wasSpellKeyDown = false;
         }
-
-        wasSpellKeyDown = isHeld;
 
         while (ModKeyMappings.OPEN_STAT_MENU.get().consumeClick()) {
             if (mc.screen instanceof StatMenuScreen) {

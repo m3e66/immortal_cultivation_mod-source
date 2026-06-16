@@ -310,7 +310,7 @@ public class SpellSelectionScreen extends Screen {
             guiGraphics.drawString(font, spell.name(), left + 34, top + 2, 0xFFFFFF, true);
 
             String requirement = ModSpells.WEIYA.equals(spell.id())
-                    ? "Innate / 1% qi per second"
+                    ? "/ 10% qi per second"
                     : spell.requiredLevel() + " / " + spell.qiCost() + " qi";
 
             guiGraphics.drawString(font, requirement, left + 34, top + 13, 0xFF888888, false);

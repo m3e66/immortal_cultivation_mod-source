@@ -2769,7 +2769,7 @@ public class ZhenshanPalmEntity extends Entity implements GeoEntity {
         if (showImpactParticles && level() instanceof ServerLevel serverLevel) {
             SpellImpactParticles.earth(serverLevel, Vec3.atCenterOf(pos));
         }
-        level().destroyBlock(pos, true, this);
+        level().destroyBlock(pos, false, this);
         return true;
     }
 

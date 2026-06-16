@@ -86,7 +86,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Weiya: innate for non-mortals, dark, toggle spell.$(br)A pressure aura technique that may be activated at will. Vast cultivation pressure radiates from your body, consuming 10% of your total qi each second while suppressing creatures whose cultivation is below your own."
+      "text": "$(br)Weiya: innate for non-mortals, toggle spell.$(br)A pressure aura technique that may be activated at will. Vast cultivation pressure radiates from your body, consuming 10% of your total qi each second while suppressing creatures whose cultivation is below your own."
     },
     {
       "type": "patchouli:text",
