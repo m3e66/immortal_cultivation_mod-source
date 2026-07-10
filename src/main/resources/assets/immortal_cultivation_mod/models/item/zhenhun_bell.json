@@ -1,0 +1,16 @@
+{
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
+	"parent": "minecraft:item/generated",
+	"textures": {
+		"layer0": "immortal_cultivation_mod:item/zhenhun_bell_inventory"
+	},
+	"display": {
+		"thirdperson_righthand": {
+			"translation": [0, -3.25, 0]
+		},
+		"thirdperson_lefthand": {
+			"translation": [0, -3.25, 0]
+		}
+	}
+}

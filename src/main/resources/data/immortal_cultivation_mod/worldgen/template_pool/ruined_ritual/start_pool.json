@@ -1,0 +1,15 @@
+{
+  "name": "immortal_cultivation_mod:ruined_ritual/start_pool",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "immortal_cultivation_mod:ruined_ritual",
+        "processors": "immortal_cultivation_mod:tomb1_ignore_air",
+        "projection": "rigid"
+      }
+    }
+  ]
+}

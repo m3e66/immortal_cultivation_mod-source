@@ -1,0 +1,10 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": "#immortal_cultivation_mod:has_village",
+  "spawners": {
+    "type": "immortal_cultivation_mod:fanren_npc",
+    "weight": 18,
+    "minCount": 1,
+    "maxCount": 3
+  }
+}

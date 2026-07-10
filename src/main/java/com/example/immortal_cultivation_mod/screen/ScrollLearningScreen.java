@@ -10,6 +10,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 
 public class ScrollLearningScreen extends Screen {
     private static final ResourceLocation BG_TL = ResourceLocation.fromNamespaceAndPath("autoforge_bricks", "textures/gui/border_corner_tl.png");
@@ -78,35 +79,35 @@ public class ScrollLearningScreen extends Screen {
         int lx = x + 15;
         int ly = y + 12;
 
-        g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".scroll_learning"), x + W / 2 - 40, ly, 0xEECC66, true);
+        g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".scroll_learning"), x + W / 2 - 40, ly, 0x8A6A23, false);
         ly += 20;
 
-        int labelColor = 0xCCCCCC;
-        int valueColor = 0xFFFFFF;
+        int labelColor = 0x555555;
+        int valueColor = 0x333333;
 
         g.drawString(mc.font, Component.literal("* ").append(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".spell_name_label")), lx, ly, labelColor, true);
-        g.drawString(mc.font, spell.name(), lx + 100, ly, valueColor, true);
+        g.drawString(mc.font, spell.name(), lx + 100, ly, valueColor, false);
         ly += 16;
 
         g.drawString(mc.font, Component.literal("* ").append(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".requirement_label")), lx, ly, labelColor, true);
-        g.drawString(mc.font, Component.literal(spell.requiredLevel()), lx + 100, ly, ChatFormatting.YELLOW.getColor(), true);
+        g.drawString(mc.font, Component.literal(spell.requiredLevel()), lx + 100, ly, 0x6F5B00, false);
         ly += 16;
 
         g.drawString(mc.font, Component.literal("* ").append(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".element_label")), lx, ly, labelColor, true);
-        g.drawString(mc.font, Component.literal(spell.element()), lx + 100, ly, 0x88FFCC, true);
+        g.drawString(mc.font, Component.literal(spell.element()), lx + 100, ly, 0x336B55, false);
         ly += 16;
 
         g.drawString(mc.font, Component.literal("* ").append(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".method_tier_label")), lx, ly, labelColor, true);
-        g.drawString(mc.font, Component.translatable("method_tier." + ImmortalCultivationMod.MODID + "." + spell.tier()), lx + 100, ly, 0xFFDD88, true);
+        g.drawString(mc.font, Component.translatable("method_tier." + ImmortalCultivationMod.MODID + "." + spell.tier()), lx + 100, ly, 0x7A5A18, false);
         ly += 16;
 
         g.drawString(mc.font, Component.literal("* ").append(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".qi_cost_label")), lx, ly, labelColor, true);
-        g.drawString(mc.font, Component.literal(String.valueOf(spell.qiCost())), lx + 100, ly, ChatFormatting.AQUA.getColor(), true);
+        g.drawString(mc.font, Component.literal(String.valueOf(spell.qiCost())), lx + 100, ly, 0x275A6A, false);
         ly += 22;
 
         g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".description_label"), lx, ly, labelColor, true);
         ly += 12;
-        g.drawString(mc.font, spell.description(), lx, ly, 0xAAAAAA, true);
+        drawWrapped(g, mc, spell.description(), lx, ly, W - 30, 0x444444);
 
         if (alreadyLearned) {
             Component learned = Component.translatable("screen." + ImmortalCultivationMod.MODID + ".spell_already_learned");
@@ -123,6 +124,13 @@ public class ScrollLearningScreen extends Screen {
     @Override
     public boolean isPauseScreen() {
         return false;
+    }
+
+    private void drawWrapped(GuiGraphics g, Minecraft mc, Component text, int x, int y, int maxWidth, int color) {
+        for (FormattedCharSequence line : mc.font.split(text, maxWidth)) {
+            g.drawString(mc.font, line, x, y, color, false);
+            y += 10;
+        }
     }
 
     private static class StyledButton extends Button {

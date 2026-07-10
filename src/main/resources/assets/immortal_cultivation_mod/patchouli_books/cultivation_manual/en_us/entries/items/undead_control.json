@@ -1,0 +1,36 @@
+{
+  "name": "Corpse Control",
+  "icon": "immortal_cultivation_mod:zhenshi_talisman",
+  "category": "immortal_cultivation_mod:items",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Kongshi Shu: Lianqi Late, dark. It shoots a projectile that can tame zombies or cultivator corpses whose level is not too far above the caster.$(br2)Tamed undead do not attack their owner and can receive tool commands."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Only 5% of natural zombies have resentment and can level up. All cultivator corpses have resentment. Every 1000 ticks alive adds 1 resentment, modified by local yin qi."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Undead stages: White Stiff at 100, Black Stiff at 500, Hopping Stiff at 2500, Flying Stiff at 12500, Wandering Corpse at 62500, Lurking Corpse at 312500, Undecaying Bone at 1562500, Drought Demon at 7812500."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Zhenshi Talisman can seal untamed or tamed zombies and corpses. Sealed undead stop moving unless later tamed and commanded. Empty-hand right-click removes the seal."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Fengyan Talisman replaces the face seal on a tamed undead. A blinded undead cannot be commanded until the talisman is removed, then the Zhenshi seal returns."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Zhenhun Bell heals your tamed zombies and corpses within 5 blocks for 5% max health. Cooldown: 3 seconds.$(br2)Yinhun Gong commands undead: left-click a mob to make all nearby tamed undead attack it, or right-click a block to make them jump to that point."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Blood and Blood Crystal can feed tamed zombies and corpses. Blood gives +1 resentment below 1000. Blood Crystal is crafted from 9 blood and gives +5 resentment at any level. Sneak-right-click feeds all held blood or crystals."
+    }
+  ]
+}

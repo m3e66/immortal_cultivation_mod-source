@@ -1,0 +1,44 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.immortal_cultivation_mod.gudiao.idle": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "body": { "rotation": { "0.0": [0, 0, 0], "1.0": [0, 0, 1.5], "2.0": [0, 0, 0] } },
+        "head": { "rotation": { "0.0": [0, 0, 0], "1.0": [2, 0, -2], "2.0": [0, 0, 0] } },
+        "tail": { "rotation": { "0.0": [0, 0, 10], "1.0": [0, 0, 16], "2.0": [0, 0, 10] } }
+      }
+    },
+    "animation.immortal_cultivation_mod.gudiao.walk": {
+      "loop": true,
+      "animation_length": 1,
+      "bones": {
+        "front_left_leg": { "rotation": { "0.0": [22, 0, 0], "0.5": [-22, 0, 0], "1.0": [22, 0, 0] } },
+        "front_right_leg": { "rotation": { "0.0": [-22, 0, 0], "0.5": [22, 0, 0], "1.0": [-22, 0, 0] } },
+        "back_left_leg": { "rotation": { "0.0": [-18, 0, 0], "0.5": [18, 0, 0], "1.0": [-18, 0, 0] } },
+        "back_right_leg": { "rotation": { "0.0": [18, 0, 0], "0.5": [-18, 0, 0], "1.0": [18, 0, 0] } },
+        "tail": { "rotation": { "0.0": [0, 0, 8], "0.5": [0, 0, 20], "1.0": [0, 0, 8] } }
+      }
+    },
+    "animation.immortal_cultivation_mod.gudiao.attack": {
+      "loop": false,
+      "animation_length": 0.7,
+      "bones": {
+        "neck": { "rotation": { "0.0": [0, 0, -12], "0.25": [20, 0, -30], "0.7": [0, 0, -12] } },
+        "head": { "rotation": { "0.0": [0, 0, 0], "0.25": [25, 0, -8], "0.7": [0, 0, 0] } },
+        "front_left_leg": { "rotation": { "0.0": [0, 0, 0], "0.25": [-55, 0, 0], "0.7": [0, 0, 0] } },
+        "front_right_leg": { "rotation": { "0.0": [0, 0, 0], "0.25": [-45, 0, 0], "0.7": [0, 0, 0] } }
+      }
+    },
+    "animation.immortal_cultivation_mod.gudiao.collapse": {
+      "loop": false,
+      "animation_length": 1,
+      "bones": {
+        "root": { "rotation": { "0.0": [0, 0, 0], "1.0": [0, 0, 82] }, "position": { "0.0": [0, 0, 0], "1.0": [0, -6, 0] } },
+        "neck": { "rotation": { "0.0": [0, 0, -18], "1.0": [0, 0, -48] } },
+        "tail": { "rotation": { "0.0": [0, 0, 12], "1.0": [0, 0, -22] } }
+      }
+    }
+  }
+}

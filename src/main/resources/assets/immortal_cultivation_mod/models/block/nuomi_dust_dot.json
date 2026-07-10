@@ -1,0 +1,17 @@
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "immortal_cultivation_mod:block/nuomi_dust",
+    "texture": "immortal_cultivation_mod:block/nuomi_dust_dot"
+  },
+  "elements": [
+    {
+      "from": [4, 0.05, 4],
+      "to": [12, 0.05, 12],
+      "faces": {
+        "up": { "texture": "#texture" },
+        "down": { "texture": "#texture" }
+      }
+    }
+  ]
+}

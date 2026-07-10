@@ -1,0 +1,28 @@
+{
+  "name": "Accessories",
+  "icon": "immortal_cultivation_mod:jade_pendant",
+  "category": "immortal_cultivation_mod:items",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Curios is required. The mod adds custom slots: Hair, Hair Accessory, Head Accessory, Neck Accessory, Inner Clothes, Cloak, two Back Accessory slots, and three Waist Accessory slots."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Coffin uses the Back Accessory slot. Sneak-right-click an empty coffin on a tamed zombie or corpse to store it, then sneak-right-click again to release it. The coffin also renders on the player's back."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Flag also uses the Back Accessory slot.$(br2)Blindfold, Blindfold 2, and Straw Hat use the Head Accessory slot."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Jade Pendant, Zhenhun Bell, and Yinhun Gong use Waist Accessory slots. The jade pendant increases meditation speed. When holding a compatible tool, press V to cycle tools from waist slots into hand."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Daoist Robes are a chestplate cosmetic armor piece with their own armor texture."
+    }
+  ]
+}

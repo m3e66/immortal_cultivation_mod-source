@@ -1,36 +1,11 @@
 {
-    "type":  "minecraft:ore",
-    "config":  {
-                   "discard_chance_on_air_exposure":  0,
-                   "size":  5,
-                   "targets":  [
-                                   {
-                                       "target":  {
-                                                      "predicate_type":  "minecraft:block_match",
-                                                      "block":  "minecraft:air"
-                                                  },
-                                       "state":  {
-                                                     "Name":  "immortal_cultivation_mod:star_dust_stone"
-                                                 }
-                                   },
-                                   {
-                                       "target":  {
-                                                      "predicate_type":  "minecraft:block_match",
-                                                      "block":  "minecraft:cave_air"
-                                                  },
-                                       "state":  {
-                                                     "Name":  "immortal_cultivation_mod:star_dust_stone"
-                                                 }
-                                   },
-                                   {
-                                       "target":  {
-                                                      "predicate_type":  "minecraft:block_match",
-                                                      "block":  "minecraft:void_air"
-                                                  },
-                                       "state":  {
-                                                     "Name":  "immortal_cultivation_mod:star_dust_stone"
-                                                 }
-                                   }
-                               ]
-               }
+  "type": "immortal_cultivation_mod:surface_patch",
+  "config": {
+    "state": {
+      "Name": "immortal_cultivation_mod:star_dust_stone"
+    },
+    "tries": 3,
+    "xz_spread": 3,
+    "y_spread": 5
+  }
 }

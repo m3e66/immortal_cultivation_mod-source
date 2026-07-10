@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cross",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "cross": "immortal_cultivation_mod:block/nuomi_plant_stage7"
+  }
+}

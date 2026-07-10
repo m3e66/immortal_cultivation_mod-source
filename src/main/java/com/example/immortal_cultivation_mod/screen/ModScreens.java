@@ -15,5 +15,8 @@ public class ModScreens {
     public static final DeferredHolder<MenuType<?>, MenuType<QiPouchMenu>> QI_POUCH =
             MENUS.register("qi_pouch", () -> new MenuType<>(QiPouchMenu::new, FeatureFlags.DEFAULT_FLAGS));
 
+    public static final DeferredHolder<MenuType<?>, MenuType<DingMenu>> DING =
+            MENUS.register("ding", () -> new MenuType<>(DingMenu::new, FeatureFlags.DEFAULT_FLAGS));
+
     public static void register(IEventBus bus) { MENUS.register(bus); }
 }

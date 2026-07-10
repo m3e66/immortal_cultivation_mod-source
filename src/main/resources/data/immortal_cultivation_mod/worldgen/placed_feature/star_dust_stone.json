@@ -2,8 +2,8 @@
         "feature":    "immortal_cultivation_mod:star_dust_stone",
         "placement":    [
                                             {
-                                                    "type":    "minecraft:count",
-                                                    "count":    4
+                                                    "type":    "minecraft:rarity_filter",
+                                                    "chance":    36
                                             },
                                             {
                                                     "type":    "minecraft:in_square"

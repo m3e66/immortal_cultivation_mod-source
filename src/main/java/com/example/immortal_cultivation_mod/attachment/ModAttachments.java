@@ -10,9 +10,12 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class ModAttachments {
+    public static final int MAX_THOUGHTS = 100;
+
     private static final DeferredRegister<AttachmentType<?>> ATTACHMENTS =
             DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, ImmortalCultivationMod.MODID);
 
@@ -32,6 +35,9 @@ public class ModAttachments {
     }
 
     public static void setData(net.minecraft.world.entity.player.Player player, CultivationData data) {
+        if (getData(player).equals(data)) {
+            return;
+        }
         player.setData(CULTIVATION_DATA, data);
     }
 
@@ -57,7 +63,10 @@ public class ModAttachments {
             int maxEnergyBonus,
             int physicalAttack,
             int magicAttack,
-            int mentalAttack
+            int mentalAttack,
+            Map<String, Integer> spellProficiencies,
+            Map<String, Integer> methodProficiencies,
+            boolean yuqiControlAllMode
     ) {
         public static final Codec<CultivationData> CODEC = RecordCodecBuilder.create(instance ->
                 instance.group(
@@ -79,10 +88,54 @@ public class ModAttachments {
                         SkillStats.CODEC.optionalFieldOf("skillStats", SkillStats.EMPTY).forGetter(CultivationData::skillStats)
                 ).apply(instance, (qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating, stats) ->
                         new CultivationData(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
-                                stats.skillPoints(), stats.maxHpBonus(), stats.maxQiBonus(), stats.maxEnergyBonus(), stats.physicalAttack(), stats.magicAttack(), stats.mentalAttack())));
+                                stats.skillPoints(), stats.maxHpBonus(), stats.maxQiBonus(), stats.maxEnergyBonus(), stats.physicalAttack(), stats.magicAttack(), stats.mentalAttack(), stats.spellProficiencies(), stats.methodProficiencies(), stats.yuqiControlAllMode())));
 
         private SkillStats skillStats() {
-            return new SkillStats(skillPoints, maxHpBonus, maxQiBonus, maxEnergyBonus, physicalAttack, magicAttack, mentalAttack);
+            return new SkillStats(skillPoints, maxHpBonus, maxQiBonus, maxEnergyBonus, physicalAttack, magicAttack, mentalAttack, spellProficiencies, methodProficiencies, yuqiControlAllMode);
+        }
+
+        public int spellProficiency(String spellId) {
+            return spellProficiencies.getOrDefault(spellId, 0);
+        }
+
+        public CultivationData withAddedSpellProficiency(String spellId, int amount) {
+            if (spellId == null || spellId.isBlank() || amount <= 0) {
+                return this;
+            }
+            Map<String, Integer> updated = new java.util.HashMap<>(spellProficiencies);
+            updated.merge(spellId, amount, (current, added) -> Math.min(Integer.MAX_VALUE, current + added));
+            return withSpellProficiencies(updated);
+        }
+
+        public CultivationData withSpellProficiencies(Map<String, Integer> proficiencies) {
+            return new CultivationData(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty,
+                    cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating, skillPoints, maxHpBonus, maxQiBonus,
+                    maxEnergyBonus, physicalAttack, magicAttack, mentalAttack, proficiencies == null ? Map.of() : Map.copyOf(proficiencies), methodProficiencies, yuqiControlAllMode);
+        }
+
+        public int methodProficiency(String methodId) {
+            return methodProficiencies.getOrDefault(methodId, 0);
+        }
+
+        public CultivationData withAddedMethodProficiency(String methodId, int amount) {
+            if (methodId == null || methodId.isBlank() || amount <= 0) {
+                return this;
+            }
+            Map<String, Integer> updated = new java.util.HashMap<>(methodProficiencies);
+            updated.merge(methodId, amount, (current, added) -> Math.min(Integer.MAX_VALUE, current + added));
+            return withMethodProficiencies(updated);
+        }
+
+        public CultivationData withMethodProficiencies(Map<String, Integer> proficiencies) {
+            return new CultivationData(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty,
+                    cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating, skillPoints, maxHpBonus, maxQiBonus,
+                    maxEnergyBonus, physicalAttack, magicAttack, mentalAttack, spellProficiencies, proficiencies == null ? Map.of() : Map.copyOf(proficiencies), yuqiControlAllMode);
+        }
+
+        public CultivationData withYuqiControlAllMode(boolean allMode) {
+            return new CultivationData(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty,
+                    cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating, skillPoints, maxHpBonus, maxQiBonus,
+                    maxEnergyBonus, physicalAttack, magicAttack, mentalAttack, spellProficiencies, methodProficiencies, allMode);
         }
 
         public CultivationData withQi(int qi) {
@@ -121,7 +174,7 @@ public class ModAttachments {
         }
 
         public CultivationData withThoughts(int thoughts) {
-            return copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
+            return copy(qi, cultivationLevel, luck, moral, bodyType, soul, Math.max(0, Math.min(MAX_THOUGHTS, thoughts)), spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
                     skillPoints, maxHpBonus, maxQiBonus, maxEnergyBonus, physicalAttack, magicAttack, mentalAttack);
         }
 
@@ -223,10 +276,10 @@ public class ModAttachments {
 
         public static CultivationData createDefault() {
             return new CultivationData(0, CultivationLevels.REALM_MORTAL, 50, 50, CultivationLevels.REALM_MORTAL, 100, 100,
-                    new ArrayList<>(), "", 0, 0L, CultivationMethods.NONE, 0, new ArrayList<>(), false, 0, 0, 0, 0, 0, 0, 0);
+                    new ArrayList<>(), "", 0, 0L, CultivationMethods.NONE, 0, new ArrayList<>(), false, 0, 0, 0, 0, 0, 0, 0, Map.of(), Map.of(), false);
         }
 
-        private static CultivationData copy(
+        private CultivationData copy(
                 int qi,
                 String cultivationLevel,
                 int luck,
@@ -251,7 +304,7 @@ public class ModAttachments {
                 int mentalAttack
         ) {
             return new CultivationData(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress,
-                    activeCultivationMethod, blood, knownSpells, isMeditating, skillPoints, maxHpBonus, maxQiBonus, maxEnergyBonus, physicalAttack, magicAttack, mentalAttack);
+                    activeCultivationMethod, blood, knownSpells, isMeditating, skillPoints, maxHpBonus, maxQiBonus, maxEnergyBonus, physicalAttack, magicAttack, mentalAttack, spellProficiencies, methodProficiencies, yuqiControlAllMode);
         }
 
         private record SkillStats(
@@ -261,9 +314,12 @@ public class ModAttachments {
                 int maxEnergyBonus,
                 int physicalAttack,
                 int magicAttack,
-                int mentalAttack
+                int mentalAttack,
+                Map<String, Integer> spellProficiencies,
+                Map<String, Integer> methodProficiencies,
+                boolean yuqiControlAllMode
         ) {
-            private static final SkillStats EMPTY = new SkillStats(0, 0, 0, 0, 0, 0, 0);
+            private static final SkillStats EMPTY = new SkillStats(0, 0, 0, 0, 0, 0, 0, Map.of(), Map.of(), false);
 
             private static final Codec<SkillStats> CODEC = RecordCodecBuilder.create(instance ->
                     instance.group(
@@ -273,7 +329,10 @@ public class ModAttachments {
                             Codec.INT.optionalFieldOf("maxEnergyBonus", 0).forGetter(SkillStats::maxEnergyBonus),
                             Codec.INT.optionalFieldOf("physicalAttack", 0).forGetter(SkillStats::physicalAttack),
                             Codec.INT.optionalFieldOf("magicAttack", 0).forGetter(SkillStats::magicAttack),
-                            Codec.INT.optionalFieldOf("mentalAttack", 0).forGetter(SkillStats::mentalAttack)
+                            Codec.INT.optionalFieldOf("mentalAttack", 0).forGetter(SkillStats::mentalAttack),
+                            Codec.unboundedMap(Codec.STRING, Codec.INT).optionalFieldOf("spellProficiencies", Map.of()).forGetter(SkillStats::spellProficiencies),
+                            Codec.unboundedMap(Codec.STRING, Codec.INT).optionalFieldOf("methodProficiencies", Map.of()).forGetter(SkillStats::methodProficiencies),
+                            Codec.BOOL.optionalFieldOf("yuqiControlAllMode", false).forGetter(SkillStats::yuqiControlAllMode)
                     ).apply(instance, SkillStats::new));
         }
     }

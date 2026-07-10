@@ -33,9 +33,16 @@ public final class SlidingWater {
     }
 
     public static void createPuddle(ServerLevel level, BlockPos pos) {
-        PUDDLES.computeIfAbsent(level.dimension(), ignored -> new ConcurrentHashMap<>())
-                .put(pos.immutable(), level.getGameTime() + PUDDLE_DURATION_TICKS);
-        PhotonEffects.puddle(level, pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D);
+        createPuddle(level, pos, 1.0F);
+    }
+
+    public static void createPuddle(ServerLevel level, BlockPos pos, float chargeScale) {
+        int radius = Math.max(0, Math.round(Math.max(1.0F, Math.min(2.0F, chargeScale)) - 1.0F));
+        for (BlockPos puddlePos : BlockPos.betweenClosed(pos.offset(-radius, 0, -radius), pos.offset(radius, 0, radius))) {
+            PUDDLES.computeIfAbsent(level.dimension(), ignored -> new ConcurrentHashMap<>())
+                    .put(puddlePos.immutable(), level.getGameTime() + PUDDLE_DURATION_TICKS);
+            PhotonEffects.puddle(level, puddlePos.getX() + 0.5D, puddlePos.getY(), puddlePos.getZ() + 0.5D);
+        }
     }
 
     public static void tick(ServerPlayer player) {

@@ -19,6 +19,7 @@ public final class WindStep {
     private static final int QI_PER_SECOND = 5;
     private static final Map<UUID, Boolean> ACTIVE = new ConcurrentHashMap<>();
     private static final Map<UUID, Boolean> USED_DOUBLE_JUMP = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> TIMED_UNTIL = new ConcurrentHashMap<>();
 
     private WindStep() {
     }
@@ -53,6 +54,14 @@ public final class WindStep {
             USED_DOUBLE_JUMP.remove(id);
         }
 
+        Long timedUntil = TIMED_UNTIL.get(id);
+        if (timedUntil != null) {
+            if (player.level().getGameTime() >= timedUntil) {
+                stop(player);
+            }
+            return;
+        }
+
         if (player.tickCount % 20 != 0) {
             return;
         }
@@ -85,7 +94,19 @@ public final class WindStep {
     public static void clear(ServerPlayer player) {
         ACTIVE.remove(player.getUUID());
         USED_DOUBLE_JUMP.remove(player.getUUID());
+        TIMED_UNTIL.remove(player.getUUID());
         player.removeEffect(ModEffects.WIND_STEP);
+    }
+
+    public static void activateTimed(ServerPlayer player, int durationTicks) {
+        UUID id = player.getUUID();
+        ACTIVE.put(id, true);
+        USED_DOUBLE_JUMP.remove(id);
+        long now = player.level().getGameTime();
+        long current = TIMED_UNTIL.getOrDefault(id, now);
+        TIMED_UNTIL.put(id, Math.max(now, current) + durationTicks);
+        refreshEffects(player);
+        ServerEvents.syncPlayerData(player);
     }
 
     private static void stop(ServerPlayer player) {

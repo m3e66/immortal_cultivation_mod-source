@@ -24,6 +24,38 @@ public class ModBlocks {
     public static final DeferredBlock<Block> ZIYUN_VINE = registerPlant("ziyun_vine");
     public static final DeferredBlock<Block> SHIHUN_GRASS = registerPlant("shihun_grass");
     public static final DeferredBlock<Block> JIUYE_XIANLAN = registerPlant("jiuye_xianlan");
+    public static final DeferredBlock<Block> NUOMI_PLANT = registerBlock("nuomi_plant",
+            () -> new GlutinousRiceCropBlock(BlockBehaviour.Properties.of()
+                    .strength(0.0F)
+                    .sound(SoundType.CROP)
+                    .noCollission()
+                    .noOcclusion()
+                    .randomTicks()));
+
+    public static final DeferredBlock<Block> NUOMI_DUST = registerBlockOnly("nuomi_dust",
+            () -> new NuomiDustBlock(BlockBehaviour.Properties.of()
+                    .strength(0.0F)
+                    .sound(SoundType.GRASS)
+                    .noCollission()
+                    .noOcclusion()
+                    .replaceable()));
+
+    public static final DeferredBlock<Block> MODOU_LINE = registerBlockOnly("modou_line",
+            () -> new ModouLineBlock(BlockBehaviour.Properties.of()
+                    .strength(-1.0F, 3600000.0F)
+                    .sound(SoundType.WOOL)
+                    .noCollission()
+                    .noOcclusion()
+                    .noLootTable()));
+
+    public static final DeferredBlock<Block> LING_FIRE = registerBlockOnly("ling_fire",
+            () -> new LingFireBlock(BlockBehaviour.Properties.of()
+                    .strength(0.0F)
+                    .lightLevel(state -> 12)
+                    .sound(SoundType.WOOL)
+                    .noCollission()
+                    .noOcclusion()
+                    .noLootTable()));
 
     public static final DeferredBlock<Block> FUGU_TAI = registerBlock("fugu_tai",
             () -> new CultivationVineBlock(BlockBehaviour.Properties.of()
@@ -79,6 +111,20 @@ public class ModBlocks {
     public static final DeferredBlock<Block> STAR_DUST_STONE =
             registerOre("star_dust_stone", 2.0F);
 
+    public static final DeferredBlock<Block> CU_TIE_XIAODING = registerBlock("cu_tie_xiaoding",
+            () -> new DingBlock(BlockBehaviour.Properties.of()
+                    .strength(1.5F, 4.0F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()
+                    .requiresCorrectToolForDrops()), true);
+
+    public static final DeferredBlock<Block> QINGTONG_YINHUO_DING = registerBlock("qingtong_yinhuo_ding",
+            () -> new DingBlock(BlockBehaviour.Properties.of()
+                    .strength(2.0F, 5.0F)
+                    .sound(SoundType.COPPER)
+                    .noOcclusion()
+                    .requiresCorrectToolForDrops()), true);
+
     private static DeferredBlock<Block> registerPlant(String name) {
         return registerBlock(name, () -> new CultivationPlantBlock(BlockBehaviour.Properties.of()
                 .strength(0.1F)
@@ -116,5 +162,9 @@ public class ModBlocks {
                 ? new GeoRockBlockItem(block.get(), new Item.Properties())
                 : new BlockItem(block.get(), new Item.Properties()));
         return block;
+    }
+
+    private static <T extends Block> DeferredBlock<T> registerBlockOnly(String name, Supplier<T> blockSupplier) {
+        return BLOCKS.register(name, blockSupplier);
     }
 }

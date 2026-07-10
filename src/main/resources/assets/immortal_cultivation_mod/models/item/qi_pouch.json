@@ -1,6 +1,33 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "immortal_cultivation_mod:item/qi_pouch"
-  }
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
+	"parent": "minecraft:item/generated",
+	"textures": {
+		"layer0": "immortal_cultivation_mod:item/qi_pouch"
+	},
+	"display": {
+		"thirdperson_righthand": {
+			"translation": [0, 2.75, 0],
+			"scale": [1, 1, 0.5]
+		},
+		"thirdperson_lefthand": {
+			"translation": [0, 2.75, 0],
+			"scale": [1, 1, 0.5]
+		},
+		"firstperson_righthand": {
+			"translation": [0, 2.75, 0],
+			"scale": [1, 1, 0.5]
+		},
+		"firstperson_lefthand": {
+			"translation": [0, 2.75, 0],
+			"scale": [1, 1, 0.5]
+		},
+		"gui": {
+			"translation": [0, -0.5, 0],
+			"scale": [1.5, 1.5, 1.5]
+		},
+		"fixed": {
+			"scale": [1.5, 1.5, 1.5]
+		}
+	}
 }

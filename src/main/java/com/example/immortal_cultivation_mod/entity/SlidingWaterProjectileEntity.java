@@ -60,7 +60,7 @@ public class SlidingWaterProjectileEntity extends ThrowableItemProjectile {
     @Override
     protected void onHitBlock(BlockHitResult result) {
         if (level() instanceof ServerLevel serverLevel) {
-            SlidingWater.createPuddle(serverLevel, result.getBlockPos().above());
+            SlidingWater.createPuddle(serverLevel, result.getBlockPos().above(), Math.max(1.0F, getPersistentData().getFloat("ChargeScale")));
         }
     }
 }

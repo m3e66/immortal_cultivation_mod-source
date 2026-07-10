@@ -1,0 +1,18 @@
+{
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
+	"parent": "minecraft:item/generated",
+	"textures": {
+		"layer0": "immortal_cultivation_mod:item/yinyang_compass"
+	},
+	"display": {
+		"firstperson_righthand": {
+			"rotation": [-30, 0, 0],
+			"scale": [1, 1, 0.3]
+		},
+		"firstperson_lefthand": {
+			"rotation": [-30, 0, 0],
+			"scale": [1, 1, 0.3]
+		}
+	}
+}

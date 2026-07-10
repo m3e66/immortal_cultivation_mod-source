@@ -1,0 +1,28 @@
+{
+  "name": "装备与方块",
+  "icon": "immortal_cultivation_mod:yinyang_compass",
+  "category": "immortal_cultivation_mod:items",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "阴阳罗盘会以点阵显示附近阴气。阴气高偏红，0为白，负阴气偏黄。大多数区域接近0。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)阴气不会生成方块，它是由噪声生成的世界隐形区域。僵尸处在非0阴气区域时，怨气增长会变快或变慢：例如3阴气为3倍，-3阴气为三分之一。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)按 V 可向任何有基础攻击伤害的武器注入灵气，消耗最大灵气1%。武器会储存灵气并增加攻击伤害；若储量超过基础伤害x100，每秒损失耐久直到不再溢出。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)飞剑是一把拥有下界合金剑耐久、基础伤害10的剑。按 X 可将其放出为飞剑实体，再用御器术控制。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)粗铁小鼎适合练气初期新手，粗重、导热不均、极易炸炉。$(br2)青铜引火鼎是练气前期基础丹鼎，比粗铁小鼎稳定，但成丹率仍低。"
+    }
+  ]
+}

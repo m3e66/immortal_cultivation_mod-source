@@ -1,0 +1,28 @@
+{
+  "name": "饰品与道服",
+  "icon": "immortal_cultivation_mod:jade_pendant",
+  "category": "immortal_cultivation_mod:items",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "本模组硬性需要 Curios。新增槽位：Hair、Hair Accessory、Head Accessory、Neck Accessory、Inner Clothes、Cloak、两个 Back Accessory、三个 Waist Accessory。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)棺材使用 Back Accessory 槽。空棺材潜行右键已驯服僵尸或尸体可收纳，再潜行右键可放出。棺材也会显示在玩家背后。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Flag 也使用 Back Accessory 槽。$(br2)蒙眼布、蒙眼布二、斗笠使用 Head Accessory 槽。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)玉佩、镇魂铃、引魂锣使用 Waist Accessory 槽。玉佩会提高打坐速度。手持可切换工具时，按 V 可从腰部饰品槽循环工具到手中。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)道服是胸甲位外观护甲，拥有单独的穿戴贴图。"
+    }
+  ]
+}

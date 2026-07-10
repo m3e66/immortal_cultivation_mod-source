@@ -1,0 +1,28 @@
+{
+  "name": "Mobs and World",
+  "icon": "immortal_cultivation_mod:gudiao_spawn_egg",
+  "category": "immortal_cultivation_mod:basics",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Zhuji Cultivator is a neutral Foundation Establishment Middle cultivator. It can use Qi Gathering, Regeneration at low health, Fireball, Wind Step, Lingbeng, and Clear Heart Method behavior."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Jindan Cultivator is a neutral Golden Core Early cultivator. It uses Qi Gathering, stronger Regeneration at 25% health, Zhenshan Palm at range, Lightning Invocation nearby, and Wind Riding to chase or flee."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Gudiao is a hostile Foundation Establishment Late beast. Its attack creates a large scratch-shaped strike similar to Zhenshan Palm logic."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)If a player dies after age is exhausted, a cultivator corpse remains. It keeps player-like attribute data, has half the player's health, falls with gravity, and can later be used by corpse-control systems."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Tomb and Ruined Ritual structures can appear in the world. Tomb chests use Zhuji-level spell and material loot. Ruined Ritual chests can contain many spirit stones, a Magic Ritual dagger, and a Magic Ritual guide book."
+    }
+  ]
+}

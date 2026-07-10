@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "immortal_cultivation_mod:block/qingtong_yinhuo_ding"
+  }
+}

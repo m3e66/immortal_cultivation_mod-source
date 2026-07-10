@@ -22,6 +22,7 @@ public final class YufengJue {
     private static final int MAX_BLOCK_DISTANCE = 20;
     private static final Map<UUID, Boolean> ACTIVE = new ConcurrentHashMap<>();
     private static final Map<UUID, Boolean> GRANTED_MAYFLY = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> TIMED_UNTIL = new ConcurrentHashMap<>();
 
     private YufengJue() {
     }
@@ -50,6 +51,12 @@ public final class YufengJue {
             return;
         }
 
+        Long timedUntil = TIMED_UNTIL.get(player.getUUID());
+        if (timedUntil != null && player.level().getGameTime() >= timedUntil) {
+            stop(player);
+            return;
+        }
+
         if (!hasBlockWithinDistance(player, MAX_BLOCK_DISTANCE)) {
             stop(player);
             return;
@@ -61,7 +68,7 @@ public final class YufengJue {
         player.fallDistance = 0.0F;
         player.resetFallDistance();
 
-        if (player.tickCount % 20 != 0) {
+        if (timedUntil != null || player.tickCount % 20 != 0) {
             return;
         }
 
@@ -77,8 +84,20 @@ public final class YufengJue {
 
     public static void clear(ServerPlayer player) {
         ACTIVE.remove(player.getUUID());
+        TIMED_UNTIL.remove(player.getUUID());
         player.removeEffect(ModEffects.YUFENG_JUE);
         disableFlight(player);
+    }
+
+    public static void activateTimed(ServerPlayer player, int durationTicks) {
+        UUID id = player.getUUID();
+        ACTIVE.put(id, true);
+        long now = player.level().getGameTime();
+        long current = TIMED_UNTIL.getOrDefault(id, now);
+        TIMED_UNTIL.put(id, Math.max(now, current) + durationTicks);
+        enableFlight(player);
+        refreshEffect(player);
+        ServerEvents.syncPlayerData(player);
     }
 
     private static void stop(ServerPlayer player) {

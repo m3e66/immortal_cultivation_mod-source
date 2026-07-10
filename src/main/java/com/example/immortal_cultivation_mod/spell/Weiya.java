@@ -23,6 +23,7 @@ public final class Weiya {
     private static final double RADIUS = 16.0D;
     private static final int REFRESH_TICKS = 40;
     private static final Map<UUID, Boolean> ACTIVE = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> TIMED_UNTIL = new ConcurrentHashMap<>();
 
     private Weiya() {
     }
@@ -62,6 +63,12 @@ public final class Weiya {
             return;
         }
 
+        Long timedUntil = TIMED_UNTIL.get(player.getUUID());
+        if (timedUntil != null && player.level().getGameTime() >= timedUntil) {
+            stop(player);
+            return;
+        }
+
         var data = ModAttachments.getData(player);
 
         if (CultivationLevels.isMortal(data.cultivationLevel())) {
@@ -72,7 +79,7 @@ public final class Weiya {
         refreshCaster(player);
         applyPressure(player, data.cultivationLevel());
 
-        if (player.tickCount % 20 != 0) {
+        if (timedUntil != null || player.tickCount % 20 != 0) {
             return;
         }
 
@@ -86,13 +93,30 @@ public final class Weiya {
     }
 
     public static boolean isSuppressed(Player player) {
-        return player.hasEffect(ModEffects.WEIYA_SUPPRESSED);
+        return player.hasEffect(ModEffects.DAZE);
     }
 
     public static void clear(ServerPlayer player) {
         ACTIVE.remove(player.getUUID());
+        TIMED_UNTIL.remove(player.getUUID());
         player.removeEffect(ModEffects.WEIYA);
         PhotonEffects.weiyaStop(player);
+    }
+
+    public static void activateTimed(ServerPlayer player, int durationTicks) {
+        var data = ModAttachments.getData(player);
+        if (CultivationLevels.isMortal(data.cultivationLevel())) {
+            return;
+        }
+        UUID id = player.getUUID();
+        ACTIVE.put(id, true);
+        long now = player.level().getGameTime();
+        long current = TIMED_UNTIL.getOrDefault(id, now);
+        TIMED_UNTIL.put(id, Math.max(now, current) + durationTicks);
+        refreshCaster(player);
+        PhotonEffects.weiyaStop(player);
+        PhotonEffects.weiyaStart(player);
+        ServerEvents.syncPlayerData(player);
     }
 
     private static void stop(ServerPlayer player) {
@@ -122,7 +146,7 @@ public final class Weiya {
             target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, REFRESH_TICKS, strength.weaknessAmplifier(), false, false, true));
 
             if (strength.suppressesSpells() && target instanceof Player player) {
-                player.addEffect(new MobEffectInstance(ModEffects.WEIYA_SUPPRESSED, REFRESH_TICKS, 0, false, false, true));
+                player.addEffect(new MobEffectInstance(ModEffects.DAZE, REFRESH_TICKS, 0, false, false, true));
             }
         }
     }

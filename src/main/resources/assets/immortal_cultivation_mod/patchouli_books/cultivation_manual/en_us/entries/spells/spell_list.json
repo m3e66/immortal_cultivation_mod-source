@@ -66,6 +66,14 @@
     },
     {
       "type": "patchouli:text",
+      "text": "$(br)Body-Protecting Qi: Lianqi Early, wind, costs 10 qi.$(br)True qi wraps the body into a thin film, blocks mortal weapons and rubble, ineffective against cultivator spells."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Dust Veil: Lianqi Middle, wind, costs 20 qi.$(br)Stir dust to obscure vision, disrupt enemy ranged targeting, provides no damage reduction."
+    },
+    {
+      "type": "patchouli:text",
       "text": "$(br)Ignite Flare: Lianqi Early, fire, costs 10 qi.$(br)Channel true fire into a blazing streak that races forward. Grass, wood, stone, and all it touches are set aflame."
     },
     {
@@ -74,7 +82,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Zhenshan Palm: Foundation Establishment Middle, earth, tier Earth, costs 390 qi.$(br)Gather the power of earth and stone into a colossal palm strike. The palm persists for three breaths, crushing all rock and soil in its path."
+      "text": "$(br)Zhenshan Palm: Golden Core Early, earth, tier Earth, costs 390 qi.$(br)Gather the power of earth and stone into a colossal palm strike. The palm persists for three breaths, crushing all rock and soil in its path."
     },
     {
       "type": "patchouli:text",
@@ -83,6 +91,14 @@
     {
       "type": "patchouli:text",
       "text": "$(br)Dielang Shield: Lianqi Late, water, tier Earth.$(br)Condense layers of water-aspected spiritual power into protective shields. One layer costs 50 qi and blocks 12 damage; two layers cost 100 qi and block 36 damage; three layers cost 150 qi and withstand 108 damage."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Solid Stone Shield: Foundation Establishment Early, earth, costs 120 qi.$(br)Earth true essence forms sturdy stone shield, withstands slashes and blunt strikes, blocks common elemental spells."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Four-Sided Boundary: Foundation Establishment Late, no element, costs 220 qi.$(br)Mini protective barrier shelters 3-5 cultivators, blocks poison and low-grade illusions."
     },
     {
       "type": "patchouli:text",
@@ -103,6 +119,18 @@
     {
       "type": "patchouli:text",
       "text": "$(br)Binding Spell: Foundation Establishment Late, metal, costs 200 qi.$(br)Silently recite an arcane incantation and launch a metal-aspected spirit projectile. Targets with lower cultivation become rigid and unable to move for a short time."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Cold Crystal Lock Claw: granted by Cold Cry Ice-Seizing Art, ice, costs 3% max qi.$(br)Dash forward and seize lower-level targets with ice claws, applying Frozen Qi so they cannot auto-regenerate qi."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Frost Heaven Cry: granted by Cold Cry Ice-Seizing Art, ice, costs 5% max qi.$(br)Fire a cold cry projectile. On impact it creates a freezing field; lower-level targets are Frozen and Dazed, preventing spell casting."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Frost-Shattering Skyglide: granted by Cold Cry Ice-Seizing Art, ice, costs 5% max qi per second.$(br)Fast low-altitude frost flight. It ends if you rise too far from solid ground or run out of qi."
     }
   ]
 }

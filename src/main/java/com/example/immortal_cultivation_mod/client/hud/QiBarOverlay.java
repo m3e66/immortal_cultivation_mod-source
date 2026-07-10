@@ -69,6 +69,65 @@ public class QiBarOverlay implements LayeredDraw.Layer {
         Component text = Component.translatable("hud." + ImmortalCultivationMod.MODID + ".qi", data.qi(), maxQi);
         int textColor = getTextColor(ratio);
         g.drawString(mc.font, text, x + 1, y - 10, textColor, true);
+
+        renderPreparedSpell(g, mc);
+        renderPreparedCharge(g, mc);
+        renderShieldBar(g, mc);
+    }
+
+    private void renderPreparedSpell(GuiGraphics g, Minecraft mc) {
+        Component spellName = ClientData.preparedSpellName();
+        if (spellName.getString().isEmpty()) {
+            return;
+        }
+        Component text = Component.translatable("hud." + ImmortalCultivationMod.MODID + ".prepared_spell", spellName);
+        int textWidth = mc.font.width(text);
+        int x = g.guiWidth() / 2 + 112;
+        x = Math.min(x, g.guiWidth() - textWidth - 8);
+        int y = g.guiHeight() - 27;
+        g.fill(x - 5, y - 3, x + textWidth + 5, y + 10, 0x99000000);
+        g.drawString(mc.font, text, x, y, 0xFFAAEEFF, true);
+    }
+
+    private void renderPreparedCharge(GuiGraphics g, Minecraft mc) {
+        if (ClientData.preparedCharging()) {
+            float progress = Math.max(0.0F, Math.min(1.0F, ClientData.preparedChargeScale() - 1.0F));
+            int barWidth = 102;
+            int barHeight = 6;
+            int fill = Math.max(1, (int) (barWidth * progress));
+            int x = g.guiWidth() / 2 - barWidth / 2;
+            int barY = g.guiHeight() - 67;
+            String percent = ClientData.preparedChargePercent() + "%";
+            g.fill(x - 5, barY - 12, x + barWidth + 5, barY + barHeight + 4, 0x99000000);
+            g.fill(x, barY, x + barWidth, barY + barHeight, 0xFF252525);
+            g.fill(x, barY, x + fill, barY + barHeight, 0xFF44CCFF);
+            g.drawString(mc.font, percent, x + barWidth / 2 - mc.font.width(percent) / 2, barY - 10, 0xFFAAEEFF, true);
+        }
+    }
+
+    private void renderShieldBar(GuiGraphics g, Minecraft mc) {
+        float shield = ClientData.shieldAmount();
+        float shieldMax = ClientData.shieldMax();
+        if (shield <= 0.0F || shieldMax <= 0.0F) {
+            return;
+        }
+
+        int barWidth = 8;
+        int barHeight = 44;
+        int x = g.guiWidth() / 2 + 95;
+        int y = g.guiHeight() - 45;
+        float ratio = Math.min(1.0F, shield / shieldMax);
+        int fillHeight = Math.max(1, (int) (barHeight * ratio));
+
+        RenderSystem.setShaderColor(0.05F, 0.12F, 0.18F, 0.85F);
+        g.blit(FILL, x, y, 0, 0, barWidth, barHeight, 1, 1);
+        RenderSystem.setShaderColor(0.25F, 0.78F, 1.0F, 1.0F);
+        g.blit(FILL, x, y + barHeight - fillHeight, 0, 0, barWidth, fillHeight, 1, 1);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
+        String text = String.valueOf(Math.round(shield));
+        int textX = x + barWidth / 2 - mc.font.width(text) / 2;
+        g.drawString(mc.font, text, textX, y - 10, 0xFF66DDFF, true);
     }
 
     private float[] getQiColor(float ratio) {

@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod;
 
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
+import com.example.immortal_cultivation_mod.attribute.ModAttributes;
 import com.example.immortal_cultivation_mod.block.ModBlockEntities;
 import com.example.immortal_cultivation_mod.block.ModBlocks;
 import com.example.immortal_cultivation_mod.effect.ModEffects;
@@ -10,12 +11,15 @@ import com.example.immortal_cultivation_mod.item.ModTabs;
 import com.example.immortal_cultivation_mod.particle.ModParticles;
 import com.example.immortal_cultivation_mod.sound.ModSounds;
 import com.example.immortal_cultivation_mod.screen.ModScreens;
+import com.example.immortal_cultivation_mod.worldgen.ModFeatures;
 import java.lang.reflect.Field;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.loading.FMLEnvironment;
 import sun.misc.Unsafe;
 
 @Mod(ImmortalCultivationMod.MODID)
@@ -27,6 +31,7 @@ public class ImmortalCultivationMod {
     public ImmortalCultivationMod(IEventBus modEventBus) {
         modEventBus.addListener(this::commonSetup);
         ModAttachments.register(modEventBus);
+        ModAttributes.ATTRIBUTES.register(modEventBus);
         ModEffects.register(modEventBus);
         ModBlocks.BLOCKS.register(modEventBus);
         ModBlockEntities.BLOCK_ENTITIES.register(modEventBus);
@@ -36,6 +41,11 @@ public class ImmortalCultivationMod {
         ModSounds.SOUND_EVENTS.register(modEventBus);
         ModScreens.MENUS.register(modEventBus);
         ModTabs.CREATIVE_TABS.register(modEventBus);
+        ModFeatures.register(modEventBus);
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            com.example.immortal_cultivation_mod.client.ModClientModBusEvents.register(modEventBus);
+            com.example.immortal_cultivation_mod.client.ModClientEvents.register();
+        }
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {

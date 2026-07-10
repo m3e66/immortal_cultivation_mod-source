@@ -2,6 +2,7 @@ package com.example.immortal_cultivation_mod.screen;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
+import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import com.example.immortal_cultivation_mod.client.ClientData;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
@@ -18,6 +19,7 @@ import java.util.List;
 public class DebugStatEditorScreen extends Screen {
     private static final int WINDOW_W = 320;
     private static final int WINDOW_H = 320;
+    private static final String METHOD_PROFICIENCY_PREFIX = "method_proficiency:";
 
     private final List<ElementToggle> elementToggles = new ArrayList<>();
     private final List<GradeToggle> gradeToggles = new ArrayList<>();
@@ -39,10 +41,15 @@ public class DebugStatEditorScreen extends Screen {
 
         addPageButton(0, x + 12, y + 30, "Stats");
         addPageButton(1, x + 90, y + 30, "Spirit Roots");
+        addPageButton(2, x + 198, y + 30, "Methods");
 
         if (page == 1) {
             addSpiritRootButtons(x + 12, y + 98);
             addGradeButtons(x + 12, y + 158);
+            return;
+        }
+        if (page == 2) {
+            addMethodProficiencyButtons(x + 12, y + 62);
             return;
         }
 
@@ -73,6 +80,18 @@ public class DebugStatEditorScreen extends Screen {
                 PacketDistributor.sendToServer(new ModPayloads.ServerboundDebugAdjustStatPayload(stat, -step))));
         addRenderableWidget(new DebugButton(x + 264, y, 22, 18, Component.literal("+"), b ->
                 PacketDistributor.sendToServer(new ModPayloads.ServerboundDebugAdjustStatPayload(stat, step))));
+    }
+
+    private void addMethodProficiencyButtons(int x, int y) {
+        List<CultivationMethods.MethodDef> methods = CultivationMethods.allMethods();
+        for (int i = 0; i < methods.size(); i++) {
+            String stat = METHOD_PROFICIENCY_PREFIX + methods.get(i).id();
+            int rowY = y + i * 22;
+            addRenderableWidget(new DebugButton(x + 218, rowY, 32, 18, Component.literal("-100"), b ->
+                    PacketDistributor.sendToServer(new ModPayloads.ServerboundDebugAdjustStatPayload(stat, -100))));
+            addRenderableWidget(new DebugButton(x + 254, rowY, 32, 18, Component.literal("+100"), b ->
+                    PacketDistributor.sendToServer(new ModPayloads.ServerboundDebugAdjustStatPayload(stat, 100))));
+        }
     }
 
     private void addSpiritRootButtons(int x, int y) {
@@ -145,6 +164,8 @@ public class DebugStatEditorScreen extends Screen {
             g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".spirit_root_elements"), x + 12, y + 88, 0x88FFCC, true);
             g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".spirit_root_grade"), x + 12, y + 150, 0xFFDDAA, true);
             updateSpiritRootButtons(data.spiritRoots(), data.spiritRootGrade());
+        } else if (page == 2) {
+            drawMethodProficiencies(g, mc, data, x + 12, y + 66);
         } else {
             var levelDef = CultivationLevels.getLevelDef(data.cultivationLevel());
 
@@ -188,6 +209,20 @@ public class DebugStatEditorScreen extends Screen {
     private void drawValue(GuiGraphics g, Minecraft mc, int x, int y, String key, String value, int color) {
         Component label = Component.translatable("screen." + ImmortalCultivationMod.MODID + "." + key).append(": ").append(value);
         g.drawString(mc.font, label, x, y, color, true);
+    }
+
+    private void drawMethodProficiencies(GuiGraphics g, Minecraft mc, com.example.immortal_cultivation_mod.attachment.ModAttachments.CultivationData data, int x, int y) {
+        List<CultivationMethods.MethodDef> methods = CultivationMethods.allMethods();
+        for (int i = 0; i < methods.size(); i++) {
+            CultivationMethods.MethodDef method = methods.get(i);
+            int value = data.methodProficiency(method.id());
+            Component label = Component.translatable(method.nameKey())
+                    .append(": ")
+                    .append(Integer.toString(value))
+                    .append(" / ")
+                    .append(CultivationMethods.methodProficiencyLevel(data, method.id()));
+            g.drawString(mc.font, label, x, y + i * 22, 0xE6D0FF, true);
+        }
     }
 
     @Override

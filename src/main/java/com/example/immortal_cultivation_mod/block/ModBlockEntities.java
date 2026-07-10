@@ -23,4 +23,11 @@ public class ModBlockEntities {
                     ModBlocks.STAR_DUST_STONE.get(),
                     ModBlocks.JINWEN_FRUIT.get()
             ).build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DingBlockEntity>> DING =
+            BLOCK_ENTITIES.register("ding", () -> BlockEntityType.Builder.of(
+                    DingBlockEntity::new,
+                    ModBlocks.CU_TIE_XIAODING.get(),
+                    ModBlocks.QINGTONG_YINHUO_DING.get()
+            ).build(null));
 }

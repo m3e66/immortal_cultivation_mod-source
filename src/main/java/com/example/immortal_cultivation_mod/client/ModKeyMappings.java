@@ -30,11 +30,36 @@ public class ModKeyMappings {
             "key." + ImmortalCultivationMod.MODID + ".meditate",
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_C, KEY_CATEGORY));
 
+    public static final Lazy<KeyMapping> OPEN_COMBO_MENU = Lazy.of(() -> new KeyMapping(
+            "key." + ImmortalCultivationMod.MODID + ".open_combo_menu",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_O, KEY_CATEGORY));
+
+    public static final Lazy<KeyMapping> INJECT_QI = Lazy.of(() -> new KeyMapping(
+            "key." + ImmortalCultivationMod.MODID + ".inject_qi",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_V, KEY_CATEGORY));
+
+    public static final Lazy<KeyMapping> TARGET_LOCK = Lazy.of(() -> new KeyMapping(
+            "key." + ImmortalCultivationMod.MODID + ".target_lock",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, KEY_CATEGORY));
+
+    public static final Lazy<KeyMapping> RELEASE_WEAPON = Lazy.of(() -> new KeyMapping(
+            "key." + ImmortalCultivationMod.MODID + ".release_weapon",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_X, KEY_CATEGORY));
+
+    public static final Lazy<KeyMapping> CAST_PREPARED_SPELL = Lazy.of(() -> new KeyMapping(
+            "key." + ImmortalCultivationMod.MODID + ".cast_prepared_spell",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_R, KEY_CATEGORY));
+
     @SubscribeEvent
     public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
         event.register(OPEN_STAT_MENU.get());
         event.register(OPEN_SPELL_WHEEL.get());
         event.register(OPEN_SPELL_SELECTION.get());
         event.register(MEDITATE.get());
+        event.register(OPEN_COMBO_MENU.get());
+        event.register(INJECT_QI.get());
+        event.register(TARGET_LOCK.get());
+        event.register(RELEASE_WEAPON.get());
+        event.register(CAST_PREPARED_SPELL.get());
     }
 }

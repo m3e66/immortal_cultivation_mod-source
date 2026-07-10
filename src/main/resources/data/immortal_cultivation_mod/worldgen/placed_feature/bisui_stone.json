@@ -2,8 +2,8 @@
         "feature":    "immortal_cultivation_mod:bisui_stone",
         "placement":    [
                                             {
-                                                    "type":    "minecraft:count",
-                                                    "count":    7
+                                                    "type":    "minecraft:rarity_filter",
+                                                    "chance":    24
                                             },
                                             {
                                                     "type":    "minecraft:in_square"

@@ -32,6 +32,8 @@ public class ZhenshanPalmEntity extends Entity implements GeoEntity {
             SynchedEntityData.defineId(ZhenshanPalmEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> DATA_FORWARD_Z =
             SynchedEntityData.defineId(ZhenshanPalmEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> DATA_SIZE_SCALE =
+            SynchedEntityData.defineId(ZhenshanPalmEntity.class, EntityDataSerializers.FLOAT);
     private static final int LIFETIME = 100;
     private static final float DAMAGE = 225.0F;
     private static final int PARTICLE_BLOCK_HIT_LIMIT = 3;
@@ -2549,8 +2551,13 @@ public class ZhenshanPalmEntity extends Entity implements GeoEntity {
     }
 
     public ZhenshanPalmEntity(Level level, LivingEntity caster) {
+        this(level, caster, 1.0F);
+    }
+
+    public ZhenshanPalmEntity(Level level, LivingEntity caster, float chargeScale) {
         this(ModEntities.ZHENSHAN_PALM.get(), level);
         this.casterId = caster.getUUID();
+        setSizeScale(0.5F * Math.max(1.0F, Math.min(2.0F, chargeScale)));
         Vec3 look = caster.getLookAngle().normalize();
         Vec3 start = caster.position().add(0.0D, caster.getEyeHeight() - 0.25D, 0.0D).add(look.scale(2.6D));
         moveTo(start.x, start.y, start.z, caster.getYRot(), caster.getXRot());
@@ -2696,7 +2703,16 @@ public class ZhenshanPalmEntity extends Entity implements GeoEntity {
     }
 
     private Vec3 handPoint(double[] point, Vec3 right, Vec3 up) {
-        return position().add(right.scale(point[0] * HAND_WIDTH_SCALE)).add(up.scale(point[1] * HAND_HEIGHT_SCALE));
+        double scale = sizeScale();
+        return position().add(right.scale(point[0] * HAND_WIDTH_SCALE * scale)).add(up.scale(point[1] * HAND_HEIGHT_SCALE * scale));
+    }
+
+    private float sizeScale() {
+        return Math.max(0.25F, entityData.get(DATA_SIZE_SCALE));
+    }
+
+    private void setSizeScale(float scale) {
+        entityData.set(DATA_SIZE_SCALE, Math.max(0.25F, scale));
     }
 
     public Vec3 forward() {
@@ -2733,9 +2749,9 @@ public class ZhenshanPalmEntity extends Entity implements GeoEntity {
 
     private boolean damageTouchedMob(Vec3 pos) {
         AABB bounds = new AABB(pos, pos).inflate(PARTICLE_TOUCH_RADIUS);
-        for (Mob mob : level().getEntitiesOfClass(Mob.class, bounds, mob ->
-                !mob.getUUID().equals(casterId) && !damagedMobs.contains(mob.getUUID()))) {
-            damagedMobs.add(mob.getUUID());
+        for (LivingEntity target : level().getEntitiesOfClass(LivingEntity.class, bounds, living ->
+                !living.getUUID().equals(casterId) && !damagedMobs.contains(living.getUUID()))) {
+            damagedMobs.add(target.getUUID());
             float damage = DAMAGE;
             Entity owner = casterId == null ? null : level().getPlayerByUUID(casterId);
 
@@ -2749,7 +2765,7 @@ public class ZhenshanPalmEntity extends Entity implements GeoEntity {
                 );
             }
 
-            mob.hurt(damageSources().magic(), damage);
+            target.hurt(damageSources().magic(), damage);
             if (level() instanceof ServerLevel serverLevel) {
                 SpellImpactParticles.earth(serverLevel, pos);
             }
@@ -2783,14 +2799,17 @@ public class ZhenshanPalmEntity extends Entity implements GeoEntity {
         builder.define(DATA_FORWARD_X, 0.0F);
         builder.define(DATA_FORWARD_Y, 0.0F);
         builder.define(DATA_FORWARD_Z, 1.0F);
+        builder.define(DATA_SIZE_SCALE, 0.5F);
     }
 
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
+        setSizeScale(tag.contains("SizeScale") ? tag.getFloat("SizeScale") : 0.5F);
     }
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
+        tag.putFloat("SizeScale", sizeScale());
     }
 
     @Override

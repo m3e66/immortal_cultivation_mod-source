@@ -65,6 +65,16 @@
         },
         {
           "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:huti_qi_scroll",
+          "weight": 6
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:michen_zhang_scroll",
+          "weight": 3
+        },
+        {
+          "type": "minecraft:item",
           "name": "immortal_cultivation_mod:sliding_water_scroll",
           "weight": 6
         },
@@ -115,6 +125,16 @@
         },
         {
           "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:gushi_shield_scroll",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:sifang_jie_scroll",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
           "name": "immortal_cultivation_mod:reincarnation_true_art_method",
           "weight": 1
         },
@@ -136,6 +156,11 @@
         {
           "type": "minecraft:item",
           "name": "immortal_cultivation_mod:fentian_life_renewal_method",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:hanti_bingqin_method",
           "weight": 1
         },
         {

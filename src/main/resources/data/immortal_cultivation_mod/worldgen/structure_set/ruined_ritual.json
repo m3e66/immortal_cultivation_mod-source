@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "immortal_cultivation_mod:ruined_ritual",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 40,
+    "separation": 16,
+    "salt": 79130531
+  }
+}

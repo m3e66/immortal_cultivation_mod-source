@@ -26,6 +26,8 @@ import net.minecraft.world.phys.Vec3;
 public class LightningProjectileEntity extends ThrowableItemProjectile {
     private static final EntityDataAccessor<Boolean> DATA_GREATER =
             SynchedEntityData.defineId(LightningProjectileEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Float> DATA_CHARGE_SCALE =
+            SynchedEntityData.defineId(LightningProjectileEntity.class, EntityDataSerializers.FLOAT);
 
     private int lifeTicks;
 
@@ -56,10 +58,11 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
 
         if (level().isClientSide) {
             Vec3 movement = getDeltaMovement();
-            int sparks = isGreater() ? 7 : 4;
+            float scale = chargeScale();
+            int sparks = Math.max(isGreater() ? 7 : 4, Math.round((isGreater() ? 7.0F : 4.0F) * scale * 1.5F));
 
             for (int i = 0; i < sparks; i++) {
-                double spread = isGreater() ? 0.34D : 0.22D;
+                double spread = (isGreater() ? 0.34D : 0.22D) * scale;
 
                 level().addParticle(
                         ParticleTypes.ELECTRIC_SPARK,
@@ -88,21 +91,21 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
                     getX(),
                     getY(),
                     getZ(),
-                    isGreater() ? 10 : 6,
-                    isGreater() ? 0.24D : 0.14D,
-                    isGreater() ? 0.24D : 0.14D,
-                    isGreater() ? 0.24D : 0.14D,
-                    isGreater() ? 0.13D : 0.08D
+                    Math.max(isGreater() ? 10 : 6, Math.round((isGreater() ? 10.0F : 6.0F) * chargeScale() * 1.6F)),
+                    (isGreater() ? 0.24D : 0.14D) * chargeScale(),
+                    (isGreater() ? 0.24D : 0.14D) * chargeScale(),
+                    (isGreater() ? 0.24D : 0.14D) * chargeScale(),
+                    (isGreater() ? 0.13D : 0.08D) * chargeScale()
             );
             serverLevel.sendParticles(
                     isGreater() ? ParticleTypes.END_ROD : ParticleTypes.WAX_OFF,
                     getX() - movement.x * 0.18D,
                     getY() - movement.y * 0.18D,
                     getZ() - movement.z * 0.18D,
-                    isGreater() ? 3 : 1,
-                    0.06D,
-                    0.06D,
-                    0.06D,
+                    Math.max(isGreater() ? 3 : 1, Math.round((isGreater() ? 3.0F : 1.0F) * chargeScale() * 1.5F)),
+                    0.06D * chargeScale(),
+                    0.06D * chargeScale(),
+                    0.06D * chargeScale(),
                     0.03D
             );
         }
@@ -123,8 +126,8 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
         Vec3 hitPos = result.getLocation();
 
         if (level() instanceof ServerLevel serverLevel) {
-            lightningStrikeParticles(serverLevel, hitPos, isGreater());
-            summonLightning(serverLevel, hitPos, isGreater());
+            lightningStrikeParticles(serverLevel, hitPos, isGreater(), chargeScale());
+            summonLightning(serverLevel, hitPos, isGreater(), chargeScale());
         }
 
         level().playSound(
@@ -174,6 +177,7 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(DATA_GREATER, false);
+        builder.define(DATA_CHARGE_SCALE, 1.0F);
     }
 
     @Override
@@ -181,6 +185,7 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
         super.addAdditionalSaveData(tag);
         tag.putBoolean("greater", isGreater());
         tag.putInt("lifeTicks", lifeTicks);
+        tag.putFloat("ChargeScale", chargeScale());
     }
 
     @Override
@@ -188,6 +193,7 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
         super.readAdditionalSaveData(tag);
         setGreater(tag.getBoolean("greater"));
         lifeTicks = tag.getInt("lifeTicks");
+        setChargeScale(tag.getFloat("ChargeScale"));
     }
 
     private boolean isGreater() {
@@ -198,13 +204,21 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
         entityData.set(DATA_GREATER, greater);
     }
 
-    private static void summonLightning(ServerLevel level, Vec3 pos, boolean greater) {
-        int strikes = greater ? 7 : 1;
-        double radius = greater ? 3.5D : 0.0D;
+    public void setChargeScale(float chargeScale) {
+        float scale = Math.max(1.0F, Math.min(2.0F, chargeScale));
+        entityData.set(DATA_CHARGE_SCALE, scale);
+        getPersistentData().putFloat("ChargeScale", scale);
+    }
+
+    private static void summonLightning(ServerLevel level, Vec3 pos, boolean greater, float chargeScale) {
+        int strikes = greater
+                ? Math.max(7, Math.round(9.0F * chargeScale))
+                : Math.max(1, Math.round(1.0F + 6.0F * (chargeScale - 1.0F)));
+        double radius = (greater ? 4.2D : 1.45D) * chargeScale;
 
         for (int i = 0; i < strikes; i++) {
-            double ox = greater ? (level.random.nextDouble() - 0.5D) * radius * 2.0D : 0.0D;
-            double oz = greater ? (level.random.nextDouble() - 0.5D) * radius * 2.0D : 0.0D;
+            double ox = strikes > 1 ? (level.random.nextDouble() - 0.5D) * radius * 2.0D : 0.0D;
+            double oz = strikes > 1 ? (level.random.nextDouble() - 0.5D) * radius * 2.0D : 0.0D;
 
             LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level);
             if (bolt != null) {
@@ -215,13 +229,13 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
         }
     }
 
-    private static void lightningStrikeParticles(ServerLevel level, Vec3 pos, boolean greater) {
-        int columns = greater ? 5 : 2;
-        int steps = greater ? 18 : 11;
+    private static void lightningStrikeParticles(ServerLevel level, Vec3 pos, boolean greater, float chargeScale) {
+        int columns = Math.max(greater ? 7 : 3, Math.round((greater ? 7.0F : 3.0F) * chargeScale));
+        int steps = Math.max(greater ? 22 : 14, Math.round((greater ? 22.0F : 14.0F) * (0.7F + 0.35F * chargeScale)));
 
         for (int column = 0; column < columns; column++) {
             double angle = column * Math.PI * 2.0D / columns;
-            double radius = column == 0 ? 0.0D : (greater ? 0.65D : 0.35D);
+            double radius = column == 0 ? 0.0D : (greater ? 0.9D : 0.5D) * chargeScale;
             double ox = Math.cos(angle) * radius;
             double oz = Math.sin(angle) * radius;
 
@@ -233,7 +247,7 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
                         pos.x + ox + (level.random.nextDouble() - 0.5D) * 0.18D,
                         y,
                         pos.z + oz + (level.random.nextDouble() - 0.5D) * 0.18D,
-                        greater ? 4 : 2,
+                        Math.max(greater ? 4 : 2, Math.round((greater ? 4.0F : 2.0F) * chargeScale)),
                         0.05D,
                         0.03D,
                         0.05D,
@@ -247,7 +261,7 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
                 pos.x,
                 pos.y + 0.35D,
                 pos.z,
-                greater ? 3 : 1,
+                Math.max(greater ? 3 : 1, Math.round((greater ? 3.0F : 1.0F) * chargeScale)),
                 0.0D,
                 0.0D,
                 0.0D,
@@ -259,10 +273,10 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
                 pos.x,
                 pos.y + 0.5D,
                 pos.z,
-                greater ? 70 : 30,
-                greater ? 1.1D : 0.55D,
+                Math.max(greater ? 70 : 30, Math.round((greater ? 70.0F : 30.0F) * chargeScale)),
+                (greater ? 1.1D : 0.55D) * chargeScale,
                 0.45D,
-                greater ? 1.1D : 0.55D,
+                (greater ? 1.1D : 0.55D) * chargeScale,
                 0.16D
         );
 
@@ -271,13 +285,17 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
                 pos.x,
                 pos.y + 0.2D,
                 pos.z,
-                greater ? 55 : 25,
-                greater ? 0.9D : 0.45D,
+                Math.max(greater ? 55 : 25, Math.round((greater ? 55.0F : 25.0F) * chargeScale)),
+                (greater ? 0.9D : 0.45D) * chargeScale,
                 0.35D,
-                greater ? 0.9D : 0.45D,
+                (greater ? 0.9D : 0.45D) * chargeScale,
                 0.18D
         );
 
         SpellImpactParticles.lightning(level, pos);
+    }
+
+    private float chargeScale() {
+        return Math.max(1.0F, Math.min(2.0F, entityData.get(DATA_CHARGE_SCALE)));
     }
 }

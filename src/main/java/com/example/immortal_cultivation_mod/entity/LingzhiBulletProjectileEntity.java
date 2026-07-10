@@ -77,11 +77,12 @@ public class LingzhiBulletProjectileEntity extends ThrowableItemProjectile {
             return;
         }
 
-        BlockPos pos = result.getBlockPos();
-        BlockPos step = pos.relative(result.getDirection().getOpposite());
-        breakBlock(pos);
-        breakBlock(step);
-        breakBlock(step.relative(result.getDirection().getOpposite()));
+        BlockPos current = result.getBlockPos();
+        int blocks = Math.max(3, Math.round(3.0F * chargeScale()));
+        for (int i = 0; i < blocks; i++) {
+            breakBlock(current);
+            current = current.relative(result.getDirection().getOpposite());
+        }
     }
 
     private void breakBlock(BlockPos pos) {
@@ -89,5 +90,10 @@ public class LingzhiBulletProjectileEntity extends ThrowableItemProjectile {
         if (!state.isAir() && state.getDestroySpeed(level(), pos) >= 0.0F) {
             level().destroyBlock(pos, true, getOwner());
         }
+    }
+
+    private float chargeScale() {
+        float scale = getPersistentData().getFloat("ChargeScale");
+        return Math.max(1.0F, Math.min(2.0F, scale));
     }
 }

@@ -1,0 +1,21 @@
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "immortal_cultivation_mod:block/modou_line",
+    "texture": "immortal_cultivation_mod:block/modou_line"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 7],
+      "to": [16, 0.25, 9],
+      "faces": {
+        "up": { "uv": [0, 6, 16, 10], "texture": "#texture" },
+        "down": { "uv": [0, 6, 16, 10], "texture": "#texture" },
+        "north": { "uv": [0, 6, 16, 8], "texture": "#texture" },
+        "south": { "uv": [0, 8, 16, 10], "texture": "#texture" },
+        "west": { "uv": [7, 6, 9, 10], "texture": "#texture" },
+        "east": { "uv": [7, 6, 9, 10], "texture": "#texture" }
+      }
+    }
+  ]
+}

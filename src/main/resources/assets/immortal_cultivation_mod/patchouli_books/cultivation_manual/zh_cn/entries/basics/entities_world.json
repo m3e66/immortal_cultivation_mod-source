@@ -1,0 +1,28 @@
+{
+  "name": "生物与世界",
+  "icon": "immortal_cultivation_mod:gudiao_spawn_egg",
+  "category": "immortal_cultivation_mod:basics",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "筑基修士是中立的筑基中期修士。它会使用引灵诀，低血量时使用回春术，并会用火球术、踏风步、灵崩和清心诀相关行为。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)金丹修士是中立的金丹前期修士。它会用引灵诀，25%血量使用强化回春术，远距离用震山掌，近距离用引雷诀，并用御风诀追击或逃跑。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)蛊雕是敌对的筑基后期妖兽。攻击时会产生巨大的爪痕形打击，逻辑类似震山掌。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)玩家寿元耗尽后死亡，会留下修士尸体。尸体继承类似玩家的属性资料，生命值为玩家一半，会受重力影响，并可被控尸系统利用。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)古墓和废弃仪式结构可在世界中生成。古墓箱子偏筑基级法术与材料；废弃仪式箱子可有大量灵石、Magic Ritual 匕首和 Magic Ritual 指南书。"
+    }
+  ]
+}

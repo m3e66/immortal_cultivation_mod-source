@@ -1,0 +1,32 @@
+{
+  "name": "进阶法术系统",
+  "icon": "immortal_cultivation_mod:flying_sword",
+  "category": "immortal_cultivation_mod:spells",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "每使用一次法术，法术熟练度+1。$(br2)熟练度境界：学会后为入门，100为小成，500为大成，1000为圆满，10000为登峰造极。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)按 O 打开自定义组合系统。Create Spell 打开组合列表，Order + 可把已学会的法术加入组合。$(br2)组合施法模式会单独保存：顺序施放会一个一个放，全体施放会把飞弹类法术分开，在玩家前方组成小六边形。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)组合里的开关类法术只持续10秒，不会永久开启。同一个组合里重复放入同类开关法术，会叠加持续时间。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)御器术：筑基前期自动学会。$(br)对准已放出的飞剑使用，可将飞剑召至身后。法术描述里的按钮可切换“只选中眼前飞剑”或“选中3格内所有自己的飞剑”。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)被御器术控制的飞剑，每把每秒消耗3灵气。挥拳发射一把，潜行挥拳最多发射六把。飞剑命中后会落地，只听从放出它的玩家。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)锁定目标按键为 G。按下时会锁定你正看着的非物品实体，并让镜头平滑地朝向目标。"
+    }
+  ]
+}

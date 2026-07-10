@@ -1,5 +1,6 @@
 package com.example.immortal_cultivation_mod.entity;
 
+import com.example.immortal_cultivation_mod.block.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -81,8 +82,11 @@ public class IgniteFlareProjectileEntity extends ThrowableItemProjectile {
 
         Direction direction = result.getDirection();
         BlockPos firePos = result.getBlockPos().relative(direction);
-        if (level().getBlockState(firePos).isAir()) {
-            level().setBlockAndUpdate(firePos, Blocks.FIRE.defaultBlockState());
+        int radius = Math.max(0, Math.round(Math.max(1.0F, getPersistentData().getFloat("ChargeScale")) - 1.0F));
+        for (BlockPos pos : BlockPos.betweenClosed(firePos.offset(-radius, 0, -radius), firePos.offset(radius, 0, radius))) {
+            if (level().getBlockState(pos).isAir()) {
+                level().setBlockAndUpdate(pos, ModBlocks.LING_FIRE.get().defaultBlockState());
+            }
         }
     }
 }

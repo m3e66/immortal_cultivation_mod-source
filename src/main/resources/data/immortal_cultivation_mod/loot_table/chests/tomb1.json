@@ -1,0 +1,84 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 2,
+        "max": 4
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "magic_ritual_mod:spirit_stone",
+          "weight": 80,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 3
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:jingtie_motherstone",
+          "weight": 8
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:yunwen_silver_crystal",
+          "weight": 8
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:hanpo_jade",
+          "weight": 6
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:liujin_sand",
+          "weight": 6
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:lingjiao_scale",
+          "weight": 3
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:gushi_shield_scroll",
+          "weight": 3
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:zhenshan_palm_scroll",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:sifang_jie_scroll",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:dingshen_scroll",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:wulei_zhengfa_scroll",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:light_beam_attack_scroll",
+          "weight": 1
+        }
+      ]
+    }
+  ]
+}

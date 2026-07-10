@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "immortal_cultivation_mod:block/modou_line_x"
+    },
+    "axis=z": {
+      "model": "immortal_cultivation_mod:block/modou_line_z"
+    }
+  }
+}

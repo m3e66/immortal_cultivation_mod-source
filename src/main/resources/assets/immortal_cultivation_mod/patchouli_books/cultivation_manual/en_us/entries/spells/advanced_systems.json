@@ -1,0 +1,32 @@
+{
+  "name": "Advanced Spell Systems",
+  "icon": "immortal_cultivation_mod:flying_sword",
+  "category": "immortal_cultivation_mod:spells",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Spell proficiency increases by 1 whenever a spell is used.$(br2)Tiers: Beginner on learning, Minor at 100, Great at 500, Perfected at 1000, and Peak at 10000."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)The combo menu is opened with O. Create Spell opens the combo list, and Order + adds learned spells to the combo.$(br2)Combo cast mode is saved per combo: ordered casts fire one by one, while all-at-once casts separate projectile spells into a small hexagon in front of the caster."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Toggle spells used inside a combo last 10 seconds instead of staying on forever. Multiple copies of the same toggle in one combo stack their duration."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Yuqi Shu: learned automatically at Foundation Establishment Early.$(br)Use it while looking at a released flying sword to call it behind you. The button in its spell description switches between calling only the looked-at sword and calling all owned swords in a 3-block area."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Controlled flying swords cost 3 qi per sword each second. Punch fires one sword, while sneaking and punching fires up to six. Swords return to the ground after impact and only answer the player who released them."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Target lock uses G. It locks onto the non-item entity you are looking at and smoothly turns the camera toward the target while active."
+    }
+  ]
+}

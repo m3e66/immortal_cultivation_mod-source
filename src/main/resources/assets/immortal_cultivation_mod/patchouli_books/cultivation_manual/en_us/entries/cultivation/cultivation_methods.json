@@ -35,6 +35,10 @@
     {
       "type": "patchouli:text",
       "text": "$(br)Heaven Burning Life Renewal Art: fire, earth tier, limit Golden Core Late.$(br)First death becomes a 1-minute spectator rebirth state with a fiery trail, then returns to survival with 1 heart. The charge resets at full health."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Cold Cry Ice-Seizing Art: ice, heaven tier, limit Soul Transformation Late.$(br)Turns qi into extreme cold yin qi. Method proficiency unlocks its personal spells: Minor grants Cold Crystal Lock Claw, Great grants Frost Heaven Cry, and Perfected grants Frost-Shattering Skyglide."
     }
   ]
 }

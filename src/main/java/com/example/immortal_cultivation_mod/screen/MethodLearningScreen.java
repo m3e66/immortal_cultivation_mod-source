@@ -11,6 +11,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 public class MethodLearningScreen extends Screen {
@@ -77,11 +78,11 @@ public class MethodLearningScreen extends Screen {
         Minecraft mc = Minecraft.getInstance();
         int lx = x + 15;
         int ly = y + 12;
-        int labelColor = 0xCCCCCC;
-        int valueColor = 0xFFFFFF;
+        int labelColor = 0x555555;
+        int valueColor = 0x333333;
 
         Component title = Component.translatable("screen." + ImmortalCultivationMod.MODID + ".method_learning");
-        g.drawString(mc.font, title, x + W / 2 - mc.font.width(title) / 2, ly, 0xEECC66, true);
+        g.drawString(mc.font, title, x + W / 2 - mc.font.width(title) / 2, ly, 0x8A6A23, false);
         ly += 20;
 
         if (method == null) {
@@ -91,19 +92,23 @@ public class MethodLearningScreen extends Screen {
         }
 
         g.drawString(mc.font, Component.literal("* ").append(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".method_name_label")), lx, ly, labelColor, true);
-        g.drawString(mc.font, Component.translatable(method.nameKey()), lx + 100, ly, valueColor, true);
+        g.drawString(mc.font, Component.translatable(method.nameKey()), lx + 100, ly, valueColor, false);
         ly += 16;
 
         g.drawString(mc.font, Component.literal("* ").append(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".method_limit_label")), lx, ly, labelColor, true);
-        g.drawString(mc.font, Component.literal(method.limitLevel()), lx + 100, ly, ChatFormatting.YELLOW.getColor(), true);
+        g.drawString(mc.font, Component.literal(method.limitLevel()), lx + 100, ly, 0x6F5B00, false);
         ly += 16;
 
         g.drawString(mc.font, Component.literal("* ").append(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".element_label")), lx, ly, labelColor, true);
-        g.drawString(mc.font, Component.translatable("method_element." + ImmortalCultivationMod.MODID + "." + method.element()), lx + 100, ly, 0x88FFCC, true);
+        g.drawString(mc.font, Component.translatable("method_element." + ImmortalCultivationMod.MODID + "." + method.element()), lx + 100, ly, 0x336B55, false);
         ly += 16;
 
         g.drawString(mc.font, Component.literal("* ").append(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".method_tier_label")), lx, ly, labelColor, true);
-        g.drawString(mc.font, Component.translatable("method_tier." + ImmortalCultivationMod.MODID + "." + method.tier()), lx + 100, ly, 0xFFDD88, true);
+        g.drawString(mc.font, Component.translatable("method_tier." + ImmortalCultivationMod.MODID + "." + method.tier()), lx + 100, ly, 0x7A5A18, false);
+        ly += 16;
+
+        g.drawString(mc.font, Component.literal("* ").append(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".method_proficiency_label")), lx, ly, labelColor, true);
+        g.drawString(mc.font, CultivationMethods.methodProficiencyDescription(ClientData.cultivationData, methodId), lx + 100, ly, 0x7A3E9D, false);
         ly += 22;
 
         g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".special_effect_label"), lx, ly, labelColor, true);
@@ -121,9 +126,11 @@ public class MethodLearningScreen extends Screen {
                 ? "method_special." + ImmortalCultivationMod.MODID + ".changqing_jue"
                 : CultivationMethods.isFentianLifeRenewal(methodId)
                 ? "method_special." + ImmortalCultivationMod.MODID + ".fentian_life_renewal"
+                : CultivationMethods.isHantiBingqin(methodId)
+                ? "method_special." + ImmortalCultivationMod.MODID + ".hanti_bingqin"
                 : "method_special." + ImmortalCultivationMod.MODID + ".none";
 
-        g.drawString(mc.font, Component.translatable(effectKey), lx, ly, 0xAAAAAA, true);
+        drawWrapped(g, mc, Component.translatable(effectKey), lx, ly, W - 30, 0x444444);
 
         if (ClientData.cultivationData.activeCultivationMethod().equals(methodId)) {
             Component active = Component.translatable("screen." + ImmortalCultivationMod.MODID + ".method_active");
@@ -140,6 +147,13 @@ public class MethodLearningScreen extends Screen {
     @Override
     public boolean isPauseScreen() {
         return false;
+    }
+
+    private void drawWrapped(GuiGraphics g, Minecraft mc, Component text, int x, int y, int maxWidth, int color) {
+        for (FormattedCharSequence line : mc.font.split(text, maxWidth)) {
+            g.drawString(mc.font, line, x, y, color, false);
+            y += 10;
+        }
     }
 
     private static class StyledButton extends Button {

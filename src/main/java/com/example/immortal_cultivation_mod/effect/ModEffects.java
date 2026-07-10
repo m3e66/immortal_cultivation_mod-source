@@ -38,11 +38,32 @@ public class ModEffects {
     public static final DeferredHolder<MobEffect, MobEffect> WEIYA_SUPPRESSED =
             MOB_EFFECTS.register("weiya_suppressed", WeiyaSuppressedEffect::new);
 
+    public static final DeferredHolder<MobEffect, MobEffect> DAZE =
+            MOB_EFFECTS.register("daze", DazeEffect::new);
+
     public static final DeferredHolder<MobEffect, MobEffect> DINGSHEN =
             MOB_EFFECTS.register("dingshen", DingshenEffect::new);
 
     public static final DeferredHolder<MobEffect, MobEffect> FENGYA =
             MOB_EFFECTS.register("fengya", FengyaEffect::new);
+
+    public static final DeferredHolder<MobEffect, MobEffect> FROZEN_QI =
+            MOB_EFFECTS.register("frozen_qi", FrozenQiEffect::new);
+
+    public static final DeferredHolder<MobEffect, MobEffect> FROZEN =
+            MOB_EFFECTS.register("frozen", FrozenEffect::new);
+
+    public static final DeferredHolder<MobEffect, MobEffect> FROST_FLIGHT =
+            MOB_EFFECTS.register("frost_flight", FrostFlightEffect::new);
+
+    public static final DeferredHolder<MobEffect, MobEffect> SHIDU =
+            MOB_EFFECTS.register("shidu", ShiduEffect::new);
+
+    public static final DeferredHolder<MobEffect, MobEffect> QI_FIRE_BURN =
+            MOB_EFFECTS.register("qi_fire_burn", QiFireBurnEffect::new);
+
+    public static final DeferredHolder<MobEffect, MobEffect> XUYING_TA =
+            MOB_EFFECTS.register("xuying_ta", XuyingTaEffect::new);
 
     public static void register(IEventBus bus) {
         MOB_EFFECTS.register(bus);

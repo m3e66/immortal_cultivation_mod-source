@@ -113,6 +113,14 @@ config="${mod_id}.mixins.json"
     side="BOTH"
 
 [[dependencies.${mod_id}]]
+    modId="curios"
+    type="required"
+    reason="Uses Curios back slot support for coffin carrying."
+    versionRange="[9.5.1,)"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
     modId="patchouli"
     type="optional"
     reason="Adds the Immortal Cultivation guide book when Patchouli is present."

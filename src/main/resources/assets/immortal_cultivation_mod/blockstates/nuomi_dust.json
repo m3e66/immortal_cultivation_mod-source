@@ -1,0 +1,44 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "immortal_cultivation_mod:block/nuomi_dust_dot"
+      }
+    },
+    {
+      "when": {
+        "north": "side"
+      },
+      "apply": {
+        "model": "immortal_cultivation_mod:block/nuomi_dust_side"
+      }
+    },
+    {
+      "when": {
+        "east": "side"
+      },
+      "apply": {
+        "model": "immortal_cultivation_mod:block/nuomi_dust_side",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "side"
+      },
+      "apply": {
+        "model": "immortal_cultivation_mod:block/nuomi_dust_side",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "side"
+      },
+      "apply": {
+        "model": "immortal_cultivation_mod:block/nuomi_dust_side",
+        "y": 270
+      }
+    }
+  ]
+}

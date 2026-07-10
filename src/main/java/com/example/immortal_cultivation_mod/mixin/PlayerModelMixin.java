@@ -28,7 +28,23 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
     @Inject(method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At("TAIL"))
     private void immortalCultivation$meditatingPose(LivingEntity entity, float limbSwing, float limbSwingAmount,
             float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {
-        if (!(entity instanceof Player player) || !ClientData.isPlayerMeditating(player.getUUID())) {
+        if (!(entity instanceof Player player)) {
+            if (immortalCultivation$poseApplied) {
+                resetDefaultPlayerPose();
+                immortalCultivation$poseApplied = false;
+            }
+            return;
+        }
+
+        if (ClientData.isPlayerCasting(player.getUUID()) && !ClientData.isPlayerMeditating(player.getUUID())) {
+            rightArm.xRot = -2.15F;
+            rightArm.yRot = -0.22F;
+            rightArm.zRot = 0.18F;
+            rightSleeve.copyFrom(rightArm);
+            return;
+        }
+
+        if (!ClientData.isPlayerMeditating(player.getUUID())) {
             if (immortalCultivation$poseApplied) {
                 resetDefaultPlayerPose();
                 immortalCultivation$poseApplied = false;

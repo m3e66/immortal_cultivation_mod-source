@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB",
+    "BBB",
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "immortal_cultivation_mod:blood"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:blood_crystal",
+    "count": 1
+  }
+}

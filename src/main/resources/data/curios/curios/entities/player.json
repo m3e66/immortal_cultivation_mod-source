@@ -1,0 +1,16 @@
+{
+  "entities": [
+    "minecraft:player"
+  ],
+  "slots": [
+    "hair",
+    "hair_accessory",
+    "head_accessory",
+    "neck_accessory",
+    "inner_clothes",
+    "cloak",
+    "back_accessory",
+    "waist_accessory"
+  ],
+  "replace": false
+}
