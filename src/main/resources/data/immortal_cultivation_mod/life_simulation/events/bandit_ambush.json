@@ -1,0 +1,29 @@
+{
+  "id": "immortal_cultivation_mod:bandit_ambush",
+  "minimum_age": 14,
+  "maximum_age": 160,
+  "weight": 10,
+  "conditions": ["alive", "!flag:bandit_ambush"],
+  "text_key": "life.immortal_cultivation_mod.event.bandit_ambush",
+  "choices": [
+    {
+      "id": "fight",
+      "text_key": "life.immortal_cultivation_mod.choice.bandit_fight",
+      "result_key": "life.immortal_cultivation_mod.result.bandit_fight",
+      "conditions": ["combat>=20"],
+      "effects": ["health-8", "combat+8", "reputation+5", "wealth+100", "set_flag:bandit_ambush"]
+    },
+    {
+      "id": "flee",
+      "text_key": "life.immortal_cultivation_mod.choice.bandit_flee",
+      "result_key": "life.immortal_cultivation_mod.result.bandit_flee",
+      "effects": ["health-4", "wealth-60", "set_flag:bandit_ambush"]
+    },
+    {
+      "id": "bribe",
+      "text_key": "life.immortal_cultivation_mod.choice.bandit_bribe",
+      "result_key": "life.immortal_cultivation_mod.result.bandit_bribe",
+      "effects": ["wealth-150", "set_flag:bandit_ambush"]
+    }
+  ]
+}

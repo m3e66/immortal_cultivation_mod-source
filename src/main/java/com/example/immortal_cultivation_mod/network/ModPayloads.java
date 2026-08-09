@@ -1,24 +1,31 @@
 package com.example.immortal_cultivation_mod.network;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
+import com.example.immortal_cultivation_mod.achievement.NoobAchievement;
 import com.example.immortal_cultivation_mod.attachment.BodyTypes;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
+import com.example.immortal_cultivation_mod.combat.CombatStateManager;
 import com.example.immortal_cultivation_mod.effect.ModEffects;
 import com.example.immortal_cultivation_mod.effect.PhotonEffects;
 import com.example.immortal_cultivation_mod.entity.JindanCloneEntity;
 import com.example.immortal_cultivation_mod.entity.JindanEntity;
 import com.example.immortal_cultivation_mod.entity.ModEntities;
+import com.example.immortal_cultivation_mod.entity.NpcProfile;
 import com.example.immortal_cultivation_mod.item.ModItems;
+import com.example.immortal_cultivation_mod.item.MysteriousRingItem;
+import com.example.immortal_cultivation_mod.item.RestrictionInsightItem;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
+import com.example.immortal_cultivation_mod.world.JindanPocketWorlds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -26,8 +33,10 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
@@ -37,6 +46,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,8 +56,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class ModPayloads {
-    public static final ResourceKey<Level> JINDAN_DIMENSION =
-            ResourceKey.create(Registries.DIMENSION, ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "jindan"));
+    public static final ResourceKey<Level> JINDAN_DIMENSION = JindanPocketWorlds.TEMPLATE_DIMENSION;
     private static final String JINDAN_RETURN_DIMENSION_TAG = "ImmortalCultivationJindanReturnDimension";
     private static final String JINDAN_RETURN_X_TAG = "ImmortalCultivationJindanReturnX";
     private static final String JINDAN_RETURN_Y_TAG = "ImmortalCultivationJindanReturnY";
@@ -56,6 +65,62 @@ public class ModPayloads {
     private static final String JINDAN_RETURN_PITCH_TAG = "ImmortalCultivationJindanReturnPitch";
     private static final String JINDAN_CLONE_UUID_TAG = "ImmortalCultivationJindanCloneUuid";
     private static final String JINDAN_ENTITY_UUID_TAG = "ImmortalCultivationJindanEntityUuid";
+    private static final String JINDAN_ANCHOR_TAG = "ImmortalCultivationJindanAnchor";
+    private static final String JINDAN_ANCHOR_VERSION_TAG = "ImmortalCultivationJindanAnchorVersion";
+    private static final String JINDAN_ANCHOR_GENERATION_TAG = "ImmortalCultivationJindanAnchorGeneration";
+    private static final String JINDAN_LEVEL_TRACKED_TAG = "ImmortalCultivationJindanLevelTracked";
+    private static final String JINDAN_WAS_LEVEL_TAG = "ImmortalCultivationWasJindanLevel";
+    private static final String JINDAN_RESET_PENDING_TAG = "ImmortalCultivationJindanResetPending";
+    private static final String JINDAN_RESET_ENTITY_UUID_TAG = "ImmortalCultivationJindanResetEntityUuid";
+    private static final String JINDAN_RESET_ANCHOR_TAG = "ImmortalCultivationJindanResetAnchor";
+    private static final String JINDAN_RESET_DIMENSION_TAG = "ImmortalCultivationJindanResetDimension";
+    private static final int JINDAN_ANCHOR_VERSION = 2;
+    private static final int JINDAN_ANCHOR_RADIUS = 100_000;
+    private static final long JINDAN_ANCHOR_RANDOM_SALT = 0x4A494E44414E5EEDL;
+    private static final long JINDAN_REPLICA_RANDOM_SALT = 0x5245504C4943415EL;
+    private static final String DEBUG_EYE_ENABLED_TAG = "ImmortalCultivationDebugEyeEnabled";
+
+    public static void syncDebugEyeState(ServerPlayer player) {
+        boolean enabled = player.hasPermissions(2)
+                && player.getPersistentData().getBoolean(DEBUG_EYE_ENABLED_TAG);
+        PacketDistributor.sendToPlayer(player, new ClientboundDebugEyeStatePayload(enabled));
+    }
+
+    public static void syncJindanFlightControlState(ServerPlayer player, boolean active) {
+        PacketDistributor.sendToPlayer(player, new ClientboundJindanFlightControlPayload(active));
+    }
+
+    public static void openDebugStatEditor(ServerPlayer viewer, ServerPlayer target) {
+        PacketDistributor.sendToPlayer(viewer, new ClientboundOpenDebugStatEditorPayload(
+                target.getUUID(), target.getGameProfile().getName()));
+        com.example.immortal_cultivation_mod.event.ServerEvents
+                .syncPlayerDataTo(target, viewer);
+        PacketDistributor.sendToPlayer(viewer, new ClientboundDebugHintCountPayload(
+                RestrictionInsightItem.hintCount(target)));
+    }
+
+    public static void beginNpcLearning(ServerPlayer player, int npcEntityId, String learningType,
+                                        String targetId, String teacherLevel) {
+        ModPayloadsHandler.beginLearningSession(
+                player, "npc", learningType, targetId, npcEntityId, teacherLevel);
+    }
+
+    public static boolean beginRestrictionInsightLearning(ServerPlayer player) {
+        return ModPayloadsHandler.beginRestrictionInsightLearning(player);
+    }
+
+    public static boolean beginDunwuSteleLearning(ServerPlayer player, String spellId) {
+        return ModPayloadsHandler.beginDunwuSteleLearning(player, spellId);
+    }
+
+    public static void openDunwuSteleEditor(ServerPlayer player, BlockPos pos, String spellId) {
+        PacketDistributor.sendToPlayer(player, new ClientboundOpenSteleSpellEditorPayload(
+                pos, spellId == null ? "" : spellId));
+    }
+
+    public static void clearPendingLearning(ServerPlayer player) {
+        ModPayloadsHandler.PENDING_LEARNING.remove(player.getUUID());
+    }
 
     public static void returnFromJindan(ServerPlayer player) {
         CompoundTag data = player.getPersistentData();
@@ -75,21 +140,156 @@ public class ModPayloads {
         float pitch = data.contains(JINDAN_RETURN_PITCH_TAG) ? data.getFloat(JINDAN_RETURN_PITCH_TAG) : player.getXRot();
         removeNormalWorldClone(player, target, x, y, z);
         player.teleportTo(target, x, y, z, Set.of(), yaw, pitch);
+        removeNormalWorldClone(player, target, x, y, z);
+        ServerLevel finalTarget = target;
+        player.server.execute(() -> removeNormalWorldClone(player, finalTarget, x, y, z));
+    }
+
+    public static void cleanupJindanClones(ServerPlayer player) {
+        CompoundTag data = player.getPersistentData();
+        ResourceKey<Level> returnDimension = Level.OVERWORLD;
+        if (data.contains(JINDAN_RETURN_DIMENSION_TAG)) {
+            returnDimension = ResourceKey.create(
+                    Registries.DIMENSION,
+                    ResourceLocation.parse(data.getString(JINDAN_RETURN_DIMENSION_TAG)));
+        }
+        ServerLevel target = player.server.getLevel(returnDimension);
+        if (target == null) {
+            target = player.server.overworld();
+        }
+        double x = data.contains(JINDAN_RETURN_X_TAG)
+                ? data.getDouble(JINDAN_RETURN_X_TAG)
+                : target.getSharedSpawnPos().getX() + 0.5D;
+        double y = data.contains(JINDAN_RETURN_Y_TAG)
+                ? data.getDouble(JINDAN_RETURN_Y_TAG)
+                : target.getSharedSpawnPos().getY();
+        double z = data.contains(JINDAN_RETURN_Z_TAG)
+                ? data.getDouble(JINDAN_RETURN_Z_TAG)
+                : target.getSharedSpawnPos().getZ() + 0.5D;
+        removeNormalWorldClone(player, target, x, y, z);
+    }
+
+    public static void trackJindanRealmState(ServerPlayer player, String cultivationLevel) {
+        CompoundTag data = player.getPersistentData();
+        if (data.getBoolean(JINDAN_RESET_PENDING_TAG)
+                && !JindanPocketWorlds.isJindanDimension(player.level().dimension())) {
+            removeOwnedJindanEntities(player);
+        }
+        int currentStage = CultivationLevels.getStageIndex(cultivationLevel);
+        int jindanStage = CultivationLevels.getStageIndex(
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_EARLY);
+        boolean isJindanLevel = currentStage >= jindanStage;
+        boolean tracked = data.getBoolean(JINDAN_LEVEL_TRACKED_TAG);
+        boolean wasJindanLevel = data.getBoolean(JINDAN_WAS_LEVEL_TAG);
+        boolean legacyLoweredPlayer = !tracked && !isJindanLevel && data.contains(JINDAN_ANCHOR_TAG);
+
+        if ((tracked && wasJindanLevel && !isJindanLevel) || legacyLoweredPlayer) {
+            if (JindanPocketWorlds.isJindanDimension(player.level().dimension())) {
+                data.putBoolean(JINDAN_RESET_PENDING_TAG, true);
+                data.putString(JINDAN_RESET_DIMENSION_TAG, player.level().dimension().location().toString());
+                if (data.hasUUID(JINDAN_ENTITY_UUID_TAG)) {
+                    data.putUUID(JINDAN_RESET_ENTITY_UUID_TAG, data.getUUID(JINDAN_ENTITY_UUID_TAG));
+                }
+                if (data.contains(JINDAN_ANCHOR_TAG)) {
+                    data.put(JINDAN_RESET_ANCHOR_TAG, data.getCompound(JINDAN_ANCHOR_TAG).copy());
+                }
+            } else {
+                removeOwnedJindanEntities(player);
+            }
+            int nextGeneration = data.getInt(JINDAN_ANCHOR_GENERATION_TAG) + 1;
+            data.putInt(JINDAN_ANCHOR_GENERATION_TAG, nextGeneration);
+            JindanPocketWorlds.setActiveGeneration(player, nextGeneration);
+            data.remove(JINDAN_ANCHOR_TAG);
+            data.remove(JINDAN_ENTITY_UUID_TAG);
+            JindanEntity.resetGeneratedChunkCount(player);
+            data.putInt(JINDAN_ANCHOR_VERSION_TAG, JINDAN_ANCHOR_VERSION);
+        }
+        data.putBoolean(JINDAN_LEVEL_TRACKED_TAG, true);
+        data.putBoolean(JINDAN_WAS_LEVEL_TAG, isJindanLevel);
+    }
+
+    public static void finishPendingJindanReset(ServerPlayer player) {
+        if (player.getPersistentData().getBoolean(JINDAN_RESET_PENDING_TAG)) {
+            removeOwnedJindanEntities(player);
+        }
+    }
+
+    private static void removeOwnedJindanEntities(ServerPlayer player) {
+        CompoundTag data = player.getPersistentData();
+        ResourceKey<Level> expectedDimension = data.contains(JINDAN_RESET_DIMENSION_TAG)
+                ? ResourceKey.create(
+                        Registries.DIMENSION,
+                        ResourceLocation.parse(data.getString(JINDAN_RESET_DIMENSION_TAG)))
+                : JindanPocketWorlds.keyFor(player);
+        ServerLevel expectedLevel = player.server.getLevel(expectedDimension);
+
+        CompoundTag anchor = data.contains(JINDAN_ANCHOR_TAG)
+                ? data.getCompound(JINDAN_ANCHOR_TAG)
+                : data.getCompound(JINDAN_RESET_ANCHOR_TAG);
+        if (expectedLevel != null && !anchor.isEmpty()) {
+            expectedLevel.getChunk(new BlockPos(
+                    anchor.getInt("x"),
+                    anchor.getInt("y"),
+                    anchor.getInt("z")));
+        }
+
+        UUID trackedEntity = data.hasUUID(JINDAN_ENTITY_UUID_TAG)
+                ? data.getUUID(JINDAN_ENTITY_UUID_TAG)
+                : data.hasUUID(JINDAN_RESET_ENTITY_UUID_TAG)
+                ? data.getUUID(JINDAN_RESET_ENTITY_UUID_TAG)
+                : null;
+        List<JindanEntity> owned = new ArrayList<>();
+        for (ServerLevel level : player.server.getAllLevels()) {
+            if (!JindanPocketWorlds.isJindanDimension(level.dimension())) {
+                continue;
+            }
+            for (var entity : level.getAllEntities()) {
+                if (entity instanceof JindanEntity jindan
+                        && ((trackedEntity != null && jindan.getUUID().equals(trackedEntity))
+                        || jindan.ownerUuid().map(player.getUUID()::equals).orElse(false))) {
+                    owned.add(jindan);
+                }
+            }
+        }
+        owned.forEach(JindanEntity::discard);
+        data.remove(JINDAN_ENTITY_UUID_TAG);
+        data.remove(JINDAN_RESET_ENTITY_UUID_TAG);
+        data.remove(JINDAN_RESET_ANCHOR_TAG);
+        data.remove(JINDAN_RESET_DIMENSION_TAG);
+        data.remove(JINDAN_RESET_PENDING_TAG);
     }
 
     private static void removeNormalWorldClone(ServerPlayer player, ServerLevel target, double x, double y, double z) {
         CompoundTag data = player.getPersistentData();
-        if (data.hasUUID(JINDAN_CLONE_UUID_TAG) && target.getEntity(data.getUUID(JINDAN_CLONE_UUID_TAG)) instanceof JindanCloneEntity clone) {
-            clone.discard();
-            data.remove(JINDAN_CLONE_UUID_TAG);
-        }
-
         BlockPos pos = BlockPos.containing(x, y, z);
         target.getChunk(pos);
-        AABB scanBox = new AABB(pos).inflate(64.0D);
-        target.getEntitiesOfClass(JindanCloneEntity.class, scanBox,
-                entity -> entity.playerUuid().map(player.getUUID()::equals).orElse(false)
-        ).forEach(JindanCloneEntity::discard);
+        UUID trackedClone = data.hasUUID(JINDAN_CLONE_UUID_TAG)
+                ? data.getUUID(JINDAN_CLONE_UUID_TAG)
+                : null;
+        List<JindanCloneEntity> clonesToRemove = new ArrayList<>();
+
+        for (ServerLevel level : player.server.getAllLevels()) {
+            for (var entity : level.getAllEntities()) {
+                if (entity instanceof JindanCloneEntity clone
+                        && ((trackedClone != null && clone.getUUID().equals(trackedClone))
+                        || clone.playerUuid().map(player.getUUID()::equals).orElse(false)
+                        || clone.playerUuid().isEmpty())) {
+                    clonesToRemove.add(clone);
+                }
+            }
+        }
+
+        AABB scanBox = new AABB(pos).inflate(128.0D);
+        for (JindanCloneEntity clone : target.getEntitiesOfClass(
+                JindanCloneEntity.class,
+                scanBox,
+                entity -> entity.playerUuid().map(player.getUUID()::equals).orElse(true))) {
+            if (!clonesToRemove.contains(clone)) {
+                clonesToRemove.add(clone);
+            }
+        }
+        clonesToRemove.forEach(JindanCloneEntity::discard);
+        data.remove(JINDAN_CLONE_UUID_TAG);
     }
 
     public record ClientboundSyncPlayerDataPayload(
@@ -98,11 +298,13 @@ public class ModPayloads {
             int maxHp,
             int maxAge,
             String cultivationLevel,
+            String jindanQuality,
             int luck,
             int moral,
             String bodyType,
             int soul,
             int thoughts,
+            float talent,
             List<String> spiritRoots,
             String spiritRootGrade,
             int agePenalty,
@@ -120,7 +322,8 @@ public class ModPayloads {
             int physicalAttack,
             int magicAttack,
             int mentalAttack,
-            boolean yuqiControlAllMode
+            boolean yuqiControlAllMode,
+            String playerIdentity
     ) implements CustomPacketPayload {
         public static final CustomPacketPayload.Type<ClientboundSyncPlayerDataPayload> TYPE =
                 new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "sync_player_data"));
@@ -133,11 +336,13 @@ public class ModPayloads {
                             ByteBufCodecs.VAR_INT.encode(buf, data.maxHp());
                             ByteBufCodecs.VAR_INT.encode(buf, data.maxAge());
                             ByteBufCodecs.STRING_UTF8.encode(buf, data.cultivationLevel());
+                            ByteBufCodecs.STRING_UTF8.encode(buf, data.jindanQuality());
                             ByteBufCodecs.VAR_INT.encode(buf, data.luck());
                             ByteBufCodecs.VAR_INT.encode(buf, data.moral());
                             ByteBufCodecs.STRING_UTF8.encode(buf, data.bodyType());
                             ByteBufCodecs.VAR_INT.encode(buf, data.soul());
                             ByteBufCodecs.VAR_INT.encode(buf, data.thoughts());
+                            ByteBufCodecs.FLOAT.encode(buf, data.talent());
                             ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()).encode(buf, data.spiritRoots());
                             ByteBufCodecs.STRING_UTF8.encode(buf, data.spiritRootGrade());
                             ByteBufCodecs.VAR_INT.encode(buf, data.agePenalty());
@@ -156,6 +361,7 @@ public class ModPayloads {
                             ByteBufCodecs.VAR_INT.encode(buf, data.magicAttack());
                             ByteBufCodecs.VAR_INT.encode(buf, data.mentalAttack());
                             ByteBufCodecs.BOOL.encode(buf, data.yuqiControlAllMode());
+                            ByteBufCodecs.STRING_UTF8.encode(buf, data.playerIdentity());
                         },
                         buf -> new ClientboundSyncPlayerDataPayload(
                                 ByteBufCodecs.VAR_INT.decode(buf),
@@ -163,11 +369,13 @@ public class ModPayloads {
                                 ByteBufCodecs.VAR_INT.decode(buf),
                                 ByteBufCodecs.VAR_INT.decode(buf),
                                 ByteBufCodecs.STRING_UTF8.decode(buf),
+                                ByteBufCodecs.STRING_UTF8.decode(buf),
                                 ByteBufCodecs.VAR_INT.decode(buf),
                                 ByteBufCodecs.VAR_INT.decode(buf),
                                 ByteBufCodecs.STRING_UTF8.decode(buf),
                                 ByteBufCodecs.VAR_INT.decode(buf),
                                 ByteBufCodecs.VAR_INT.decode(buf),
+                                ByteBufCodecs.FLOAT.decode(buf),
                                 ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()).decode(buf),
                                 ByteBufCodecs.STRING_UTF8.decode(buf),
                                 ByteBufCodecs.VAR_INT.decode(buf),
@@ -185,7 +393,8 @@ public class ModPayloads {
                                 ByteBufCodecs.VAR_INT.decode(buf),
                                 ByteBufCodecs.VAR_INT.decode(buf),
                                 ByteBufCodecs.VAR_INT.decode(buf),
-                                ByteBufCodecs.BOOL.decode(buf)
+                                ByteBufCodecs.BOOL.decode(buf),
+                                ByteBufCodecs.STRING_UTF8.decode(buf)
                         ));
 
         @Override
@@ -228,11 +437,32 @@ public class ModPayloads {
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
 
-    public record ClientboundOpenJindanChallengePayload() implements CustomPacketPayload {
+    public record ClientboundOpenJindanChallengePayload(boolean assisted) implements CustomPacketPayload {
         public static final CustomPacketPayload.Type<ClientboundOpenJindanChallengePayload> TYPE =
                 new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "open_jindan_challenge"));
         public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundOpenJindanChallengePayload> STREAM_CODEC =
-                StreamCodec.unit(new ClientboundOpenJindanChallengePayload());
+                StreamCodec.composite(
+                        ByteBufCodecs.BOOL, ClientboundOpenJindanChallengePayload::assisted,
+                        ClientboundOpenJindanChallengePayload::new);
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
+    public record ClientboundJindanTribulationPayload(int event, int durationTicks, float intensity)
+            implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ClientboundJindanTribulationPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "jindan_tribulation"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundJindanTribulationPayload> STREAM_CODEC =
+                StreamCodec.of(
+                        (buf, data) -> {
+                            buf.writeVarInt(data.event());
+                            buf.writeVarInt(data.durationTicks());
+                            buf.writeFloat(data.intensity());
+                        },
+                        buf -> new ClientboundJindanTribulationPayload(
+                                buf.readVarInt(), buf.readVarInt(), buf.readFloat()));
+
         @Override
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
@@ -316,6 +546,41 @@ public class ModPayloads {
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
 
+    public record ClientboundInterruptSpellPreparationPayload() implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ClientboundInterruptSpellPreparationPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "interrupt_spell_preparation"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundInterruptSpellPreparationPayload>
+                STREAM_CODEC = StreamCodec.unit(new ClientboundInterruptSpellPreparationPayload());
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
+    public record ClientboundRingDialoguePayload(
+            Component message, boolean elder, int durationTicks)
+            implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ClientboundRingDialoguePayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "mysterious_ring_dialogue"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundRingDialoguePayload>
+                STREAM_CODEC = StreamCodec.of(
+                        (buf, data) -> {
+                            ComponentSerialization.STREAM_CODEC.encode(buf, data.message());
+                            ByteBufCodecs.BOOL.encode(buf, data.elder());
+                            ByteBufCodecs.VAR_INT.encode(buf, data.durationTicks());
+                        },
+                        buf -> new ClientboundRingDialoguePayload(
+                                ComponentSerialization.STREAM_CODEC.decode(buf),
+                                ByteBufCodecs.BOOL.decode(buf),
+                                ByteBufCodecs.VAR_INT.decode(buf)));
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
     public record ClientboundYinYangCompassPayload(int centerX, int centerZ, int step, int size,
                                              List<Integer> values, List<Integer> qiValues) implements CustomPacketPayload {
         public static final CustomPacketPayload.Type<ClientboundYinYangCompassPayload> TYPE =
@@ -372,6 +637,147 @@ public class ModPayloads {
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
 
+    public record ClientboundNpcProfilePayload(CompoundTag data) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ClientboundNpcProfilePayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "npc_profile"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundNpcProfilePayload> STREAM_CODEC =
+                StreamCodec.of(
+                        (buf, payload) -> buf.writeNbt(payload.data()),
+                        buf -> {
+                            CompoundTag data = buf.readNbt();
+                            return new ClientboundNpcProfilePayload(data == null ? new CompoundTag() : data);
+                        });
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
+    public record ServerboundNpcActionPayload(int entityId, String action, int index) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ServerboundNpcActionPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "npc_action"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundNpcActionPayload> STREAM_CODEC =
+                StreamCodec.composite(
+                        ByteBufCodecs.VAR_INT, ServerboundNpcActionPayload::entityId,
+                        ByteBufCodecs.STRING_UTF8, ServerboundNpcActionPayload::action,
+                        ByteBufCodecs.VAR_INT, ServerboundNpcActionPayload::index,
+                        ServerboundNpcActionPayload::new);
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
+    public record ClientboundDebugEyeStatePayload(boolean enabled) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ClientboundDebugEyeStatePayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "debug_eye_state"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundDebugEyeStatePayload> STREAM_CODEC =
+                StreamCodec.composite(
+                        ByteBufCodecs.BOOL, ClientboundDebugEyeStatePayload::enabled,
+                        ClientboundDebugEyeStatePayload::new);
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
+    public record ClientboundJindanFlightControlPayload(boolean active) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ClientboundJindanFlightControlPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "jindan_flight_control"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundJindanFlightControlPayload> STREAM_CODEC =
+                StreamCodec.composite(
+                        ByteBufCodecs.BOOL, ClientboundJindanFlightControlPayload::active,
+                        ClientboundJindanFlightControlPayload::new);
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
+    public record ClientboundDebugHintCountPayload(int hints) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ClientboundDebugHintCountPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "debug_hint_count"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundDebugHintCountPayload> STREAM_CODEC =
+                StreamCodec.composite(
+                        ByteBufCodecs.VAR_INT, ClientboundDebugHintCountPayload::hints,
+                        ClientboundDebugHintCountPayload::new);
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
+    public record ClientboundOpenDebugStatEditorPayload(UUID targetId, String targetName)
+            implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ClientboundOpenDebugStatEditorPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "open_debug_stat_editor"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundOpenDebugStatEditorPayload>
+                STREAM_CODEC = StreamCodec.of(
+                        (buf, payload) -> {
+                            buf.writeLong(payload.targetId().getMostSignificantBits());
+                            buf.writeLong(payload.targetId().getLeastSignificantBits());
+                            ByteBufCodecs.STRING_UTF8.encode(buf, payload.targetName());
+                        },
+                        buf -> new ClientboundOpenDebugStatEditorPayload(
+                                new UUID(buf.readLong(), buf.readLong()),
+                                ByteBufCodecs.STRING_UTF8.decode(buf)));
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    public record ClientboundOpenWantedOrderPayload(String skin, String name, String realm,
+                                                     String rewardKey, int rewardCount) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ClientboundOpenWantedOrderPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "open_wanted_order"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundOpenWantedOrderPayload> STREAM_CODEC =
+                StreamCodec.of(
+                        (buf, payload) -> {
+                            ByteBufCodecs.STRING_UTF8.encode(buf, payload.skin());
+                            ByteBufCodecs.STRING_UTF8.encode(buf, payload.name());
+                            ByteBufCodecs.STRING_UTF8.encode(buf, payload.realm());
+                            ByteBufCodecs.STRING_UTF8.encode(buf, payload.rewardKey());
+                            ByteBufCodecs.VAR_INT.encode(buf, payload.rewardCount());
+                        },
+                        buf -> new ClientboundOpenWantedOrderPayload(
+                                ByteBufCodecs.STRING_UTF8.decode(buf),
+                                ByteBufCodecs.STRING_UTF8.decode(buf),
+                                ByteBufCodecs.STRING_UTF8.decode(buf),
+                                ByteBufCodecs.STRING_UTF8.decode(buf),
+                                ByteBufCodecs.VAR_INT.decode(buf)));
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    public record ClientboundProtectivePendantActivationPayload() implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ClientboundProtectivePendantActivationPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "protective_pendant_activation"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundProtectivePendantActivationPayload> STREAM_CODEC =
+                StreamCodec.unit(new ClientboundProtectivePendantActivationPayload());
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    public record ServerboundToggleDebugEyePayload() implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ServerboundToggleDebugEyePayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "toggle_debug_eye"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundToggleDebugEyePayload> STREAM_CODEC =
+                StreamCodec.unit(new ServerboundToggleDebugEyePayload());
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
     public record ServerboundLearnSpellPayload(String spellName) implements CustomPacketPayload {
         public static final CustomPacketPayload.Type<ServerboundLearnSpellPayload> TYPE =
                 new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "learn_spell"));
@@ -390,6 +796,114 @@ public class ModPayloads {
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
 
+    public record ClientboundOpenSteleSpellEditorPayload(
+            BlockPos pos,
+            String spellId
+    ) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ClientboundOpenSteleSpellEditorPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "open_stele_spell_editor"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundOpenSteleSpellEditorPayload> STREAM_CODEC =
+                StreamCodec.of(
+                        (buf, data) -> {
+                            buf.writeBlockPos(data.pos());
+                            ByteBufCodecs.STRING_UTF8.encode(buf, data.spellId());
+                        },
+                        buf -> new ClientboundOpenSteleSpellEditorPayload(
+                                buf.readBlockPos(),
+                                ByteBufCodecs.STRING_UTF8.decode(buf)));
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    public record ServerboundSetSteleSpellPayload(
+            BlockPos pos,
+            String spellId
+    ) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ServerboundSetSteleSpellPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "set_stele_spell"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundSetSteleSpellPayload> STREAM_CODEC =
+                StreamCodec.of(
+                        (buf, data) -> {
+                            buf.writeBlockPos(data.pos());
+                            ByteBufCodecs.STRING_UTF8.encode(buf, data.spellId());
+                        },
+                        buf -> new ServerboundSetSteleSpellPayload(
+                                buf.readBlockPos(),
+                                ByteBufCodecs.STRING_UTF8.decode(buf)));
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    public record ClientboundOpenLearningGamePayload(
+            String learningType,
+            String targetId,
+            int requiredPoints,
+            float difficulty,
+            float talent,
+            boolean assisted,
+            long token
+    ) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ClientboundOpenLearningGamePayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "open_learning_game"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundOpenLearningGamePayload> STREAM_CODEC =
+                StreamCodec.of(
+                        (buf, data) -> {
+                            ByteBufCodecs.STRING_UTF8.encode(buf, data.learningType());
+                            ByteBufCodecs.STRING_UTF8.encode(buf, data.targetId());
+                            ByteBufCodecs.VAR_INT.encode(buf, data.requiredPoints());
+                            ByteBufCodecs.FLOAT.encode(buf, data.difficulty());
+                            ByteBufCodecs.FLOAT.encode(buf, data.talent());
+                            ByteBufCodecs.BOOL.encode(buf, data.assisted());
+                            buf.writeLong(data.token());
+                        },
+                        buf -> new ClientboundOpenLearningGamePayload(
+                                ByteBufCodecs.STRING_UTF8.decode(buf),
+                                ByteBufCodecs.STRING_UTF8.decode(buf),
+                                ByteBufCodecs.VAR_INT.decode(buf),
+                                ByteBufCodecs.FLOAT.decode(buf),
+                                ByteBufCodecs.FLOAT.decode(buf),
+                                ByteBufCodecs.BOOL.decode(buf),
+                                buf.readLong()));
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
+    public record ServerboundCompleteLearningGamePayload(long token, int score) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ServerboundCompleteLearningGamePayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "complete_learning_game"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundCompleteLearningGamePayload> STREAM_CODEC =
+                StreamCodec.composite(
+                        ByteBufCodecs.VAR_LONG, ServerboundCompleteLearningGamePayload::token,
+                        ByteBufCodecs.VAR_INT, ServerboundCompleteLearningGamePayload::score,
+                        ServerboundCompleteLearningGamePayload::new);
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
+    public record ServerboundCancelLearningGamePayload(long token) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ServerboundCancelLearningGamePayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "cancel_learning_game"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundCancelLearningGamePayload> STREAM_CODEC =
+                StreamCodec.composite(ByteBufCodecs.VAR_LONG, ServerboundCancelLearningGamePayload::token,
+                        ServerboundCancelLearningGamePayload::new);
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
     public record ServerboundCastSpellPayload(String spellName, float chargeScale) implements CustomPacketPayload {
         public static final CustomPacketPayload.Type<ServerboundCastSpellPayload> TYPE =
                 new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "cast_spell"));
@@ -398,6 +912,27 @@ public class ModPayloads {
                         ByteBufCodecs.STRING_UTF8, ServerboundCastSpellPayload::spellName,
                         ByteBufCodecs.FLOAT, ServerboundCastSpellPayload::chargeScale,
                         ServerboundCastSpellPayload::new);
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
+    public record ServerboundSpellPreparationPayload(
+            List<String> spellNames,
+            boolean preparing,
+            boolean sequential) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ServerboundSpellPreparationPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "spell_preparation"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundSpellPreparationPayload> STREAM_CODEC =
+                StreamCodec.composite(
+                        ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()),
+                        ServerboundSpellPreparationPayload::spellNames,
+                        ByteBufCodecs.BOOL,
+                        ServerboundSpellPreparationPayload::preparing,
+                        ByteBufCodecs.BOOL,
+                        ServerboundSpellPreparationPayload::sequential,
+                        ServerboundSpellPreparationPayload::new);
+
         @Override
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
@@ -424,11 +959,32 @@ public class ModPayloads {
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
 
+    public record ServerboundShihunfanSlashPayload() implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ServerboundShihunfanSlashPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "shihunfan_slash"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundShihunfanSlashPayload> STREAM_CODEC =
+                StreamCodec.unit(new ServerboundShihunfanSlashPayload());
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
     public record ServerboundReleaseWeaponPayload() implements CustomPacketPayload {
         public static final CustomPacketPayload.Type<ServerboundReleaseWeaponPayload> TYPE =
                 new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "release_weapon"));
         public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundReleaseWeaponPayload> STREAM_CODEC =
                 StreamCodec.unit(new ServerboundReleaseWeaponPayload());
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
+    public record ServerboundSwordCaseActionPayload(boolean releaseAll) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ServerboundSwordCaseActionPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "sword_case_action"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundSwordCaseActionPayload> STREAM_CODEC =
+                StreamCodec.composite(ByteBufCodecs.BOOL, ServerboundSwordCaseActionPayload::releaseAll,
+                        ServerboundSwordCaseActionPayload::new);
         @Override
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
@@ -487,6 +1043,65 @@ public class ModPayloads {
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
 
+    public record ServerboundSetAutoChannelQiPayload(boolean enabled) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ServerboundSetAutoChannelQiPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "set_auto_channel_qi"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundSetAutoChannelQiPayload> STREAM_CODEC =
+                StreamCodec.composite(
+                        ByteBufCodecs.BOOL, ServerboundSetAutoChannelQiPayload::enabled,
+                        ServerboundSetAutoChannelQiPayload::new);
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
+    public record ServerboundSetFormationPlatePaymentOrderPayload(boolean qiFirst)
+            implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ServerboundSetFormationPlatePaymentOrderPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "set_formation_plate_payment_order"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundSetFormationPlatePaymentOrderPayload> STREAM_CODEC =
+                StreamCodec.composite(
+                        ByteBufCodecs.BOOL, ServerboundSetFormationPlatePaymentOrderPayload::qiFirst,
+                        ServerboundSetFormationPlatePaymentOrderPayload::new);
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    public record ServerboundSetJindanFlightPayload(boolean enabled) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ServerboundSetJindanFlightPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "set_jindan_flight"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundSetJindanFlightPayload> STREAM_CODEC =
+                StreamCodec.composite(
+                        ByteBufCodecs.BOOL, ServerboundSetJindanFlightPayload::enabled,
+                        ServerboundSetJindanFlightPayload::new);
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    public record ServerboundAdjustJindanFlightSpeedPayload(int steps) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ServerboundAdjustJindanFlightSpeedPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "adjust_jindan_flight_speed"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundAdjustJindanFlightSpeedPayload> STREAM_CODEC =
+                StreamCodec.composite(
+                        ByteBufCodecs.VAR_INT, ServerboundAdjustJindanFlightSpeedPayload::steps,
+                        ServerboundAdjustJindanFlightSpeedPayload::new);
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
     public record ServerboundDingActionPayload(boolean heatPulse) implements CustomPacketPayload {
         public static final CustomPacketPayload.Type<ServerboundDingActionPayload> TYPE =
                 new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "ding_action"));
@@ -505,28 +1120,40 @@ public class ModPayloads {
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
 
-    public record ServerboundDebugAdjustStatPayload(String stat, int delta) implements CustomPacketPayload {
+    public record ServerboundDebugAdjustStatPayload(UUID targetId, String stat, int delta)
+            implements CustomPacketPayload {
         public static final CustomPacketPayload.Type<ServerboundDebugAdjustStatPayload> TYPE =
                 new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "debug_adjust_stat"));
         public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundDebugAdjustStatPayload> STREAM_CODEC =
-                StreamCodec.composite(
-                        ByteBufCodecs.STRING_UTF8, ServerboundDebugAdjustStatPayload::stat,
-                        ByteBufCodecs.VAR_INT, ServerboundDebugAdjustStatPayload::delta,
-                        ServerboundDebugAdjustStatPayload::new);
+                StreamCodec.of(
+                        (buf, payload) -> {
+                            buf.writeLong(payload.targetId().getMostSignificantBits());
+                            buf.writeLong(payload.targetId().getLeastSignificantBits());
+                            ByteBufCodecs.STRING_UTF8.encode(buf, payload.stat());
+                            ByteBufCodecs.VAR_INT.encode(buf, payload.delta());
+                        },
+                        buf -> new ServerboundDebugAdjustStatPayload(
+                                new UUID(buf.readLong(), buf.readLong()),
+                                ByteBufCodecs.STRING_UTF8.decode(buf),
+                                ByteBufCodecs.VAR_INT.decode(buf)));
         @Override
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
 
-    public record ServerboundDebugSetSpiritRootsPayload(List<String> roots, String grade) implements CustomPacketPayload {
+    public record ServerboundDebugSetSpiritRootsPayload(
+            UUID targetId, List<String> roots, String grade) implements CustomPacketPayload {
         public static final CustomPacketPayload.Type<ServerboundDebugSetSpiritRootsPayload> TYPE =
                 new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "debug_set_spirit_roots"));
         public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundDebugSetSpiritRootsPayload> STREAM_CODEC =
                 StreamCodec.of(
                         (buf, data) -> {
+                            buf.writeLong(data.targetId().getMostSignificantBits());
+                            buf.writeLong(data.targetId().getLeastSignificantBits());
                             ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()).encode(buf, data.roots());
                             ByteBufCodecs.STRING_UTF8.encode(buf, data.grade());
                         },
                         buf -> new ServerboundDebugSetSpiritRootsPayload(
+                                new UUID(buf.readLong(), buf.readLong()),
                                 ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()).decode(buf),
                                 ByteBufCodecs.STRING_UTF8.decode(buf)
                         ));
@@ -534,7 +1161,41 @@ public class ModPayloads {
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
 
-    public record ServerboundCompleteEnlightenmentPayload(List<String> roots, String grade, String bodyType) implements CustomPacketPayload {
+    public record ServerboundDebugSetJindanQualityPayload(UUID targetId, String quality)
+            implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ServerboundDebugSetJindanQualityPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "debug_set_jindan_quality"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundDebugSetJindanQualityPayload> STREAM_CODEC =
+                StreamCodec.of(
+                        (buf, payload) -> {
+                            buf.writeLong(payload.targetId().getMostSignificantBits());
+                            buf.writeLong(payload.targetId().getLeastSignificantBits());
+                            ByteBufCodecs.STRING_UTF8.encode(buf, payload.quality());
+                        },
+                        buf -> new ServerboundDebugSetJindanQualityPayload(
+                                new UUID(buf.readLong(), buf.readLong()),
+                                ByteBufCodecs.STRING_UTF8.decode(buf)));
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
+    public record ServerboundCloseDebugStatEditorPayload() implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<ServerboundCloseDebugStatEditorPayload> TYPE =
+                new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "close_debug_stat_editor"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundCloseDebugStatEditorPayload>
+                STREAM_CODEC = StreamCodec.unit(new ServerboundCloseDebugStatEditorPayload());
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    public record ServerboundCompleteEnlightenmentPayload(List<String> roots, String grade, String bodyType,
+                                                           String gender) implements CustomPacketPayload {
         public static final CustomPacketPayload.Type<ServerboundCompleteEnlightenmentPayload> TYPE =
                 new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "complete_enlightenment"));
         public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundCompleteEnlightenmentPayload> STREAM_CODEC =
@@ -543,9 +1204,11 @@ public class ModPayloads {
                             ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()).encode(buf, data.roots());
                             ByteBufCodecs.STRING_UTF8.encode(buf, data.grade());
                             ByteBufCodecs.STRING_UTF8.encode(buf, data.bodyType());
+                            ByteBufCodecs.STRING_UTF8.encode(buf, data.gender());
                         },
                         buf -> new ServerboundCompleteEnlightenmentPayload(
                                 ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()).decode(buf),
+                                ByteBufCodecs.STRING_UTF8.decode(buf),
                                 ByteBufCodecs.STRING_UTF8.decode(buf),
                                 ByteBufCodecs.STRING_UTF8.decode(buf)
                         ));
@@ -560,6 +1223,9 @@ public class ModPayloads {
         private static final Map<UUID, QueuedCombo> QUEUED_COMBOS = new HashMap<>();
         private static final Map<UUID, Map<String, Long>> SPELL_COOLDOWNS = new HashMap<>();
         private static final Map<UUID, Map<String, Long>> MESSAGE_COOLDOWNS = new HashMap<>();
+        private static final Map<UUID, PendingLearning> PENDING_LEARNING = new HashMap<>();
+        private static final int BASE_LEARNING_POINTS = 5_000;
+        private static final long LEARNING_SESSION_TICKS = 20L * 60L * 15L;
         private static final ThreadLocal<Boolean> IGNORE_SPELL_COOLDOWN = ThreadLocal.withInitial(() -> false);
         private static final ThreadLocal<Vec3> COMBO_PROJECTILE_OFFSET = new ThreadLocal<>();
         @SubscribeEvent
@@ -570,29 +1236,126 @@ public class ModPayloads {
             registrar.playToClient(ClientboundCastAnimationPayload.TYPE, ClientboundCastAnimationPayload.STREAM_CODEC, ModPayloadsHandler::handleCastAnimationOnClient);
             registrar.playToClient(ClientboundShieldDataPayload.TYPE, ClientboundShieldDataPayload.STREAM_CODEC, ModPayloadsHandler::handleShieldDataOnClient);
             registrar.playToClient(ClientboundSpellCooldownPayload.TYPE, ClientboundSpellCooldownPayload.STREAM_CODEC, ModPayloadsHandler::handleSpellCooldownOnClient);
+            registrar.playToClient(ClientboundInterruptSpellPreparationPayload.TYPE,
+                    ClientboundInterruptSpellPreparationPayload.STREAM_CODEC,
+                    (payload, context) -> com.example.immortal_cultivation_mod.client.ClientPayloadHandlers
+                            .handleInterruptSpellPreparation(payload, context));
+            registrar.playToClient(ClientboundRingDialoguePayload.TYPE,
+                    ClientboundRingDialoguePayload.STREAM_CODEC,
+                    ModPayloadsHandler::handleRingDialogueOnClient);
             registrar.playToClient(ClientboundYinYangCompassPayload.TYPE, ClientboundYinYangCompassPayload.STREAM_CODEC, ModPayloadsHandler::handleYinYangCompassOnClient);
             registrar.playToClient(ClientboundOpenJindanChallengePayload.TYPE, ClientboundOpenJindanChallengePayload.STREAM_CODEC, ModPayloadsHandler::handleOpenJindanChallengeOnClient);
+            registrar.playToClient(ClientboundJindanTribulationPayload.TYPE, ClientboundJindanTribulationPayload.STREAM_CODEC,
+                    ModPayloadsHandler::handleJindanTribulationOnClient);
+            registrar.playToClient(ClientboundNpcProfilePayload.TYPE, ClientboundNpcProfilePayload.STREAM_CODEC, ModPayloadsHandler::handleNpcProfileOnClient);
+            registrar.playToClient(ClientboundOpenLearningGamePayload.TYPE, ClientboundOpenLearningGamePayload.STREAM_CODEC,
+                    ModPayloadsHandler::handleOpenLearningGameOnClient);
+            registrar.playToClient(ClientboundOpenSteleSpellEditorPayload.TYPE,
+                    ClientboundOpenSteleSpellEditorPayload.STREAM_CODEC,
+                    (payload, context) -> com.example.immortal_cultivation_mod.client.ClientPayloadHandlers
+                            .handleOpenSteleSpellEditor(payload, context));
+            registrar.playToClient(ClientboundDebugEyeStatePayload.TYPE, ClientboundDebugEyeStatePayload.STREAM_CODEC, ModPayloadsHandler::handleDebugEyeStateOnClient);
+            registrar.playToClient(ClientboundJindanFlightControlPayload.TYPE,
+                    ClientboundJindanFlightControlPayload.STREAM_CODEC,
+                    ModPayloadsHandler::handleJindanFlightControlOnClient);
+            registrar.playToClient(ClientboundDebugHintCountPayload.TYPE, ClientboundDebugHintCountPayload.STREAM_CODEC,
+                    ModPayloadsHandler::handleDebugHintCountOnClient);
+            registrar.playToClient(ClientboundOpenDebugStatEditorPayload.TYPE,
+                    ClientboundOpenDebugStatEditorPayload.STREAM_CODEC,
+                    ModPayloadsHandler::handleOpenDebugStatEditorOnClient);
+            registrar.playToClient(ClientboundOpenWantedOrderPayload.TYPE, ClientboundOpenWantedOrderPayload.STREAM_CODEC,
+                    (payload, context) -> com.example.immortal_cultivation_mod.client.ClientPayloadHandlers.handleWantedOrder(payload, context));
+            registrar.playToClient(ClientboundProtectivePendantActivationPayload.TYPE,
+                    ClientboundProtectivePendantActivationPayload.STREAM_CODEC,
+                    (payload, context) -> com.example.immortal_cultivation_mod.client.ClientPayloadHandlers
+                            .handleProtectivePendantActivation(payload, context));
             registrar.playToServer(ServerboundRequestBreakthroughPayload.TYPE, ServerboundRequestBreakthroughPayload.STREAM_CODEC, ModPayloadsHandler::handleBreakthroughOnServer);
             registrar.playToServer(ServerboundEnterJindanPayload.TYPE, ServerboundEnterJindanPayload.STREAM_CODEC, ModPayloadsHandler::handleEnterJindanOnServer);
             registrar.playToServer(ServerboundCompleteJindanChallengePayload.TYPE, ServerboundCompleteJindanChallengePayload.STREAM_CODEC, ModPayloadsHandler::handleCompleteJindanChallengeOnServer);
             registrar.playToServer(ServerboundSpendSkillPointPayload.TYPE, ServerboundSpendSkillPointPayload.STREAM_CODEC, ModPayloadsHandler::handleSpendSkillPointOnServer);
             registrar.playToServer(ServerboundLearnSpellPayload.TYPE, ServerboundLearnSpellPayload.STREAM_CODEC, ModPayloadsHandler::handleLearnSpellOnServer);
             registrar.playToServer(ServerboundActivateMethodPayload.TYPE, ServerboundActivateMethodPayload.STREAM_CODEC, ModPayloadsHandler::handleActivateMethodOnServer);
+            registrar.playToServer(ServerboundSetSteleSpellPayload.TYPE, ServerboundSetSteleSpellPayload.STREAM_CODEC,
+                    ModPayloadsHandler::handleSetSteleSpellOnServer);
+            registrar.playToServer(ServerboundCompleteLearningGamePayload.TYPE, ServerboundCompleteLearningGamePayload.STREAM_CODEC,
+                    ModPayloadsHandler::handleCompleteLearningGameOnServer);
+            registrar.playToServer(ServerboundCancelLearningGamePayload.TYPE, ServerboundCancelLearningGamePayload.STREAM_CODEC,
+                    ModPayloadsHandler::handleCancelLearningGameOnServer);
             registrar.playToServer(ServerboundCastSpellPayload.TYPE, ServerboundCastSpellPayload.STREAM_CODEC, ModPayloadsHandler::handleCastSpellOnServer);
+            registrar.playToServer(ServerboundSpellPreparationPayload.TYPE,
+                    ServerboundSpellPreparationPayload.STREAM_CODEC,
+                    ModPayloadsHandler::handleSpellPreparationOnServer);
             registrar.playToServer(ServerboundCastComboPayload.TYPE, ServerboundCastComboPayload.STREAM_CODEC, ModPayloadsHandler::handleCastComboOnServer);
             registrar.playToServer(ServerboundLightBeamAirPunchPayload.TYPE, ServerboundLightBeamAirPunchPayload.STREAM_CODEC, ModPayloadsHandler::handleLightBeamAirPunchOnServer);
+            registrar.playToServer(ServerboundShihunfanSlashPayload.TYPE, ServerboundShihunfanSlashPayload.STREAM_CODEC,
+                    ModPayloadsHandler::handleShihunfanSlashOnServer);
             registrar.playToServer(ServerboundReleaseWeaponPayload.TYPE, ServerboundReleaseWeaponPayload.STREAM_CODEC, ModPayloadsHandler::handleReleaseWeaponOnServer);
+            registrar.playToServer(ServerboundSwordCaseActionPayload.TYPE, ServerboundSwordCaseActionPayload.STREAM_CODEC,
+                    ModPayloadsHandler::handleSwordCaseActionOnServer);
             registrar.playToServer(ServerboundFlyingSwordPunchPayload.TYPE, ServerboundFlyingSwordPunchPayload.STREAM_CODEC, ModPayloadsHandler::handleFlyingSwordPunchOnServer);
             registrar.playToServer(ServerboundFlyingSwordInteractPayload.TYPE, ServerboundFlyingSwordInteractPayload.STREAM_CODEC, ModPayloadsHandler::handleFlyingSwordInteractOnServer);
             registrar.playToServer(ServerboundYuqiModePayload.TYPE, ServerboundYuqiModePayload.STREAM_CODEC, ModPayloadsHandler::handleYuqiModeOnServer);
             registrar.playToServer(ServerboundWindStepJumpPayload.TYPE, ServerboundWindStepJumpPayload.STREAM_CODEC, ModPayloadsHandler::handleWindStepJumpOnServer);
             registrar.playToServer(ServerboundMeditatePayload.TYPE, ServerboundMeditatePayload.STREAM_CODEC, ModPayloadsHandler::handleMeditateOnServer);
             registrar.playToServer(ServerboundInjectQiPayload.TYPE, ServerboundInjectQiPayload.STREAM_CODEC, ModPayloadsHandler::handleInjectQiOnServer);
+            registrar.playToServer(ServerboundSetAutoChannelQiPayload.TYPE, ServerboundSetAutoChannelQiPayload.STREAM_CODEC,
+                    ModPayloadsHandler::handleSetAutoChannelQiOnServer);
+            registrar.playToServer(ServerboundSetFormationPlatePaymentOrderPayload.TYPE,
+                    ServerboundSetFormationPlatePaymentOrderPayload.STREAM_CODEC,
+                    ModPayloadsHandler::handleSetFormationPlatePaymentOrderOnServer);
+            registrar.playToServer(ServerboundSetJindanFlightPayload.TYPE, ServerboundSetJindanFlightPayload.STREAM_CODEC,
+                    ModPayloadsHandler::handleSetJindanFlightOnServer);
+            registrar.playToServer(ServerboundAdjustJindanFlightSpeedPayload.TYPE,
+                    ServerboundAdjustJindanFlightSpeedPayload.STREAM_CODEC,
+                    ModPayloadsHandler::handleAdjustJindanFlightSpeedOnServer);
             registrar.playToServer(ServerboundDingActionPayload.TYPE, ServerboundDingActionPayload.STREAM_CODEC, ModPayloadsHandler::handleDingActionOnServer);
             registrar.playToServer(ServerboundFrostFlightCameraPayload.TYPE, ServerboundFrostFlightCameraPayload.STREAM_CODEC, ModPayloadsHandler::handleFrostFlightCameraOnServer);
             registrar.playToServer(ServerboundDebugAdjustStatPayload.TYPE, ServerboundDebugAdjustStatPayload.STREAM_CODEC, ModPayloadsHandler::handleDebugAdjustStatOnServer);
             registrar.playToServer(ServerboundDebugSetSpiritRootsPayload.TYPE, ServerboundDebugSetSpiritRootsPayload.STREAM_CODEC, ModPayloadsHandler::handleDebugSetSpiritRootsOnServer);
+            registrar.playToServer(ServerboundDebugSetJindanQualityPayload.TYPE,
+                    ServerboundDebugSetJindanQualityPayload.STREAM_CODEC,
+                    ModPayloadsHandler::handleDebugSetJindanQualityOnServer);
+            registrar.playToServer(ServerboundCloseDebugStatEditorPayload.TYPE,
+                    ServerboundCloseDebugStatEditorPayload.STREAM_CODEC,
+                    ModPayloadsHandler::handleCloseDebugStatEditorOnServer);
             registrar.playToServer(ServerboundCompleteEnlightenmentPayload.TYPE, ServerboundCompleteEnlightenmentPayload.STREAM_CODEC, ModPayloadsHandler::handleCompleteEnlightenmentOnServer);
+            registrar.playToServer(ServerboundNpcActionPayload.TYPE, ServerboundNpcActionPayload.STREAM_CODEC, ModPayloadsHandler::handleNpcActionOnServer);
+            registrar.playToServer(ServerboundToggleDebugEyePayload.TYPE, ServerboundToggleDebugEyePayload.STREAM_CODEC, ModPayloadsHandler::handleToggleDebugEyeOnServer);
+        }
+
+        private static void handleToggleDebugEyeOnServer(ServerboundToggleDebugEyePayload payload, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                if (!(ctx.player() instanceof ServerPlayer player)) {
+                    return;
+                }
+                if (!player.hasPermissions(2)) {
+                    player.getPersistentData().putBoolean(DEBUG_EYE_ENABLED_TAG, false);
+                    syncDebugEyeState(player);
+                    player.displayClientMessage(Component.translatable(
+                            "message." + ImmortalCultivationMod.MODID + ".debug_eye_no_permission"), true);
+                    return;
+                }
+                boolean enabled = !player.getPersistentData().getBoolean(DEBUG_EYE_ENABLED_TAG);
+                player.getPersistentData().putBoolean(DEBUG_EYE_ENABLED_TAG, enabled);
+                syncDebugEyeState(player);
+                player.displayClientMessage(Component.translatable(
+                        "message." + ImmortalCultivationMod.MODID
+                                + (enabled ? ".debug_eye_enabled" : ".debug_eye_disabled")), true);
+            });
+        }
+
+        private static void handleNpcActionOnServer(ServerboundNpcActionPayload payload, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                if (!(ctx.player() instanceof ServerPlayer player)) {
+                    return;
+                }
+                var entity = player.level().getEntity(payload.entityId());
+                if (entity instanceof net.minecraft.world.entity.PathfinderMob mob
+                        && entity instanceof com.example.immortal_cultivation_mod.entity.CultivationNpc) {
+                    com.example.immortal_cultivation_mod.entity.NpcProfile.handleAction(
+                            mob, player, payload.action(), payload.index());
+                }
+            });
         }
 
         private static void handleDingActionOnServer(ServerboundDingActionPayload payload, IPayloadContext ctx) {
@@ -616,13 +1379,12 @@ public class ModPayloads {
         }
 
         private static void enterJindan(ServerPlayer player) {
-            ServerLevel target = player.server.getLevel(JINDAN_DIMENSION);
-            if (target == null) {
-                player.displayClientMessage(Component.literal("Jindan dimension is not loaded."), true);
-                return;
-            }
+            finishPendingJindanReset(player);
             storeJindanReturnPoint(player);
+            ServerLevel target = JindanPocketWorlds.getOrCreate(player);
+            boolean hadLegacyAnchor = player.getPersistentData().contains(JINDAN_ANCHOR_TAG);
             BlockPos anchor = getOrCreateJindanAnchor(player, target);
+            JindanPocketWorlds.migrateLegacyPocket(player, target, anchor, hadLegacyAnchor);
             ensureNormalWorldClone(player);
             ensureJindanReturnEntity(player, target, anchor);
             player.teleportTo(target,
@@ -636,14 +1398,26 @@ public class ModPayloads {
 
         private static BlockPos getOrCreateJindanAnchor(ServerPlayer player, ServerLevel target) {
             CompoundTag data = player.getPersistentData();
-            if (data.contains("ImmortalCultivationJindanAnchor")) {
-                CompoundTag anchor = data.getCompound("ImmortalCultivationJindanAnchor");
-                return new BlockPos(anchor.getInt("x"), anchor.getInt("y"), anchor.getInt("z"));
+            if (data.getInt(JINDAN_ANCHOR_VERSION_TAG) == JINDAN_ANCHOR_VERSION
+                    && data.contains(JINDAN_ANCHOR_TAG)) {
+                CompoundTag saved = data.getCompound(JINDAN_ANCHOR_TAG);
+                BlockPos savedPos = new BlockPos(saved.getInt("x"), saved.getInt("y"), saved.getInt("z"));
+                target.getChunk(savedPos);
+                return savedPos;
+            }
+            if (data.contains(JINDAN_ANCHOR_TAG) || data.hasUUID(JINDAN_ENTITY_UUID_TAG)) {
+                removeOwnedJindanEntities(player);
             }
 
-            int radius = 12_000;
-            int x = player.getRandom().nextInt(radius * 2 + 1) - radius;
-            int z = player.getRandom().nextInt(radius * 2 + 1) - radius;
+            UUID playerId = player.getUUID();
+            long generation = data.getInt(JINDAN_ANCHOR_GENERATION_TAG);
+            long playerSeed = JINDAN_ANCHOR_RANDOM_SALT
+                    ^ playerId.getMostSignificantBits()
+                    ^ Long.rotateLeft(playerId.getLeastSignificantBits(), 29)
+                    ^ generation * 0x9E3779B97F4A7C15L;
+            RandomSource random = RandomSource.create(playerSeed);
+            int x = random.nextInt(JINDAN_ANCHOR_RADIUS * 2 + 1) - JINDAN_ANCHOR_RADIUS;
+            int z = random.nextInt(JINDAN_ANCHOR_RADIUS * 2 + 1) - JINDAN_ANCHOR_RADIUS;
             int y = Math.max(target.getMinBuildHeight() + 2, target.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z));
             BlockPos anchorPos = new BlockPos(x, y, z);
             target.getChunk(anchorPos);
@@ -652,12 +1426,13 @@ public class ModPayloads {
             anchor.putInt("x", anchorPos.getX());
             anchor.putInt("y", anchorPos.getY());
             anchor.putInt("z", anchorPos.getZ());
-            data.put("ImmortalCultivationJindanAnchor", anchor);
+            data.put(JINDAN_ANCHOR_TAG, anchor);
+            data.putInt(JINDAN_ANCHOR_VERSION_TAG, JINDAN_ANCHOR_VERSION);
             return anchorPos;
         }
 
         private static void storeJindanReturnPoint(ServerPlayer player) {
-            if (JINDAN_DIMENSION.equals(player.level().dimension())) {
+            if (JindanPocketWorlds.isJindanDimension(player.level().dimension())) {
                 return;
             }
             CompoundTag data = player.getPersistentData();
@@ -672,28 +1447,80 @@ public class ModPayloads {
         private static void ensureJindanReturnEntity(ServerPlayer player, ServerLevel target, BlockPos anchor) {
             CompoundTag data = player.getPersistentData();
             target.getChunk(anchor);
+            long replicaSourceSeed = jindanReplicaSourceSeed(player);
 
+            List<JindanEntity> loadedJindanEntities = new ArrayList<>();
+            List<JindanEntity> unownedLegacyEntities = new ArrayList<>();
+            for (var entity : target.getAllEntities()) {
+                if (entity instanceof JindanEntity jindan) {
+                    if (jindan.ownerUuid().map(player.getUUID()::equals).orElse(false)) {
+                        loadedJindanEntities.add(jindan);
+                    } else if (jindan.ownerUuid().isEmpty()) {
+                        unownedLegacyEntities.add(jindan);
+                    }
+                }
+            }
+            unownedLegacyEntities.forEach(JindanEntity::discard);
+
+            JindanEntity singleton = null;
             if (data.hasUUID(JINDAN_ENTITY_UUID_TAG)
-                    && target.getEntity(data.getUUID(JINDAN_ENTITY_UUID_TAG)) instanceof JindanEntity existing) {
-                existing.setOwner(player.getUUID());
-                return;
+                    && target.getEntity(data.getUUID(JINDAN_ENTITY_UUID_TAG)) instanceof JindanEntity existing
+                    && existing.ownerUuid().map(player.getUUID()::equals).orElse(false)) {
+                singleton = existing;
             }
 
-            AABB scanBox = new AABB(anchor).inflate(8.0D);
-            List<JindanEntity> existingNearAnchor = target.getEntitiesOfClass(JindanEntity.class, scanBox,
-                    entity -> entity.ownerUuid().map(player.getUUID()::equals).orElse(false));
-            if (!existingNearAnchor.isEmpty()) {
-                data.putUUID(JINDAN_ENTITY_UUID_TAG, existingNearAnchor.getFirst().getUUID());
+            if (singleton == null && !loadedJindanEntities.isEmpty()) {
+                double anchorX = anchor.getX() + 0.5D;
+                double anchorY = anchor.getY();
+                double anchorZ = anchor.getZ() + 0.5D;
+                double closestDistance = Double.MAX_VALUE;
+                for (JindanEntity candidate : loadedJindanEntities) {
+                    double distance = candidate.distanceToSqr(anchorX, anchorY, anchorZ);
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        singleton = candidate;
+                    }
+                }
+            }
+
+            if (singleton != null) {
+                for (JindanEntity candidate : loadedJindanEntities) {
+                    if (candidate != singleton) {
+                        candidate.discard();
+                    }
+                }
+
+                double anchorX = anchor.getX() + 0.5D;
+                double anchorY = anchor.getY();
+                double anchorZ = anchor.getZ() + 0.5D;
+                singleton.moveTo(anchorX, anchorY, anchorZ, 180.0F, 0.0F);
+                singleton.setOwner(player.getUUID());
+                singleton.setReplicaSourceSeed(replicaSourceSeed);
+                singleton.syncGeneratedChunkCount(player);
+                singleton.setDeltaMovement(Vec3.ZERO);
+                data.putUUID(JINDAN_ENTITY_UUID_TAG, singleton.getUUID());
                 return;
             }
 
             JindanEntity jindan = ModEntities.JINDAN.get().create(target);
             if (jindan != null) {
+                jindan.moveTo(anchor.getX() + 0.5D, anchor.getY(), anchor.getZ() + 0.5D, 180.0F, 0.0F);
                 jindan.setOwner(player.getUUID());
-                jindan.moveTo(anchor.getX() + 0.5D, anchor.getY(), anchor.getZ() + 2.5D, 180.0F, 0.0F);
+                jindan.setReplicaSourceSeed(replicaSourceSeed);
+                jindan.syncGeneratedChunkCount(player);
                 target.addFreshEntity(jindan);
                 data.putUUID(JINDAN_ENTITY_UUID_TAG, jindan.getUUID());
             }
+        }
+
+        private static long jindanReplicaSourceSeed(ServerPlayer player) {
+            UUID playerId = player.getUUID();
+            long generation = player.getPersistentData().getInt(JINDAN_ANCHOR_GENERATION_TAG);
+            long seed = JINDAN_REPLICA_RANDOM_SALT
+                    ^ Long.rotateLeft(playerId.getMostSignificantBits(), 17)
+                    ^ Long.rotateRight(playerId.getLeastSignificantBits(), 11)
+                    ^ generation * 0xD1B54A32D192ED03L;
+            return seed == 0L ? JINDAN_REPLICA_RANDOM_SALT : seed;
         }
 
         private static void ensureNormalWorldClone(ServerPlayer player) {
@@ -714,19 +1541,13 @@ public class ModPayloads {
             BlockPos clonePos = BlockPos.containing(x, y, z);
             returnLevel.getChunk(clonePos);
 
-            AABB scanBox = new AABB(clonePos).inflate(8.0D);
-            List<JindanCloneEntity> existingClones = returnLevel.getEntitiesOfClass(JindanCloneEntity.class, scanBox,
-                    entity -> entity.playerUuid().map(player.getUUID()::equals).orElse(false));
-            if (!existingClones.isEmpty()) {
-                data.putUUID(JINDAN_CLONE_UUID_TAG, existingClones.getFirst().getUUID());
-            } else {
-                JindanCloneEntity clone = ModEntities.JINDAN_CLONE.get().create(returnLevel);
-                if (clone != null) {
-                    clone.moveTo(x, y, z, yaw, 0.0F);
-                    clone.copyFrom(player);
-                    returnLevel.addFreshEntity(clone);
-                    data.putUUID(JINDAN_CLONE_UUID_TAG, clone.getUUID());
-                }
+            removeNormalWorldClone(player, returnLevel, x, y, z);
+            JindanCloneEntity clone = ModEntities.JINDAN_CLONE.get().create(returnLevel);
+            if (clone != null) {
+                clone.moveTo(x, y, z, yaw, 0.0F);
+                clone.copyFrom(player);
+                returnLevel.addFreshEntity(clone);
+                data.putUUID(JINDAN_CLONE_UUID_TAG, clone.getUUID());
             }
         }
 
@@ -737,19 +1558,32 @@ public class ModPayloads {
                     if (def == null) {
                         return;
                     }
-                    var data = ModAttachments.getData(sp).withActiveCultivationMethod(payload.methodId());
-                    ModAttachments.setData(sp, data);
-                    sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".method_activated",
-                            Component.translatable(def.nameKey())));
-                    com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+                    var current = ModAttachments.getData(sp);
+                    boolean learned = payload.methodId().equals(current.activeCultivationMethod())
+                            || current.methodProficiencies().containsKey(payload.methodId());
+                    if (learned) {
+                        activateMethod(sp, payload.methodId());
+                    } else {
+                        beginLearningSession(sp, "method_item", "method", payload.methodId(), -1,
+                                def.limitLevel());
+                    }
                 }
             });
         }
 
         private static void handleDebugAdjustStatOnServer(ServerboundDebugAdjustStatPayload payload, IPayloadContext ctx) {
             ctx.enqueueWork(() -> {
-                if (ctx.player() instanceof ServerPlayer sp) {
-                    var data = ModAttachments.getData(sp);
+                if (ctx.player() instanceof ServerPlayer editor) {
+                    ServerPlayer target = resolveDebugTarget(editor, payload.targetId());
+                    if (target == null) {
+                        return;
+                    }
+                    if ("restriction_hints".equals(payload.stat())) {
+                        int hints = RestrictionInsightItem.adjustHintCount(target, payload.delta());
+                        syncDebugHintCount(target, editor, hints);
+                        return;
+                    }
+                    var data = ModAttachments.getData(target);
                     var updated = switch (payload.stat()) {
                         case "cultivation_level" -> data.withCultivationLevel(nextCultivationLevel(data.cultivationLevel(), payload.delta()));
                         case "body_type" -> data.withBodyType(BodyTypes.next(data.bodyType(), payload.delta()));
@@ -761,21 +1595,45 @@ public class ModPayloads {
                         case "moral" -> data.withMoral(clamp(data.moral() + payload.delta(), 0, 100));
                         case "luck" -> data.withLuck(clamp(data.luck() + payload.delta(), 0, 100));
                         case "soul" -> data.withSoul(clamp(data.soul() + payload.delta(), 0, 1000));
-                        case "thoughts" -> data.withThoughts(clamp(data.thoughts() + payload.delta(), 0, ModAttachments.MAX_THOUGHTS));
+                        case "thoughts" -> data.withThoughts(clamp(data.thoughts() + payload.delta(), 0, data.maxThoughts()));
                         case "spirit_roots" -> data.withSpiritRoots(SpiritRoots.nextRootSet(data.spiritRoots(), payload.delta()), data.spiritRootGrade());
                         case "spirit_root_grade" -> data.withSpiritRoots(data.spiritRoots(), SpiritRoots.nextGrade(data.spiritRootGrade(), payload.delta()));
-                        case "skill_points", "max_hp", "max_qi", "max_energy", "physical", "magic", "mental" -> data.debugAdjustStat(payload.stat(), payload.delta());
+                        case "skill_points", "max_hp", "max_qi", "max_energy", "physical", "magic", "mental", "talent" ->
+                                data.debugAdjustStat(payload.stat(), payload.delta());
                         default -> data;
                     };
                     if (payload.stat().startsWith(METHOD_PROFICIENCY_PREFIX)) {
                         updated = adjustMethodProficiency(data, payload.stat().substring(METHOD_PROFICIENCY_PREFIX.length()), payload.delta());
                     }
                     if (updated != data) {
-                        ModAttachments.setData(sp, updated);
-                        com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+                        ModAttachments.setData(target, updated);
+                        syncDebugTarget(target, editor);
                     }
                 }
             });
+        }
+
+        private static ServerPlayer resolveDebugTarget(ServerPlayer editor, UUID targetId) {
+            boolean holdingEditor = editor.getMainHandItem().is(ModItems.DEBUG_STAT_EDITOR.get())
+                    || editor.getOffhandItem().is(ModItems.DEBUG_STAT_EDITOR.get());
+            if (!holdingEditor || editor.getServer() == null) {
+                return null;
+            }
+            return editor.getServer().getPlayerList().getPlayer(targetId);
+        }
+
+        private static void syncDebugTarget(ServerPlayer target, ServerPlayer editor) {
+            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(target);
+            if (target != editor) {
+                com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerDataTo(target, editor);
+            }
+        }
+
+        private static void syncDebugHintCount(ServerPlayer target, ServerPlayer editor, int hints) {
+            PacketDistributor.sendToPlayer(editor, new ClientboundDebugHintCountPayload(hints));
+            if (target != editor) {
+                PacketDistributor.sendToPlayer(target, new ClientboundDebugHintCountPayload(hints));
+            }
         }
 
         private static ModAttachments.CultivationData adjustMethodProficiency(ModAttachments.CultivationData data, String methodId, int delta) {
@@ -784,22 +1642,50 @@ public class ModPayloads {
             }
             Map<String, Integer> updated = new HashMap<>(data.methodProficiencies());
             long value = (long) data.methodProficiency(methodId) + delta;
-            if (value <= 0L) {
-                updated.remove(methodId);
-            } else {
-                updated.put(methodId, (int) Math.min(Integer.MAX_VALUE, value));
-            }
+            updated.put(methodId, (int) Math.min(Integer.MAX_VALUE, Math.max(0L, value)));
             return data.withMethodProficiencies(updated);
         }
 
         private static void handleDebugSetSpiritRootsOnServer(ServerboundDebugSetSpiritRootsPayload payload, IPayloadContext ctx) {
             ctx.enqueueWork(() -> {
-                if (ctx.player() instanceof ServerPlayer sp) {
-                    var data = ModAttachments.getData(sp);
+                if (ctx.player() instanceof ServerPlayer editor) {
+                    ServerPlayer target = resolveDebugTarget(editor, payload.targetId());
+                    if (target == null) {
+                        return;
+                    }
+                    var data = ModAttachments.getData(target);
                     var roots = SpiritRoots.sanitizeRootList(payload.roots());
                     String grade = SpiritRoots.sanitizeGrade(payload.grade());
-                    ModAttachments.setData(sp, data.withSpiritRoots(roots, grade));
-                    com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+                    ModAttachments.setData(target, data.withSpiritRoots(roots, grade));
+                    syncDebugTarget(target, editor);
+                }
+            });
+        }
+
+        private static void handleDebugSetJindanQualityOnServer(ServerboundDebugSetJindanQualityPayload payload, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                if (ctx.player() instanceof ServerPlayer editor) {
+                    ServerPlayer target = resolveDebugTarget(editor, payload.targetId());
+                    if (target == null) {
+                        return;
+                    }
+                    com.example.immortal_cultivation_mod.event.ServerEvents.setJindanQuality(
+                            target, payload.quality());
+                    if (target != editor) {
+                        com.example.immortal_cultivation_mod.event.ServerEvents
+                                .syncPlayerDataTo(target, editor);
+                    }
+                }
+            });
+        }
+
+        private static void handleCloseDebugStatEditorOnServer(
+                ServerboundCloseDebugStatEditorPayload payload, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                if (ctx.player() instanceof ServerPlayer editor) {
+                    com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(editor);
+                    PacketDistributor.sendToPlayer(editor, new ClientboundDebugHintCountPayload(
+                            RestrictionInsightItem.hintCount(editor)));
                 }
             });
         }
@@ -832,6 +1718,9 @@ public class ModPayloads {
                     }
                     String grade = SpiritRoots.sanitizeGrade(payload.grade());
                     String bodyType = BodyTypes.sanitize(payload.bodyType());
+                    sp.getPersistentData().putString(
+                            com.example.immortal_cultivation_mod.entity.NpcProfile.PLAYER_GENDER_TAG,
+                            com.example.immortal_cultivation_mod.entity.NpcProfile.normalizePlayerGender(payload.gender()));
                     var updated = data
                             .withCultivationLevel(CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY)
                             .withSpiritRoots(roots, grade)
@@ -882,16 +1771,303 @@ public class ModPayloads {
                         sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".spell_requirement", spell.requiredLevel()));
                         return;
                     }
-                    var known = new java.util.ArrayList<>(data.knownSpells());
-                    if (!known.contains(spellId)) {
-                        known.add(spellId);
-                        ModAttachments.setData(sp, data.withKnownSpells(known));
-                        consumeLearnedScroll(sp, spellId);
-                        sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".spell_learned", spell.name()));
-                        com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+                    if (data.knownSpells().contains(spellId) || ModSpells.isInnateKnown(spellId, data)) {
+                        return;
                     }
+                    beginLearningSession(sp, "scroll", "spell", spellId, -1, spell.requiredLevel());
                 }
             });
+        }
+
+        private static void handleSetSteleSpellOnServer(ServerboundSetSteleSpellPayload payload,
+                                                         IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                if (!(ctx.player() instanceof ServerPlayer player)
+                        || player.distanceToSqr(Vec3.atCenterOf(payload.pos())) > 64.0D
+                        || (!player.getMainHandItem().is(ModItems.DEBUG_STAT_EDITOR.get())
+                        && !player.getOffhandItem().is(ModItems.DEBUG_STAT_EDITOR.get()))
+                        || !player.level().getBlockState(payload.pos()).is(
+                        com.example.immortal_cultivation_mod.block.ModBlocks.DUNWU_STELE.get())
+                        || !(player.level().getBlockEntity(payload.pos())
+                        instanceof com.example.immortal_cultivation_mod.block.GeoRockBlockEntity stele)) {
+                    return;
+                }
+                String spellId = payload.spellId().isBlank()
+                        ? ""
+                        : ModSpells.normalizeId(payload.spellId());
+                ModSpells.SpellDef spell = spellId.isBlank() ? null : ModSpells.get(spellId);
+                if (!spellId.isBlank() && spell == null) {
+                    return;
+                }
+                stele.setSteleSpellId(spellId);
+                player.displayClientMessage(Component.translatable(
+                        "message." + ImmortalCultivationMod.MODID + ".dunwu_stele.set",
+                        spell == null
+                                ? Component.translatable("screen." + ImmortalCultivationMod.MODID
+                                + ".stele_spell_editor.empty")
+                                : spell.name()), true);
+            });
+        }
+
+        private static boolean beginRestrictionInsightLearning(ServerPlayer player) {
+            PendingLearning existing = PENDING_LEARNING.get(player.getUUID());
+            if (existing != null && player.level().getGameTime() <= existing.expiresAt()) {
+                return false;
+            }
+            PENDING_LEARNING.remove(player.getUUID());
+            long token = player.getRandom().nextLong() ^ player.level().getGameTime();
+            PendingLearning pending = new PendingLearning(
+                    "restriction_insight",
+                    "restriction_insight",
+                    "restriction_insight",
+                    -1,
+                    RestrictionInsightItem.LEARNING_GOAL,
+                    token,
+                    player.level().getGameTime() + LEARNING_SESSION_TICKS);
+            PENDING_LEARNING.put(player.getUUID(), pending);
+            PacketDistributor.sendToPlayer(player, new ClientboundOpenLearningGamePayload(
+                    pending.learningType(), pending.targetId(), pending.requiredPoints(),
+                    1.0F, 1.0F, NoobAchievement.hasReward(player), token));
+            MysteriousRingItem.onLearningStarted(player);
+            return true;
+        }
+
+        private static boolean beginDunwuSteleLearning(ServerPlayer player, String requestedSpellId) {
+            PendingLearning existing = PENDING_LEARNING.get(player.getUUID());
+            if (existing != null
+                    && player.level().getGameTime() <= existing.expiresAt()
+                    && !"dunwu_stele".equals(existing.source())) {
+                return false;
+            }
+            PENDING_LEARNING.remove(player.getUUID());
+            ModAttachments.CultivationData data = ModAttachments.getData(player);
+            String spellId = ModSpells.normalizeId(requestedSpellId);
+            ModSpells.SpellDef spell = ModSpells.get(spellId);
+            if (spell == null || data.knownSpells().contains(spellId)
+                    || ModSpells.isInnateKnown(spellId, data)
+                    || !ModSpells.meetsRequirement(data.cultivationLevel(), spell)) {
+                return false;
+            }
+            if (player.getAbilities().instabuild) {
+                completeDunwuSteleLearning(player, spellId);
+                return true;
+            }
+            int maxQi = Math.max(1, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
+            int requiredPoints = (int) Math.min(Integer.MAX_VALUE, Math.max(1L, maxQi * 75L));
+            long token = player.getRandom().nextLong() ^ player.level().getGameTime();
+            PendingLearning pending = new PendingLearning(
+                    "dunwu_stele",
+                    "spell",
+                    spellId,
+                    -1,
+                    requiredPoints,
+                    token,
+                    player.level().getGameTime() + LEARNING_SESSION_TICKS);
+            PENDING_LEARNING.put(player.getUUID(), pending);
+            PacketDistributor.sendToPlayer(player, new ClientboundOpenLearningGamePayload(
+                    pending.learningType(), pending.targetId(), pending.requiredPoints(),
+                    1.0F, 1.0F, NoobAchievement.hasReward(player), token));
+            MysteriousRingItem.onLearningStarted(player);
+            return true;
+        }
+
+        private static void beginLearningSession(ServerPlayer player, String source, String learningType,
+                                                 String targetId, int npcEntityId, String teacherLevel) {
+            if (targetId == null || targetId.isBlank()
+                    || (!("spell".equals(learningType)) && !("method".equals(learningType)))) {
+                return;
+            }
+            if (player.getAbilities().instabuild) {
+                switch (source) {
+                    case "scroll" -> completeScrollSpellLearning(player, targetId);
+                    case "method_item" -> activateMethod(player, targetId);
+                    case "npc" -> NpcProfile.completeNpcLearning(
+                            player, npcEntityId, learningType, targetId);
+                    default -> {
+                    }
+                }
+                return;
+            }
+            ModAttachments.CultivationData data = ModAttachments.getData(player);
+            float talent = ModAttachments.CultivationData.sanitizeTalent(data.talent());
+            float difficulty = learningDifficulty(data.cultivationLevel(), teacherLevel);
+            int requiredPoints = Math.max(1, (int) Math.ceil(BASE_LEARNING_POINTS * difficulty / talent));
+            long token = player.getRandom().nextLong() ^ player.level().getGameTime();
+            PendingLearning pending = new PendingLearning(
+                    source,
+                    learningType,
+                    targetId,
+                    npcEntityId,
+                    requiredPoints,
+                    token,
+                    player.level().getGameTime() + LEARNING_SESSION_TICKS);
+            PENDING_LEARNING.put(player.getUUID(), pending);
+            PacketDistributor.sendToPlayer(player, new ClientboundOpenLearningGamePayload(
+                    learningType, targetId, requiredPoints, difficulty, talent,
+                    NoobAchievement.hasReward(player), token));
+            MysteriousRingItem.onLearningStarted(player);
+        }
+
+        private static float learningDifficulty(String playerLevel, String teacherLevel) {
+            if (teacherLevel == null || teacherLevel.isBlank()) {
+                return 1.0F;
+            }
+            int playerStage = CultivationLevels.getStageIndex(playerLevel);
+            int teacherStage = CultivationLevels.getStageIndex(teacherLevel);
+            if (teacherStage <= 0 || playerStage <= teacherStage) {
+                return 1.0F;
+            }
+            if (playerStage - teacherStage == 1) {
+                return 0.9F;
+            }
+            int realmDifference = CultivationLevels.getRealmIndex(playerLevel)
+                    - CultivationLevels.getRealmIndex(teacherLevel);
+            return realmDifference == 1 ? 0.5F : 0.1F;
+        }
+
+        private static void handleCompleteLearningGameOnServer(
+                ServerboundCompleteLearningGamePayload payload, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                if (!(ctx.player() instanceof ServerPlayer player)) {
+                    return;
+                }
+                PendingLearning pending = PENDING_LEARNING.get(player.getUUID());
+                if (pending == null
+                        || pending.token() != payload.token()
+                        || player.level().getGameTime() > pending.expiresAt()
+                        || payload.score() < pending.requiredPoints()) {
+                    return;
+                }
+                PENDING_LEARNING.remove(player.getUUID());
+                switch (pending.source()) {
+                    case "scroll" -> completeScrollSpellLearning(player, pending.targetId());
+                    case "method_item" -> activateMethod(player, pending.targetId());
+                    case "npc" -> NpcProfile.completeNpcLearning(
+                            player, pending.npcEntityId(), pending.learningType(), pending.targetId());
+                    case "restriction_insight" -> RestrictionInsightItem.completeLearning(player);
+                    case "dunwu_stele" -> completeDunwuSteleLearning(player, pending.targetId());
+                    case "lianshen_spell" -> completeLianshenSpellPuzzle(player);
+                    default -> {
+                    }
+                }
+                MysteriousRingItem.onLearningSucceeded(player);
+            });
+        }
+
+        private static void handleCancelLearningGameOnServer(
+                ServerboundCancelLearningGamePayload payload, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                if (!(ctx.player() instanceof ServerPlayer player)) {
+                    return;
+                }
+                PendingLearning pending = PENDING_LEARNING.get(player.getUUID());
+                if (pending != null && pending.token() == payload.token()) {
+                    PENDING_LEARNING.remove(player.getUUID());
+                    MysteriousRingItem.onLearningFailed(player);
+                }
+            });
+        }
+
+        private static void completeScrollSpellLearning(ServerPlayer player, String spellId) {
+            ModSpells.SpellDef spell = ModSpells.get(spellId);
+            ModAttachments.CultivationData data = ModAttachments.getData(player);
+            if (spell == null
+                    || data.knownSpells().contains(spellId)
+                    || ModSpells.isInnateKnown(spellId, data)
+                    || !ModSpells.meetsRequirement(data.cultivationLevel(), spell)) {
+                return;
+            }
+            List<String> known = new ArrayList<>(data.knownSpells());
+            known.add(spellId);
+            ModAttachments.setData(player, data.withKnownSpells(known));
+            consumeLearnedScroll(player, spellId);
+            player.sendSystemMessage(Component.translatable(
+                    "message." + ImmortalCultivationMod.MODID + ".spell_learned", spell.name()));
+            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(player);
+        }
+
+        private static void completeDunwuSteleLearning(ServerPlayer player, String spellId) {
+            ModSpells.SpellDef spell = ModSpells.get(spellId);
+            ModAttachments.CultivationData data = ModAttachments.getData(player);
+            if (spell == null
+                    || data.knownSpells().contains(spellId)
+                    || ModSpells.isInnateKnown(spellId, data)
+                    || !ModSpells.meetsRequirement(data.cultivationLevel(), spell)) {
+                return;
+            }
+            List<String> known = new ArrayList<>(data.knownSpells());
+            known.add(spellId);
+            ModAttachments.setData(player, data.withKnownSpells(known));
+            player.sendSystemMessage(Component.translatable(
+                    "message." + ImmortalCultivationMod.MODID + ".dunwu_stele.learned",
+                    spell.name()));
+            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(player);
+        }
+
+        private static boolean beginLianshenSpellPuzzle(ServerPlayer player, ModAttachments.CultivationData data) {
+            PendingLearning existing = PENDING_LEARNING.get(player.getUUID());
+            if (existing != null && player.level().getGameTime() <= existing.expiresAt()) {
+                return false;
+            }
+            if (!data.knownSpells().contains(ModSpells.LIANSHEN_SHU) || data.hasLianshenThoughtBonus()) {
+                return false;
+            }
+            int maxQi = Math.max(1, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
+            int qiCost = Math.max(1, maxQi * 75 / 100);
+            if (data.qi() < qiCost) {
+                sendNotEnoughQi(player);
+                return false;
+            }
+            ModAttachments.setData(player, data.withQi(data.qi() - qiCost));
+            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(player);
+
+            PENDING_LEARNING.remove(player.getUUID());
+            int requiredPoints = (int) Math.min(Integer.MAX_VALUE, Math.max(1L, maxQi * 75L));
+            long token = player.getRandom().nextLong() ^ player.level().getGameTime();
+            PendingLearning pending = new PendingLearning(
+                    "lianshen_spell",
+                    "spell",
+                    ModSpells.LIANSHEN_SHU,
+                    -1,
+                    requiredPoints,
+                    token,
+                    player.level().getGameTime() + LEARNING_SESSION_TICKS);
+            PENDING_LEARNING.put(player.getUUID(), pending);
+            PacketDistributor.sendToPlayer(player, new ClientboundOpenLearningGamePayload(
+                    pending.learningType(), pending.targetId(), pending.requiredPoints(),
+                    1.0F, 1.0F, NoobAchievement.hasReward(player), token));
+            MysteriousRingItem.onLearningStarted(player);
+            return true;
+        }
+
+        private static void completeLianshenSpellPuzzle(ServerPlayer player) {
+            ModAttachments.CultivationData data = ModAttachments.getData(player);
+            if (!data.knownSpells().contains(ModSpells.LIANSHEN_SHU) || data.hasLianshenThoughtBonus()) {
+                return;
+            }
+            ModAttachments.setData(player, data.withLianshenThoughtBonus());
+            player.sendSystemMessage(Component.translatable(
+                    "message." + ImmortalCultivationMod.MODID + ".lianshen_shu.completed"));
+            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(player);
+        }
+
+        private static void activateMethod(ServerPlayer player, String methodId) {
+            CultivationMethods.MethodDef def = CultivationMethods.get(methodId);
+            if (def == null) {
+                return;
+            }
+            ModAttachments.CultivationData current = ModAttachments.getData(player);
+            Map<String, Integer> learnedMethods = new HashMap<>(current.methodProficiencies());
+            if (CultivationMethods.get(current.activeCultivationMethod()) != null) {
+                learnedMethods.putIfAbsent(current.activeCultivationMethod(), 0);
+            }
+            learnedMethods.putIfAbsent(methodId, 0);
+            ModAttachments.setData(player, current.withMethodProficiencies(learnedMethods)
+                    .withActiveCultivationMethod(methodId));
+            player.sendSystemMessage(Component.translatable(
+                    "message." + ImmortalCultivationMod.MODID + ".method_activated",
+                    Component.translatable(def.nameKey())));
+            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(player);
         }
 
         private static void consumeLearnedScroll(ServerPlayer sp, String spellId) {
@@ -930,6 +2106,9 @@ public class ModPayloads {
                 case ModSpells.XUYING_TA -> ModItems.XUYING_TA_SCROLL.get();
                 case ModSpells.DUANLIU_KONGDUN -> ModItems.DUANLIU_KONGDUN_SCROLL.get();
                 case ModSpells.YIHEN_CI -> ModItems.YIHEN_CI_SCROLL.get();
+                case ModSpells.JINHUO_XINLIAO -> ModItems.JINHUO_XINLIAO_SCROLL.get();
+                case ModSpells.SUIGUI_XINGYUN -> ModItems.SUIGUI_XINGYUN_SCROLL.get();
+                case ModSpells.SHIXU_CHILIU -> ModItems.SHIXU_CHILIU_SCROLL.get();
                 default -> null;
             };
             if (scroll == null) {
@@ -982,6 +2161,15 @@ public class ModPayloads {
             }
         }
 
+        private static void handleRingDialogueOnClient(
+                ClientboundRingDialoguePayload payload, IPayloadContext ctx) {
+            if (net.neoforged.fml.loading.FMLEnvironment.dist
+                    == net.neoforged.api.distmarker.Dist.CLIENT) {
+                com.example.immortal_cultivation_mod.client.ClientPayloadHandlers
+                        .handleRingDialogue(payload, ctx);
+            }
+        }
+
         private static void handleYinYangCompassOnClient(ClientboundYinYangCompassPayload payload, IPayloadContext ctx) {
             if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
                 com.example.immortal_cultivation_mod.client.ClientPayloadHandlers.handleYinYangCompass(payload, ctx);
@@ -991,6 +2179,53 @@ public class ModPayloads {
         private static void handleOpenJindanChallengeOnClient(ClientboundOpenJindanChallengePayload payload, IPayloadContext ctx) {
             if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
                 com.example.immortal_cultivation_mod.client.ClientPayloadHandlers.handleOpenJindanChallenge(payload, ctx);
+            }
+        }
+
+        private static void handleJindanTribulationOnClient(ClientboundJindanTribulationPayload payload, IPayloadContext ctx) {
+            if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
+                com.example.immortal_cultivation_mod.client.ClientPayloadHandlers.handleJindanTribulation(payload, ctx);
+            }
+        }
+
+        private static void handleNpcProfileOnClient(ClientboundNpcProfilePayload payload, IPayloadContext ctx) {
+            if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
+                com.example.immortal_cultivation_mod.client.ClientPayloadHandlers.handleNpcProfile(payload, ctx);
+            }
+        }
+
+        private static void handleOpenLearningGameOnClient(
+                ClientboundOpenLearningGamePayload payload, IPayloadContext ctx) {
+            if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
+                com.example.immortal_cultivation_mod.client.ClientPayloadHandlers.handleOpenLearningGame(payload, ctx);
+            }
+        }
+
+        private static void handleDebugEyeStateOnClient(ClientboundDebugEyeStatePayload payload, IPayloadContext ctx) {
+            if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
+                com.example.immortal_cultivation_mod.client.ClientPayloadHandlers.handleDebugEyeState(payload, ctx);
+            }
+        }
+
+        private static void handleJindanFlightControlOnClient(
+                ClientboundJindanFlightControlPayload payload, IPayloadContext ctx) {
+            if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
+                com.example.immortal_cultivation_mod.client.ClientPayloadHandlers
+                        .handleJindanFlightControl(payload, ctx);
+            }
+        }
+
+        private static void handleDebugHintCountOnClient(ClientboundDebugHintCountPayload payload, IPayloadContext ctx) {
+            if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
+                com.example.immortal_cultivation_mod.client.ClientPayloadHandlers.handleDebugHintCount(payload, ctx);
+            }
+        }
+
+        private static void handleOpenDebugStatEditorOnClient(
+                ClientboundOpenDebugStatEditorPayload payload, IPayloadContext ctx) {
+            if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
+                com.example.immortal_cultivation_mod.client.ClientPayloadHandlers
+                        .handleOpenDebugStatEditor(payload, ctx);
             }
         }
 
@@ -1036,7 +2271,27 @@ public class ModPayloads {
             ctx.enqueueWork(() -> {
                 if (ctx.player() instanceof ServerPlayer sp) {
                     String spellId = ModSpells.normalizeId(payload.spellName());
+                    if (!CombatStateManager.finishSpellPreparation(
+                            sp, List.of(spellId), false, payload.chargeScale())) {
+                        return;
+                    }
                     castValidatedSpell(sp, spellId, payload.chargeScale());
+                }
+            });
+        }
+
+        private static void handleSpellPreparationOnServer(
+                ServerboundSpellPreparationPayload payload,
+                IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                if (!(ctx.player() instanceof ServerPlayer sp)) {
+                    return;
+                }
+                if (payload.preparing()) {
+                    CombatStateManager.beginSpellPreparation(
+                            sp, payload.spellNames(), payload.sequential());
+                } else {
+                    CombatStateManager.cancelSpellPreparation(sp);
                 }
             });
         }
@@ -1044,13 +2299,17 @@ public class ModPayloads {
         private static void handleCastComboOnServer(ServerboundCastComboPayload payload, IPayloadContext ctx) {
             ctx.enqueueWork(() -> {
                 if (ctx.player() instanceof ServerPlayer sp) {
+                    List<String> requestedSpells = payload.spellNames().stream()
+                            .map(ModSpells::normalizeId)
+                            .filter(ModSpells::isComboEligible)
+                            .toList();
+                    if (!CombatStateManager.finishSpellPreparation(
+                            sp, requestedSpells, payload.sequential(), payload.chargeScale())) {
+                        return;
+                    }
                     java.util.Map<String, Integer> timedToggles = new java.util.HashMap<>();
                     java.util.List<String> normalSpells = new java.util.ArrayList<>();
-                    for (String rawSpell : payload.spellNames()) {
-                        String spellId = ModSpells.normalizeId(rawSpell);
-                        if (!ModSpells.isComboEligible(spellId)) {
-                            continue;
-                        }
+                    for (String spellId : requestedSpells) {
                         if (ModSpells.isComboTimedToggle(spellId)) {
                             timedToggles.merge(spellId, 1, Integer::sum);
                         } else {
@@ -1096,7 +2355,14 @@ public class ModPayloads {
 
         public static void tickQueuedComboCasts(ServerPlayer player) {
             QueuedCombo combo = QUEUED_COMBOS.get(player.getUUID());
-            if (combo == null || player.tickCount < combo.nextCastTick()) {
+            if (combo == null) {
+                return;
+            }
+            if (CombatStateManager.isSpellcastingBlocked(player)) {
+                QUEUED_COMBOS.remove(player.getUUID());
+                return;
+            }
+            if (player.tickCount < combo.nextCastTick()) {
                 return;
             }
             castValidatedSpell(player, combo.spellIds().get(combo.nextSpellIndex()), combo.chargeScale());
@@ -1107,6 +2373,26 @@ public class ModPayloads {
                 QUEUED_COMBOS.put(player.getUUID(), new QueuedCombo(combo.spellIds(), nextIndex,
                         player.tickCount + COMBO_CAST_INTERVAL_TICKS, combo.chargeScale()));
             }
+        }
+
+        public static boolean isQueuedComboCasting(ServerPlayer player) {
+            return QUEUED_COMBOS.containsKey(player.getUUID())
+                    && !CombatStateManager.isSpellcastingBlocked(player);
+        }
+
+        public static void cancelQueuedCombo(ServerPlayer player) {
+            QUEUED_COMBOS.remove(player.getUUID());
+        }
+
+        private record PendingLearning(
+                String source,
+                String learningType,
+                String targetId,
+                int npcEntityId,
+                int requiredPoints,
+                long token,
+                long expiresAt
+        ) {
         }
 
         private record QueuedCombo(List<String> spellIds, int nextSpellIndex, int nextCastTick, float chargeScale) {
@@ -1123,7 +2409,7 @@ public class ModPayloads {
                         return;
                     }
                     var data = ModAttachments.getData(sp);
-                    if (sp.hasEffect(ModEffects.DAZE)) {
+                    if (CombatStateManager.isSpellcastingBlocked(sp)) {
                         return;
                     }
                     if (sp.hasEffect(ModEffects.QI_GATHERING) && !ModSpells.QI_GATHERING.equals(spellId)) {
@@ -1146,12 +2432,14 @@ public class ModPayloads {
                     if (!IGNORE_SPELL_COOLDOWN.get() && isSpellOnCooldown(sp, spellId)) {
                         return;
                     }
-                    sendCastAnimation(sp);
+                    com.example.immortal_cultivation_mod.magicritual.center.CenterEffectSupport
+                            .beginSpellCast(sp, spellId);
+                    try {
                     boolean castSucceeded = true;
                     if (ModSpells.FIREBALL.equals(spellId)) {
-                        castFireball(sp, data, spell, chargeScale);
+                        castSucceeded = castFireball(sp, data, spell, chargeScale);
                     } else if (ModSpells.LINGBENG.equals(spellId)) {
-                        castLingbeng(sp, data, spell);
+                        castSucceeded = castLingbeng(sp, data, spell);
                     } else if (ModSpells.REGENERATION.equals(spellId)) {
                         castSucceeded = castRegeneration(sp, data, spell);
                     } else if (ModSpells.BEAM.equals(spellId)) {
@@ -1159,35 +2447,35 @@ public class ModPayloads {
                     } else if (ModSpells.EARTH_ESCAPE.equals(spellId)) {
                         castEarthEscape(sp, data);
                     } else if (ModSpells.CLEANSE.equals(spellId)) {
-                        castCleanse(sp, data, spell);
+                        castSucceeded = castCleanse(sp, data, spell);
                     } else if (ModSpells.QI_GATHERING.equals(spellId)) {
-                        castQiGathering(sp);
+                        castSucceeded = castQiGathering(sp);
                     } else if (ModSpells.IGNITE_FLARE.equals(spellId)) {
-                        castIgniteFlare(sp, data, spell, chargeScale);
+                        castSucceeded = castIgniteFlare(sp, data, spell, chargeScale);
                     } else if (ModSpells.SPIRIT_SIGHT.equals(spellId)) {
                         com.example.immortal_cultivation_mod.event.ServerEvents.toggleSpiritSight(sp);
                     } else if (ModSpells.ZHENSHAN_PALM.equals(spellId)) {
-                        castZhenshanPalm(sp, data, spell, chargeScale);
+                        castSucceeded = castZhenshanPalm(sp, data, spell, chargeScale);
                     } else if (ModSpells.LIGHT_BEAM_ATTACK.equals(spellId)) {
-                        com.example.immortal_cultivation_mod.spell.LightBeamAttack.cast(sp);
+                        castSucceeded = com.example.immortal_cultivation_mod.spell.LightBeamAttack.cast(sp);
                     } else if (ModSpells.DIELANG_SHIELD.equals(spellId)) {
                         castSucceeded = com.example.immortal_cultivation_mod.spell.DielangShield.cast(sp);
                     } else if (ModSpells.LINGZHI_BULLET.equals(spellId)) {
-                        castLingzhiBullet(sp, data, spell, chargeScale);
+                        castSucceeded = castLingzhiBullet(sp, data, spell, chargeScale);
                     } else if (ModSpells.WIND_BLADE.equals(spellId)) {
-                        castWindBlade(sp, data, spell, chargeScale);
+                        castSucceeded = castWindBlade(sp, data, spell, chargeScale);
                     } else if (ModSpells.WIND_STEP.equals(spellId)) {
                         com.example.immortal_cultivation_mod.spell.WindStep.toggle(sp);
                     } else if (ModSpells.YUFENG_JUE.equals(spellId)) {
                         com.example.immortal_cultivation_mod.spell.YufengJue.toggle(sp);
                     } else if (ModSpells.SMOKE_ART.equals(spellId)) {
-                        castSmokeArt(sp, data, spell, chargeScale);
+                        castSucceeded = castSmokeArt(sp, data, spell, chargeScale);
                     } else if (ModSpells.HUTI_QI.equals(spellId)) {
                         castSucceeded = com.example.immortal_cultivation_mod.spell.HutiQi.cast(sp);
                     } else if (ModSpells.MICHEN_ZHANG.equals(spellId)) {
                         com.example.immortal_cultivation_mod.spell.MichenZhang.cast(sp, chargeScale);
                     } else if (ModSpells.SLIDING_WATER.equals(spellId)) {
-                        castSlidingWater(sp, data, spell, chargeScale);
+                        castSucceeded = castSlidingWater(sp, data, spell, chargeScale);
                     } else if (ModSpells.WEIYA.equals(spellId)) {
                         com.example.immortal_cultivation_mod.spell.Weiya.toggle(sp);
                     } else if (ModSpells.ZIBAO.equals(spellId)) {
@@ -1199,11 +2487,11 @@ public class ModPayloads {
                     } else if (ModSpells.FENGYA.equals(spellId)) {
                         com.example.immortal_cultivation_mod.spell.Fengya.toggle(sp);
                     } else if (ModSpells.DINGSHEN.equals(spellId)) {
-                        castDingshen(sp, data, spell, chargeScale);
+                        castSucceeded = castDingshen(sp, data, spell, chargeScale);
                     } else if (ModSpells.YINLEI_JUE.equals(spellId)) {
-                        castLightning(sp, data, spell, false, chargeScale);
+                        castSucceeded = castLightning(sp, data, spell, false, chargeScale);
                     } else if (ModSpells.WULEI_ZHENGFA.equals(spellId)) {
-                        castLightning(sp, data, spell, true, chargeScale);
+                        castSucceeded = castLightning(sp, data, spell, true, chargeScale);
                     } else if (ModSpells.LIUGUANG_JIANYING.equals(spellId)) {
                         castSucceeded = castLiuguangJianying(sp, data, spell, chargeScale);
                     } else if (ModSpells.SIFANG_JIE.equals(spellId)) {
@@ -1226,10 +2514,29 @@ public class ModPayloads {
                         castSucceeded = com.example.immortal_cultivation_mod.spell.DuanliuKongdun.cast(sp);
                     } else if (ModSpells.YIHEN_CI.equals(spellId)) {
                         castSucceeded = castYihenCi(sp, data, spell);
+                    } else if (ModSpells.JINHUO_XINLIAO.equals(spellId)) {
+                        castSucceeded = castJinhuoXinliao(sp, data, spell, chargeScale);
+                    } else if (ModSpells.SUIGUI_XINGYUN.equals(spellId)) {
+                        castSucceeded = castSuiguiXingyun(sp, data, spell, chargeScale);
+                    } else if (ModSpells.DONGTIAN_JIELING.equals(spellId)) {
+                        castSucceeded = com.example.immortal_cultivation_mod.spell.DongtianJieling.cast(sp);
+                    } else if (ModSpells.SHIXU_CHILIU.equals(spellId)) {
+                        castSucceeded = com.example.immortal_cultivation_mod.spell.ShixuChiliu.toggle(sp);
+                    } else if (ModSpells.LIANSHEN_SHU.equals(spellId)) {
+                        castSucceeded = beginLianshenSpellPuzzle(sp, data);
+                    } else if (ModSpells.SUOKONG_SHU.equals(spellId)) {
+                        castSucceeded = castSuokongShu(sp, data, chargeScale);
+                    } else if (ModSpells.CUIGU_LIANSHEN.equals(spellId)) {
+                        castSucceeded = com.example.immortal_cultivation_mod.spell.BodyCultivation.cast(sp);
                     }
                     if (castSucceeded) {
+                        sendCastAnimation(sp);
                         startSpellCooldown(sp, spellId);
                         addSpellProficiency(sp, spellId, 1);
+                    }
+                    } finally {
+                        com.example.immortal_cultivation_mod.magicritual.center.CenterEffectSupport
+                                .endSpellCast();
                     }
         }
 
@@ -1303,7 +2610,9 @@ public class ModPayloads {
         }
 
         private static void startSpellCooldown(ServerPlayer player, String spellId) {
-            int ticks = spellCooldownTicks(spellId);
+            int ticks = ModSpells.CUIGU_LIANSHEN.equals(spellId)
+                    ? com.example.immortal_cultivation_mod.spell.BodyCultivation.cooldownTicks(player)
+                    : spellCooldownTicks(spellId);
             if (ticks <= 0) {
                 return;
             }
@@ -1323,7 +2632,10 @@ public class ModPayloads {
             if (baseCost <= 0) {
                 return scale;
             }
-            while (scale > 1.0F && ModAttachments.getData(player).qi() < chargedCost(baseCost, scale)) {
+            while (scale > 1.0F && !com.example.immortal_cultivation_mod.event.ServerEvents.canAffordQiOrBlood(
+                    ModAttachments.getData(player),
+                    com.example.immortal_cultivation_mod.magicritual.center.CenterEffectSupport
+                            .adjustSpellQiCost(player, chargedCost(baseCost, scale), spellId))) {
                 scale = Math.max(1.0F, scale - 0.025F);
             }
             return scale;
@@ -1337,6 +2649,9 @@ public class ModPayloads {
             if (ModSpells.SHUANGTIAN_QI.equals(spellId)) {
                 int maxQi = Math.max(1, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
                 return Math.max(1, maxQi * 5 / 100);
+            }
+            if (ModSpells.SUOKONG_SHU.equals(spellId)) {
+                return suokongQiCost(data);
             }
             ModSpells.SpellDef spell = ModSpells.get(spellId);
             return spell == null ? 0 : Math.max(0, spell.qiCost());
@@ -1353,7 +2668,12 @@ public class ModPayloads {
 
         private static void addSpellProficiency(ServerPlayer player, String spellId, int amount) {
             var data = ModAttachments.getData(player);
+            int oldValue = data.spellProficiencies().getOrDefault(spellId, 0);
             ModAttachments.setData(player, data.withAddedSpellProficiency(spellId, amount));
+            int newValue = ModAttachments.getData(player)
+                    .spellProficiencies().getOrDefault(spellId, oldValue);
+            MysteriousRingItem.onSpellCast(player, spellId);
+            MysteriousRingItem.onSpellProficiencyIncreased(player, oldValue, newValue);
             com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(player);
         }
 
@@ -1381,7 +2701,9 @@ public class ModPayloads {
                     || ModSpells.LIUGUANG_JIANYING.equals(spellId)
                     || ModSpells.SHUANGTIAN_QI.equals(spellId)
                     || ModSpells.DUANLIU_KONGDUN.equals(spellId)
-                    || ModSpells.YIHEN_CI.equals(spellId);
+                    || ModSpells.YIHEN_CI.equals(spellId)
+                    || ModSpells.JINHUO_XINLIAO.equals(spellId)
+                    || ModSpells.SUOKONG_SHU.equals(spellId);
         }
 
         private static Vec3 comboHexOffset(ServerPlayer player, int index) {
@@ -1437,7 +2759,7 @@ public class ModPayloads {
                 return false;
             }
             var data = ModAttachments.getData(sp);
-            if (sp.hasEffect(ModEffects.DAZE)) {
+            if (CombatStateManager.isSpellcastingBlocked(sp)) {
                 return false;
             }
             if (sp.hasEffect(ModEffects.QI_GATHERING) && !ModSpells.QI_GATHERING.equals(spellId)) {
@@ -1490,6 +2812,9 @@ public class ModPayloads {
             } else if (ModSpells.WEIYA.equals(spellId)) {
                 com.example.immortal_cultivation_mod.spell.Weiya.activateTimed(sp, durationTicks);
                 return;
+            } else if (ModSpells.SHIXU_CHILIU.equals(spellId)) {
+                com.example.immortal_cultivation_mod.spell.ShixuChiliu.activateTimed(sp, durationTicks);
+                return;
             } else if (ModSpells.FENGYA.equals(spellId)) {
                 sp.addEffect(new MobEffectInstance(ModEffects.FENGYA, stackedEffectDuration(sp, ModEffects.FENGYA, durationTicks), 0, false, false, true));
             } else if (ModSpells.SUISHUANG_LINGXIAO.equals(spellId)) {
@@ -1536,10 +2861,30 @@ public class ModPayloads {
             });
         }
 
+        private static void handleShihunfanSlashOnServer(ServerboundShihunfanSlashPayload payload, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                if (ctx.player() instanceof ServerPlayer player) {
+                    com.example.immortal_cultivation_mod.item.ShihunfanItem.soulWindSlash(player);
+                }
+            });
+        }
+
         private static void handleReleaseWeaponOnServer(ServerboundReleaseWeaponPayload payload, IPayloadContext ctx) {
             ctx.enqueueWork(() -> {
                 if (ctx.player() instanceof ServerPlayer sp) {
                     com.example.immortal_cultivation_mod.entity.FlyingSwordEntity.releaseFromHand(sp);
+                }
+            });
+        }
+
+        private static void handleSwordCaseActionOnServer(ServerboundSwordCaseActionPayload payload, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                if (ctx.player() instanceof ServerPlayer sp) {
+                    boolean handled = com.example.immortal_cultivation_mod.item.SwordCaseItem.handleAction(
+                            sp, payload.releaseAll());
+                    if (!handled && !payload.releaseAll()) {
+                        com.example.immortal_cultivation_mod.item.ClothSheathItem.swapWeapon(sp);
+                    }
                 }
             });
         }
@@ -1579,56 +2924,48 @@ public class ModPayloads {
             });
         }
 
-        private static void castLingzhiBullet(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
+        private static boolean castLingzhiBullet(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
             if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, chargedCost(spell.qiCost(), chargeScale))) {
                 sendNotEnoughQi(sp);
-                return;
+                return false;
             }
-            var projectile = new com.example.immortal_cultivation_mod.entity.LingzhiBulletProjectileEntity(sp.level(), sp);
-            projectile.getPersistentData().putFloat("ChargeScale", chargedAreaScale(chargeScale));
-            projectile.shootFromRotation(sp, sp.getXRot(), sp.getYRot(), 0, 2.1f, 0.0f);
-            applyComboProjectileOffset(projectile);
-            sp.level().addFreshEntity(projectile);
-            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            boolean cast = com.example.immortal_cultivation_mod.spell.CultivatorSpellExecution
+                    .lingzhiBullet(sp, null, chargeScale, ModPayloadsHandler::applyComboProjectileOffset);
+            if (cast) com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            return cast;
         }
 
-        private static void castWindBlade(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
+        private static boolean castWindBlade(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
             if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, chargedCost(spell.qiCost(), chargeScale))) {
                 sendNotEnoughQi(sp);
-                return;
+                return false;
             }
-            var projectile = new com.example.immortal_cultivation_mod.entity.WindBladeProjectileEntity(sp.level(), sp);
-            projectile.getPersistentData().putFloat("ChargeScale", chargedAreaScale(chargeScale));
-            projectile.shootFromRotation(sp, sp.getXRot(), sp.getYRot(), 0, 1.9f, 0.0f);
-            applyComboProjectileOffset(projectile);
-            sp.level().addFreshEntity(projectile);
-            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            boolean cast = com.example.immortal_cultivation_mod.spell.CultivatorSpellExecution
+                    .windBlade(sp, null, chargeScale, ModPayloadsHandler::applyComboProjectileOffset);
+            if (cast) com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            return cast;
         }
 
-        private static void castSmokeArt(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
+        private static boolean castSmokeArt(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
             if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, chargedCost(spell.qiCost(), chargeScale))) {
                 sendNotEnoughQi(sp);
-                return;
+                return false;
             }
-            var projectile = new com.example.immortal_cultivation_mod.entity.SmokeProjectileEntity(sp.level(), sp);
-            projectile.getPersistentData().putFloat("ChargeScale", chargedAreaScale(chargeScale));
-            projectile.shootFromRotation(sp, sp.getXRot(), sp.getYRot(), 0, 1.4f, 0.2f);
-            applyComboProjectileOffset(projectile);
-            sp.level().addFreshEntity(projectile);
-            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            boolean cast = com.example.immortal_cultivation_mod.spell.CultivatorSpellExecution
+                    .smokeArt(sp, null, chargeScale, ModPayloadsHandler::applyComboProjectileOffset);
+            if (cast) com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            return cast;
         }
 
-        private static void castSlidingWater(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
+        private static boolean castSlidingWater(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
             if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, chargedCost(spell.qiCost(), chargeScale))) {
                 sendNotEnoughQi(sp);
-                return;
+                return false;
             }
-            var projectile = new com.example.immortal_cultivation_mod.entity.SlidingWaterProjectileEntity(sp.level(), sp);
-            projectile.getPersistentData().putFloat("ChargeScale", chargedAreaScale(chargeScale));
-            projectile.shootFromRotation(sp, sp.getXRot(), sp.getYRot(), 0, 1.6f, 0.0f);
-            applyComboProjectileOffset(projectile);
-            sp.level().addFreshEntity(projectile);
-            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            boolean cast = com.example.immortal_cultivation_mod.spell.CultivatorSpellExecution
+                    .slidingWater(sp, null, chargeScale, ModPayloadsHandler::applyComboProjectileOffset);
+            if (cast) com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            return cast;
         }
 
         private static void castAbsorbCultivation(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
@@ -1675,6 +3012,8 @@ public class ModPayloads {
             }
 
             long progressGain = consumedBlocks * 10L;
+            var damageSource = new net.minecraft.world.damagesource.DamageSource(
+                    sp.damageSources().magic().typeHolder(), sp, sp, centerVec);
             var targets = serverLevel.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class,
                     new net.minecraft.world.phys.AABB(centerVec, centerVec).inflate(radius),
                     entity -> entity.isAlive() && !entity.getUUID().equals(sp.getUUID()));
@@ -1683,7 +3022,7 @@ public class ModPayloads {
                     continue;
                 }
                 float maxHealth = target.getMaxHealth();
-                target.hurt(sp.damageSources().magic(), 100.0F);
+                target.hurt(damageSource, 100.0F);
                 serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.WITCH,
                         target.getX(), target.getY() + target.getBbHeight() * 0.5D, target.getZ(),
                         24, 0.35D, 0.35D, 0.35D, 0.08D);
@@ -1704,16 +3043,15 @@ public class ModPayloads {
             com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
         }
 
-        private static void castDingshen(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
+        private static boolean castDingshen(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
             if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, chargedCost(spell.qiCost(), chargeScale))) {
                 sendNotEnoughQi(sp);
-                return;
+                return false;
             }
-            var projectile = new com.example.immortal_cultivation_mod.entity.DingshenProjectileEntity(sp.level(), sp);
-            projectile.shootFromRotation(sp, sp.getXRot(), sp.getYRot(), 0, 1.9f, 0.0f);
-            applyComboProjectileOffset(projectile);
-            sp.level().addFreshEntity(projectile);
-            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            boolean cast = com.example.immortal_cultivation_mod.spell.CultivatorSpellExecution
+                    .dingshen(sp, null, chargeScale, ModPayloadsHandler::applyComboProjectileOffset);
+            if (cast) com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            return cast;
         }
 
         private static void castKongshiShu(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
@@ -1728,20 +3066,15 @@ public class ModPayloads {
             com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
         }
 
-        private static void castLightning(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, boolean greater, float chargeScale) {
+        private static boolean castLightning(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, boolean greater, float chargeScale) {
             if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, chargedCost(spell.qiCost(), chargeScale))) {
                 sendNotEnoughQi(sp);
-                return;
+                return false;
             }
-            var projectile = new com.example.immortal_cultivation_mod.entity.LightningProjectileEntity(sp.level(), sp, greater);
-            projectile.setChargeScale(chargedAreaScale(chargeScale));
-            projectile.shootFromRotation(sp, sp.getXRot(), sp.getYRot(), 0.0F, greater ? 3.2F : 2.4F, greater ? 0.2F : 0.4F);
-            applyComboProjectileOffset(projectile);
-            sp.level().addFreshEntity(projectile);
-            if (sp.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-                com.example.immortal_cultivation_mod.entity.SpellImpactParticles.lightning(serverLevel, sp.getEyePosition().add(sp.getLookAngle().scale(0.9D)));
-            }
-            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            boolean cast = com.example.immortal_cultivation_mod.spell.CultivatorSpellExecution
+                    .lightning(sp, null, greater, chargeScale, ModPayloadsHandler::applyComboProjectileOffset);
+            if (cast) com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            return cast;
         }
 
         private static boolean castLiuguangJianying(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
@@ -1749,9 +3082,10 @@ public class ModPayloads {
                 sendNotEnoughQi(sp);
                 return false;
             }
-            com.example.immortal_cultivation_mod.spell.LiuguangJianying.cast(sp, chargeScale);
-            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
-            return true;
+            boolean cast = com.example.immortal_cultivation_mod.spell.CultivatorSpellExecution
+                    .liuguangJianying(sp, chargeScale);
+            if (cast) com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            return cast;
         }
 
         private static boolean castYihenCi(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
@@ -1767,51 +3101,110 @@ public class ModPayloads {
             return true;
         }
 
-        private static void castZhenshanPalm(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
+        private static boolean castSuokongShu(ServerPlayer sp, ModAttachments.CultivationData data, float chargeScale) {
+            int cost = chargedCost(suokongQiCost(data), chargeScale);
+            if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, cost)) {
+                sendNotEnoughQi(sp);
+                return false;
+            }
+            var projectile = new com.example.immortal_cultivation_mod.entity.SuokongProjectileEntity(sp.level(), sp);
+            projectile.shootFromRotation(sp, sp.getXRot(), sp.getYRot(), 0.0F, 2.2F, 0.0F);
+            applyComboProjectileOffset(projectile);
+            sp.level().addFreshEntity(projectile);
+            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            return true;
+        }
+
+        private static int suokongQiCost(ModAttachments.CultivationData data) {
+            String realm = CultivationLevels.getLevelDef(data.cultivationLevel()).realm();
+            if (CultivationLevels.REALM_JINDAN.equals(realm)
+                    || CultivationLevels.REALM_YUANYING.equals(realm)
+                    || CultivationLevels.REALM_HUASHEN.equals(realm)
+                    || CultivationLevels.REALM_LIANXU.equals(realm)
+                    || CultivationLevels.REALM_HETI.equals(realm)
+                    || CultivationLevels.REALM_DACHENG.equals(realm)
+                    || CultivationLevels.REALM_DUJIE.equals(realm)) {
+                return 2000;
+            }
+            return CultivationLevels.REALM_ZHUJI.equals(realm) ? 700 : 100;
+        }
+
+        private static boolean castJinhuoXinliao(ServerPlayer sp, ModAttachments.CultivationData data,
+                                                  ModSpells.SpellDef spell, float chargeScale) {
+            LivingEntity target = sp.getLastHurtByMob();
+            if (target == null || !target.isAlive() || target.level() != sp.level()) {
+                target = null;
+            }
+            if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(
+                    sp, data, chargedCost(spell.qiCost(), chargeScale))) {
+                sendNotEnoughQi(sp);
+                return false;
+            }
+            boolean cast = com.example.immortal_cultivation_mod.spell.CultivatorSpellExecution
+                    .jinhuoXinliao(sp, target, chargeScale, ModPayloadsHandler::applyComboProjectileOffset);
+            if (cast) com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            return cast;
+        }
+
+        private static boolean castSuiguiXingyun(ServerPlayer sp, ModAttachments.CultivationData data,
+                                                  ModSpells.SpellDef spell, float chargeScale) {
+            if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(
+                    sp, data, chargedCost(spell.qiCost(), chargeScale))) {
+                sendNotEnoughQi(sp);
+                return false;
+            }
+            boolean cast = com.example.immortal_cultivation_mod.spell.SuiguiXingyun.cast(sp, chargeScale);
+            if (cast) {
+                com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            }
+            return cast;
+        }
+
+        private static boolean castZhenshanPalm(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
             if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, chargedCost(spell.qiCost(), chargeScale))) {
                 sendNotEnoughQi(sp);
-                return;
+                return false;
             }
-            var palm = new com.example.immortal_cultivation_mod.entity.ZhenshanPalmEntity(sp.level(), sp, chargedAreaScale(chargeScale));
-            applyComboProjectileOffset(palm);
-            sp.level().addFreshEntity(palm);
-            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            boolean cast = com.example.immortal_cultivation_mod.spell.CultivatorSpellExecution
+                    .zhenshanPalm(sp, chargeScale, ModPayloadsHandler::applyComboProjectileOffset);
+            if (cast) com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            return cast;
         }
 
-        private static void castCleanse(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
+        private static boolean castCleanse(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
+            if (sp.getActiveEffects().stream().noneMatch(effect ->
+                    effect.getEffect().value().getCategory() == net.minecraft.world.effect.MobEffectCategory.HARMFUL)) {
+                return false;
+            }
             if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, spell.qiCost())) {
                 sendNotEnoughQi(sp);
-                return;
+                return false;
             }
-            var harmful = sp.getActiveEffects().stream()
-                    .filter(effect -> effect.getEffect().value().getCategory() == net.minecraft.world.effect.MobEffectCategory.HARMFUL)
-                    .map(MobEffectInstance::getEffect)
-                    .toList();
-            for (var effect : harmful) {
-                sp.removeEffect(effect);
-            }
-            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            boolean cast = com.example.immortal_cultivation_mod.spell.CultivatorSpellExecution.applyCleanse(sp);
+            if (cast) com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            return cast;
         }
 
-        private static void castQiGathering(ServerPlayer sp) {
-            sp.addEffect(new MobEffectInstance(ModEffects.QI_GATHERING, MobEffectInstance.INFINITE_DURATION, 0, false, false, true));
+        private static boolean castQiGathering(ServerPlayer sp) {
+            if (!com.example.immortal_cultivation_mod.spell.CultivatorSpellExecution.applyQiGathering(sp)) {
+                return false;
+            }
             if (sp.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
                 PhotonEffects.meditatingStart(serverLevel, sp);
             }
             com.example.immortal_cultivation_mod.event.ServerEvents.startQiGathering(sp);
+            return true;
         }
 
-        private static void castIgniteFlare(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
+        private static boolean castIgniteFlare(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
             if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, chargedCost(spell.qiCost(), chargeScale))) {
                 sendNotEnoughQi(sp);
-                return;
+                return false;
             }
-            var projectile = new com.example.immortal_cultivation_mod.entity.IgniteFlareProjectileEntity(sp.level(), sp);
-            projectile.getPersistentData().putFloat("ChargeScale", chargedAreaScale(chargeScale));
-            projectile.shootFromRotation(sp, sp.getXRot(), sp.getYRot(), 0, 1.8f, 0.0f);
-            applyComboProjectileOffset(projectile);
-            sp.level().addFreshEntity(projectile);
-            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            boolean cast = com.example.immortal_cultivation_mod.spell.CultivatorSpellExecution
+                    .igniteFlare(sp, null, chargeScale, ModPayloadsHandler::applyComboProjectileOffset);
+            if (cast) com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            return cast;
         }
 
         private static void castEarthEscape(ServerPlayer sp, ModAttachments.CultivationData data) {
@@ -1829,21 +3222,18 @@ public class ModPayloads {
             sp.setNoGravity(true);
         }
 
-        private static void castLingbeng(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
+        private static boolean castLingbeng(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
             if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, spell.qiCost())) {
                 sendNotEnoughQi(sp);
-                return;
+                return false;
             }
             data = ModAttachments.getData(sp);
-            var current = sp.getEffect(ModEffects.LINGBENG);
-            int amplifier = current == null ? 0 : Math.min(9, current.getAmplifier() + 1);
             int duration = SpiritRoots.effectDuration(data, spell, 20 * (45 + data.mentalAttack()));
-            if (current != null) {
-                duration += current.getDuration();
-            }
-            sp.addEffect(new MobEffectInstance(ModEffects.LINGBENG, duration, amplifier, false, false, true));
+            boolean cast = com.example.immortal_cultivation_mod.spell.CultivatorSpellExecution
+                    .applyLingbeng(sp, duration);
             sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".lingbeng_active"));
             com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            return cast;
         }
 
         private static void castBeam(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
@@ -1859,30 +3249,28 @@ public class ModPayloads {
         }
 
         private static boolean castRegeneration(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
+            if (sp.getHealth() >= sp.getMaxHealth()) {
+                return false;
+            }
             if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, spell.qiCost())) {
                 sendNotEnoughQi(sp);
                 return false;
             }
-            sp.addEffect(new MobEffectInstance(MobEffects.HEAL, 20 * 1, 0));
-            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
-            return true;
+            boolean cast = com.example.immortal_cultivation_mod.spell.CultivatorSpellExecution
+                    .applyRegeneration(sp);
+            if (cast) com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            return cast;
         }
 
-        private static void castFireball(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
+        private static boolean castFireball(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
             if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendQiOrBlood(sp, data, chargedCost(spell.qiCost(), chargeScale))) {
                 sendNotEnoughQi(sp);
-                return;
+                return false;
             }
-            var projectile = new com.example.immortal_cultivation_mod.entity.FireballProjectileEntity(sp.level(), sp);
-            projectile.setChargeScale(chargedAreaScale(chargeScale));
-            projectile.shootFromRotation(sp, sp.getXRot(), sp.getYRot(), 0, 1.5f, 1.0f);
-            applyComboProjectileOffset(projectile);
-            sp.level().addFreshEntity(projectile);
-            PhotonEffects.fireballProjectile(projectile);
-            sp.level().playSound(null, sp.getX(), sp.getY(), sp.getZ(),
-                    com.example.immortal_cultivation_mod.sound.ModSounds.FIREBALL_CAST.get(),
-                    net.minecraft.sounds.SoundSource.PLAYERS, 1.0f, 1.0f);
-            com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            boolean cast = com.example.immortal_cultivation_mod.spell.CultivatorSpellExecution
+                    .fireball(sp, null, chargeScale, ModPayloadsHandler::applyComboProjectileOffset);
+            if (cast) com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            return cast;
         }
 
         private static void castFrostCry(ServerPlayer sp, ModAttachments.CultivationData data, float chargeScale) {
@@ -1917,6 +3305,44 @@ public class ModPayloads {
                     if (!com.example.immortal_cultivation_mod.item.CorpseControlToolCycler.cycle(sp)) {
                         com.example.immortal_cultivation_mod.item.QiInfusedWeapon.inject(sp);
                     }
+                }
+            });
+        }
+
+        private static void handleSetAutoChannelQiOnServer(ServerboundSetAutoChannelQiPayload payload, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                if (ctx.player() instanceof ServerPlayer sp) {
+                    com.example.immortal_cultivation_mod.item.QiInfusedWeapon.setAutoChannel(sp, payload.enabled());
+                }
+            });
+        }
+
+        private static void handleSetFormationPlatePaymentOrderOnServer(
+                ServerboundSetFormationPlatePaymentOrderPayload payload, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                if (ctx.player() instanceof ServerPlayer sp) {
+                    com.example.immortal_cultivation_mod.magicritual.item.custom.ZhenpanItem
+                            .setQiFirst(sp, payload.qiFirst());
+                }
+            });
+        }
+
+        private static void handleSetJindanFlightOnServer(
+                ServerboundSetJindanFlightPayload payload, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                if (ctx.player() instanceof ServerPlayer sp) {
+                    com.example.immortal_cultivation_mod.spell.JindanCreativeFlight.setEnabled(
+                            sp, payload.enabled());
+                }
+            });
+        }
+
+        private static void handleAdjustJindanFlightSpeedOnServer(
+                ServerboundAdjustJindanFlightSpeedPayload payload, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                if (ctx.player() instanceof ServerPlayer sp) {
+                    com.example.immortal_cultivation_mod.spell.JindanCreativeFlight.adjustSpeed(
+                            sp, payload.steps());
                 }
             });
         }

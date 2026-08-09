@@ -1,0 +1,20 @@
+{
+  "name": "灵石矿石地图",
+  "icon": "immortal_cultivation_mod:spirit_map",
+  "category": "immortal_cultivation_mod:spirit_resources",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "immortal_cultivation_mod:spirit_map",
+      "text": "$(item)灵石矿石地图$()是一种可以显示附近灵脉核心位置的地图。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)使用方法：$()$(br)$(li)右键创建或打开地图$(li)灵脉核心会显示为红色标记"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "你也可以使用$(bold)/locate poi immortal_cultivation_mod:$(br)spirit_vein_center$()命令快速定位最近的灵脉核心。灵石矿石地图非常适合同时寻找多个矿脉并规划基地。"
+    }
+  ]
+}

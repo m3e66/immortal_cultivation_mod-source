@@ -1,0 +1,33 @@
+{
+  "name": "Success and Backlash",
+  "icon": "minecraft:fire_charge",
+  "category": "immortal_cultivation_mod:principles",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Success",
+      "text": "Success occurs when every node simultaneously matches its target. The formation flashes and every selected restriction is written into the weapon. No selected layer is applied early."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Withdrawing",
+      "text": "Pressing Withdraw, closing the abacus, or moving more than 8 blocks from the table immediately resolves failure from the current mismatch. Running out of limited moves before solving also fails."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Minor and Major Failure",
+      "text": "Below 20% mismatch: lose 150 Qi and 1 spirit stone.$(br2)Below 48%: lose 600 Qi and 2 stones, take nonlethal damage equal to 5% max health, and damage the artifact by 3% max durability."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Severe Backlash",
+      "text": "At 48% mismatch or higher: lose 1200 Qi and 3 stones, take nonlethal damage equal to 15% max health, and damage the artifact by 10% max durability. Beyond layer 72, this has a 20% chance to tear away one old layer."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Mismatch",
+      "text": "Mismatch is the total distance between every current and target value, normalized by node count and the maximum value of 6. Bringing more beads near their targets before withdrawing reduces the consequence."
+    }
+  ]
+}

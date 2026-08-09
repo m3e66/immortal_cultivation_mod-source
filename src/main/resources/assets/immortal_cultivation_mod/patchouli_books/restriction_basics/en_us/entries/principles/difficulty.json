@@ -1,0 +1,33 @@
+{
+  "name": "Difficulty Growth",
+  "icon": "immortal_cultivation_mod:restriction_table",
+  "category": "immortal_cultivation_mod:principles",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Layers 1-9",
+      "text": "The first nine layers use independent paths. Layer 1 normally has only 3 beads and about 2 scramble moves. The scramble gains roughly one move every 5 total layers without sudden tier-boundary spikes."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Layers 10-36",
+      "text": "The first linked path appears at layer 10. Roughly one node and one path are added every 10 layers afterward. This stage contains no locked, unstable, or hidden nodes."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Layers 37-72",
+      "text": "Complexity keeps rising gradually. Locked nodes begin at layer 46, unstable nodes at layer 55, and a second locked node at layer 64. Layer 72 still reveals every target."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Beyond Layer 72",
+      "text": "At total layer 73, hidden targets and limited moves begin. Hidden nodes grow about every 36 layers, unstable nodes every 24, and locks every 18. Instability also accelerates gradually to a minimum interval of 4 moves."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Carving in Batches",
+      "text": "Selecting many layers makes one puzzle harder: roughly every 8 additional selected layers adds a scramble move, up to 10, while selections reaching 25 and 49 layers add one node each. Batches save time but raise single-attempt risk."
+    }
+  ]
+}

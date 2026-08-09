@@ -1,0 +1,30 @@
+{
+  "id": "immortal_cultivation_mod:severe_illness",
+  "minimum_age": 2,
+  "maximum_age": 120,
+  "weight": 7,
+  "conditions": ["alive", "!flag:survived_serious_illness"],
+  "text_key": "life.immortal_cultivation_mod.event.severe_illness",
+  "effects": ["health-12"],
+  "choices": [
+    {
+      "id": "medicine",
+      "text_key": "life.immortal_cultivation_mod.choice.illness_medicine",
+      "result_key": "life.immortal_cultivation_mod.result.illness_medicine",
+      "effects": ["wealth-80", "health+16", "set_flag:survived_serious_illness"]
+    },
+    {
+      "id": "self_treat",
+      "text_key": "life.immortal_cultivation_mod.choice.illness_self_treat",
+      "result_key": "life.immortal_cultivation_mod.result.illness_self_treat",
+      "conditions": ["medical>=15"],
+      "effects": ["health+12", "medical+4", "set_flag:survived_serious_illness"]
+    },
+    {
+      "id": "endure",
+      "text_key": "life.immortal_cultivation_mod.choice.illness_endure",
+      "result_key": "life.immortal_cultivation_mod.result.illness_endure",
+      "effects": ["health-10", "mentality-6", "set_flag:survived_serious_illness"]
+    }
+  ]
+}

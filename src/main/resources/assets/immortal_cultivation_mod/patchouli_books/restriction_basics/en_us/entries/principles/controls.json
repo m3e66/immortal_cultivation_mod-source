@@ -1,0 +1,28 @@
+{
+  "name": "Controls and Qi",
+  "icon": "immortal_cultivation_mod:qi_pouch",
+  "category": "immortal_cultivation_mod:principles",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Selecting Beads",
+      "text": "Click a row to select its node. Click left of its bead or press < to move it left; click right or press > to move it right. W/S or Up/Down selects rows, while A/D or Left/Right moves the bead."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Qi Values",
+      "text": "Every bead ranges from 0 to 6 Qi. A golden diamond marks the node's target. The formation completes automatically when every node reaches its target, engraving all selected restrictions."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Invalid Movement",
+      "text": "One move may affect several linked nodes. If any affected node would fall below 0 or rise above 6, the entire move is rejected without changing the formation or consuming Qi."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Movement Cost",
+      "text": "Each valid bead movement costs 300 Qi. If personal Qi is insufficient, spirit stones in the inventory are consumed automatically. The movement is rejected if their combined value is still insufficient."
+    }
+  ]
+}

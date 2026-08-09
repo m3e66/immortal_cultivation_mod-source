@@ -1,0 +1,6 @@
+{
+  "name": "阵眼",
+  "description": "阵法的核心，用于提供燃料、控制符文，并管理作用范围。",
+  "icon": "immortal_cultivation_mod:magic_center_block",
+  "sortnum": 1
+}

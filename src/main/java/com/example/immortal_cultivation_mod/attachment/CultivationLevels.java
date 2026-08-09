@@ -19,9 +19,10 @@ public class CultivationLevels {
     public static final String STAGE_MID = "\u4e2d\u671f";
     public static final String STAGE_LATE = "\u540e\u671f";
 
-    public static final LevelDef LEVEL_MORTAL = new LevelDef(REALM_MORTAL, "", 20, 100, 20, 10L);
+    public static final LevelDef LEVEL_MORTAL = new LevelDef(REALM_MORTAL, "", 20, 100, 20, 0.0D, 10L);
 
-    public record StageDef(String stage, int maxHp, int maxAge, int maxQi, long qiNeeded, float breakthroughFailMultiplier) {}
+    public record StageDef(String stage, int maxHp, int maxAge, int maxQi, double armor,
+                           long qiNeeded, float breakthroughFailMultiplier) {}
 
     public record RealmDef(String realm, List<StageDef> stages) {
         public StageDef getStage(String stage) {
@@ -29,53 +30,54 @@ public class CultivationLevels {
         }
     }
 
-    public record LevelDef(String realm, String stage, int maxHp, int maxAge, int maxQi, long qiNeeded) {}
+    public record LevelDef(String realm, String stage, int maxHp, int maxAge, int maxQi,
+                           double armor, long qiNeeded) {}
 
     private static final Map<String, RealmDef> REALMS = Map.of(
             REALM_LIANQI, new RealmDef(REALM_LIANQI, List.of(
-                    new StageDef(STAGE_EARLY, 50, 105, 50, 100L, 0.01f),
-                    new StageDef(STAGE_MID, 80, 115, 120, 800L, 0.01f),
-                    new StageDef(STAGE_LATE, 120, 130, 250, 2500L, 0.01f)
+                    new StageDef(STAGE_EARLY, 50, 105, 50, 1.0D, 100L, 0.01f),
+                    new StageDef(STAGE_MID, 80, 115, 120, 1.5D, 800L, 0.01f),
+                    new StageDef(STAGE_LATE, 120, 130, 250, 2.5D, 2500L, 0.01f)
             )),
             REALM_ZHUJI, new RealmDef(REALM_ZHUJI, List.of(
-                    new StageDef(STAGE_EARLY, 250, 180, 500, 8000L, 0.01f),
-                    new StageDef(STAGE_MID, 400, 230, 900, 25000L, 0.01f),
-                    new StageDef(STAGE_LATE, 700, 300, 1500, 80000L, 0.01f)
+                    new StageDef(STAGE_EARLY, 250, 180, 500, 5.0D, 8000L, 0.01f),
+                    new StageDef(STAGE_MID, 400, 230, 900, 8.0D, 25000L, 0.01f),
+                    new StageDef(STAGE_LATE, 700, 300, 1500, 14.0D, 80000L, 0.01f)
             )),
             REALM_JINDAN, new RealmDef(REALM_JINDAN, List.of(
-                    new StageDef(STAGE_EARLY, 1500, 500, 3000, 200000L, 0.01f),
-                    new StageDef(STAGE_MID, 2500, 700, 5000, 600000L, 0.01f),
-                    new StageDef(STAGE_LATE, 4000, 1000, 8000, 2000000L, 0.01f)
+                    new StageDef(STAGE_EARLY, 1500, 500, 3000, 30.0D, 200000L, 0.01f),
+                    new StageDef(STAGE_MID, 2500, 700, 5000, 50.0D, 600000L, 0.01f),
+                    new StageDef(STAGE_LATE, 4000, 1000, 8000, 80.0D, 2000000L, 0.01f)
             )),
             REALM_YUANYING, new RealmDef(REALM_YUANYING, List.of(
-                    new StageDef(STAGE_EARLY, 8000, 2000, 15000, 5000000L, 0.01f),
-                    new StageDef(STAGE_MID, 13000, 3000, 25000, 15000000L, 0.01f),
-                    new StageDef(STAGE_LATE, 22000, 4500, 40000, 50000000L, 0.01f)
+                    new StageDef(STAGE_EARLY, 8000, 2000, 15000, 160.0D, 5000000L, 0.01f),
+                    new StageDef(STAGE_MID, 13000, 3000, 25000, 260.0D, 15000000L, 0.01f),
+                    new StageDef(STAGE_LATE, 22000, 4500, 40000, 440.0D, 50000000L, 0.01f)
             )),
             REALM_HUASHEN, new RealmDef(REALM_HUASHEN, List.of(
-                    new StageDef(STAGE_EARLY, 50000, 8000, 100000, 120000000L, 0.01f),
-                    new StageDef(STAGE_MID, 80000, 12000, 160000, 400000000L, 0.01f),
-                    new StageDef(STAGE_LATE, 130000, 18000, 250000, 1200000000L, 0.01f)
+                    new StageDef(STAGE_EARLY, 50000, 8000, 100000, 1_000.0D, 120000000L, 0.01f),
+                    new StageDef(STAGE_MID, 80000, 12000, 160000, 1_600.0D, 400000000L, 0.01f),
+                    new StageDef(STAGE_LATE, 130000, 18000, 250000, 2_600.0D, 1200000000L, 0.01f)
             )),
             REALM_LIANXU, new RealmDef(REALM_LIANXU, List.of(
-                    new StageDef(STAGE_EARLY, 300000, 30000, 600000, 3000000000L, 0.01f),
-                    new StageDef(STAGE_MID, 500000, 50000, 1000000, 9000000000L, 0.01f),
-                    new StageDef(STAGE_LATE, 800000, 80000, 1600000, 30000000000L, 0.01f)
+                    new StageDef(STAGE_EARLY, 300000, 30000, 600000, 6_000.0D, 3000000000L, 0.01f),
+                    new StageDef(STAGE_MID, 500000, 50000, 1000000, 10_000.0D, 9000000000L, 0.01f),
+                    new StageDef(STAGE_LATE, 800000, 80000, 1600000, 16_000.0D, 30000000000L, 0.01f)
             )),
             REALM_HETI, new RealmDef(REALM_HETI, List.of(
-                    new StageDef(STAGE_EARLY, 2000000, 150000, 4000000, 80000000000L, 0.01f),
-                    new StageDef(STAGE_MID, 3500000, 250000, 7000000, 250000000000L, 0.01f),
-                    new StageDef(STAGE_LATE, 6000000, 400000, 12000000, 800000000000L, 0.01f)
+                    new StageDef(STAGE_EARLY, 2000000, 150000, 4000000, 40_000.0D, 80000000000L, 0.01f),
+                    new StageDef(STAGE_MID, 3500000, 250000, 7000000, 70_000.0D, 250000000000L, 0.01f),
+                    new StageDef(STAGE_LATE, 6000000, 400000, 12000000, 120_000.0D, 800000000000L, 0.01f)
             )),
             REALM_DACHENG, new RealmDef(REALM_DACHENG, List.of(
-                    new StageDef(STAGE_EARLY, 15000000, 1000000, 30000000, 2000000000000L, 0.01f),
-                    new StageDef(STAGE_MID, 25000000, 1800000, 50000000, 7000000000000L, 0.01f),
-                    new StageDef(STAGE_LATE, 40000000, 3000000, 80000000, 25000000000000L, 0.01f)
+                    new StageDef(STAGE_EARLY, 15000000, 1000000, 30000000, 300_000.0D, 2000000000000L, 0.01f),
+                    new StageDef(STAGE_MID, 25000000, 1800000, 50000000, 500_000.0D, 7000000000000L, 0.01f),
+                    new StageDef(STAGE_LATE, 40000000, 3000000, 80000000, 800_000.0D, 25000000000000L, 0.01f)
             )),
             REALM_DUJIE, new RealmDef(REALM_DUJIE, List.of(
-                    new StageDef(STAGE_EARLY, 100000000, 10000000, 200000000, 100000000000000L, 0.01f),
-                    new StageDef(STAGE_MID, 180000000, 30000000, 350000000, 500000000000000L, 0.01f),
-                    new StageDef(STAGE_LATE, 300000000, 100000000, 600000000, 2000000000000000L, 0.01f)
+                    new StageDef(STAGE_EARLY, 100000000, 10000000, 200000000, 2_000_000.0D, 100000000000000L, 0.01f),
+                    new StageDef(STAGE_MID, 180000000, 30000000, 350000000, 3_600_000.0D, 500000000000000L, 0.01f),
+                    new StageDef(STAGE_LATE, 300000000, 100000000, 600000000, 6_000_000.0D, 2000000000000000L, 0.01f)
             ))
     );
 
@@ -95,7 +97,8 @@ public class CultivationLevels {
             for (var stage : entry.getValue().stages()) {
                 String fullName = entry.getKey() + stage.stage();
                 if (fullName.equals(cultivationLevel)) {
-                    return new LevelDef(entry.getKey(), stage.stage(), stage.maxHp(), stage.maxAge(), stage.maxQi(), stage.qiNeeded());
+                    return new LevelDef(entry.getKey(), stage.stage(), stage.maxHp(), stage.maxAge(),
+                            stage.maxQi(), stage.armor(), stage.qiNeeded());
                 }
             }
         }

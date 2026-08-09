@@ -1,0 +1,34 @@
+{
+  "name": "Carving Basics",
+  "icon": "immortal_cultivation_mod:restriction_table",
+  "category": "immortal_cultivation_mod:principles",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "immortal_cultivation_mod:restriction_table",
+      "title": "Restriction Table",
+      "text": "The table engraves restrictions into any item recognized by the system as a weapon. Place the weapon in the central slot, then select the restrictions to carve."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Selecting Layers",
+      "text": "Left-click a sigil to add one layer and right-click to remove one. Hold Shift to change ten at once. Different restriction types may be mixed, but the total cannot exceed the tier's remaining capacity."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Begin Carving",
+      "text": "Select at least one layer and press Carve to enter the Ling Shu Abacus. Every selected layer is applied together only after the formation is solved. Failure grants none of the selected layers."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Seventy-Two Layers",
+      "text": "Each artifact tier holds 72 layers. At 72, Evolve merges those restrictions into the artifact. They stop appearing individually but remain effective; current progress resets and the artifact advances one tier."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Artifact Tiers",
+      "text": "The tiers are Mortal Weapon, Spiritual Weapon, Treasure Weapon, Magic Treasure, Profound Treasure, Spirit Treasure, Dao Treasure, and Immortal Weapon. Immortal Weapon is currently the maximum."
+    }
+  ]
+}

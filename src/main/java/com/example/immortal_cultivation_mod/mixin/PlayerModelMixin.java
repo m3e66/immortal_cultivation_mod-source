@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod.mixin;
 
 import com.example.immortal_cultivation_mod.client.ClientData;
+import com.example.immortal_cultivation_mod.spell.JindanCreativeFlight;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -33,6 +34,12 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
                 resetDefaultPlayerPose();
                 immortalCultivation$poseApplied = false;
             }
+            return;
+        }
+
+        if (JindanCreativeFlight.shouldUseElytraPose(player)) {
+            immortalCultivation$poseApplied = true;
+            applyJindanFastFlightPose(netHeadYaw);
             return;
         }
 
@@ -98,6 +105,60 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
         leftLeg.xRot = -2.0F;
         leftLeg.yRot = 0.0F;
         leftLeg.zRot = -1.42F;
+
+        jacket.copyFrom(body);
+        rightSleeve.copyFrom(rightArm);
+        leftSleeve.copyFrom(leftArm);
+        rightPants.copyFrom(rightLeg);
+        leftPants.copyFrom(leftLeg);
+    }
+
+    private void applyJindanFastFlightPose(float netHeadYaw) {
+        crouching = false;
+        float yaw = netHeadYaw * ((float) Math.PI / 180.0F);
+
+        body.x = 0.0F;
+        body.y = 0.0F;
+        body.z = 0.0F;
+        body.xRot = 0.0F;
+        body.yRot = 0.0F;
+        body.zRot = 0.0F;
+
+        head.x = 0.0F;
+        head.y = 0.0F;
+        head.z = 0.0F;
+        head.xRot = -((float) Math.PI / 4.0F);
+        head.yRot = yaw;
+        head.zRot = 0.0F;
+        hat.copyFrom(head);
+
+        rightArm.x = -5.0F;
+        rightArm.y = 2.0F;
+        rightArm.z = 0.0F;
+        rightArm.xRot = -0.35F;
+        rightArm.yRot = 0.0F;
+        rightArm.zRot = 0.10F;
+
+        leftArm.x = 5.0F;
+        leftArm.y = 2.0F;
+        leftArm.z = 0.0F;
+        leftArm.xRot = -0.35F;
+        leftArm.yRot = 0.0F;
+        leftArm.zRot = -0.10F;
+
+        rightLeg.x = -1.9F;
+        rightLeg.y = 12.0F;
+        rightLeg.z = 0.0F;
+        rightLeg.xRot = 0.10F;
+        rightLeg.yRot = 0.0F;
+        rightLeg.zRot = 0.02F;
+
+        leftLeg.x = 1.9F;
+        leftLeg.y = 12.0F;
+        leftLeg.z = 0.0F;
+        leftLeg.xRot = -0.10F;
+        leftLeg.yRot = 0.0F;
+        leftLeg.zRot = -0.02F;
 
         jacket.copyFrom(body);
         rightSleeve.copyFrom(rightArm);

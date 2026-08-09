@@ -16,6 +16,8 @@ public final class BodyTypes {
     public static final String ICE_BODY = "\u51b0\u7075\u4f53";
     public static final String LIGHT_BODY = "\u5149\u7075\u4f53";
     public static final String DARK_BODY = "\u6697\u7075\u4f53";
+    public static final String VOID_BODY = "\u865a\u7a7a\u4f53";
+    public static final String OUTER_DEMON_BODY = "\u5929\u5916\u4e4b\u9b54";
 
     public static final List<String> VALUES = List.of(
             MORTAL_BODY,
@@ -28,7 +30,9 @@ public final class BodyTypes {
             WIND_BODY,
             ICE_BODY,
             LIGHT_BODY,
-            DARK_BODY
+            DARK_BODY,
+            VOID_BODY,
+            OUTER_DEMON_BODY
     );
 
     private BodyTypes() {

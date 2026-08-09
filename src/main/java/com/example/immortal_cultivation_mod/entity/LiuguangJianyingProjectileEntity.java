@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod.entity;
 
 import com.example.immortal_cultivation_mod.effect.PhotonEffects;
+import com.example.immortal_cultivation_mod.magicritual.center.behavior.ForcefieldCenterBehavior;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -38,6 +39,7 @@ public class LiuguangJianyingProjectileEntity extends ThrowableItemProjectile {
 
     public LiuguangJianyingProjectileEntity(Level level, LivingEntity shooter) {
         super(ModEntities.LIUGUANG_JIANYING_PROJECTILE.get(), shooter, level);
+        NpcProfile.markNpcOwnedEffect(this, shooter);
         setNoGravity(true);
         lastRedirectPos = position();
     }
@@ -50,6 +52,14 @@ public class LiuguangJianyingProjectileEntity extends ThrowableItemProjectile {
     @Override
     public void tick() {
         setNoGravity(true);
+        if (!level().isClientSide) {
+            Entity owner = getOwner();
+            NpcProfile.markNpcOwnedEffect(this, owner);
+            if (NpcProfile.isOrphanedNpcEffect(this, owner)) {
+                discardProjectile();
+                return;
+            }
+        }
         baseTick();
         lifeTicks++;
         if (lastRedirectPos == Vec3.ZERO) {
@@ -95,6 +105,11 @@ public class LiuguangJianyingProjectileEntity extends ThrowableItemProjectile {
             if (entityDist <= blockDist) {
                 hit = entityHit;
             }
+        }
+        Vec3 interceptionPoint = hit.getType() == HitResult.Type.MISS
+                ? end : hit.getLocation();
+        if (ForcefieldCenterBehavior.interceptProjectileImpact(this, interceptionPoint)) {
+            return;
         }
         if (hit.getType() != HitResult.Type.MISS) {
             setPos(hit.getLocation().x, hit.getLocation().y, hit.getLocation().z);
@@ -143,7 +158,7 @@ public class LiuguangJianyingProjectileEntity extends ThrowableItemProjectile {
     }
 
     private void hitEntity(EntityHitResult result) {
-        Entity target = result.getEntity();
+        Entity target = ModelBonePartEntity.resolveParent(result.getEntity());
         Entity owner = getOwner();
         if (owner == null || !target.getUUID().equals(owner.getUUID())) {
             target.hurt(damageSources().thrown(this, owner), DAMAGE);
@@ -154,7 +169,10 @@ public class LiuguangJianyingProjectileEntity extends ThrowableItemProjectile {
     @Override
     protected boolean canHitEntity(Entity entity) {
         Entity owner = getOwner();
-        return (owner == null || !entity.getUUID().equals(owner.getUUID())) && super.canHitEntity(entity);
+        Entity target = ModelBonePartEntity.resolveParent(entity);
+        return (owner == null || !target.getUUID().equals(owner.getUUID()))
+                && NpcProfile.canNpcEffectHit(this, owner, entity)
+                && super.canHitEntity(entity);
     }
 
     private void redirectRandom() {

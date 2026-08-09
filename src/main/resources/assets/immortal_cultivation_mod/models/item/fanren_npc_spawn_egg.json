@@ -1,6 +1,3 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "immortal_cultivation_mod:item/fanren_npc_spawn_egg"
-  }
+  "parent": "minecraft:item/template_spawn_egg"
 }

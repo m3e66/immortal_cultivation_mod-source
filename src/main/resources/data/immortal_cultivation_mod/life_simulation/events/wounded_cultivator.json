@@ -1,0 +1,35 @@
+{
+  "id": "immortal_cultivation_mod:wounded_cultivator",
+  "minimum_age": 12,
+  "maximum_age": 100,
+  "weight": 12,
+  "conditions": ["alive", "!flag:wounded_cultivator_resolved"],
+  "text_key": "life.immortal_cultivation_mod.event.wounded_cultivator",
+  "choices": [
+    {
+      "id": "heal",
+      "text_key": "life.immortal_cultivation_mod.choice.heal_elder",
+      "result_key": "life.immortal_cultivation_mod.result.heal_elder",
+      "conditions": ["medical>=20"],
+      "effects": ["reputation+5", "morality+6", "friend:benefactor", "set_flag:wounded_cultivator_resolved"]
+    },
+    {
+      "id": "steal",
+      "text_key": "life.immortal_cultivation_mod.choice.steal_manual",
+      "result_key": "life.immortal_cultivation_mod.result.steal_manual",
+      "effects": ["morality-12", "cultivation+900", "set_flag:wounded_cultivator_resolved", "set_flag:stole_elder_manual"]
+    },
+    {
+      "id": "report",
+      "text_key": "life.immortal_cultivation_mod.choice.report_sect",
+      "result_key": "life.immortal_cultivation_mod.result.report_sect",
+      "effects": ["reputation+4", "wealth+120", "set_flag:wounded_cultivator_resolved"]
+    },
+    {
+      "id": "leave",
+      "text_key": "life.immortal_cultivation_mod.choice.leave",
+      "result_key": "life.immortal_cultivation_mod.result.leave_elder",
+      "effects": ["set_flag:wounded_cultivator_resolved"]
+    }
+  ]
+}

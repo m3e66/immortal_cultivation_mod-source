@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "id": "immortal_cultivation_mod:noob_hat"
+    },
+    "title": {
+      "translate": "advancement.immortal_cultivation_mod.you_are_really_bad.title"
+    },
+    "description": {
+      "translate": "advancement.immortal_cultivation_mod.you_are_really_bad.description"
+    },
+    "frame": "task",
+    "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "died_ten_times": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

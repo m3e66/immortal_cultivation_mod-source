@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
@@ -24,6 +25,7 @@ public class IgniteFlareProjectileEntity extends ThrowableItemProjectile {
 
     public IgniteFlareProjectileEntity(Level level, LivingEntity shooter) {
         super(ModEntities.IGNITE_FLARE_PROJECTILE.get(), shooter, level);
+        NpcProfile.markNpcOwnedEffect(this, shooter);
         setNoGravity(true);
     }
 
@@ -35,6 +37,14 @@ public class IgniteFlareProjectileEntity extends ThrowableItemProjectile {
     @Override
     public void tick() {
         setNoGravity(true);
+        if (!level().isClientSide) {
+            Entity owner = getOwner();
+            NpcProfile.markNpcOwnedEffect(this, owner);
+            if (NpcProfile.isOrphanedNpcEffect(this, owner)) {
+                discard();
+                return;
+            }
+        }
         super.tick();
         if (level().isClientSide) {
             var movement = getDeltaMovement();
@@ -70,8 +80,13 @@ public class IgniteFlareProjectileEntity extends ThrowableItemProjectile {
     }
 
     @Override
+    protected boolean canHitEntity(Entity entity) {
+        return NpcProfile.canNpcEffectHit(this, getOwner(), entity) && super.canHitEntity(entity);
+    }
+
+    @Override
     protected void onHitEntity(EntityHitResult result) {
-        result.getEntity().igniteForSeconds(5);
+        ModelBonePartEntity.resolveParent(result.getEntity()).igniteForSeconds(5);
     }
 
     @Override

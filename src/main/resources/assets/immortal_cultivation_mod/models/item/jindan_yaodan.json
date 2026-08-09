@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "immortal_cultivation_mod:item/jindan_yaodan"
+  },
+  "display": {
+    "gui": {
+      "rotation": [0, 0, 0],
+      "scale": [1.35, 1.35, 0.1]
+    }
+  }
+}

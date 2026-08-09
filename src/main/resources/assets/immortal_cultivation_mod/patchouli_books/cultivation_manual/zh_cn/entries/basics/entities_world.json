@@ -1,6 +1,6 @@
 {
   "name": "生物与世界",
-  "icon": "immortal_cultivation_mod:gudiao_spawn_egg",
+  "icon": "immortal_cultivation_mod:zhuji_cultivator_spawn_egg",
   "category": "immortal_cultivation_mod:basics",
   "sortnum": 2,
   "pages": [
@@ -11,10 +11,6 @@
     {
       "type": "patchouli:text",
       "text": "$(br)金丹修士是中立的金丹前期修士。它会用引灵诀，25%血量使用强化回春术，远距离用震山掌，近距离用引雷诀，并用御风诀追击或逃跑。"
-    },
-    {
-      "type": "patchouli:text",
-      "text": "$(br)蛊雕是敌对的筑基后期妖兽。攻击时会产生巨大的爪痕形打击，逻辑类似震山掌。"
     },
     {
       "type": "patchouli:text",

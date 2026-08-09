@@ -24,7 +24,7 @@ public final class CorpseControlToolCycler {
                                  top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler waistStacks) {
         ItemStack hand = player.getMainHandItem();
         boolean handIsTool = isTool(hand);
-        if (!hand.isEmpty() && !handIsTool) {
+        if (!handIsTool) {
             return false;
         }
 

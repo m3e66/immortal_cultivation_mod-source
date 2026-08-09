@@ -1,0 +1,34 @@
+{
+  "name": "入门与篆刻",
+  "icon": "immortal_cultivation_mod:restriction_table",
+  "category": "immortal_cultivation_mod:principles",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "immortal_cultivation_mod:restriction_table",
+      "title": "禁制台",
+      "text": "禁制台可将禁制刻入任何被系统识别为武器的器物。把武器放入中央槽位，再选择本次要篆刻的禁制。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "选择禁制",
+      "text": "左键点击禁制符印增加一重，右键减少一重；按住 Shift 时每次增减十重。一次可混合选择多种禁制，但总数不能超过本品阶剩余容量。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "开始篆刻",
+      "text": "至少选择一重后点击“篆刻”，便会进入灵枢算盘。解开阵路后，本次选择的全部禁制才会一起写入武器；中途失败则不会获得这些禁制。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "七十二重与蜕变",
+      "text": "每一品阶最多容纳七十二重禁制。满七十二重后点击“蜕变”，已有禁制会融入器物本身，不再逐条显示，但效果仍然保留；当前禁制计数归零，并晋升下一品阶。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "器物品阶",
+      "text": "品阶依次为：凡器、灵器、宝器、法宝、玄宝、灵宝、道器、仙器。仙器是当前最高品阶，无法继续蜕变。"
+    }
+  ]
+}

@@ -23,6 +23,14 @@
     {
       "type": "patchouli:text",
       "text": "$(br)Crude Iron Small Ding is a rough beginner cauldron for Lianqi Early practice. It is heavy, uneven, and easy to fail.$(br2)Bronze Fire-Guiding Ding is a basic sect cauldron for early Lianqi, better than crude iron but still low success."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)The Restriction Carving Table engraves seven stackable weapon restrictions through the Abacus Circuitry Puzzle, the Ling Shu Abacus. Move jade beads left or right until every node holds the Qi marked by its golden target. Connected formation paths cause one bead to alter others. Each movement costs 300 Qi; spirit stones are consumed automatically when needed."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)Layers 1-9 use independent paths. Layers 10-36 add linked nodes. Layers 37-72 add locked and unstable nodes. Beyond 72, targets may be hidden, circuits overlap, and moves are limited.$(br2)Withdrawing or exhausting the formation causes failure. Severe mismatch triggers backlash that damages the cultivator and artifact; dangerous high-tier collapse may tear away a previous layer. At 72 layers, Evolve advances the artifact tier."
     }
   ]
 }

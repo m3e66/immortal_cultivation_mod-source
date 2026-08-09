@@ -9,12 +9,12 @@
 		"thirdperson_righthand": {
 			"rotation": [0, -90, 0],
 			"translation": [0, 5.75, 1],
-			"scale": [1.5, 1.5, 0]
+			"scale": [1.5, 1.5, 0.1]
 		},
 		"thirdperson_lefthand": {
 			"rotation": [0, 90, 0],
 			"translation": [0, 5.75, 1],
-			"scale": [1.5, 1.5, 0]
+			"scale": [1.5, 1.5, 0.1]
 		},
 		"firstperson_righthand": {
 			"rotation": [0, -90, 25],
@@ -27,7 +27,7 @@
 			"scale": [1, 1, 0.1]
 		},
 		"ground": {
-			"scale": [0.75, 0.75, 1]
+			"scale": [0.75, 0.75, 0.1]
 		},
 		"gui": {
 			"rotation": [0, 0, -47],

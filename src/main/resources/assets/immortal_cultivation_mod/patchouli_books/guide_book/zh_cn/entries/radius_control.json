@@ -1,0 +1,15 @@
+{
+  "name": "半径与流血",
+  "icon": "immortal_cultivation_mod:magic_center_block",
+  "category": "immortal_cultivation_mod:magic_center",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "放置阵眼时，可选择 3 至 101 的任意奇数半径。阵眼界面的 - 与 + 按钮也会每次调整 2 格半径。$(br2)放置时获得与所选半径秒数相同的流血效果。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "半径决定两件事：$(br2)$(li)符文被检测与供能的范围$(li)基础燃料消耗速度（半径越大，每分钟消耗越多）$(br2)符文必须在阵眼水平半径范围内且垂直相差不超过 ±3 格，才会被计算。"
+    }
+  ]
+}

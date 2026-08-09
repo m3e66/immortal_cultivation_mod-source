@@ -1,0 +1,20 @@
+{
+    "name": "Spirit Map",
+    "icon": "immortal_cultivation_mod:spirit_map",
+    "category": "immortal_cultivation_mod:spirit_resources",
+    "pages": [
+        {
+            "type": "patchouli:spotlight",
+            "item": "immortal_cultivation_mod:spirit_map",
+            "text": "The $(item)Spirit Map$() is a map that shows you the locations of nearby Spirit Vein Centers."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(bold)Usage:$()$(br)$(li)Right-click to create or open the map$(li)Spirit Vein Centers appear as $(bold)red markers.$()"
+        },
+        {
+            "type": "patchouli:text",
+            "text": "You can also use the $(bold)/locate poi immortal_cultivation_mod:spirit_vein_center$() command to quickly find the nearest Spirit Vein Center. The Spirit Map is useful for finding multiple veins at once and planning your base."
+        }
+    ]
+}

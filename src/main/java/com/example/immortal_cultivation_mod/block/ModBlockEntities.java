@@ -21,7 +21,8 @@ public class ModBlockEntities {
                     ModBlocks.MOXUAN_IRON.get(),
                     ModBlocks.BISUI_STONE.get(),
                     ModBlocks.STAR_DUST_STONE.get(),
-                    ModBlocks.JINWEN_FRUIT.get()
+                    ModBlocks.JINWEN_FRUIT.get(),
+                    ModBlocks.DUNWU_STELE.get()
             ).build(null));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DingBlockEntity>> DING =
@@ -29,5 +30,11 @@ public class ModBlockEntities {
                     DingBlockEntity::new,
                     ModBlocks.CU_TIE_XIAODING.get(),
                     ModBlocks.QINGTONG_YINHUO_DING.get()
+            ).build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<RestrictionTableBlockEntity>> RESTRICTION_TABLE =
+            BLOCK_ENTITIES.register("restriction_table", () -> BlockEntityType.Builder.of(
+                    RestrictionTableBlockEntity::new,
+                    ModBlocks.RESTRICTION_TABLE.get()
             ).build(null));
 }

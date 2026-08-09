@@ -10,6 +10,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -100,6 +102,16 @@ public final class YufengJue {
         ServerEvents.syncPlayerData(player);
     }
 
+    /** One paid second of the real Yufeng Jue effect for an NPC caster. */
+    public static boolean activateNpc(PathfinderMob caster) {
+        MobEffectInstance current = caster.getEffect(ModEffects.YUFENG_JUE);
+        if ((current != null && current.getDuration() > 10) || !hasFlightSupport(caster)) {
+            return false;
+        }
+        refreshEffect(caster, 20);
+        return true;
+    }
+
     private static void stop(ServerPlayer player) {
         clear(player);
         ServerEvents.syncPlayerData(player);
@@ -115,7 +127,11 @@ public final class YufengJue {
     }
 
     private static void refreshEffect(ServerPlayer player) {
-        player.addEffect(new MobEffectInstance(ModEffects.YUFENG_JUE, 40, 0, false, false, true));
+        refreshEffect(player, 40);
+    }
+
+    private static void refreshEffect(LivingEntity entity, int durationTicks) {
+        entity.addEffect(new MobEffectInstance(ModEffects.YUFENG_JUE, durationTicks, 0, false, false, true));
     }
 
     private static void disableFlight(ServerPlayer player) {
@@ -130,14 +146,22 @@ public final class YufengJue {
     }
 
     private static boolean hasBlockWithinDistance(ServerPlayer player, int maxDistance) {
-        BlockPos base = player.blockPosition();
+        return hasBlockWithinDistance((LivingEntity) player, maxDistance);
+    }
+
+    public static boolean hasFlightSupport(LivingEntity entity) {
+        return hasBlockWithinDistance(entity, MAX_BLOCK_DISTANCE);
+    }
+
+    private static boolean hasBlockWithinDistance(LivingEntity entity, int maxDistance) {
+        BlockPos base = entity.blockPosition();
         for (int i = 0; i <= maxDistance; i++) {
             BlockPos pos = base.below(i);
-            if (pos.getY() < player.level().getMinBuildHeight()) {
+            if (pos.getY() < entity.level().getMinBuildHeight()) {
                 return false;
             }
-            BlockState state = player.level().getBlockState(pos);
-            if (!state.isAir() && !state.getCollisionShape(player.level(), pos).isEmpty()) {
+            BlockState state = entity.level().getBlockState(pos);
+            if (!state.isAir() && !state.getCollisionShape(entity.level(), pos).isEmpty()) {
                 return true;
             }
         }

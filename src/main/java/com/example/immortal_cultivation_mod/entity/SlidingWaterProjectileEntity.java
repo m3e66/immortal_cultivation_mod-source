@@ -3,6 +3,7 @@ package com.example.immortal_cultivation_mod.entity;
 import com.example.immortal_cultivation_mod.spell.SlidingWater;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
@@ -10,6 +11,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
 public class SlidingWaterProjectileEntity extends ThrowableItemProjectile {
@@ -20,6 +22,7 @@ public class SlidingWaterProjectileEntity extends ThrowableItemProjectile {
 
     public SlidingWaterProjectileEntity(Level level, LivingEntity shooter) {
         super(ModEntities.SLIDING_WATER_PROJECTILE.get(), shooter, level);
+        NpcProfile.markNpcOwnedEffect(this, shooter);
         setNoGravity(true);
     }
 
@@ -31,6 +34,14 @@ public class SlidingWaterProjectileEntity extends ThrowableItemProjectile {
     @Override
     public void tick() {
         setNoGravity(true);
+        if (!level().isClientSide) {
+            Entity owner = getOwner();
+            NpcProfile.markNpcOwnedEffect(this, owner);
+            if (NpcProfile.isOrphanedNpcEffect(this, owner)) {
+                discard();
+                return;
+            }
+        }
         super.tick();
         if (level().isClientSide) {
             level().addParticle(ParticleTypes.SPLASH,
@@ -58,9 +69,27 @@ public class SlidingWaterProjectileEntity extends ThrowableItemProjectile {
     }
 
     @Override
+    protected boolean canHitEntity(Entity entity) {
+        return NpcProfile.canNpcEffectHit(this, getOwner(), entity) && super.canHitEntity(entity);
+    }
+
+    @Override
     protected void onHitBlock(BlockHitResult result) {
         if (level() instanceof ServerLevel serverLevel) {
-            SlidingWater.createPuddle(serverLevel, result.getBlockPos().above(), Math.max(1.0F, getPersistentData().getFloat("ChargeScale")));
+            SlidingWater.createPuddle(serverLevel, result.getBlockPos().above(),
+                    Math.max(1.0F, getPersistentData().getFloat("ChargeScale")), getOwner());
+        }
+    }
+
+    @Override
+    protected void onHitEntity(EntityHitResult result) {
+        LivingEntity target = ModelBonePartEntity.resolveLiving(result.getEntity());
+        if (level() instanceof ServerLevel serverLevel && target != null) {
+            SlidingWater.createPuddle(
+                    serverLevel,
+                    target.blockPosition(),
+                    Math.max(1.0F, getPersistentData().getFloat("ChargeScale")),
+                    getOwner());
         }
     }
 }

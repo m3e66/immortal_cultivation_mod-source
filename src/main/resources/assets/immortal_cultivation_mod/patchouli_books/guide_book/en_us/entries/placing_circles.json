@@ -1,0 +1,15 @@
+{
+    "name": "Placing Circles",
+    "icon": "immortal_cultivation_mod:ritual_dagger",
+    "category": "immortal_cultivation_mod:magic_circles",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "To place a magic circle, simply $(bold)right-click$() while holding the Ritual Dagger. A GUI will appear letting you choose the type of sigil to draw.$(br2)The circle will appear $(bold)beneath your feet$() and costs 3 seconds of Bleeding."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "A magic circle only functions if it is within range of an active Magic Center Block. The center block must have enough fuel for the circles to work.$(br2)Circles are fragile - they break easily and do not drop anything when broken."
+        }
+    ]
+}

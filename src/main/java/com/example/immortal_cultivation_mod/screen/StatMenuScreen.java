@@ -3,11 +3,15 @@ package com.example.immortal_cultivation_mod.screen;
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
+import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import com.example.immortal_cultivation_mod.client.ClientData;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -15,79 +19,113 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class StatMenuScreen extends Screen {
-    private static final ResourceLocation STAT_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/stat_menu.png");
     private static final ResourceLocation JINDAN_BUTTON_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/jindan_button.png");
-    private static final int TEXTURE_W = 1402;
-    private static final int TEXTURE_H = 1122;
-    private static final int DESIGN_W = 520;
-    private static final int DESIGN_H = 416;
+            ResourceLocation.fromNamespaceAndPath(
+                    ImmortalCultivationMod.MODID,
+                    "textures/gui/jindan_button.png");
+    private static final ResourceLocation STAT_ICONS =
+            elementTexture("stat_icons");
+    private static final ResourceLocation PERSON =
+            elementTexture("stat_person");
+    private static final ResourceLocation TOP_TAB =
+            elementTexture("stat_tab_top");
+    private static final ResourceLocation BOTTOM_TAB =
+            elementTexture("stat_tab_bottom");
+
+    private static final int ICON_ATLAS_WIDTH = 360;
+    private static final int ICON_SOURCE_SIZE = 72;
+    private static final int PERSON_WIDTH = 305;
+    private static final int PERSON_HEIGHT = 311;
+    private static final int TOP_TAB_WIDTH = 70;
+    private static final int TOP_TAB_HEIGHT = 160;
+    private static final int BOTTOM_TAB_WIDTH = 70;
+    private static final int BOTTOM_TAB_HEIGHT = 160;
+
     private static final int WINDOW_W = 430;
     private static final int WINDOW_H = 344;
 
-    private static final int TEXT_COLOR = 0x3F3A35;
-    private static final int VALUE_COLOR = 0x465A52;
-    private static final int ACCENT_COLOR = 0x5F4A82;
+    private static final int INK = 0xFF38352E;
+    private static final int MUTED_INK = 0xFF756F63;
+    private static final int VALUE_COLOR = 0xFF465A52;
+    private static final int ACCENT_COLOR = 0xFF5F4A82;
+    private static final int JADE = 0xFF315E50;
+    private static final int GOLD = 0xFF9B7C43;
+    private static final int PANEL = 0xB8F1ECE1;
+    private static final int PANEL_ROW = 0x54E6E0D4;
+    private static final int PANEL_BORDER = 0xFFAAA18F;
 
-    private static final int SKILL_BUTTON_X = 198;
-    private static final int SKILL_BUTTON_Y = 96;
-    private static final int SKILL_BUTTON_SPACING = 25;
-    private static final int SKILL_BUTTON_SIZE = 24;
+    private static final int PROFILE_X = 32;
+    private static final int PROFILE_Y = 62;
+    private static final int PROFILE_W = 121;
+    private static final int PROFILE_H = 123;
 
-    private static final int SKILL_TEXT_X = 230;
-    private static final int SKILL_TEXT_Y = 104;
-    private static final int SKILL_TEXT_SPACING = 25;
-    private static final int SKILL_TEXT_WIDTH = 245;
+    private static final int TRAITS_X = 32;
+    private static final int TRAITS_Y = 190;
+    private static final int TRAITS_W = 121;
+    private static final int TRAITS_H = 115;
+    private static final int TRAIT_ICON_X = 39;
+    private static final int TRAIT_TEXT_X = 62;
+    private static final int TRAIT_START_Y = 195;
+    private static final int TRAIT_SPACING = 21;
+    private static final int TRAIT_ICON_SIZE = 18;
+    private static final int TRAIT_TEXT_WIDTH = 84;
 
-    private static final int SKILL_POINTS_X = 428;
-    private static final int SKILL_POINTS_Y = 47;
-    private static final int SKILL_POINTS_WIDTH = 88;
+    private static final int SKILL_PANEL_X = 163;
+    private static final int SKILL_PANEL_Y = 62;
+    private static final int SKILL_PANEL_W = 235;
+    private static final int SKILL_PANEL_H = 154;
+    private static final int SKILL_BUTTON_X = 171;
+    private static final int SKILL_BUTTON_Y = 72;
+    private static final int SKILL_BUTTON_SIZE = 18;
+    private static final int SKILL_ROW_SPACING = 23;
+    private static final int SKILL_TEXT_X = 196;
+    private static final int SKILL_TEXT_WIDTH = 194;
 
-    private static final int LEVEL_X = 49;
-    private static final int LEVEL_Y = 95;
-    private static final int LEVEL_WIDTH = 112;
+    private static final int ROOT_X = 163;
+    private static final int ROOT_Y = 224;
+    private static final int ROOT_W = 117;
+    private static final int ROOT_H = 36;
+    private static final int AGE_X = 286;
+    private static final int AGE_Y = 224;
+    private static final int AGE_W = 112;
+    private static final int AGE_H = 36;
+    private static final int METHOD_X = 163;
+    private static final int METHOD_Y = 266;
+    private static final int METHOD_W = 235;
+    private static final int METHOD_H = 35;
 
-    private static final int LEFT_VALUE_X = 105;
-    private static final int LEFT_VALUE_WIDTH = 65;
-    private static final int BODY_Y = 223;
-    private static final int MORAL_Y = 250;
-    private static final int LUCK_Y = 277;
-    private static final int SOUL_Y = 304;
-    private static final int THOUGHTS_Y = 331;
+    private static final int PROGRESS_X = 163;
+    private static final int PROGRESS_Y = 312;
+    private static final int PROGRESS_W = 139;
+    private static final int PROGRESS_H = 16;
+    private static final int BREAKTHROUGH_X = 309;
+    private static final int BREAKTHROUGH_Y = 310;
+    private static final int BREAKTHROUGH_W = 89;
+    private static final int BREAKTHROUGH_H = 20;
 
-    private static final int ROOT_X = 196;
-    private static final int ROOT_Y = 282;
-    private static final int ROOT_WIDTH = 146;
+    private static final int TOP_TAB_X = -21;
+    private static final int TOP_TAB_Y = 27;
+    private static final int BOTTOM_TAB_X = -21;
+    private static final int BOTTOM_TAB_Y = 81;
+    private static final int TAB_DRAW_W = 25;
+    private static final int TAB_DRAW_H = 52;
 
-    private static final int METHOD_X = 194;
-    private static final int METHOD_Y = 322;
-    private static final int METHOD_WIDTH = 150;
-
-    private static final int AGE_X = 395;
-    private static final int AGE_Y = 286;
-    private static final int AGE_WIDTH = 68;
-
-    private static final int PROGRESS_X = 196;
-    private static final int PROGRESS_Y = 367;
-    private static final int PROGRESS_WIDTH = 166;
-
-    private static final int BREAKTHROUGH_X = 379;
-    private static final int BREAKTHROUGH_Y = 353;
-    private static final int BREAKTHROUGH_WIDTH = 91;
-    private static final int BREAKTHROUGH_HEIGHT = 27;
-    private static final int JINDAN_BUTTON_SIZE = 36;
-    private final List<Button> skillButtons = new ArrayList<>();
-    private Button breakthroughBtn;
-    private Button proficiencyBtn;
-    private Button jindanBtn;
+    private final List<AbstractButton> skillButtons =
+            new ArrayList<>();
+    private AbstractButton breakthroughBtn;
+    private AbstractButton proficiencyBtn;
+    private AbstractButton jindanBtn;
 
     public StatMenuScreen() {
-        super(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".stat_menu"));
+        super(Component.translatable(
+                "screen." + ImmortalCultivationMod.MODID + ".stat_menu"));
+    }
+
+    private static ResourceLocation elementTexture(String name) {
+        return ResourceLocation.fromNamespaceAndPath(
+                ImmortalCultivationMod.MODID,
+                "textures/gui/elements/" + name + ".png");
     }
 
     @Override
@@ -96,46 +134,67 @@ public class StatMenuScreen extends Screen {
         int x = left();
         int y = top();
 
-        addSkillButton("hp", x + sx(SKILL_BUTTON_X), y + sy(SKILL_BUTTON_Y));
-        addSkillButton("qi", x + sx(SKILL_BUTTON_X), y + sy(SKILL_BUTTON_Y + SKILL_BUTTON_SPACING));
-        addSkillButton("energy", x + sx(SKILL_BUTTON_X), y + sy(SKILL_BUTTON_Y + SKILL_BUTTON_SPACING * 2));
-        addSkillButton("physical", x + sx(SKILL_BUTTON_X), y + sy(SKILL_BUTTON_Y + SKILL_BUTTON_SPACING * 3));
-        addSkillButton("magic", x + sx(SKILL_BUTTON_X), y + sy(SKILL_BUTTON_Y + SKILL_BUTTON_SPACING * 4));
-        addSkillButton("mental", x + sx(SKILL_BUTTON_X), y + sy(SKILL_BUTTON_Y + SKILL_BUTTON_SPACING * 5));
+        addSkillButton("hp", x + SKILL_BUTTON_X, y + SKILL_BUTTON_Y);
+        addSkillButton(
+                "qi",
+                x + SKILL_BUTTON_X,
+                y + SKILL_BUTTON_Y + SKILL_ROW_SPACING);
+        addSkillButton(
+                "energy",
+                x + SKILL_BUTTON_X,
+                y + SKILL_BUTTON_Y + SKILL_ROW_SPACING * 2);
+        addSkillButton(
+                "physical",
+                x + SKILL_BUTTON_X,
+                y + SKILL_BUTTON_Y + SKILL_ROW_SPACING * 3);
+        addSkillButton(
+                "magic",
+                x + SKILL_BUTTON_X,
+                y + SKILL_BUTTON_Y + SKILL_ROW_SPACING * 4);
+        addSkillButton(
+                "mental",
+                x + SKILL_BUTTON_X,
+                y + SKILL_BUTTON_Y + SKILL_ROW_SPACING * 5);
 
-        proficiencyBtn = new InvisibleButton(
-                x + tx(30),
-                y + ty(300),
-                tx(110),
-                ty(210),
-                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".proficiency_menu"),
-                b -> minecraft.setScreen(new ProficiencyMenuScreen())
-        );
-        addRenderableWidget(proficiencyBtn);
+        proficiencyBtn = addRenderableWidget(new InvisibleButton(
+                x + BOTTOM_TAB_X,
+                y + BOTTOM_TAB_Y,
+                TAB_DRAW_W,
+                TAB_DRAW_H,
+                Component.translatable(
+                        "screen." + ImmortalCultivationMod.MODID
+                                + ".proficiency_menu"),
+                ignored -> minecraft.setScreen(
+                        new ProficiencyMenuScreen())));
 
-        breakthroughBtn = new InvisibleButton(
-                x + sx(BREAKTHROUGH_X),
-                y + sy(BREAKTHROUGH_Y),
-                sx(BREAKTHROUGH_WIDTH),
-                sy(BREAKTHROUGH_HEIGHT),
-                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".breakthrough_button"),
-                b -> PacketDistributor.sendToServer(new ModPayloads.ServerboundRequestBreakthroughPayload())
-        );
-        addRenderableWidget(breakthroughBtn);
+        breakthroughBtn = addRenderableWidget(
+                new CultivationGuiButton(
+                        x + BREAKTHROUGH_X,
+                        y + BREAKTHROUGH_Y,
+                        BREAKTHROUGH_W,
+                        BREAKTHROUGH_H,
+                        Component.translatable(
+                                "screen." + ImmortalCultivationMod.MODID
+                                        + ".breakthrough_button"),
+                        () -> PacketDistributor.sendToServer(
+                                new ModPayloads
+                                        .ServerboundRequestBreakthroughPayload())));
 
-        jindanBtn = new TexturedIconButton(
-                x + tx(958),
-                y + ty(820),
-                sx(JINDAN_BUTTON_SIZE),
-                sy(JINDAN_BUTTON_SIZE),
-                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".enter_jindan"),
-                b -> {
-                    PacketDistributor.sendToServer(new ModPayloads.ServerboundEnterJindanPayload());
+        jindanBtn = addRenderableWidget(new TexturedIconButton(
+                x + PROFILE_X + PROFILE_W - 27,
+                y + PROFILE_Y + 5,
+                22,
+                22,
+                Component.translatable(
+                        "screen." + ImmortalCultivationMod.MODID
+                                + ".enter_jindan"),
+                ignored -> {
+                    PacketDistributor.sendToServer(
+                            new ModPayloads
+                                    .ServerboundEnterJindanPayload());
                     minecraft.setScreen(null);
                 },
-                JINDAN_BUTTON_TEXTURE
-        );
-        addRenderableWidget(jindanBtn);
+                JINDAN_BUTTON_TEXTURE));
     }
 
     private int left() {
@@ -146,115 +205,707 @@ public class StatMenuScreen extends Screen {
         return (height - WINDOW_H) / 2;
     }
 
-    private static int sx(int designX) {
-        return Math.round(designX * (WINDOW_W / (float) DESIGN_W));
-    }
-
-    private static int sy(int designY) {
-        return Math.round(designY * (WINDOW_H / (float) DESIGN_H));
-    }
-
-    private static int tx(int textureX) {
-        return Math.round(textureX * (WINDOW_W / (float) TEXTURE_W));
-    }
-
-    private static int ty(int textureY) {
-        return Math.round(textureY * (WINDOW_H / (float) TEXTURE_H));
-    }
-
     private void addSkillButton(String stat, int x, int y) {
-        Button button = new InvisibleButton(
+        AbstractButton button = new CultivationGuiButton(
                 x,
                 y,
-                sx(SKILL_BUTTON_SIZE),
-                sy(SKILL_BUTTON_SIZE),
+                SKILL_BUTTON_SIZE,
+                SKILL_BUTTON_SIZE,
                 Component.literal("+"),
-                b -> PacketDistributor.sendToServer(new ModPayloads.ServerboundSpendSkillPointPayload(stat))
-        );
+                () -> PacketDistributor.sendToServer(
+                        new ModPayloads
+                                .ServerboundSpendSkillPointPayload(stat)));
         skillButtons.add(button);
         addRenderableWidget(button);
     }
 
     @Override
-    public void render(GuiGraphics g, int mx, int my, float pt) {
+    public void render(
+            GuiGraphics graphics,
+            int mouseX,
+            int mouseY,
+            float partialTick) {
         int x = left();
         int y = top();
+        graphics.fill(0, 0, width, height, 0xA0101716);
+        graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        CultivationGuiTextures.drawLandscape(
+                graphics, x, y, WINDOW_W, WINDOW_H);
+        renderPanels(graphics, x, y);
+        renderTabs(graphics, x, y, mouseX, mouseY);
 
-        g.blit(STAT_TEXTURE, x, y, WINDOW_W, WINDOW_H,
-                0.0F, 0.0F, TEXTURE_W, TEXTURE_H, TEXTURE_W, TEXTURE_H);
+        drawCenteredScaled(
+                graphics,
+                title,
+                x + WINDOW_W / 2,
+                y + 18,
+                190,
+                INK,
+                false);
 
-        Minecraft mc = Minecraft.getInstance();
+        Minecraft minecraft = Minecraft.getInstance();
         var data = ClientData.cultivationData;
-
         if (data == null) {
             setWidgetsVisible(false);
-            drawFitted(g, mc, Component.literal("No data"), x + sx(221), y + sy(198), sx(80), 0xAA3333, false);
-            super.render(g, mx, my, pt);
+            drawCenteredScaled(
+                    graphics,
+                    Component.literal("No data"),
+                    x + WINDOW_W / 2,
+                    y + WINDOW_H / 2,
+                    120,
+                    0xFFAA3333,
+                    false);
+            super.render(graphics, mouseX, mouseY, partialTick);
             return;
         }
 
-        String level = CultivationLevels.isMortal(data.cultivationLevel()) ? CultivationLevels.REALM_MORTAL : data.cultivationLevel();
+        setWidgetsVisible(true);
+        String level = CultivationLevels.isMortal(
+                data.cultivationLevel())
+                ? CultivationLevels.REALM_MORTAL
+                : data.cultivationLevel();
         var levelDef = CultivationLevels.getLevelDef(level);
-        int maxHp = Math.max(1, levelDef.maxHp() + data.maxHpBonus());
+        int maxHp = Math.max(
+                1,
+                levelDef.maxHp() + data.maxHpBonus());
         int maxQi = levelDef.maxQi() + data.maxQiBonus();
-        int maxAge = Math.max(1, levelDef.maxAge() - data.agePenalty());
+        boolean jindanOrHigher =
+                CultivationLevels.getStageIndex(level)
+                        >= CultivationLevels.getStageIndex(
+                                CultivationLevels.REALM_JINDAN
+                                        + CultivationLevels.STAGE_EARLY);
 
-        drawCentered(g, mc, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".skill_points", data.skillPoints()),
-                x + sx(SKILL_POINTS_X), y + sy(SKILL_POINTS_Y), sx(SKILL_POINTS_WIDTH), 0xEFE8D4, false);
-        drawCentered(g, mc, Component.literal(level), x + sx(LEVEL_X), y + sy(LEVEL_Y), sx(LEVEL_WIDTH), VALUE_COLOR, false);
-
-        drawSkillLine(g, mc, x, y, 0, "hp", 4, maxHp, data.maxHpBonus() / 4, TEXT_COLOR);
-        drawSkillLine(g, mc, x, y, 1, "qi", 40, maxQi, data.maxQiBonus() / 40, 0x355F6C);
-        drawSkillLine(g, mc, x, y, 2, "energy", 40, data.maxEnergyBonus(), data.maxEnergyBonus() / 40, 0x735F2D);
-        drawSkillLine(g, mc, x, y, 3, "physical", 1, data.physicalAttack(), data.physicalAttack(), 0x794D39);
-        drawSkillLine(g, mc, x, y, 4, "magic", 1, data.magicAttack(), data.magicAttack(), ACCENT_COLOR);
-        drawSkillLine(g, mc, x, y, 5, "mental", 1, data.mentalAttack(), data.mentalAttack(), 0x3B6A57);
-
-        drawFitted(g, mc, Component.literal(data.bodyType()), x + sx(LEFT_VALUE_X), y + sy(BODY_Y), sx(LEFT_VALUE_WIDTH), VALUE_COLOR, false);
-        drawFitted(g, mc, Component.literal(String.valueOf(data.moral())), x + sx(LEFT_VALUE_X), y + sy(MORAL_Y), sx(LEFT_VALUE_WIDTH), VALUE_COLOR, false);
-        drawFitted(g, mc, Component.literal(String.valueOf(data.luck())), x + sx(LEFT_VALUE_X), y + sy(LUCK_Y), sx(LEFT_VALUE_WIDTH), VALUE_COLOR, false);
-        drawFitted(g, mc, Component.literal(String.valueOf(data.soul())), x + sx(LEFT_VALUE_X), y + sy(SOUL_Y), sx(LEFT_VALUE_WIDTH), ACCENT_COLOR, false);
-        drawFitted(g, mc, Component.literal(String.valueOf(data.thoughts())), x + sx(LEFT_VALUE_X), y + sy(THOUGHTS_Y), sx(LEFT_VALUE_WIDTH), VALUE_COLOR, false);
-
-        drawCentered(g, mc, Component.literal(SpiritRoots.format(data.spiritRoots(), data.spiritRootGrade())),
-                x + sx(ROOT_X), y + sy(ROOT_Y), sx(ROOT_WIDTH), VALUE_COLOR, false);
-
-        var method = CultivationMethods.get(data.activeCultivationMethod());
-        Component methodName = method == null
-                ? Component.translatable("screen." + ImmortalCultivationMod.MODID + ".none")
-                : Component.translatable(method.nameKey());
-        MutableComponent methodLine = methodName.copy();
-        if (method != null) {
-            methodLine = methodLine.append(" / ").append(CultivationMethods.methodProficiencyLevel(data, data.activeCultivationMethod()));
-        }
-        drawCentered(g, mc, methodLine, x + sx(METHOD_X), y + sy(METHOD_Y), sx(METHOD_WIDTH), VALUE_COLOR, false);
-        drawCentered(g, mc, Component.literal(String.valueOf(maxAge)), x + sx(AGE_X), y + sy(AGE_Y), sx(AGE_WIDTH), VALUE_COLOR, false);
-
-        long progressNeeded = CultivationLevels.getTotalQiNeeded(level);
-        drawCentered(g, mc, Component.literal(data.cultivationProgress() + "/" + progressNeeded),
-                x + sx(PROGRESS_X), y + sy(PROGRESS_Y), sx(PROGRESS_WIDTH), 0xEEE7D4, false);
+        renderProfile(
+                graphics, data, level, jindanOrHigher, x, y);
+        renderTraits(graphics, data, x, y);
+        renderSkills(graphics, data, maxHp, maxQi, x, y);
+        renderCultivationDetails(graphics, data, level, x, y);
 
         String nextStage = CultivationLevels.getNextStage(level);
-        boolean fullProgress = data.cultivationProgress() >= progressNeeded;
-        boolean needsPill = CultivationLevels.needsBreakthroughPill(level);
-        boolean hasPill = hasBreakthroughPill(mc);
-        boolean canBreakthrough = nextStage != null && fullProgress && (!needsPill || hasPill);
+        long progressNeeded =
+                CultivationLevels.getTotalQiNeeded(level);
+        boolean fullProgress =
+                data.cultivationProgress() >= progressNeeded;
+        boolean needsPill =
+                CultivationLevels.needsBreakthroughPill(level);
+        boolean canBreakthrough = nextStage != null
+                && fullProgress
+                && (!needsPill || hasBreakthroughPill(minecraft));
 
-        for (Button button : skillButtons) {
+        for (AbstractButton button : skillButtons) {
             button.active = data.skillPoints() > 0;
             button.visible = true;
         }
-        if (breakthroughBtn != null) {
-            breakthroughBtn.active = canBreakthrough;
-            breakthroughBtn.visible = nextStage != null;
+        breakthroughBtn.active = canBreakthrough;
+        breakthroughBtn.visible = nextStage != null;
+        jindanBtn.active = jindanOrHigher;
+        jindanBtn.visible = jindanOrHigher;
+
+        super.render(graphics, mouseX, mouseY, partialTick);
+    }
+
+    private void renderPanels(
+            GuiGraphics graphics,
+            int x,
+            int y) {
+        CultivationGuiTextures.drawInnerBox(
+                graphics,
+                x + TRAITS_X,
+                y + TRAITS_Y,
+                TRAITS_W,
+                TRAITS_H);
+        CultivationGuiTextures.drawInnerBox(
+                graphics,
+                x + SKILL_PANEL_X,
+                y + SKILL_PANEL_Y,
+                SKILL_PANEL_W,
+                SKILL_PANEL_H);
+        CultivationGuiTextures.drawInnerBox(
+                graphics,
+                x + ROOT_X,
+                y + ROOT_Y,
+                ROOT_W,
+                ROOT_H);
+        CultivationGuiTextures.drawInnerBox(
+                graphics,
+                x + AGE_X,
+                y + AGE_Y,
+                AGE_W,
+                AGE_H);
+        CultivationGuiTextures.drawInnerBox(
+                graphics,
+                x + METHOD_X,
+                y + METHOD_Y,
+                METHOD_W,
+                METHOD_H);
+    }
+
+    private void renderTabs(
+            GuiGraphics graphics,
+            int x,
+            int y,
+            int mouseX,
+            int mouseY) {
+        graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        graphics.blit(
+                TOP_TAB,
+                x + TOP_TAB_X,
+                y + TOP_TAB_Y,
+                TAB_DRAW_W,
+                TAB_DRAW_H,
+                0.0F,
+                0.0F,
+                TOP_TAB_WIDTH,
+                TOP_TAB_HEIGHT,
+                TOP_TAB_WIDTH,
+                TOP_TAB_HEIGHT);
+        graphics.blit(
+                BOTTOM_TAB,
+                x + BOTTOM_TAB_X,
+                y + BOTTOM_TAB_Y,
+                TAB_DRAW_W,
+                TAB_DRAW_H,
+                0.0F,
+                0.0F,
+                BOTTOM_TAB_WIDTH,
+                BOTTOM_TAB_HEIGHT,
+                BOTTOM_TAB_WIDTH,
+                BOTTOM_TAB_HEIGHT);
+        if (isInside(
+                mouseX,
+                mouseY,
+                x + BOTTOM_TAB_X,
+                y + BOTTOM_TAB_Y,
+                TAB_DRAW_W,
+                TAB_DRAW_H)) {
+            graphics.fill(
+                    x + BOTTOM_TAB_X,
+                    y + BOTTOM_TAB_Y,
+                    x + BOTTOM_TAB_X + TAB_DRAW_W,
+                    y + BOTTOM_TAB_Y + TAB_DRAW_H,
+                    0x22FFFFFF);
         }
-        if (jindanBtn != null) {
-            boolean canEnterJindan = CultivationLevels.getRealmIndex(level) >= CultivationLevels.getRealmIndex(CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_EARLY);
-            jindanBtn.active = canEnterJindan;
-            jindanBtn.visible = canEnterJindan;
+    }
+
+    private void renderProfile(
+            GuiGraphics graphics,
+            ModAttachments.CultivationData data,
+            String level,
+            boolean jindanOrHigher,
+            int x,
+            int y) {
+        graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        graphics.blit(
+                PERSON,
+                x + PROFILE_X,
+                y + PROFILE_Y,
+                PROFILE_W,
+                PROFILE_H,
+                0.0F,
+                0.0F,
+                PERSON_WIDTH,
+                PERSON_HEIGHT,
+                PERSON_WIDTH,
+                PERSON_HEIGHT);
+        drawCenteredScaled(
+                graphics,
+                Component.literal(level),
+                x + PROFILE_X + PROFILE_W / 2,
+                y + PROFILE_Y + 5,
+                jindanOrHigher ? PROFILE_W - 38 : PROFILE_W - 12,
+                VALUE_COLOR,
+                false);
+
+        drawCenteredScaled(
+                graphics,
+                Component.translatable(
+                        "screen." + ImmortalCultivationMod.MODID
+                                + ".player_identity",
+                        Component.translatable(
+                                "screen." + ImmortalCultivationMod.MODID
+                                        + ".npc.identity."
+                                        + ClientData.playerIdentity)),
+                x + PROFILE_X + PROFILE_W / 2,
+                y + PROFILE_Y + 91,
+                PROFILE_W - 10,
+                INK,
+                false);
+        if (jindanOrHigher) {
+            drawCenteredScaled(
+                    graphics,
+                    Component.translatable(
+                            "screen." + ImmortalCultivationMod.MODID
+                                    + ".jindan_quality",
+                            Component.translatable(
+                                    "jindan_quality."
+                                            + ImmortalCultivationMod.MODID
+                                            + "."
+                                            + ClientData.jindanQuality)),
+                    x + PROFILE_X + PROFILE_W / 2,
+                    y + PROFILE_Y + 106,
+                    PROFILE_W - 10,
+                    GOLD,
+                    false);
+        }
+    }
+
+    private void renderTraits(
+            GuiGraphics graphics,
+            ModAttachments.CultivationData data,
+            int x,
+            int y) {
+        renderTrait(
+                graphics,
+                0,
+                labelled(
+                        "body_type",
+                        Component.literal(data.bodyType())),
+                x,
+                y,
+                VALUE_COLOR);
+        renderTrait(
+                graphics,
+                1,
+                labelled(
+                        "moral",
+                        Component.literal(
+                                Integer.toString(data.moral()))),
+                x,
+                y,
+                VALUE_COLOR);
+        renderTrait(
+                graphics,
+                2,
+                labelled(
+                        "luck",
+                        Component.literal(
+                                Integer.toString(data.luck()))),
+                x,
+                y,
+                VALUE_COLOR);
+        renderTrait(
+                graphics,
+                3,
+                labelled(
+                        "soul",
+                        Component.literal(
+                                Integer.toString(data.soul()))),
+                x,
+                y,
+                ACCENT_COLOR);
+        renderTrait(
+                graphics,
+                4,
+                labelled(
+                        "thoughts",
+                        Component.literal(
+                                Integer.toString(data.thoughts()))),
+                x,
+                y,
+                VALUE_COLOR);
+    }
+
+    private void renderTrait(
+            GuiGraphics graphics,
+            int index,
+            Component text,
+            int x,
+            int y,
+            int color) {
+        int rowY = y + TRAIT_START_Y + index * TRAIT_SPACING;
+        if (index > 0) {
+            graphics.fill(
+                    x + TRAITS_X + 5,
+                    rowY - 4,
+                    x + TRAITS_X + TRAITS_W - 5,
+                    rowY - 3,
+                    0x448E8472);
+        }
+        graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        graphics.blit(
+                STAT_ICONS,
+                x + TRAIT_ICON_X,
+                rowY,
+                TRAIT_ICON_SIZE,
+                TRAIT_ICON_SIZE,
+                index * (float) ICON_SOURCE_SIZE,
+                0.0F,
+                ICON_SOURCE_SIZE,
+                ICON_SOURCE_SIZE,
+                ICON_ATLAS_WIDTH,
+                ICON_SOURCE_SIZE);
+        drawScaled(
+                graphics,
+                text,
+                x + TRAIT_TEXT_X,
+                rowY + 5,
+                TRAIT_TEXT_WIDTH,
+                color,
+                false);
+    }
+
+    private void renderSkills(
+            GuiGraphics graphics,
+            ModAttachments.CultivationData data,
+            int maxHp,
+            int maxQi,
+            int x,
+            int y) {
+        Component points = Component.translatable(
+                "screen." + ImmortalCultivationMod.MODID
+                        + ".skill_points",
+                data.skillPoints());
+        graphics.fill(
+                x + 300,
+                y + 42,
+                x + 399,
+                y + 58,
+                0xCC315E50);
+        graphics.renderOutline(
+                x + 300, y + 42, 99, 16, 0xFF203F36);
+        drawCenteredScaled(
+                graphics,
+                points,
+                x + 349,
+                y + 46,
+                91,
+                0xFFF8F3DF,
+                true);
+
+        for (int row = 0; row < 6; row++) {
+            int rowY = y + SKILL_BUTTON_Y
+                    + row * SKILL_ROW_SPACING;
+            CultivationGuiTextures.drawInnerBox(
+                    graphics,
+                    x + SKILL_PANEL_X + 5,
+                    rowY - 2,
+                    SKILL_PANEL_W - 10,
+                    SKILL_BUTTON_SIZE + 4);
         }
 
-        super.render(g, mx, my, pt);
+        drawSkillLine(
+                graphics,
+                data,
+                x,
+                y,
+                0,
+                "hp",
+                4,
+                maxHp,
+                data.maxHpBonus() / 4,
+                INK);
+        drawSkillLine(
+                graphics,
+                data,
+                x,
+                y,
+                1,
+                "qi",
+                40,
+                maxQi,
+                data.maxQiBonus() / 40,
+                0xFF355F6C);
+        drawSkillLine(
+                graphics,
+                data,
+                x,
+                y,
+                2,
+                "energy",
+                40,
+                data.maxEnergyBonus(),
+                data.maxEnergyBonus() / 40,
+                0xFF735F2D);
+        drawSkillLine(
+                graphics,
+                data,
+                x,
+                y,
+                3,
+                "physical",
+                1,
+                data.physicalAttack(),
+                data.physicalAttack(),
+                0xFF794D39);
+        drawSkillLine(
+                graphics,
+                data,
+                x,
+                y,
+                4,
+                "magic",
+                1,
+                data.magicAttack(),
+                data.magicAttack(),
+                ACCENT_COLOR);
+        drawSkillLine(
+                graphics,
+                data,
+                x,
+                y,
+                5,
+                "mental",
+                1,
+                data.mentalAttack(),
+                data.mentalAttack(),
+                0xFF3B6A57);
+    }
+
+    private void renderCultivationDetails(
+            GuiGraphics graphics,
+            ModAttachments.CultivationData data,
+            String level,
+            int x,
+            int y) {
+        drawCenteredScaled(
+                graphics,
+                Component.translatable(
+                        "screen." + ImmortalCultivationMod.MODID
+                                + ".spirit_roots"),
+                x + ROOT_X + ROOT_W / 2,
+                y + ROOT_Y + 5,
+                ROOT_W - 10,
+                MUTED_INK,
+                false);
+        drawCenteredScaled(
+                graphics,
+                Component.literal(SpiritRoots.format(
+                        data.spiritRoots(),
+                        data.spiritRootGrade())),
+                x + ROOT_X + ROOT_W / 2,
+                y + ROOT_Y + 19,
+                ROOT_W - 10,
+                VALUE_COLOR,
+                false);
+
+        int maxAge = Math.max(
+                1,
+                CultivationLevels.getLevelDef(level).maxAge()
+                        - data.agePenalty());
+        drawCenteredScaled(
+                graphics,
+                Component.translatable(
+                        "screen." + ImmortalCultivationMod.MODID
+                                + ".max_age"),
+                x + AGE_X + AGE_W / 2,
+                y + AGE_Y + 5,
+                AGE_W - 10,
+                MUTED_INK,
+                false);
+        drawCenteredScaled(
+                graphics,
+                Component.literal(Integer.toString(maxAge)),
+                x + AGE_X + AGE_W / 2,
+                y + AGE_Y + 19,
+                AGE_W - 10,
+                VALUE_COLOR,
+                false);
+
+        drawCenteredScaled(
+                graphics,
+                Component.translatable(
+                        "screen." + ImmortalCultivationMod.MODID
+                                + ".cultivation_method"),
+                x + METHOD_X + METHOD_W / 2,
+                y + METHOD_Y + 5,
+                METHOD_W - 12,
+                MUTED_INK,
+                false);
+        var method = CultivationMethods.get(
+                data.activeCultivationMethod());
+        Component methodName = method == null
+                ? Component.translatable(
+                        "screen." + ImmortalCultivationMod.MODID
+                                + ".none")
+                : Component.translatable(method.nameKey());
+        MutableComponent methodLine = methodName.copy();
+        if (method != null) {
+            methodLine = methodLine
+                    .append(" / ")
+                    .append(CultivationMethods.methodProficiencyLevel(
+                            data,
+                            data.activeCultivationMethod()));
+        }
+        drawCenteredScaled(
+                graphics,
+                methodLine,
+                x + METHOD_X + METHOD_W / 2,
+                y + METHOD_Y + 19,
+                METHOD_W - 12,
+                VALUE_COLOR,
+                false);
+
+        long progressNeeded =
+                CultivationLevels.getTotalQiNeeded(level);
+        float ratio = progressNeeded <= 0L
+                ? 1.0F
+                : Math.max(
+                        0.0F,
+                        Math.min(
+                                1.0F,
+                                data.cultivationProgress()
+                                        / (float) progressNeeded));
+        drawScaled(
+                graphics,
+                Component.translatable(
+                        "screen." + ImmortalCultivationMod.MODID
+                                + ".cultivation_progress"),
+                x + PROGRESS_X,
+                y + PROGRESS_Y - 11,
+                PROGRESS_W,
+                MUTED_INK,
+                false);
+        CultivationGuiTextures.drawProgressFrame(
+                graphics,
+                x + PROGRESS_X,
+                y + PROGRESS_Y,
+                PROGRESS_W,
+                PROGRESS_H);
+        int progressInsetX = 5;
+        int progressInsetY = 4;
+        int progressFillWidth =
+                PROGRESS_W - progressInsetX * 2;
+        int progressFillHeight =
+                PROGRESS_H - progressInsetY * 2;
+        graphics.fill(
+                x + PROGRESS_X + progressInsetX,
+                y + PROGRESS_Y + progressInsetY,
+                x + PROGRESS_X + progressInsetX
+                        + progressFillWidth,
+                y + PROGRESS_Y + progressInsetY
+                        + progressFillHeight,
+                0xFF343C39);
+        graphics.fill(
+                x + PROGRESS_X + progressInsetX,
+                y + PROGRESS_Y + progressInsetY,
+                x + PROGRESS_X + progressInsetX
+                        + Math.round(progressFillWidth * ratio),
+                y + PROGRESS_Y + progressInsetY
+                        + progressFillHeight,
+                JADE);
+        drawCenteredScaled(
+                graphics,
+                Component.literal(
+                        data.cultivationProgress()
+                                + "/"
+                                + progressNeeded),
+                x + PROGRESS_X + PROGRESS_W / 2,
+                y + PROGRESS_Y + 4,
+                PROGRESS_W - 8,
+                0xFFF8F3DF,
+                true);
+    }
+
+    private Component labelled(String key, Component value) {
+        return Component.translatable(
+                        "screen." + ImmortalCultivationMod.MODID
+                                + "." + key)
+                .copy()
+                .append(": ")
+                .append(value);
+    }
+
+    private void drawSkillLine(
+            GuiGraphics graphics,
+            ModAttachments.CultivationData data,
+            int x,
+            int y,
+            int row,
+            String key,
+            int increase,
+            int total,
+            int invested,
+            int color) {
+        Component label = Component.translatable(
+                "screen." + ImmortalCultivationMod.MODID
+                        + ".skill_" + key,
+                increase,
+                total,
+                invested);
+        drawScaled(
+                graphics,
+                label,
+                x + SKILL_TEXT_X,
+                y + SKILL_BUTTON_Y
+                        + row * SKILL_ROW_SPACING
+                        + 5,
+                SKILL_TEXT_WIDTH,
+                color,
+                false);
+    }
+
+    private void drawPanel(
+            GuiGraphics graphics,
+            int x,
+            int y,
+            int width,
+            int height) {
+        graphics.fill(x, y, x + width, y + height, PANEL);
+        graphics.renderOutline(
+                x, y, width, height, PANEL_BORDER);
+    }
+
+    private void drawCenteredScaled(
+            GuiGraphics graphics,
+            Component text,
+            int centerX,
+            int y,
+            int maxWidth,
+            int color,
+            boolean shadow) {
+        int textWidth = font.width(text);
+        if (textWidth <= maxWidth) {
+            graphics.drawString(
+                    font,
+                    text,
+                    centerX - textWidth / 2,
+                    y,
+                    color,
+                    shadow);
+            return;
+        }
+        float scale = Math.max(
+                0.55F,
+                maxWidth / (float) textWidth);
+        graphics.pose().pushPose();
+        graphics.pose().scale(scale, scale, 1.0F);
+        graphics.drawString(
+                font,
+                text,
+                Math.round(centerX / scale - textWidth / 2.0F),
+                Math.round(y / scale),
+                color,
+                shadow);
+        graphics.pose().popPose();
+    }
+
+    private void drawScaled(
+            GuiGraphics graphics,
+            Component text,
+            int x,
+            int y,
+            int maxWidth,
+            int color,
+            boolean shadow) {
+        int textWidth = font.width(text);
+        if (textWidth <= maxWidth) {
+            graphics.drawString(
+                    font, text, x, y, color, shadow);
+            return;
+        }
+        float scale = Math.max(
+                0.55F,
+                maxWidth / (float) textWidth);
+        graphics.pose().pushPose();
+        graphics.pose().scale(scale, scale, 1.0F);
+        graphics.drawString(
+                font,
+                text,
+                Math.round(x / scale),
+                Math.round(y / scale),
+                color,
+                shadow);
+        graphics.pose().popPose();
     }
 
     private void setWidgetsVisible(boolean visible) {
@@ -270,44 +921,41 @@ public class StatMenuScreen extends Screen {
         }
     }
 
-    private boolean hasBreakthroughPill(Minecraft mc) {
-        if (mc.player == null) {
+    private boolean hasBreakthroughPill(
+            Minecraft minecraft) {
+        if (minecraft.player == null) {
             return false;
         }
-        for (var stack : mc.player.getInventory().items) {
-            if (!stack.isEmpty() && stack.getItem() == com.example.immortal_cultivation_mod.item.ModItems.BREAKTHROUGH_PILL.get()) {
+        for (var stack : minecraft.player.getInventory().items) {
+            if (!stack.isEmpty()
+                    && stack.getItem()
+                            == com.example.immortal_cultivation_mod.item
+                                    .ModItems.BREAKTHROUGH_PILL.get()) {
                 return true;
             }
         }
         return false;
     }
 
-    private void drawSkillLine(GuiGraphics g, Minecraft mc, int x, int y, int row, String key, int increase, int total, int invested, int color) {
-        Component label = Component.translatable("screen." + ImmortalCultivationMod.MODID + ".skill_" + key, increase, total, invested);
-        drawFitted(g, mc, label, x + sx(SKILL_TEXT_X), y + sy(SKILL_TEXT_Y + row * SKILL_TEXT_SPACING), sx(SKILL_TEXT_WIDTH), color, false);
-    }
-
-    private void drawCentered(GuiGraphics g, Minecraft mc, Component text, int x, int y, int maxWidth, int color, boolean shadow) {
-        Component fitted = fittedText(mc, text, maxWidth);
-        g.drawString(mc.font, fitted, x + (maxWidth - mc.font.width(fitted)) / 2, y, color, shadow);
-    }
-
-    private void drawFitted(GuiGraphics g, Minecraft mc, Component text, int x, int y, int maxWidth, int color, boolean shadow) {
-        g.drawString(mc.font, fittedText(mc, text, maxWidth), x, y, color, shadow);
-    }
-
-    private Component fittedText(Minecraft mc, Component text, int maxWidth) {
-        if (mc.font.width(text) <= maxWidth) {
-            return text;
-        }
-        String suffix = "...";
-        int suffixWidth = mc.font.width(suffix);
-        String clipped = mc.font.plainSubstrByWidth(text.getString(), Math.max(0, maxWidth - suffixWidth));
-        return Component.literal(clipped + suffix);
+    private static boolean isInside(
+            double mouseX,
+            double mouseY,
+            int x,
+            int y,
+            int width,
+            int height) {
+        return mouseX >= x
+                && mouseX < x + width
+                && mouseY >= y
+                && mouseY < y + height;
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void renderBackground(
+            GuiGraphics graphics,
+            int mouseX,
+            int mouseY,
+            float partialTick) {
     }
 
     @Override
@@ -315,30 +963,82 @@ public class StatMenuScreen extends Screen {
         return false;
     }
 
-    private static class InvisibleButton extends Button {
-        InvisibleButton(int x, int y, int width, int height, Component message, OnPress onPress) {
-            super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
+    private static final class InvisibleButton extends Button {
+        private InvisibleButton(
+                int x,
+                int y,
+                int width,
+                int height,
+                Component message,
+                OnPress onPress) {
+            super(
+                    x,
+                    y,
+                    width,
+                    height,
+                    message,
+                    onPress,
+                    DEFAULT_NARRATION);
         }
 
         @Override
-        protected void renderWidget(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        protected void renderWidget(
+                GuiGraphics graphics,
+                int mouseX,
+                int mouseY,
+                float partialTick) {
         }
     }
 
-    private static class TexturedIconButton extends Button {
+    private static final class TexturedIconButton extends Button {
         private final ResourceLocation texture;
 
-        TexturedIconButton(int x, int y, int width, int height, Component message, OnPress onPress, ResourceLocation texture) {
-            super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
+        private TexturedIconButton(
+                int x,
+                int y,
+                int width,
+                int height,
+                Component message,
+                OnPress onPress,
+                ResourceLocation texture) {
+            super(
+                    x,
+                    y,
+                    width,
+                    height,
+                    message,
+                    onPress,
+                    DEFAULT_NARRATION);
             this.texture = texture;
         }
 
         @Override
-        protected void renderWidget(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-            int color = isHoveredOrFocused() ? 0xFFFFFFFF : 0xFFEFE6C8;
-            g.setColor(((color >> 16) & 0xFF) / 255.0F, ((color >> 8) & 0xFF) / 255.0F, (color & 0xFF) / 255.0F, 1.0F);
-            g.blit(texture, getX(), getY(), getWidth(), getHeight(), 0.0F, 0.0F, 138, 139, 138, 139);
-            g.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        protected void renderWidget(
+                GuiGraphics graphics,
+                int mouseX,
+                int mouseY,
+                float partialTick) {
+            int color = isHoveredOrFocused()
+                    ? 0xFFFFFFFF
+                    : 0xFFEFE6C8;
+            graphics.setColor(
+                    ((color >> 16) & 0xFF) / 255.0F,
+                    ((color >> 8) & 0xFF) / 255.0F,
+                    (color & 0xFF) / 255.0F,
+                    1.0F);
+            graphics.blit(
+                    texture,
+                    getX(),
+                    getY(),
+                    getWidth(),
+                    getHeight(),
+                    0.0F,
+                    0.0F,
+                    138,
+                    139,
+                    138,
+                    139);
+            graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
         }
     }
 }

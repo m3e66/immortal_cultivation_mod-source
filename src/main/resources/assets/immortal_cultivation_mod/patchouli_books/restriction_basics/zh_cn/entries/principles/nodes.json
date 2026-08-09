@@ -1,0 +1,33 @@
+{
+  "name": "节点与阵路",
+  "icon": "immortal_cultivation_mod:restriction_insight",
+  "category": "immortal_cultivation_mod:principles",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "普通节点",
+      "text": "普通节点可直接左右拨动。当前值等于目标值时，算珠会变为金色。未连接的普通节点只改变自身，是最基础的独立灵路。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "相连阵路",
+      "text": "阵线连接的节点会互相牵动。正向金色阵线令相连算珠同向移动；带“−”标记的青色阵线令相连算珠反向移动。一枚算珠可同时牵动多条阵线。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "锁定节点",
+      "text": "灰色锁定算珠不能被直接拨动。必须移动与它相连的其他算珠，借阵线把锁定节点推到目标值。锁定节点从总禁制第 46 重起逐渐出现。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "不稳节点",
+      "text": "红青闪烁的算珠是不稳节点。达到界面显示的拨动间隔后，它会自行移动一格，并可能通过阵线牵动其他节点。不稳节点从总禁制第 55 重起出现。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "隐藏节点",
+      "text": "隐藏节点以“?”遮蔽目标值，必须根据阵路变化推断目标，或使用禁制提示校正。隐藏节点与有限步数从总禁制第 73 重起出现。"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "流血",
+  "icon": "immortal_cultivation_mod:ritual_dagger",
+  "category": "immortal_cultivation_mod:effects",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "immortal_cultivation_mod:ritual_dagger",
+      "text": "$(c)流血$()是一种负面状态效果，每秒造成$(bold)2点魔法伤害$()（1颗心）。放置符文或阵眼时会获得该效果作为代价。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)流血来源：$()$(br)$(li)放置符文$(li)放置阵眼$(br2)该伤害无法被护甲减免。"
+    }
+  ]
+}

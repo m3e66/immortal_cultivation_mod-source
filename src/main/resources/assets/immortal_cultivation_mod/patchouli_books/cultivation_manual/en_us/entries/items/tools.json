@@ -14,7 +14,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Magic Ritual Spirit Stones restore qi when used: low grade restores 10 qi, middle grade restores 100 qi, and high grade restores 1000 qi."
+      "text": "$(br)Magic Ritual Spirit Stones restore Qi when used: low grade restores 10, middle grade restores 100, and high grade restores 1,000. Infinite Spirit Stones restore 10,000 Qi and are never consumed."
     }
   ]
 }

@@ -1,0 +1,19 @@
+{
+  "name": "符文类型",
+  "icon": "immortal_cultivation_mod:magic_circle_block",
+  "category": "immortal_cultivation_mod:magic_circles",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "共有三种符文类型，每种都会为站在其上的实体提供不同效果。阵眼范围内多个相同类型的符文可以叠加效果等级。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)攻击$() 红色$()——提供$(thing)力量 I$()。每增加一个攻击符文，效果等级提升一级。$(br2)$(bold)防御$() 蓝色$()——提供$(thing)抗性提升 I$()。额外的防御符文会提高抗性提升等级。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)生命恢复$() 绿色$()——提供$(thing)生命恢复 I$()。更多生命恢复符文会提高恢复效果等级。$(br2)只要阵眼拥有燃料，这些效果就会持续生效。"
+    }
+  ]
+}

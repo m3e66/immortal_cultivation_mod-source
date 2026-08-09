@@ -8,12 +8,17 @@ import net.minecraft.world.level.block.Block;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.function.Consumer;
 
 public class GeoRockBlockItem extends BlockItem implements GeoItem {
+    private static final RawAnimation QINGTONG_DING_IDLE =
+            RawAnimation.begin().thenLoop("idle");
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public GeoRockBlockItem(Block block, Properties properties) {
@@ -42,6 +47,13 @@ public class GeoRockBlockItem extends BlockItem implements GeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(
+                this,
+                "qingtong_ding_item",
+                0,
+                state -> "qingtong_yinhuo_ding".equals(modelName())
+                        ? state.setAndContinue(QINGTONG_DING_IDLE)
+                        : PlayState.STOP));
     }
 
     @Override

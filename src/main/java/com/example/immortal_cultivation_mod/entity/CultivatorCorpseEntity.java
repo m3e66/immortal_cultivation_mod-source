@@ -12,6 +12,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
@@ -23,6 +24,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.resources.ResourceLocation;
 
 public class CultivatorCorpseEntity extends PathfinderMob {
     private static final EntityDataAccessor<Optional<UUID>> PLAYER_UUID =
@@ -35,6 +37,8 @@ public class CultivatorCorpseEntity extends PathfinderMob {
             SynchedEntityData.defineId(CultivatorCorpseEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> SEALED =
             SynchedEntityData.defineId(CultivatorCorpseEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<String> TEXTURE =
+            SynchedEntityData.defineId(CultivatorCorpseEntity.class, EntityDataSerializers.STRING);
 
     public CultivatorCorpseEntity(EntityType<? extends CultivatorCorpseEntity> entityType, Level level) {
         super(entityType, level);
@@ -72,6 +76,7 @@ public class CultivatorCorpseEntity extends PathfinderMob {
     public void copyFrom(ServerPlayer player) {
         entityData.set(PLAYER_UUID, Optional.of(player.getUUID()));
         entityData.set(PLAYER_NAME, player.getGameProfile().getName());
+        entityData.set(TEXTURE, "");
         entityData.set(CORPSE_YAW, player.getYRot());
 
         setPos(player.getX(), player.getY(), player.getZ());
@@ -86,6 +91,25 @@ public class CultivatorCorpseEntity extends PathfinderMob {
         setHealth(Math.max(1.0F, getMaxHealth() * 0.5F));
     }
 
+    public void copyFromNpc(LivingEntity npc, String name, ResourceLocation texture) {
+        entityData.set(PLAYER_UUID, Optional.empty());
+        entityData.set(PLAYER_NAME, name == null || name.isBlank() ? npc.getName().getString() : name);
+        entityData.set(TEXTURE, texture == null ? "" : texture.toString());
+        entityData.set(CORPSE_YAW, npc.getYRot());
+
+        setPos(npc.getX(), npc.getY(), npc.getZ());
+        lockFacing();
+
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            setItemSlot(slot, npc.getItemBySlot(slot).copy());
+            setDropChance(slot, 0.0F);
+        }
+
+        copyAttributesFrom(npc);
+        copyNpcCoreAttributes(npc);
+        setHealth(Math.max(1.0F, getMaxHealth() * 0.5F));
+    }
+
     public Optional<UUID> getPlayerUuid() {
         return entityData.get(PLAYER_UUID);
     }
@@ -96,6 +120,10 @@ public class CultivatorCorpseEntity extends PathfinderMob {
 
     public GameProfile getGameProfile() {
         return new GameProfile(getPlayerUuid().orElse(Util.NIL_UUID), getPlayerName());
+    }
+
+    public String getTextureId() {
+        return entityData.get(TEXTURE);
     }
 
     public float getCorpseYaw() {
@@ -136,6 +164,7 @@ public class CultivatorCorpseEntity extends PathfinderMob {
         builder.define(CORPSE_YAW, 0.0F);
         builder.define(RAISED, false);
         builder.define(SEALED, false);
+        builder.define(TEXTURE, "");
     }
 
     @Override
@@ -168,6 +197,7 @@ public class CultivatorCorpseEntity extends PathfinderMob {
         super.addAdditionalSaveData(tag);
         getPlayerUuid().ifPresent(uuid -> tag.putUUID("PlayerUuid", uuid));
         tag.putString("PlayerName", getPlayerName());
+        tag.putString("Texture", getTextureId());
         tag.putFloat("CorpseYaw", getCorpseYaw());
         tag.putBoolean("Raised", isRaised());
         tag.putBoolean("Sealed", isSealed());
@@ -180,6 +210,7 @@ public class CultivatorCorpseEntity extends PathfinderMob {
             entityData.set(PLAYER_UUID, Optional.of(tag.getUUID("PlayerUuid")));
         }
         entityData.set(PLAYER_NAME, tag.getString("PlayerName"));
+        entityData.set(TEXTURE, tag.getString("Texture"));
         entityData.set(CORPSE_YAW, tag.getFloat("CorpseYaw"));
         entityData.set(RAISED, tag.getBoolean("Raised"));
         entityData.set(SEALED, tag.getBoolean("Sealed"));
@@ -201,14 +232,42 @@ public class CultivatorCorpseEntity extends PathfinderMob {
         setDeltaMovement(0.0D, y * 0.98D, 0.0D);
     }
 
-    private void copyAttributesFrom(ServerPlayer player) {
-        for (AttributeInstance source : player.getAttributes().getSyncableAttributes()) {
+    private void copyAttributesFrom(LivingEntity entity) {
+        for (AttributeInstance source : entity.getAttributes().getSyncableAttributes()) {
             AttributeInstance target = getAttribute(source.getAttribute());
             if (target == null) {
                 continue;
             }
             target.setBaseValue(source.getBaseValue());
             source.getModifiers().forEach(target::addPermanentModifier);
+        }
+    }
+
+    private void copyNpcCoreAttributes(LivingEntity npc) {
+        setBaseAttribute(Attributes.MAX_HEALTH, Math.max(1.0D, npc.getMaxHealth()));
+        copyBaseAttribute(npc, Attributes.ARMOR);
+        copyBaseAttribute(npc, Attributes.ARMOR_TOUGHNESS);
+        copyBaseAttribute(npc, Attributes.ATTACK_DAMAGE);
+        copyBaseAttribute(npc, Attributes.ATTACK_SPEED);
+        copyBaseAttribute(npc, Attributes.KNOCKBACK_RESISTANCE);
+        copyBaseAttribute(npc, Attributes.MOVEMENT_SPEED);
+        copyBaseAttribute(npc, Attributes.FOLLOW_RANGE);
+        copyBaseAttribute(npc, Attributes.SCALE);
+        copyBaseAttribute(npc, Attributes.GRAVITY);
+        copyBaseAttribute(npc, Attributes.JUMP_STRENGTH);
+    }
+
+    private void copyBaseAttribute(LivingEntity sourceEntity, net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute) {
+        AttributeInstance source = sourceEntity.getAttribute(attribute);
+        if (source != null) {
+            setBaseAttribute(attribute, source.getValue());
+        }
+    }
+
+    private void setBaseAttribute(net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute, double value) {
+        AttributeInstance target = getAttribute(attribute);
+        if (target != null) {
+            target.setBaseValue(value);
         }
     }
 

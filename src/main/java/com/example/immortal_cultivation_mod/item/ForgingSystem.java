@@ -4,14 +4,19 @@ import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.block.ModBlocks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.ItemLike;
 
@@ -51,6 +56,44 @@ public final class ForgingSystem {
         return material(stack) != null;
     }
 
+    public static boolean isPurityMaterial(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return false;
+        }
+        return isForgeMaterial(stack)
+                || stack.is(ModItems.CHI_LIN.get())
+                || stack.is(ModItems.HUO_XI_BLOOD.get())
+                || stack.is(ModItems.JINDAN_YAODAN.get())
+                || stack.is(ModItems.CHIYAN_BONE.get())
+                || stack.is(ModItems.YUANYING_YAODAN.get())
+                || stack.is(ModItems.YANJIAO_HORN.get())
+                || stack.is(ModItems.YAOYUAN_BONE.get())
+                || stack.is(ModItems.XUESHA_HIDE.get())
+                || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get())
+                || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_SILKWORM_SILK.get())
+                || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get())
+                || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_STORAGE_CRYSTAL.get())
+                || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.FLOWING_SPIRIT_CRYSTAL.get())
+                || fixedPurity(stack) > 0;
+    }
+
+    public static boolean hasFixedPurity(ItemStack stack) {
+        return fixedPurity(stack) > 0;
+    }
+
+    private static int fixedPurity(ItemStack stack) {
+        if (stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_STONE.get())) {
+            return 30;
+        }
+        if (stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.MEDIUM_SPIRIT_STONE.get())) {
+            return 60;
+        }
+        if (stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.HIGH_SPIRIT_STONE.get())) {
+            return 100;
+        }
+        return 0;
+    }
+
     public static boolean isReusableAdditive(ItemStack stack) {
         return false;
     }
@@ -68,12 +111,27 @@ public final class ForgingSystem {
     }
 
     public static int purity(ItemStack stack) {
+        int fixed = fixedPurity(stack);
+        if (fixed > 0) {
+            return fixed;
+        }
         CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
         return Math.max(1, Math.min(100, tag.getInt(TAG_PURITY)));
     }
 
+    public static boolean hasDeterminedPurity(ItemStack stack) {
+        if (!isPurityMaterial(stack)) {
+            return false;
+        }
+        if (hasFixedPurity(stack)) {
+            return true;
+        }
+        CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+        return tag.contains(TAG_PURITY, Tag.TAG_INT);
+    }
+
     public static void ensurePurity(ItemStack stack, int seed) {
-        if (!isForgeMaterial(stack)) {
+        if (!isPurityMaterial(stack) || hasFixedPurity(stack)) {
             return;
         }
         CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
@@ -84,9 +142,22 @@ public final class ForgingSystem {
         }
     }
 
+    public static void copyPurity(ItemStack source, ItemStack target) {
+        if (!isPurityMaterial(source) || !isPurityMaterial(target) || hasFixedPurity(target)) {
+            return;
+        }
+        CompoundTag tag = target.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+        tag.putInt(TAG_PURITY, purity(source));
+        target.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+    }
+
     public static Component purityTooltip(ItemStack stack) {
-        if (!isForgeMaterial(stack)) {
+        if (!isPurityMaterial(stack)) {
             return Component.empty();
+        }
+        if (!hasDeterminedPurity(stack)) {
+            return Component.translatable("tooltip." + ImmortalCultivationMod.MODID + ".material_purity_unknown")
+                    .withStyle(ChatFormatting.GRAY);
         }
         return Component.translatable("tooltip." + ImmortalCultivationMod.MODID + ".material_purity", purity(stack))
                 .withStyle(ChatFormatting.AQUA);
@@ -113,6 +184,39 @@ public final class ForgingSystem {
         if (yujian.is(ModItems.DAO_YUJIAN.get())) {
             return recipeById("dao");
         }
+        if (yujian.is(ModItems.JINGTIE_SPEAR_YUJIAN.get())) {
+            return recipeById("jingtie_spear");
+        }
+        if (yujian.is(ModItems.HEAVY_IRON_BRACER_YUJIAN.get())) {
+            return recipeById("heavy_iron_bracer");
+        }
+        if (yujian.is(ModItems.THROWING_KNIFE_YUJIAN.get())) {
+            return recipeById("throwing_knife");
+        }
+        if (yujian.is(ModItems.FLYING_NEEDLE_YUJIAN.get())) {
+            return recipeById("flying_needle");
+        }
+        if (yujian.is(ModItems.ZHENPAN_YUJIAN.get())) {
+            return recipeById("zhenpan");
+        }
+        if (yujian.is(ModItems.BLANK_FORMATION_FLAG_YUJIAN.get())) {
+            return recipeById("blank_formation_flag");
+        }
+        if (yujian.is(ModItems.DURATION_FLAG_YUJIAN.get())) {
+            return recipeById("duration_flag");
+        }
+        if (yujian.is(ModItems.AMPLIFIER_FLAG_YUJIAN.get())) {
+            return recipeById("amplifier_flag");
+        }
+        if (yujian.is(ModItems.SPIRIT_GATHERING_FLAG_YUJIAN.get())) {
+            return recipeById("spirit_gathering_flag");
+        }
+        if (yujian.is(ModItems.HASTE_FLAG_YUJIAN.get())) {
+            return recipeById("haste_flag");
+        }
+        if (yujian.is(ModItems.QI_RETURN_FLAG_YUJIAN.get())) {
+            return recipeById("qi_return_flag");
+        }
         return null;
     }
 
@@ -137,6 +241,139 @@ public final class ForgingSystem {
                             ModBlocks.MOXUAN_IRON.get().asItem(), 3
                     ));
         }
+        if ("jingtie_spear".equals(id)) {
+            return new ForgingRecipe(
+                    "jingtie_spear",
+                    ModItems.SPEAR_MOLD.get(),
+                    3500,
+                    Map.of(
+                            ModBlocks.MOXUAN_IRON.get().asItem(), 3,
+                            ModBlocks.JINGTIE_MOTHERSTONE.get().asItem(), 3
+                    ));
+        }
+        if ("heavy_iron_bracer".equals(id)) {
+            return new ForgingRecipe(
+                    "heavy_iron_bracer",
+                    ModItems.WEAPON_MOLD.get(),
+                    3500,
+                    Map.of(
+                            ModBlocks.JINGTIE_MOTHERSTONE.get().asItem(), 1,
+                            ModBlocks.MOXUAN_IRON.get().asItem(), 4
+                    ));
+        }
+        if ("throwing_knife".equals(id)) {
+            return new ForgingRecipe(
+                    "throwing_knife",
+                    ModItems.WEAPON_MOLD.get(),
+                    3500,
+                    Map.of(
+                            ModBlocks.MOXUAN_IRON.get().asItem(), 2,
+                            ModBlocks.JINGTIE_MOTHERSTONE.get().asItem(), 1
+                    ));
+        }
+        if ("flying_needle".equals(id)) {
+            return new ForgingRecipe(
+                    "flying_needle",
+                    ModItems.WEAPON_MOLD.get(),
+                    3500,
+                    Map.of(
+                            ModBlocks.JINGTIE_MOTHERSTONE.get().asItem(), 1,
+                            ModBlocks.MOXUAN_IRON.get().asItem(), 1
+                    ));
+        }
+        if ("zhenpan".equals(id)) {
+            return new ForgingRecipe(
+                    "zhenpan",
+                    com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENPAN.get(),
+                    1800,
+                    Map.of(
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 4,
+                            ModBlocks.JINGTIE_MOTHERSTONE.get().asItem(), 1
+                    ),
+                    true,
+                    128);
+        }
+        if ("blank_formation_flag".equals(id)) {
+            return new ForgingRecipe(
+                    "blank_formation_flag",
+                    com.example.immortal_cultivation_mod.magicritual.item.ModItems.BLANK_FORMATION_FLAG.get(),
+                    1600,
+                    Map.of(
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.PATTERNED_CLOTH.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.LINGMU_FLAGPOLE.get(), 1
+                    ),
+                    true,
+                    0);
+        }
+        if ("duration_flag".equals(id)) {
+            return new ForgingRecipe(
+                    "duration_flag",
+                    com.example.immortal_cultivation_mod.magicritual.item.ModItems.DURATION_FLAG.get(),
+                    1800,
+                    Map.of(
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.BLANK_FORMATION_FLAG.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_STORAGE_CRYSTAL.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 1
+                    ),
+                    true,
+                    0);
+        }
+        if ("amplifier_flag".equals(id)) {
+            return new ForgingRecipe(
+                    "amplifier_flag",
+                    com.example.immortal_cultivation_mod.magicritual.item.ModItems.AMPLIFIER_FLAG.get(),
+                    2200,
+                    Map.of(
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.BLANK_FORMATION_FLAG.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.FLOWING_SPIRIT_CRYSTAL.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 2
+                    ),
+                    true,
+                    0);
+        }
+        if ("spirit_gathering_flag".equals(id)) {
+            return new ForgingRecipe(
+                    "spirit_gathering_flag",
+                    com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GATHERING_FLAG.get(),
+                    2100,
+                    Map.of(
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.BLANK_FORMATION_FLAG.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_STORAGE_CRYSTAL.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.FLOWING_SPIRIT_CRYSTAL.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 2
+                    ),
+                    true,
+                    0);
+        }
+        if ("haste_flag".equals(id)) {
+            return new ForgingRecipe(
+                    "haste_flag",
+                    com.example.immortal_cultivation_mod.magicritual.item.ModItems.HASTE_FLAG.get(),
+                    2100,
+                    Map.of(
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.BLANK_FORMATION_FLAG.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.FLOWING_SPIRIT_CRYSTAL.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), 2
+                    ),
+                    true,
+                    0);
+        }
+        if ("qi_return_flag".equals(id)) {
+            return new ForgingRecipe(
+                    "qi_return_flag",
+                    com.example.immortal_cultivation_mod.magicritual.item.ModItems.QI_RETURN_FLAG.get(),
+                    1900,
+                    Map.of(
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.BLANK_FORMATION_FLAG.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_STORAGE_CRYSTAL.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 1
+                    ),
+                    true,
+                    0);
+        }
         return null;
     }
 
@@ -145,9 +382,14 @@ public final class ForgingSystem {
             return false;
         }
         Map<Item, Integer> counts = new LinkedHashMap<>();
+        int spiritStones = 0;
         for (ItemStack stack : inputs) {
-            if (!stack.isEmpty()) {
-                counts.merge(stack.getItem(), stack.getCount(), Integer::sum);
+            if (stack.isEmpty()) {
+                continue;
+            }
+            counts.merge(stack.getItem(), stack.getCount(), Integer::sum);
+            if (isRecipeSpiritStone(stack)) {
+                spiritStones += stack.getCount();
             }
         }
         for (var required : recipe.required().entrySet()) {
@@ -155,7 +397,25 @@ public final class ForgingSystem {
                 return false;
             }
         }
-        return true;
+        return spiritStones >= recipe.spiritStoneCount();
+    }
+
+    public static boolean isIngredientForRecipe(ForgingRecipe recipe, ItemStack stack) {
+        if (stack.isEmpty()) {
+            return false;
+        }
+        if (recipe == null || !recipe.directOutput()) {
+            return isForgeMaterial(stack);
+        }
+        return recipe.required().containsKey(stack.getItem())
+                || recipe.spiritStoneCount() > 0 && isRecipeSpiritStone(stack);
+    }
+
+    public static boolean isRecipeSpiritStone(ItemStack stack) {
+        return com.example.immortal_cultivation_mod.magicritual.item.ModItems
+                .isSpiritStone(stack.getItem())
+                && !stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems
+                .INFINITE_SPIRIT_STONE.get());
     }
 
     public static int meltTicks(List<ItemStack> inputs) {
@@ -183,6 +443,7 @@ public final class ForgingSystem {
         ItemStack mold = new ItemStack(recipe.moldItem());
         int quality = quality(recipe.averageTemp(), averageTemp, materials);
         CompoundTag data = new CompoundTag();
+        data.putInt("schema_version", 2);
         data.putString("recipe", recipe.id());
         data.putInt("target_temp", recipe.averageTemp());
         data.putDouble("average_temp", averageTemp);
@@ -190,20 +451,29 @@ public final class ForgingSystem {
         data.putString("quality_name", qualityName(quality));
         data.putString("fire", fireType == null || fireType.isBlank() ? "normal_fire" : fireType);
         CompoundTag materialCounts = new CompoundTag();
+        Map<Item, Integer> ingredientCounts = new LinkedHashMap<>();
         double purityTotal = 0.0D;
-        int purityCount = 0;
+        int purityWeight = 0;
         for (ItemStack stack : materials) {
-            MaterialDef material = material(stack);
-            if (material == null) {
+            if (stack.isEmpty()) {
                 continue;
             }
-            purityTotal += purity(stack) * stack.getCount();
-            purityCount += stack.getCount();
+            ingredientCounts.merge(stack.getItem(), stack.getCount(), Integer::sum);
+            PurityContribution contribution = effectivePurity(stack);
+            purityTotal += contribution.purity() * contribution.weight();
+            purityWeight += contribution.weight();
+
+            MaterialDef material = material(stack);
+            if (recipe.directOutput() || material == null) {
+                continue;
+            }
             materialCounts.putInt(material.id(), materialCounts.getInt(material.id()) + stack.getCount());
             data.putInt(material.statKey(), data.getInt(material.statKey()) + stack.getCount());
         }
         data.put("materials", materialCounts);
-        data.putDouble("average_purity", purityCount <= 0 ? 1.0D : purityTotal / purityCount);
+        data.put("ingredients", ingredientList(ingredientCounts));
+        data.putInt("purity_weight", purityWeight);
+        data.putDouble("average_purity", purityWeight <= 0 ? 1.0D : purityTotal / purityWeight);
         CompoundTag tag = mold.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
         tag.put(TAG_FORGING, data);
         mold.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
@@ -211,18 +481,30 @@ public final class ForgingSystem {
     }
 
     public static ItemStack temper(ItemStack mold) {
-        if (!mold.is(ModItems.SWORD_MOLD.get()) && !mold.is(ModItems.SABER_MOLD.get())) {
+        if (!mold.is(ModItems.SWORD_MOLD.get()) && !mold.is(ModItems.SABER_MOLD.get())
+                && !mold.is(ModItems.SPEAR_MOLD.get()) && !mold.is(ModItems.WEAPON_MOLD.get())) {
             return ItemStack.EMPTY;
         }
         CompoundTag tag = mold.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
         CompoundTag forging = tag.getCompound(TAG_FORGING);
         String recipe = forging.getString("recipe");
-        if (!"flying_sword".equals(recipe) && !"dao".equals(recipe)) {
+        if (!"flying_sword".equals(recipe) && !"dao".equals(recipe)
+                && !"jingtie_spear".equals(recipe)
+                && !"heavy_iron_bracer".equals(recipe)
+                && !"throwing_knife".equals(recipe)
+                && !"flying_needle".equals(recipe)) {
             return ItemStack.EMPTY;
         }
         forging.putString("tempering", "cool_water");
         tag.put(TAG_FORGING, forging);
-        ItemStack weapon = new ItemStack("dao".equals(recipe) ? ModItems.DAO.get() : ModItems.FLYING_SWORD.get());
+        ItemStack weapon = new ItemStack(switch (recipe) {
+            case "dao" -> ModItems.DAO.get();
+            case "jingtie_spear" -> ModItems.JINGTIE_SPEAR.get();
+            case "heavy_iron_bracer" -> ModItems.HEAVY_IRON_BRACER.get();
+            case "throwing_knife" -> ModItems.THROWING_KNIFE.get();
+            case "flying_needle" -> ModItems.FLYING_NEEDLE.get();
+            default -> ModItems.FLYING_SWORD.get();
+        });
         weapon.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
         applyForgedDurability(weapon);
         return weapon;
@@ -235,7 +517,7 @@ public final class ForgingSystem {
         }
         CompoundTag forging = tag.getCompound(TAG_FORGING);
         return Component.translatable("tooltip." + ImmortalCultivationMod.MODID + ".mold_stats",
-                qualityName(forging.getInt("quality")),
+                qualityComponent(forging.getInt("quality")),
                 format(forging.getDouble("average_temp")),
                 format(forging.getDouble("average_purity")));
     }
@@ -247,7 +529,7 @@ public final class ForgingSystem {
         }
         return Component.translatable("tooltip." + ImmortalCultivationMod.MODID + ".forged_weapon_summary",
                 recipeDisplayName(forging.getString("recipe")),
-                qualityName(forging.getInt("quality")));
+                qualityComponent(forging.getInt("quality")));
     }
 
     public static boolean hasForgingData(ItemStack stack) {
@@ -255,7 +537,26 @@ public final class ForgingSystem {
     }
 
     public static boolean isForgedWeapon(ItemStack stack) {
-        return (stack.is(ModItems.FLYING_SWORD.get()) || stack.is(ModItems.DAO.get())) && hasForgingData(stack);
+        return (stack.is(ModItems.FLYING_SWORD.get()) || stack.is(ModItems.DAO.get())
+                || stack.is(ModItems.JINGTIE_SPEAR.get())
+                || stack.is(ModItems.THROWING_KNIFE.get())
+                || stack.is(ModItems.FLYING_NEEDLE.get())
+                || stack.is(ModItems.HEAVY_IRON_BRACER.get())) && hasForgingData(stack);
+    }
+
+    public static boolean isForgedRitualArtifact(ItemStack stack) {
+        return (stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENPAN.get())
+                || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.BLANK_FORMATION_FLAG.get())
+                || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.DURATION_FLAG.get())
+                || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.AMPLIFIER_FLAG.get())
+                || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GATHERING_FLAG.get())
+                || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.HASTE_FLAG.get())
+                || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.QI_RETURN_FLAG.get()))
+                && hasForgingData(stack);
+    }
+
+    public static boolean isFinishedForgedItem(ItemStack stack) {
+        return isForgedWeapon(stack) || isForgedRitualArtifact(stack);
     }
 
     public static List<Component> forgedBuffTooltips(ItemStack stack) {
@@ -275,14 +576,35 @@ public final class ForgingSystem {
         List<Component> tooltips = new ArrayList<>();
         tooltips.add(Component.translatable("tooltip." + ImmortalCultivationMod.MODID + ".forged.materials")
                 .withStyle(ChatFormatting.GRAY));
-        CompoundTag materialCounts = forging.getCompound("materials");
-        for (MaterialDef def : MATERIALS) {
-            int count = materialCounts.getInt(def.id());
-            if (count > 0) {
+        ListTag ingredients = forging.getList("ingredients", Tag.TAG_COMPOUND);
+        if (!ingredients.isEmpty()) {
+            for (int i = 0; i < ingredients.size(); i++) {
+                CompoundTag ingredient = ingredients.getCompound(i);
+                ResourceLocation itemId = ResourceLocation.tryParse(ingredient.getString("item"));
+                if (itemId == null) {
+                    continue;
+                }
+                Item item = BuiltInRegistries.ITEM.get(itemId);
+                Component itemName = item == Items.AIR
+                        && !itemId.equals(ResourceLocation.withDefaultNamespace("air"))
+                        ? Component.literal(itemId.toString())
+                        : Component.translatable(item.getDescriptionId());
+                int count = Math.max(1, ingredient.getInt("count"));
                 tooltips.add(Component.literal("  ")
-                        .append(Component.translatable(def.item().getDescriptionId()))
+                        .append(itemName)
                         .append(Component.literal(count > 1 ? " x" + count : ""))
                         .withStyle(ChatFormatting.DARK_AQUA));
+            }
+        } else {
+            CompoundTag materialCounts = forging.getCompound("materials");
+            for (MaterialDef def : MATERIALS) {
+                int count = materialCounts.getInt(def.id());
+                if (count > 0) {
+                    tooltips.add(Component.literal("  ")
+                            .append(Component.translatable(def.item().getDescriptionId()))
+                            .append(Component.literal(count > 1 ? " x" + count : ""))
+                            .withStyle(ChatFormatting.DARK_AQUA));
+                }
             }
         }
         String fire = normalizedFire(forging.getString("fire"));
@@ -416,6 +738,41 @@ public final class ForgingSystem {
         return stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getCompound(TAG_FORGING);
     }
 
+    private static ListTag ingredientList(Map<Item, Integer> ingredientCounts) {
+        ListTag ingredients = new ListTag();
+        for (Map.Entry<Item, Integer> entry : ingredientCounts.entrySet()) {
+            ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(entry.getKey());
+            if (itemId == null || entry.getValue() <= 0) {
+                continue;
+            }
+            CompoundTag ingredient = new CompoundTag();
+            ingredient.putString("item", itemId.toString());
+            ingredient.putInt("count", entry.getValue());
+            ingredients.add(ingredient);
+        }
+        return ingredients;
+    }
+
+    private static PurityContribution effectivePurity(ItemStack stack) {
+        CompoundTag inherited = forgingData(stack);
+        if (inherited.contains("average_purity")) {
+            double purity = Math.max(1.0D, Math.min(100.0D, inherited.getDouble("average_purity")));
+            if (stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.BLANK_FORMATION_FLAG.get())) {
+                return new PurityContribution(purity, Math.max(1, stack.getCount()));
+            }
+            int inheritedWeight = inherited.contains("purity_weight")
+                    ? Math.max(1, inherited.getInt("purity_weight"))
+                    : 1;
+            long combinedWeight = (long) inheritedWeight * Math.max(1, stack.getCount());
+            return new PurityContribution(purity,
+                    (int) Math.min(Integer.MAX_VALUE, combinedWeight));
+        }
+        if (isPurityMaterial(stack)) {
+            return new PurityContribution(purity(stack), Math.max(1, stack.getCount()));
+        }
+        return new PurityContribution(0.0D, 0);
+    }
+
     private static String normalizedFire(String fire) {
         if ("ling_fire".equals(fire)) {
             return "ling_fire";
@@ -479,12 +836,27 @@ public final class ForgingSystem {
     }
 
     public static String qualityName(int quality) {
-        if (quality >= 100) return "Flawless";
-        if (quality >= 95) return "Perfect";
-        if (quality >= 85) return "Excellent";
-        if (quality >= 70) return "Fine";
-        if (quality >= 50) return "Normal";
-        return "Crude";
+        return switch (qualityKey(quality)) {
+            case "flawless" -> "Flawless";
+            case "perfect" -> "Perfect";
+            case "excellent" -> "Excellent";
+            case "fine" -> "Fine";
+            case "normal" -> "Normal";
+            default -> "Crude";
+        };
+    }
+
+    public static Component qualityComponent(int quality) {
+        return Component.translatable("weapon_quality." + ImmortalCultivationMod.MODID + "." + qualityKey(quality));
+    }
+
+    private static String qualityKey(int quality) {
+        if (quality >= 100) return "flawless";
+        if (quality >= 95) return "perfect";
+        if (quality >= 85) return "excellent";
+        if (quality >= 70) return "fine";
+        if (quality >= 50) return "normal";
+        return "crude";
     }
 
     private static String format(double value) {
@@ -494,6 +866,15 @@ public final class ForgingSystem {
     public record MaterialDef(String id, Item item, String displayTrait, String statKey) {
     }
 
-    public record ForgingRecipe(String id, ItemLike moldItem, int averageTemp, Map<Item, Integer> required) {
+    private record PurityContribution(double purity, int weight) {
+    }
+
+    public record ForgingRecipe(String id, ItemLike moldItem, int averageTemp,
+                                Map<Item, Integer> required, boolean directOutput,
+                                int spiritStoneCount) {
+        public ForgingRecipe(String id, ItemLike moldItem, int averageTemp,
+                             Map<Item, Integer> required) {
+            this(id, moldItem, averageTemp, required, false, 0);
+        }
     }
 }

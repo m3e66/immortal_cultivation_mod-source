@@ -1,0 +1,16 @@
+{
+    "name": "Spirit Ore",
+    "icon": "immortal_cultivation_mod:spirit_ore",
+    "category": "immortal_cultivation_mod:spirit_resources",
+    "pages": [
+        {
+            "type": "patchouli:spotlight",
+            "item": "immortal_cultivation_mod:spirit_ore",
+            "text": "$(item)Spirit Ore$() is a resource found deep underground in large veins. It must be mined with an $(bold)Iron Pickaxe$() or better to drop Spirit Stones$()."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(bold)Spirit Ore Veins$() generate between Y=0 and Y=-100 . Each vein is very large, containing 200-250 ore blocks.$(br2)Mining through a vein may reveal Spirit Vein Centers.$(br2)Use a Spirit Map or $(bold)/locate poi immortal_cultivation_mod:spirit_vein_center$() command to find nearby veins."
+        }
+    ]
+}

@@ -10,7 +10,9 @@
     "inner_clothes",
     "cloak",
     "back_accessory",
-    "waist_accessory"
+    "waist_accessory",
+    "ring",
+    "system"
   ],
   "replace": false
 }

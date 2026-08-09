@@ -1,0 +1,57 @@
+{
+  "name": "阵心阵图",
+  "icon": "immortal_cultivation_mod:magic_center_block",
+  "category": "immortal_cultivation_mod:magic_center",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "以空白阵法中枢为中心摆出5x5阵图，再用仪式匕首击中中枢。$(br2)A=攻击阵纹，D=防御阵纹，R=恢复阵纹，C=中枢，.=空位。阵图允许旋转，所有未标记位置必须为空。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "护域阵心",
+      "text": "D.D.D$(br).DRD.$(br)D.C.D$(br).DRD.$(br)D.D.D$(br2)始终阻挡雷电。也会阻挡无主、生物拥有和黑名单玩家拥有的投射物与远程攻击实体；同时阻挡黑名单玩家、他们的其他攻击，以及已启用类别的生物。非黑名单玩家及其拥有的非雷电攻击可自由穿过。阵外爆炸无法摧毁阵内方块。边界扩大时会将附近受阻实体向外推行。物品和经验可穿过。下/中/上品灵石分别承受10/100/1000伤害；储备耗尽时阵心爆炸。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "迷尘 / 逆脉",
+      "text": "$(bold)迷尘$()$(br)R...R$(br).DAD.$(br)R.C.R$(br).DAD.$(br)R...R$(br2)$(bold)逆脉$()$(br)A.R.A$(br)..D..$(br)R.C.R$(br)..D..$(br)A.R.A"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "炽阳焚灵阵心",
+      "text": "A...A$(br).A.A.$(br)R.C.R$(br).A.A.$(br)A...A$(br2)每秒灼伤敌人并抽取1%最大灵气，解除冰冻，削弱治疗，强化火系术法并提高冰系术法消耗。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "回春聚灵阵心",
+      "text": "R.R.R$(br)..D..$(br)R.C.R$(br)..D..$(br)R.R.R$(br2)给予生命恢复II，每秒恢复1%最大灵气，提高自然回气，缩短燃烧，并清除轻微中毒与虚弱。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "玄冰封脉阵心",
+      "text": "D.R.D$(br).D.D.$(br)A.C.A$(br).R.R.$(br)D.R.D$(br2)减速、灭火、冻结并施加冰封灵气。灵气恢复减半，术法消耗提高；火系术法可削减冰封时间。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "血煞蚀元阵心",
+      "text": "A.R.A$(br).A.A.$(br)R.C.R$(br).A.A.$(br)A.R.A$(br2)施加凋零与虚弱，削弱治疗并提高治疗术消耗。尸修与血魔功修士受到的负面效果较弱。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "五雷引劫阵心",
+      "text": "A.D.A$(br).R.R.$(br)A.C.A$(br)..D..$(br)A...A$(br2)每3秒轰击灵气最高的敌对目标，造成20点法术伤害加1%最大生命。潮湿或冻结目标承受更多伤害，且不会点燃方块。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "灵识巡天阵心",
+      "text": "D.A.D$(br).R.R.$(br)A.C.A$(br)..D..$(br)A...D$(br2)显露入侵者和敌对生物；每次进入仅示警一次并显示姓名、境界；标记魂体，给予许可者灵视，并在近距离识破易容。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "淬锋重铸阵",
+      "text": "R...R$(br).D.D.$(br)R.C.R$(br).D.D.$(br)R...R$(br2)将可损坏的武器放入额外武器槽。阵法启用且燃料充足时，武器悬浮于阵心上方，并每秒恢复1点耐久。"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+    "name": "Ritual Dagger",
+    "icon": "immortal_cultivation_mod:ritual_dagger",
+    "category": "immortal_cultivation_mod:getting_started",
+    "pages": [
+        {
+            "type": "patchouli:spotlight",
+            "item": "immortal_cultivation_mod:ritual_dagger",
+            "text": "The $(item)Ritual Dagger$() is your primary tool for creating and managing magic rituals. It has 250 durability and deals 4 attack damage."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(bold)Right-click$() with the dagger to open the Sigil Selection screen, where you can choose a magic circle type to place at your feet.$(br2)$(bold)Shift + Right-click$() to open the Radius Selection screen, where you can place a Magic Center Block with a chosen radius."
+        }
+    ]
+}

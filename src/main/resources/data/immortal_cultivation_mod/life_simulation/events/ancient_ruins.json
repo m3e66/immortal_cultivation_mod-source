@@ -1,0 +1,30 @@
+{
+  "id": "immortal_cultivation_mod:ancient_ruins",
+  "minimum_age": 16,
+  "maximum_age": 5000,
+  "weight": 8,
+  "conditions": ["alive", "spiritual_root", "!flag:ancient_ruins"],
+  "text_key": "life.immortal_cultivation_mod.event.ancient_ruins",
+  "choices": [
+    {
+      "id": "enter",
+      "text_key": "life.immortal_cultivation_mod.choice.ruins_enter",
+      "result_key": "life.immortal_cultivation_mod.result.ruins_enter",
+      "conditions": ["combat>=25"],
+      "effects": ["health-12", "cultivation+1400", "wealth+420", "reputation+3", "set_flag:ancient_ruins"]
+    },
+    {
+      "id": "study",
+      "text_key": "life.immortal_cultivation_mod.choice.ruins_study",
+      "result_key": "life.immortal_cultivation_mod.result.ruins_study",
+      "conditions": ["comprehension>=45"],
+      "effects": ["comprehension+7", "cultivation+700", "set_flag:ancient_ruins"]
+    },
+    {
+      "id": "leave",
+      "text_key": "life.immortal_cultivation_mod.choice.leave",
+      "result_key": "life.immortal_cultivation_mod.result.ruins_leave",
+      "effects": ["set_flag:ancient_ruins"]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "灵脉核心",
+  "icon": "immortal_cultivation_mod:spirit_vein_center",
+  "category": "immortal_cultivation_mod:spirit_resources",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "immortal_cultivation_mod:spirit_vein_center",
+      "text": "在灵石矿脉深处，你可能会发现一个$(item)灵脉核心$()。它是一种隐形方块，会自动随时间产出灵石。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "每条矿脉有较小概率（1/50）生成一个灵脉核心，而不是普通灵石矿石。$(br2)该核心每分钟产出1个灵石。每次产出有10%概率为中品灵石，1%概率为上品灵石。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "由于灵脉核心是隐形的，你可能一开始无法察觉它的存在。可以通过掉落音效或使用灵石地图来定位附近的所有核心。"
+    }
+  ]
+}

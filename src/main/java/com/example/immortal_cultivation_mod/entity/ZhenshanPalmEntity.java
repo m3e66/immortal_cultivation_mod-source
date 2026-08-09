@@ -1,5 +1,6 @@
 package com.example.immortal_cultivation_mod.entity;
 
+import com.example.immortal_cultivation_mod.magicritual.center.ForcefieldInterceptable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -25,7 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class ZhenshanPalmEntity extends Entity implements GeoEntity {
+public class ZhenshanPalmEntity extends Entity implements GeoEntity, ForcefieldInterceptable {
     private static final EntityDataAccessor<Float> DATA_FORWARD_X =
             SynchedEntityData.defineId(ZhenshanPalmEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> DATA_FORWARD_Y =
@@ -2550,6 +2551,67 @@ public class ZhenshanPalmEntity extends Entity implements GeoEntity {
         setNoGravity(true);
     }
 
+    @Override
+    public Entity forcefieldOwner() {
+        return resolveCaster();
+    }
+
+    @Override
+    public Vec3 forcefieldMovement() {
+        return getDeltaMovement();
+    }
+
+    @Override
+    public float forcefieldBarrierDamage() {
+        LivingEntity owner = resolveCaster();
+        return owner == null ? DAMAGE
+                : com.example.immortal_cultivation_mod.spell.SpellDamageHelper.damage(
+                        owner,
+                        DAMAGE,
+                        com.example.immortal_cultivation_mod.spell.ModSpells.get(
+                                com.example.immortal_cultivation_mod.spell.ModSpells.ZHENSHAN_PALM));
+    }
+
+    @Override
+    public void forcefieldBounce(Vec3 reflectedMovement) {
+        if (reflectedMovement.lengthSqr() > 1.0E-9D) {
+            setForward(reflectedMovement);
+            updateRotationFromMovement(reflectedMovement);
+        }
+        setDeltaMovement(reflectedMovement);
+        hurtMarked = true;
+        hasImpulse = true;
+    }
+
+    @Override
+    public double forcefieldSupport(Vec3 normal) {
+        Vec3 forward = forward();
+        Vec3 right = forward.cross(new Vec3(0.0D, 1.0D, 0.0D)).normalize();
+        if (right.lengthSqr() < 0.001D) {
+            right = new Vec3(1.0D, 0.0D, 0.0D);
+        }
+        Vec3 up = right.cross(forward).normalize();
+        double scale = sizeScale();
+        double rightReach = Math.max(Math.abs(HAND_POINT_MIN_X), Math.abs(HAND_POINT_MAX_X))
+                * HAND_WIDTH_SCALE * scale + PARTICLE_TOUCH_RADIUS;
+        double upReach = Math.max(Math.abs(HAND_POINT_MIN_Y), Math.abs(HAND_POINT_MAX_Y))
+                * HAND_HEIGHT_SCALE * scale + PARTICLE_TOUCH_RADIUS;
+        return Math.abs(normal.dot(forward)) * PARTICLE_TOUCH_RADIUS
+                + Math.abs(normal.dot(right)) * rightReach
+                + Math.abs(normal.dot(up)) * upReach;
+    }
+
+    @Override
+    public double forcefieldMaximumSupport() {
+        double scale = sizeScale();
+        double rightReach = Math.max(Math.abs(HAND_POINT_MIN_X), Math.abs(HAND_POINT_MAX_X))
+                * HAND_WIDTH_SCALE * scale + PARTICLE_TOUCH_RADIUS;
+        double upReach = Math.max(Math.abs(HAND_POINT_MIN_Y), Math.abs(HAND_POINT_MAX_Y))
+                * HAND_HEIGHT_SCALE * scale + PARTICLE_TOUCH_RADIUS;
+        return Math.sqrt(PARTICLE_TOUCH_RADIUS * PARTICLE_TOUCH_RADIUS
+                + rightReach * rightReach + upReach * upReach);
+    }
+
     public ZhenshanPalmEntity(Level level, LivingEntity caster) {
         this(level, caster, 1.0F);
     }
@@ -2557,6 +2619,7 @@ public class ZhenshanPalmEntity extends Entity implements GeoEntity {
     public ZhenshanPalmEntity(Level level, LivingEntity caster, float chargeScale) {
         this(ModEntities.ZHENSHAN_PALM.get(), level);
         this.casterId = caster.getUUID();
+        NpcProfile.markNpcOwnedEffect(this, caster);
         setSizeScale(0.5F * Math.max(1.0F, Math.min(2.0F, chargeScale)));
         Vec3 look = caster.getLookAngle().normalize();
         Vec3 start = caster.position().add(0.0D, caster.getEyeHeight() - 0.25D, 0.0D).add(look.scale(2.6D));
@@ -2570,6 +2633,14 @@ public class ZhenshanPalmEntity extends Entity implements GeoEntity {
     public void tick() {
         noPhysics = true;
         setNoGravity(true);
+        if (!level().isClientSide) {
+            LivingEntity caster = resolveCaster();
+            NpcProfile.markNpcOwnedEffect(this, caster);
+            if (NpcProfile.isOrphanedNpcEffect(this, caster)) {
+                discard();
+                return;
+            }
+        }
         super.tick();
         setPos(getX() + getDeltaMovement().x, getY() + getDeltaMovement().y, getZ() + getDeltaMovement().z);
         updateRotationFromMovement(forward());
@@ -2749,11 +2820,21 @@ public class ZhenshanPalmEntity extends Entity implements GeoEntity {
 
     private boolean damageTouchedMob(Vec3 pos) {
         AABB bounds = new AABB(pos, pos).inflate(PARTICLE_TOUCH_RADIUS);
+        LivingEntity owner = resolveCaster();
+        NpcProfile.markNpcOwnedEffect(this, owner);
+        if (NpcProfile.isOrphanedNpcEffect(this, owner)) {
+            return false;
+        }
+        LivingEntity resolvedOwner = owner;
         for (LivingEntity target : level().getEntitiesOfClass(LivingEntity.class, bounds, living ->
-                !living.getUUID().equals(casterId) && !damagedMobs.contains(living.getUUID()))) {
+                !living.getUUID().equals(casterId)
+                        && !damagedMobs.contains(living.getUUID())
+                        && (resolvedOwner == null
+                        || (resolvedOwner instanceof CultivationNpc
+                        ? NpcProfile.canNpcEffectHit(this, resolvedOwner, living)
+                        : !NpcProfile.areCombatAllies(resolvedOwner, living))))) {
             damagedMobs.add(target.getUUID());
             float damage = DAMAGE;
-            Entity owner = casterId == null ? null : level().getPlayerByUUID(casterId);
 
             if (owner != null) {
                 damage = com.example.immortal_cultivation_mod.spell.SpellDamageHelper.damage(
@@ -2765,13 +2846,23 @@ public class ZhenshanPalmEntity extends Entity implements GeoEntity {
                 );
             }
 
-            target.hurt(damageSources().magic(), damage);
+            target.hurt(owner == null
+                    ? damageSources().magic()
+                    : owner.damageSources().indirectMagic(this, owner), damage);
             if (level() instanceof ServerLevel serverLevel) {
                 SpellImpactParticles.earth(serverLevel, pos);
             }
             return true;
         }
         return false;
+    }
+
+    private LivingEntity resolveCaster() {
+        if (casterId != null && level() instanceof ServerLevel serverLevel
+                && serverLevel.getEntity(casterId) instanceof LivingEntity livingOwner) {
+            return livingOwner;
+        }
+        return null;
     }
 
     private boolean breakTouchedBlock(BlockPos pos) {
@@ -2805,11 +2896,36 @@ public class ZhenshanPalmEntity extends Entity implements GeoEntity {
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
         setSizeScale(tag.contains("SizeScale") ? tag.getFloat("SizeScale") : 0.5F);
+        if (tag.hasUUID("Caster")) {
+            casterId = tag.getUUID("Caster");
+        }
+        setForward(new Vec3(
+                tag.getDouble("ForwardX"),
+                tag.getDouble("ForwardY"),
+                tag.getDouble("ForwardZ")));
+        long[] damaged = tag.getLongArray("DamagedMobs");
+        for (int index = 0; index + 1 < damaged.length; index += 2) {
+            damagedMobs.add(new UUID(damaged[index], damaged[index + 1]));
+        }
     }
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
         tag.putFloat("SizeScale", sizeScale());
+        if (casterId != null) {
+            tag.putUUID("Caster", casterId);
+        }
+        Vec3 forward = forward();
+        tag.putDouble("ForwardX", forward.x);
+        tag.putDouble("ForwardY", forward.y);
+        tag.putDouble("ForwardZ", forward.z);
+        long[] damaged = new long[damagedMobs.size() * 2];
+        int index = 0;
+        for (UUID uuid : damagedMobs) {
+            damaged[index++] = uuid.getMostSignificantBits();
+            damaged[index++] = uuid.getLeastSignificantBits();
+        }
+        tag.putLongArray("DamagedMobs", damaged);
     }
 
     @Override

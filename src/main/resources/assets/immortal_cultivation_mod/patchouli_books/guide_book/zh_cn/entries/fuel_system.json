@@ -1,0 +1,20 @@
+{
+  "name": "燃料系统",
+  "icon": "immortal_cultivation_mod:spirit_stone",
+  "category": "immortal_cultivation_mod:magic_center",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "immortal_cultivation_mod:spirit_stone",
+      "text": "阵眼需要$(item)灵石$()作为燃料来驱动相连阵纹。没有燃料时效果不会生效。无限灵石可永久供能且不会被消耗。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)基础燃料消耗$()$(br2)$(li)半径 3：8/分$(li)半径 5：16/分$(li)半径 7：32/分$(li)半径 9：64/分$(li)半径 11：128/分$(li)半径 13：256/分$(br2)超过 13 后，消耗沿用相同的三次方增长曲线。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(li)半径 49：13709/分$(li)半径 65：32000/分$(li)半径 81：61925/分$(li)半径 101：120053/分$(br2)每增加一个阵纹，额外增加 10/分。右键无限灵石恢复 10000 灵气，物品不会消耗。"
+    }
+  ]
+}

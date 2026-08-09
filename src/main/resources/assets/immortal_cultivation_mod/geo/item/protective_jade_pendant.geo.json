@@ -1,0 +1,47 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.jade_pendant",
+				"texture_width": 8,
+				"texture_height": 8,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 2.5,
+				"visible_bounds_offset": [0, 0.75, 0]
+			},
+			"bones": [
+				{
+					"name": "bipedBody",
+					"pivot": [0, 24, 0]
+				},
+				{
+					"name": "armorBody",
+					"parent": "bipedBody",
+					"pivot": [0, 24, 0]
+				},
+				{
+					"name": "bb_main",
+					"parent": "armorBody",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{
+							"origin": [-5.4, 8, -3.35],
+							"size": [3, 7, 0],
+							"pivot": [-5, 12, -3.55],
+							"rotation": [0, 17.5, 0],
+							"uv": {
+								"north": {"uv": [2.58824, 0.39216], "uv_size": [2.76471, 7]},
+								"east": {"uv": [0, 0], "uv_size": [0, -0.37255]},
+								"south": {"uv": [0, 0.07843], "uv_size": [0, -0.07843]},
+								"west": {"uv": [-0.05882, 0], "uv_size": [0, -0.37255]},
+								"up": {"uv": [0, 0], "uv_size": [-0.05882, 0]},
+								"down": {"uv": [-0.05882, 0], "uv_size": [-0.05882, 0]}
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,57 @@
+{
+  "name": "Center Formations",
+  "icon": "immortal_cultivation_mod:magic_center_block",
+  "category": "immortal_cultivation_mod:magic_center",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Build each 5x5 pattern around a Blank Magic Center, then strike the center with a Ritual Dagger.$(br2)A = Attack, D = Defense, R = Regeneration, C = Center, . = empty. Patterns may be rotated. Every unmarked position must remain empty."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Forcefield Center",
+      "text": "D.D.D$(br).DRD.$(br)D.C.D$(br).DRD.$(br)D.D.D$(br2)Always blocks lightning. Also blocks ownerless, mob-owned, and blacklisted-player projectiles and ranged attack entities, plus blacklisted players, their other attacks, and enabled mob categories. Nonblacklisted players and non-lightning attacks they own pass freely. Outside explosions cannot destroy blocks inside the field. An expanding boundary carries blocked nearby entities outward. Items and experience pass. Spirit stones absorb 10/100/1000 damage; an unfueled broken ward explodes."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Fog / Inverted",
+      "text": "$(bold)Fog$()$(br)R...R$(br).DAD.$(br)R.C.R$(br).DAD.$(br)R...R$(br2)$(bold)Inverted$()$(br)A.R.A$(br)..D..$(br)R.C.R$(br)..D..$(br)A.R.A"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Scorching Center",
+      "text": "A...A$(br).A.A.$(br)R.C.R$(br).A.A.$(br)A...A$(br2)Burns and damages enemies each second, drains 1% maximum Qi, removes Frozen effects, reduces healing, strengthens fire techniques, and raises ice-technique cost."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Sanctuary Center",
+      "text": "R.R.R$(br)..D..$(br)R.C.R$(br)..D..$(br)R.R.R$(br2)Grants Regeneration II, restores 1% maximum Qi each second, improves natural Qi recovery, shortens fire, and removes minor Poison and Weakness."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Frost Center",
+      "text": "D.R.D$(br).D.D.$(br)A.C.A$(br).R.R.$(br)D.R.D$(br2)Slows, extinguishes, freezes, and applies Frozen Qi. Qi recovery is halved and spell costs rise. Fire techniques erode Frozen Qi."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Decay Center",
+      "text": "A.R.A$(br).A.A.$(br)R.C.R$(br).A.A.$(br)A.R.A$(br2)Inflicts Wither and Weakness, reduces healing, and raises healing-technique cost. Corpse and Blood Demon cultivators resist part of the effect."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Thunder Center",
+      "text": "A.D.A$(br).R.R.$(br)A.C.A$(br)..D..$(br)A...A$(br2)Every 3 seconds, strikes the hostile target with the most Qi for 20 magic damage plus 1% maximum health. Wet and frozen targets take more. Blocks never ignite."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Detection Center",
+      "text": "D.A.D$(br).R.R.$(br)A.C.A$(br)..D..$(br)A...D$(br2)Reveals intruders and hostile mobs, reports player name and realm once per entry, marks souls, grants Spirit Sight to permitted players, and exposes nearby disguises."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Reforge Blade Formation",
+      "text": "R...R$(br).D.D.$(br)R.C.R$(br).D.D.$(br)R...R$(br2)Place a damageable weapon in the extra weapon slot. While enabled and fueled, the weapon floats above the center and restores 1 durability each second."
+    }
+  ]
+}

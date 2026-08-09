@@ -3,8 +3,15 @@
   "minVersion": "0.8",
   "package": "com.example.immortal_cultivation_mod.mixin",
   "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "MinecraftServerAccessor"
+  ],
   "client": [
-    "PlayerModelMixin"
+    "GuiGraphicsMixin",
+    "PlayerModelMixin",
+    "PlayerRendererMixin",
+    "MobBattleMobStickMixin",
+    "ParticleEngineMixin"
   ],
   "injectors": {
     "defaultRequire": 1

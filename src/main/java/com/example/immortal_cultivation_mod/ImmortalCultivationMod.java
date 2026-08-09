@@ -4,6 +4,8 @@ import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.attribute.ModAttributes;
 import com.example.immortal_cultivation_mod.block.ModBlockEntities;
 import com.example.immortal_cultivation_mod.block.ModBlocks;
+import com.example.immortal_cultivation_mod.config.ModClientConfig;
+import com.example.immortal_cultivation_mod.config.ModServerConfig;
 import com.example.immortal_cultivation_mod.effect.ModEffects;
 import com.example.immortal_cultivation_mod.item.ModItems;
 import com.example.immortal_cultivation_mod.entity.ModEntities;
@@ -17,6 +19,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
@@ -26,9 +30,13 @@ import sun.misc.Unsafe;
 public class ImmortalCultivationMod {
     public static final String MODID = "immortal_cultivation_mod";
     public static final double MAX_CULTIVATION_HEALTH = 1_000_000_000.0D;
+    public static final double MAX_CULTIVATION_ARMOR = 1_000_000_000.0D;
     private static volatile boolean maxHealthAttributeLimitRaised;
+    private static volatile boolean armorAttributeLimitRaised;
 
-    public ImmortalCultivationMod(IEventBus modEventBus) {
+    public ImmortalCultivationMod(IEventBus modEventBus, ModContainer modContainer) {
+        modContainer.registerConfig(ModConfig.Type.CLIENT, ModClientConfig.SPEC);
+        modContainer.registerConfig(ModConfig.Type.SERVER, ModServerConfig.SPEC);
         modEventBus.addListener(this::commonSetup);
         ModAttachments.register(modEventBus);
         ModAttributes.ATTRIBUTES.register(modEventBus);
@@ -36,12 +44,14 @@ public class ImmortalCultivationMod {
         ModBlocks.BLOCKS.register(modEventBus);
         ModBlockEntities.BLOCK_ENTITIES.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
+        com.example.immortal_cultivation_mod.item.ModRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
         ModEntities.ENTITY_TYPES.register(modEventBus);
         ModParticles.PARTICLE_TYPES.register(modEventBus);
         ModSounds.SOUND_EVENTS.register(modEventBus);
         ModScreens.MENUS.register(modEventBus);
         ModTabs.CREATIVE_TABS.register(modEventBus);
         ModFeatures.register(modEventBus);
+        com.example.immortal_cultivation_mod.magicritual.MagicRitualMod.register(modEventBus);
         if (FMLEnvironment.dist == Dist.CLIENT) {
             com.example.immortal_cultivation_mod.client.ModClientModBusEvents.register(modEventBus);
             com.example.immortal_cultivation_mod.client.ModClientEvents.register();
@@ -49,7 +59,11 @@ public class ImmortalCultivationMod {
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
-        event.enqueueWork(ImmortalCultivationMod::raiseMaxHealthAttributeLimit);
+        event.enqueueWork(() -> {
+            ModBlocks.registerVanillaInteractions();
+            raiseMaxHealthAttributeLimit();
+            raiseArmorAttributeLimit();
+        });
     }
 
     public static void raiseMaxHealthAttributeLimit() {
@@ -60,15 +74,33 @@ public class ImmortalCultivationMod {
             return;
         }
 
+        raiseAttributeLimit(maxHealth, MAX_CULTIVATION_HEALTH, "Max health");
+        maxHealthAttributeLimitRaised = true;
+    }
+
+    public static void raiseArmorAttributeLimit() {
+        if (!(Attributes.ARMOR.value() instanceof RangedAttribute armor)) {
+            return;
+        }
+        if (armorAttributeLimitRaised
+                && armor.sanitizeValue(MAX_CULTIVATION_ARMOR) >= MAX_CULTIVATION_ARMOR) {
+            return;
+        }
+        raiseAttributeLimit(armor, MAX_CULTIVATION_ARMOR, "Armor");
+        armorAttributeLimitRaised = true;
+    }
+
+    private static void raiseAttributeLimit(RangedAttribute attribute, double limit, String name) {
         try {
-            Field maxValue = findMaxValueField(maxHealth);
-            writeFinalDouble(maxHealth, maxValue, MAX_CULTIVATION_HEALTH);
-            if (maxHealth.sanitizeValue(MAX_CULTIVATION_HEALTH) < MAX_CULTIVATION_HEALTH) {
-                throw new IllegalStateException("Max health attribute still capped at " + maxHealth.sanitizeValue(MAX_CULTIVATION_HEALTH));
+            Field maxValue = findMaxValueField(attribute);
+            writeFinalDouble(attribute, maxValue, limit);
+            if (attribute.sanitizeValue(limit) < limit) {
+                throw new IllegalStateException(name + " attribute still capped at "
+                        + attribute.sanitizeValue(limit));
             }
-            maxHealthAttributeLimitRaised = true;
         } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to raise max health attribute limit", exception);
+            throw new IllegalStateException("Unable to raise " + name.toLowerCase()
+                    + " attribute limit", exception);
         }
     }
 

@@ -1,0 +1,82 @@
+{
+  "name": "Combo Patterns",
+  "icon": "immortal_cultivation_mod:magic_circle_block",
+  "category": "immortal_cultivation_mod:magic_circles",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Build a 5x5 pattern around a Blank Magic Center, then strike the center with a Ritual Dagger.$(br2)A = Attack, D = Defense, R = Regeneration, C = Center, X = empty. Patterns may be rotated. Every unmarked position must remain empty. The completed center needs spirit-stone fuel."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Forcefield Center",
+      "text": "DXDXD$(br)XDRDX$(br)DXCXD$(br)XDRDX$(br)DXDXD$(br2)Always blocks lightning. Also blocks ownerless, mob-owned, and blacklisted-player projectiles and ranged attack entities, plus blacklisted players, their other attacks, and enabled mob categories. Nonblacklisted players and non-lightning attacks they own pass freely. Outside explosions cannot destroy blocks inside the field. An expanding boundary carries blocked nearby entities outward. Items and experience pass. Spirit stones absorb 10/100/1000 damage; an unfueled broken ward explodes."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Fog / Inverted",
+      "text": "$(bold)Fog$()$(br)RXXXR$(br)XDADX$(br)RXCXR$(br)XDADX$(br)RXXXR$(br2)$(bold)Inverted$()$(br)AXRXA$(br)XXDXX$(br)RXCXR$(br)XXDXX$(br)AXRXA"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Scorching Center",
+      "text": "AXXXA$(br)XAXAX$(br)RXCXR$(br)XAXAX$(br)AXXXA$(br2)Burns and damages enemies each second, drains 1% maximum Qi, removes Frozen effects, reduces healing, strengthens fire techniques, and raises ice-technique cost."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Sanctuary Center",
+      "text": "RXRXR$(br)XXDXX$(br)RXCXR$(br)XXDXX$(br)RXRXR$(br2)Grants Regeneration II, restores 1% maximum Qi each second, improves natural Qi recovery, shortens fire, and removes minor Poison and Weakness."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Frost Center",
+      "text": "DXRXD$(br)XDXDX$(br)AXCXA$(br)XRXRX$(br)DXRXD$(br2)Slows, extinguishes, freezes, and applies Frozen Qi. Qi recovery is halved and spell costs rise. Fire techniques erode Frozen Qi."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Decay Center",
+      "text": "AXRXA$(br)XAXAX$(br)RXCXR$(br)XAXAX$(br)AXRXA$(br2)Inflicts Wither and Weakness, reduces healing, and raises healing-technique cost. Corpse and Blood Demon cultivators resist part of the effect."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Thunder Center",
+      "text": "AXDXA$(br)XRXRX$(br)AXCXA$(br)XXDXX$(br)AXXXA$(br2)Every 3 seconds, strikes the hostile target with the most Qi for 20 magic damage plus 1% maximum health. Wet and frozen targets take more. Blocks never ignite."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Detection Center",
+      "text": "DXAXD$(br)XRXRX$(br)AXCXA$(br)XXDXX$(br)AXXXD$(br2)Reveals intruders and hostile mobs, reports player name and realm once per entry, marks souls, grants Spirit Sight to permitted players, and exposes nearby disguises."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Reforge Blade Formation",
+      "text": "RXXXR$(br)XDXDX$(br)RXCXR$(br)XDXDX$(br)RXXXR$(br2)Place a damageable weapon in the extra weapon slot. While enabled and fueled, the weapon floats above the center and restores 1 durability each second."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Teleport Center",
+      "text": "XAXAX$(br)DXRXD$(br)XRCRX$(br)DXRXD$(br)XAXAX$(br2)Links two permanent Teleport Centers. This formation has no passive fuel drain and consumes its teleport fuel only when a teleport completes. Its glyph glows only while enabled, fueled, and a living non-spectator player is inside its radius."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Linking Centers",
+      "text": "Right-click the first Teleport Center with an empty Zhenpan, then right-click the second center with the recorded Zhenpan. The clicked center GUI still opens during both linking interactions. The record stores its dimension, coordinates, owner, and unique center ID. Links begin as two-way. The owner can later use the GUI to select two-way or either endpoint as the source of a one-way link. A Zhenpan can store one Magic Center."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Temporary Endpoints",
+      "text": "A Zhenpan holding a Teleport Center can maintain two temporary Teleport Centers at once. Summon them with normal right-clicks away from a Teleport Center; the second endpoint automatically links two-way to the first. Each has its own countdown. Entities are teleported automatically when they enter either radius. Qi and center-energy fuel are charged to the Zhenpan owner, using spirit stones from that player's inventory; excess stone value remains in the source until it expires. An arrival must leave before it can trigger that endpoint again."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Teleporting",
+      "text": "The owner or a control-whitelisted player must stand inside the radius and sneak-right-click the center with an empty hand. All entities in the radius teleport after 5 seconds. Leaving the radius or taking damage immediately cancels the charge and deactivates the combo.$(br2)Cost: 100 Qi per entity from the activator, plus 10 center energy per block of distance per entity."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Teleport Flags",
+      "text": "Each Spirit Gathering Flag reduces teleport center-energy fuel by 25% and does not apply the normal ×1.5 flag-cost multiplier.$(br2)Each Haste Flag removes 2 seconds from charging, down to 0.5 seconds, but raises center-energy fuel by 30%. Other flags retain their normal ×1.5 fuel multiplier. Qi cost is unchanged."
+    }
+  ]
+}

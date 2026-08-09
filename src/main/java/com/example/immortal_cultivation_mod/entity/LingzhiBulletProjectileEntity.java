@@ -4,6 +4,7 @@ import com.example.immortal_cultivation_mod.spell.ModSpells;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
@@ -22,6 +23,7 @@ public class LingzhiBulletProjectileEntity extends ThrowableItemProjectile {
 
     public LingzhiBulletProjectileEntity(Level level, LivingEntity shooter) {
         super(ModEntities.LINGZHI_BULLET_PROJECTILE.get(), shooter, level);
+        NpcProfile.markNpcOwnedEffect(this, shooter);
         setNoGravity(true);
     }
 
@@ -33,6 +35,14 @@ public class LingzhiBulletProjectileEntity extends ThrowableItemProjectile {
     @Override
     public void tick() {
         setNoGravity(true);
+        if (!level().isClientSide) {
+            Entity owner = getOwner();
+            NpcProfile.markNpcOwnedEffect(this, owner);
+            if (NpcProfile.isOrphanedNpcEffect(this, owner)) {
+                discard();
+                return;
+            }
+        }
         super.tick();
         if (level().isClientSide) {
             level().addParticle(ParticleTypes.CRIT,
@@ -62,13 +72,19 @@ public class LingzhiBulletProjectileEntity extends ThrowableItemProjectile {
     }
 
     @Override
+    protected boolean canHitEntity(Entity entity) {
+        return NpcProfile.canNpcEffectHit(this, getOwner(), entity) && super.canHitEntity(entity);
+    }
+
+    @Override
     protected void onHitEntity(EntityHitResult result) {
+        Entity target = ModelBonePartEntity.resolveParent(result.getEntity());
         float damage = com.example.immortal_cultivation_mod.spell.SpellDamageHelper.damage(
                 getOwner(),
                 5.0F,
                 ModSpells.get(ModSpells.LINGZHI_BULLET)
         );
-        result.getEntity().hurt(damageSources().thrown(this, getOwner()), damage);
+        target.hurt(damageSources().thrown(this, getOwner()), damage);
     }
 
     @Override

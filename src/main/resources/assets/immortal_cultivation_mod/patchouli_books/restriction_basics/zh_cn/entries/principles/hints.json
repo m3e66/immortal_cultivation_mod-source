@@ -1,0 +1,29 @@
+{
+  "name": "禁制感悟与解法",
+  "icon": "immortal_cultivation_mod:restriction_insight",
+  "category": "immortal_cultivation_mod:principles",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "immortal_cultivation_mod:restriction_insight",
+      "title": "禁制感悟",
+      "text": "使用禁制感悟会开启四种灵珠的三消参悟。达到 10000 分并完成参悟后消耗一件物品，获得一次永久保存的禁制提示。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "使用提示",
+      "text": "算盘中的“提示”按钮会消耗一次提示，并沿可解路线把一枚尚未完成的算珠校正一步。提示不消耗 300 灵气、不增加已用步数，也不会触发不稳节点。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "基础思路",
+      "text": "先处理连接最少的普通节点，再观察正向与反向阵线。锁定节点只能借相邻节点调整，应优先为它预留空间。临近不稳触发时，避免把关键节点停在 0 或 6。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "隐藏目标",
+      "text": "隐藏节点不会显示是否已经正确。记录相连节点每次变化，先解开可见目标，再用剩余阵线反推隐藏值。无法判断时，禁制提示会沿实际可解路线推进，不会随意来回。"
+    }
+  ]
+}

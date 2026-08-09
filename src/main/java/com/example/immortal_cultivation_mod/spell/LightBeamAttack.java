@@ -7,6 +7,7 @@ import com.example.immortal_cultivation_mod.event.ServerEvents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -39,8 +40,10 @@ public final class LightBeamAttack {
             return false;
         }
 
-        for (int slot = 0; slot < LightBeamProjectileEntity.PROJECTILES_PER_STACK; slot++) {
-            level.addFreshEntity(new LightBeamProjectileEntity(level, player, currentStacks, slot));
+        List<LightBeamProjectileEntity> prepared = prepareStack(level, player, currentStacks);
+        if (prepared.size() != LightBeamProjectileEntity.PROJECTILES_PER_STACK) {
+            prepared.forEach(LightBeamProjectileEntity::discard);
+            return false;
         }
         ServerEvents.syncPlayerData(player);
         return true;
@@ -79,7 +82,44 @@ public final class LightBeamAttack {
         return !waitingProjectiles(player.level(), player).isEmpty();
     }
 
-    private static List<LightBeamProjectileEntity> waitingProjectiles(Level level, Player player) {
+    /** Creates and immediately fires one real six-projectile light-beam stack for non-player casters. */
+    public static boolean prepareAndFireVolley(LivingEntity caster, Vec3 direction) {
+        if (!(caster.level() instanceof ServerLevel level) || direction.lengthSqr() < 1.0E-6D) {
+            return false;
+        }
+        List<LightBeamProjectileEntity> waiting = waitingProjectiles(level, caster);
+        int currentStacks = waiting.size() / LightBeamProjectileEntity.PROJECTILES_PER_STACK;
+        if (currentStacks >= LightBeamProjectileEntity.MAX_STACKS) {
+            return false;
+        }
+        List<LightBeamProjectileEntity> prepared = prepareStack(level, caster, currentStacks);
+        if (prepared.size() != LightBeamProjectileEntity.PROJECTILES_PER_STACK) {
+            prepared.forEach(LightBeamProjectileEntity::discard);
+            return false;
+        }
+        Vec3 normalized = direction.normalize();
+        for (LightBeamProjectileEntity projectile : prepared) {
+            projectile.fireInDirection(normalized);
+        }
+        return true;
+    }
+
+    private static List<LightBeamProjectileEntity> prepareStack(
+            ServerLevel level,
+            LivingEntity caster,
+            int ring) {
+        java.util.ArrayList<LightBeamProjectileEntity> prepared = new java.util.ArrayList<>(
+                LightBeamProjectileEntity.PROJECTILES_PER_STACK);
+        for (int slot = 0; slot < LightBeamProjectileEntity.PROJECTILES_PER_STACK; slot++) {
+            LightBeamProjectileEntity projectile = new LightBeamProjectileEntity(level, caster, ring, slot);
+            if (level.addFreshEntity(projectile)) {
+                prepared.add(projectile);
+            }
+        }
+        return List.copyOf(prepared);
+    }
+
+    private static List<LightBeamProjectileEntity> waitingProjectiles(Level level, LivingEntity player) {
         return level.getEntitiesOfClass(LightBeamProjectileEntity.class,
                         new AABB(player.blockPosition()).inflate(48.0D),
                         projectile -> projectile.isWaiting() && player.getUUID().equals(projectile.getCasterId()))

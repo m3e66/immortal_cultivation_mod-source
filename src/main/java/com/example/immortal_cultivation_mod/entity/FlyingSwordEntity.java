@@ -83,7 +83,8 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
             SynchedEntityData.defineId(FlyingSwordEntity.class, EntityDataSerializers.FLOAT);
 
     private int qiTickCounter;
-    private int swordHealth = 20;
+    private int swordHealth = 1;
+    private int swordMaxHealth = 1;
     private int photonEffectAttempts;
     private int shotTick = -1;
     private ItemStack storedSwordStack = ItemStack.EMPTY;
@@ -91,6 +92,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
     public FlyingSwordEntity(EntityType<? extends ThrowableItemProjectile> entityType, Level level) {
         super(entityType, level);
         setNoGravity(false);
+        resetSwordHealth(new ItemStack(ModItems.FLYING_SWORD.get()));
     }
 
     public FlyingSwordEntity(Level level, ServerPlayer owner, Vec3 pos) {
@@ -99,6 +101,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         setOwnerUuid(owner.getUUID());
         setPos(pos.x, pos.y, pos.z);
         setNoGravity(false);
+        resetSwordHealth(new ItemStack(ModItems.FLYING_SWORD.get()));
     }
 
     @Override
@@ -162,6 +165,15 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         storedSwordStack = stack.isEmpty() ? new ItemStack(ModItems.FLYING_SWORD.get()) : stack.copyWithCount(1);
         setItem(storedSwordStack);
         setWeaponDamage(baseAttackDamage(storedSwordStack));
+        resetSwordHealth(storedSwordStack);
+    }
+
+    public int getSwordHealth() {
+        return swordHealth;
+    }
+
+    public int getSwordMaxHealth() {
+        return swordMaxHealth;
     }
 
     @Override
@@ -421,16 +433,20 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         setShotRotation(look);
         PhotonEffects.flyingSwordProjectile(this);
         photonEffectAttempts = 1;
-        shoot(look.x, look.y, look.z, SHOOT_SPEED, 0.0F);
+        float speed = (float) (SHOOT_SPEED
+                * com.example.immortal_cultivation_mod.item.WeaponRestrictionSystem
+                .flyingSpeedMultiplier(storedSwordStack));
+        shoot(look.x, look.y, look.z, speed, 0.0F);
     }
 
     @Override
     protected boolean canHitEntity(Entity entity) {
         UUID owner = getOwnerUuid();
+        Entity target = ModelBonePartEntity.resolveParent(entity);
         if (!isShot()) {
             return false;
         }
-        if (owner != null && entity.getUUID().equals(owner)) {
+        if (owner != null && target.getUUID().equals(owner)) {
             return false;
         }
         if (entity instanceof FlyingSwordEntity otherSword && owner != null && owner.equals(otherSword.getOwnerUuid())) {
@@ -507,7 +523,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
     }
 
     private void hitEntityAndStick(EntityHitResult result) {
-        Entity target = result.getEntity();
+        Entity target = ModelBonePartEntity.resolveParent(result.getEntity());
         UUID owner = getOwnerUuid();
         if (owner != null && owner.equals(target.getUUID())) {
             return;
@@ -522,6 +538,8 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         target.hurt(source, damageAgainst(target));
         if (target instanceof LivingEntity living) {
             com.example.immortal_cultivation_mod.item.ForgingSystem.applyWeaponHitEffects(storedSwordStack, living);
+            com.example.immortal_cultivation_mod.item.WeaponRestrictionSystem
+                    .applyWeaponHitEffects(storedSwordStack, living);
         }
         stickAt(result.getLocation(), getDeltaMovement());
     }
@@ -777,6 +795,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         tag.putBoolean("Shot", isShot());
         tag.putBoolean("Stuck", isStuck());
         tag.putInt("SwordHealth", swordHealth);
+        tag.putInt("SwordMaxHealth", swordMaxHealth);
         tag.putFloat("WeaponDamage", getWeaponDamage());
         tag.putInt("SwordIndex", getSwordIndex());
         tag.putInt("TotalControlledSwords", getTotalControlledSwords());
@@ -798,7 +817,6 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         entityData.set(DISABLED, tag.getBoolean("Disabled"));
         entityData.set(SHOT, tag.getBoolean("Shot"));
         entityData.set(STUCK, tag.getBoolean("Stuck"));
-        swordHealth = tag.contains("SwordHealth") ? tag.getInt("SwordHealth") : 20;
         entityData.set(WEAPON_DAMAGE, tag.contains("WeaponDamage") ? tag.getFloat("WeaponDamage") : 10.0F);
         entityData.set(SWORD_INDEX, tag.getInt("SwordIndex"));
         entityData.set(TOTAL_CONTROLLED_SWORDS, Math.max(1, tag.getInt("TotalControlledSwords")));
@@ -812,6 +830,13 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
             storedSwordStack = new ItemStack(ModItems.FLYING_SWORD.get());
         }
         setItem(storedSwordStack);
+        swordMaxHealth = weaponEntityHealth(storedSwordStack);
+        if (tag.contains("SwordMaxHealth") && tag.contains("SwordHealth")) {
+            swordHealth = Math.max(0, Math.min(swordMaxHealth, tag.getInt("SwordHealth")));
+        } else {
+            // Old entities used a fixed 20 HP pool; migrate them to the durability-derived maximum.
+            swordHealth = swordMaxHealth;
+        }
     }
 
     public static boolean releaseFromHand(ServerPlayer player) {
@@ -835,6 +860,43 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
             player.getItemInHand(hand).shrink(1);
         }
         return true;
+    }
+
+    public static int releaseControlledFromCase(ServerPlayer player, List<ItemStack> weapons) {
+        if (!(player.level() instanceof ServerLevel level) || weapons.isEmpty()) {
+            return 0;
+        }
+        Vec3 forward = horizontal(player.getLookAngle());
+        Vec3 right = new Vec3(-forward.z, 0.0D, forward.x);
+        Vec3 center = player.position().subtract(forward.scale(1.1D)).add(0.0D, 1.35D, 0.0D);
+        int released = 0;
+        for (ItemStack weapon : weapons) {
+            if (!isFlyingWeapon(weapon)) {
+                continue;
+            }
+            double sideOffset = (released - (weapons.size() - 1) * 0.5D) * 0.18D;
+            FlyingSwordEntity sword = new FlyingSwordEntity(level, player, center.add(right.scale(sideOffset)));
+            sword.setStoredSwordStack(weapon);
+            if (!level.addFreshEntity(sword)) {
+                break;
+            }
+            sword.control(player);
+            released++;
+        }
+        return released;
+    }
+
+    public static List<ItemStack> collectControlledForCase(ServerPlayer player) {
+        List<ItemStack> collected = new ArrayList<>();
+        for (FlyingSwordEntity sword : controlledSwords(player)) {
+            ItemStack stack = sword.pickupSwordStack();
+            if (isFlyingWeapon(stack)) {
+                collected.add(stack);
+                sword.ejectPassengers();
+                sword.discard();
+            }
+        }
+        return collected;
     }
 
     private static int recallNearby(ServerPlayer player, double radius) {
@@ -1069,10 +1131,22 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         return hasAttackDamage ? (float) Math.max(1.0D, damage) : 10.0F;
     }
 
+    private void resetSwordHealth(ItemStack stack) {
+        swordMaxHealth = weaponEntityHealth(stack);
+        swordHealth = swordMaxHealth;
+    }
+
+    private static int weaponEntityHealth(ItemStack stack) {
+        int durability = stack.isDamageableItem() ? stack.getMaxDamage() : 10;
+        return Math.max(1, durability / 10);
+    }
+
     private float damageAgainst(Entity target) {
         float damage = getWeaponDamage();
         if (target instanceof LivingEntity living) {
             damage = com.example.immortal_cultivation_mod.item.ForgingSystem.adjustWeaponDamage(storedSwordStack, living, damage);
+            damage = com.example.immortal_cultivation_mod.item.WeaponRestrictionSystem
+                    .adjustWeaponDamage(storedSwordStack, living, damage);
         }
         if (target instanceof LivingEntity living
                 && com.example.immortal_cultivation_mod.spell.UndeadControl.isUndeadServantType(living)) {
@@ -1085,7 +1159,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         return damage;
     }
 
-    private static boolean isFlyingWeapon(ItemStack stack) {
+    public static boolean isFlyingWeapon(ItemStack stack) {
         return stack.is(ModItems.FLYING_SWORD.get())
                 || stack.is(ModItems.DAO.get())
                 || stack.is(ModItems.TAOMU_SWORD.get())

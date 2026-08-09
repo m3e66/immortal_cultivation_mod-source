@@ -1,0 +1,46 @@
+{
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
+	"gui_light": "front",
+	"parent": "minecraft:item/handheld",
+	"textures": {
+		"layer0": "immortal_cultivation_mod:item/jingtie_spear"
+	},
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [0, -90, 0],
+			"translation": [0, 5, 0.75],
+			"scale": [2.3, 2.3, 0.1]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [0, 90, 0],
+			"translation": [0, 5, 0.75],
+			"scale": [2.3, 2.3, 0.1]
+		},
+		"firstperson_righthand": {
+			"rotation": [-75, -90, 0],
+			"scale": [2.3, 2.3, 0.1]
+		},
+		"firstperson_lefthand": {
+			"rotation": [-75, 90, 0],
+			"scale": [2.3, 2.3, 0.1]
+		},
+		"ground": {
+			"scale": [1.3, 1.3, 0.1]
+		},
+		"gui": {
+			"rotation": [0, 0, -47],
+			"scale": [1.3, 1.3, 0.5]
+		},
+		"head": {
+			"scale": [1, 1, 0]
+		},
+		"fixed": {
+			"rotation": [0, -180, -47],
+			"scale": [1.3, 1.3, 0]
+		},
+		"on_shelf": {
+			"scale": [1.3, 1.3, 0]
+		}
+	}
+}

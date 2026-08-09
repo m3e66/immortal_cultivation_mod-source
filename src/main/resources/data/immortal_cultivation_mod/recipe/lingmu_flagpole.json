@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " L",
+    "L "
+  ],
+  "key": {
+    "L": {
+      "item": "immortal_cultivation_mod:lingmu_log"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:lingmu_flagpole",
+    "count": 1
+  }
+}

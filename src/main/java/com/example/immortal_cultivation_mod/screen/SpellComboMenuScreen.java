@@ -17,7 +17,7 @@ import java.util.UUID;
 
 public class SpellComboMenuScreen extends Screen {
     private static final int WINDOW_W = 360;
-    private static final int WINDOW_H = 260;
+    private static final int WINDOW_H = 287;
     private static final int ROW_H = 22;
 
     public SpellComboMenuScreen() {
@@ -30,14 +30,14 @@ public class SpellComboMenuScreen extends Screen {
         int x = (width - WINDOW_W) / 2;
         int y = (height - WINDOW_H) / 2;
 
-        addRenderableWidget(new ComboButton(x + 104, y + 28, 18, 18,
+        addRenderableWidget(new ComboButton(x + 132, y + 45, 18, 18,
                 Component.literal("+"),
                 b -> minecraft.setScreen(new SpellComboEditScreen(null, "", new ArrayList<>(), ClientSpellCombos.CastMode.SEQUENTIAL))));
 
         List<ClientSpellCombos.SpellCombo> combos = ClientSpellCombos.combos();
         for (int i = 0; i < Math.min(8, combos.size()); i++) {
             ClientSpellCombos.SpellCombo combo = combos.get(i);
-            int rowY = y + 58 + i * ROW_H;
+            int rowY = y + 76 + i * ROW_H;
             addRenderableWidget(new ComboButton(x + WINDOW_W - 58, rowY, 18, 18, Component.literal("+"),
                     b -> minecraft.setScreen(new SpellComboEditScreen(combo.id(), combo.name(), new ArrayList<>(combo.spellIds()), combo.castMode()))));
             addRenderableWidget(new ComboButton(x + WINDOW_W - 34, rowY, 18, 18, Component.literal("-"),
@@ -55,23 +55,25 @@ public class SpellComboMenuScreen extends Screen {
         int x = (width - WINDOW_W) / 2;
         int y = (height - WINDOW_H) / 2;
         drawPanel(g, x, y, WINDOW_W, WINDOW_H);
-        g.drawString(font, title, x + 14, y + 10, 0x55DDFF, true);
+        g.drawString(font, title, x + (WINDOW_W - font.width(title)) / 2, y + 16,
+                0xFF38352E, false);
         g.drawString(font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".create_spell"),
-                x + 14, y + 33, 0xFFFFFFFF, true);
+                x + 42, y + 50, 0xFF31584F, false);
 
         List<ClientSpellCombos.SpellCombo> combos = ClientSpellCombos.combos();
         if (combos.isEmpty()) {
             g.drawString(font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".no_spell_combos"),
-                    x + 14, y + 68, 0xFF888888, false);
+                    x + 42, y + 86, 0xFF756D60, false);
         }
 
         for (int i = 0; i < Math.min(8, combos.size()); i++) {
             ClientSpellCombos.SpellCombo combo = combos.get(i);
-            int rowY = y + 58 + i * ROW_H;
-            int bg = (mouseY >= rowY && mouseY < rowY + 18 && mouseX >= x + 12 && mouseX <= x + WINDOW_W - 12) ? 0x3322AAFF : 0x22000000;
-            g.fill(x + 12, rowY - 1, x + WINDOW_W - 12, rowY + 19, bg);
-            g.drawString(font, combo.name(), x + 18, rowY + 5, 0xFFFFFFFF, true);
-            g.drawString(font, ClientSpellCombos.topElements(combo), x + 160, rowY + 5, 0xFFFFDDAA, true);
+            int rowY = y + 76 + i * ROW_H;
+            int bg = (mouseY >= rowY && mouseY < rowY + 18 && mouseX >= x + 34 && mouseX <= x + WINDOW_W - 18)
+                    ? 0x403C6B5D : 0x18A89B7D;
+            g.fill(x + 34, rowY - 1, x + WINDOW_W - 18, rowY + 19, bg);
+            g.drawString(font, combo.name(), x + 42, rowY + 5, 0xFF332F28, false);
+            g.drawString(font, ClientSpellCombos.topElements(combo), x + 180, rowY + 5, 0xFF7A5B2D, false);
         }
 
         super.render(g, mouseX, mouseY, partialTick);
@@ -87,15 +89,12 @@ public class SpellComboMenuScreen extends Screen {
     }
 
     static void drawPanel(GuiGraphics g, int x, int y, int w, int h) {
-        g.fill(x, y, x + w, y + h, 0xE0101010);
-        g.renderOutline(x, y, w, h, 0xFF55DDFF);
-        g.fill(x + 1, y + 1, x + w - 1, y + 2, 0xAA8FFFFF);
-        g.fill(x + 1, y + h - 2, x + w - 1, y + h - 1, 0xAA1E6F7A);
+        CultivationGuiTextures.drawLandscape(g, x, y, w, h);
     }
 }
 
 class SpellComboEditScreen extends Screen {
-    private static final int WINDOW_W = 360;
+    private static final int WINDOW_W = 400;
     private static final int WINDOW_H = 320;
     private static final int ROW_H = 22;
 
@@ -123,13 +122,13 @@ class SpellComboEditScreen extends Screen {
                 Component.literal("+"),
                 b -> minecraft.setScreen(new SpellComboSpellPickerScreen(this))));
 
-        addRenderableWidget(new ComboButton(x + 14, y + 54, 156, 18,
+        addRenderableWidget(new ComboButton(x + 24, y + 54, 166, 18,
                 Component.translatable("screen." + ImmortalCultivationMod.MODID + ".combo_mode_sequential"),
                 b -> {
                     castMode = ClientSpellCombos.CastMode.SEQUENTIAL;
                     init();
                 }));
-        addRenderableWidget(new ComboButton(x + 190, y + 54, 156, 18,
+        addRenderableWidget(new ComboButton(x + 210, y + 54, 166, 18,
                 Component.translatable("screen." + ImmortalCultivationMod.MODID + ".combo_mode_simultaneous"),
                 b -> {
                     castMode = ClientSpellCombos.CastMode.SIMULTANEOUS;
@@ -165,28 +164,29 @@ class SpellComboEditScreen extends Screen {
         int x = (width - WINDOW_W) / 2;
         int y = (height - WINDOW_H) / 2;
         SpellComboMenuScreen.drawPanel(g, x, y, WINDOW_W, WINDOW_H);
-        g.drawString(font, title, x + 14, y + 10, 0x55DDFF, true);
+        g.drawString(font, title, x + (WINDOW_W - font.width(title)) / 2, y + 16,
+                0xFF38352E, false);
         g.drawString(font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".order"),
-                x + 14, y + 33, 0xFFFFFFFF, true);
+                x + 24, y + 33, 0xFF31584F, false);
         g.drawString(font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".combo_cast_mode"),
-                x + 90, y + 33, 0xFFAAAAAA, false);
-        int selectedX = castMode == ClientSpellCombos.CastMode.SEQUENTIAL ? x + 14 : x + 190;
-        g.renderOutline(selectedX, y + 54, 156, 18, 0xFFFFDDAA);
+                x + 100, y + 33, 0xFF756D60, false);
+        int selectedX = castMode == ClientSpellCombos.CastMode.SEQUENTIAL ? x + 24 : x + 210;
+        g.renderOutline(selectedX, y + 54, 166, 18, 0xFF8B6A35);
 
         if (spellIds.isEmpty()) {
             g.drawString(font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".empty_combo_hint"),
-                    x + 14, y + 68, 0xFF888888, false);
+                    x + 24, y + 68, 0xFF756D60, false);
         }
 
         for (int i = 0; i < Math.min(9, spellIds.size()); i++) {
             int rowY = y + 82 + i * ROW_H;
             var spell = ModSpells.get(spellIds.get(i));
             String name = spell == null ? spellIds.get(i) : spell.name().getString();
-            int bg = draggingIndex == i ? 0x5533CCFF : 0x22000000;
-            g.fill(x + 12, rowY - 1, x + WINDOW_W - 12, rowY + 19, bg);
-            g.drawString(font, "|||", x + 18, rowY + 5, 0xFFAAAAAA, false);
-            g.drawString(font, Integer.toString(i + 1), x + 46, rowY + 5, 0xFFFFDDAA, true);
-            g.drawString(font, name, x + 70, rowY + 5, 0xFFFFFFFF, true);
+            int bg = draggingIndex == i ? 0x483C6B5D : 0x18A89B7D;
+            g.fill(x + 22, rowY - 1, x + WINDOW_W - 18, rowY + 19, bg);
+            g.drawString(font, "|||", x + 28, rowY + 5, 0xFF756D60, false);
+            g.drawString(font, Integer.toString(i + 1), x + 56, rowY + 5, 0xFF7A5B2D, false);
+            g.drawString(font, name, x + 80, rowY + 5, 0xFF332F28, false);
         }
 
         super.render(g, mouseX, mouseY, partialTick);
@@ -197,7 +197,7 @@ class SpellComboEditScreen extends Screen {
         if (button == 0) {
             int row = rowAt(mouseX, mouseY);
             int x = (width - WINDOW_W) / 2;
-            if (row >= 0 && mouseX >= x + 14 && mouseX <= x + 42) {
+            if (row >= 0 && mouseX >= x + 24 && mouseX <= x + 52) {
                 draggingIndex = row;
                 return true;
             }
@@ -223,7 +223,7 @@ class SpellComboEditScreen extends Screen {
     private int rowAt(double mouseX, double mouseY) {
         int x = (width - WINDOW_W) / 2;
         int y = (height - WINDOW_H) / 2;
-        if (mouseX < x + 12 || mouseX > x + WINDOW_W - 12) {
+        if (mouseX < x + 22 || mouseX > x + WINDOW_W - 18) {
             return -1;
         }
         int row = (int) ((mouseY - (y + 82)) / ROW_H);
@@ -242,7 +242,7 @@ class SpellComboEditScreen extends Screen {
 
 class SpellComboSpellPickerScreen extends Screen {
     private static final int WINDOW_W = 360;
-    private static final int WINDOW_H = 280;
+    private static final int WINDOW_H = 287;
     private static final int VISIBLE_ROWS = 8;
     private final SpellComboEditScreen parent;
     private EditBox searchBox;
@@ -280,7 +280,8 @@ class SpellComboSpellPickerScreen extends Screen {
         int x = (width - WINDOW_W) / 2;
         int y = (height - WINDOW_H) / 2;
         SpellComboMenuScreen.drawPanel(g, x, y, WINDOW_W, WINDOW_H);
-        g.drawString(font, title, x + 14, y + 10, 0x55DDFF, true);
+        g.drawString(font, title, x + (WINDOW_W - font.width(title)) / 2, y + 16,
+                0xFF38352E, false);
 
         List<ModSpells.SpellDef> spells = filteredSpells();
         scrollOffset = Math.max(0, Math.min(scrollOffset, Math.max(0, spells.size() - VISIBLE_ROWS)));
@@ -288,9 +289,10 @@ class SpellComboSpellPickerScreen extends Screen {
             ModSpells.SpellDef spell = spells.get(i + scrollOffset);
             int rowY = y + 62 + i * 24;
             boolean hover = mouseX >= x + 14 && mouseX <= x + WINDOW_W - 14 && mouseY >= rowY && mouseY <= rowY + 20;
-            g.fill(x + 14, rowY, x + WINDOW_W - 14, rowY + 20, hover ? 0x3322AAFF : 0x22000000);
-            g.drawString(font, spell.name(), x + 20, rowY + 6, 0xFFFFFFFF, true);
-            g.drawString(font, spell.element(), x + WINDOW_W - 58, rowY + 6, 0xFFFFDDAA, true);
+            g.fill(x + 14, rowY, x + WINDOW_W - 14, rowY + 20,
+                    hover ? 0x403C6B5D : 0x18A89B7D);
+            g.drawString(font, spell.name(), x + 20, rowY + 6, 0xFF332F28, false);
+            g.drawString(font, spell.element(), x + WINDOW_W - 58, rowY + 6, 0xFF7A5B2D, false);
         }
         if (spells.size() > VISIBLE_ROWS) {
             String scrollText = (scrollOffset + 1) + "-" + Math.min(spells.size(), scrollOffset + VISIBLE_ROWS) + "/" + spells.size();
@@ -343,7 +345,7 @@ class SpellComboSpellPickerScreen extends Screen {
 
 class SpellComboNameScreen extends Screen {
     private static final int WINDOW_W = 280;
-    private static final int WINDOW_H = 120;
+    private static final int WINDOW_H = 224;
     private final String comboId;
     private final String existingName;
     private final List<String> spellIds;
@@ -362,7 +364,7 @@ class SpellComboNameScreen extends Screen {
     protected void init() {
         int x = (width - WINDOW_W) / 2;
         int y = (height - WINDOW_H) / 2;
-        nameBox = new EditBox(font, x + 16, y + 42, WINDOW_W - 32, 20, Component.literal(""));
+        nameBox = new EditBox(font, x + 24, y + 96, WINDOW_W - 48, 20, Component.literal(""));
         nameBox.setMaxLength(32);
         nameBox.setValue(existingName.isBlank() ? "New Combo" : existingName);
         addRenderableWidget(nameBox);
@@ -379,7 +381,8 @@ class SpellComboNameScreen extends Screen {
         int x = (width - WINDOW_W) / 2;
         int y = (height - WINDOW_H) / 2;
         SpellComboMenuScreen.drawPanel(g, x, y, WINDOW_W, WINDOW_H);
-        g.drawString(font, title, x + 16, y + 14, 0x55DDFF, true);
+        g.drawString(font, title, x + (WINDOW_W - font.width(title)) / 2, y + 17,
+                0xFF38352E, false);
         super.render(g, mouseX, mouseY, partialTick);
     }
 
@@ -390,7 +393,7 @@ class SpellComboNameScreen extends Screen {
 
 class SpellComboConfirmScreen extends Screen {
     private static final int WINDOW_W = 280;
-    private static final int WINDOW_H = 110;
+    private static final int WINDOW_H = 224;
     private final Screen previous;
     private final Component message;
     private final Runnable confirm;
@@ -417,7 +420,7 @@ class SpellComboConfirmScreen extends Screen {
         int x = (width - WINDOW_W) / 2;
         int y = (height - WINDOW_H) / 2;
         SpellComboMenuScreen.drawPanel(g, x, y, WINDOW_W, WINDOW_H);
-        g.drawString(font, message, x + 16, y + 28, 0xFFFFFFFF, true);
+        g.drawCenteredString(font, message, x + WINDOW_W / 2, y + 94, 0xFF38352E);
         super.render(g, mouseX, mouseY, partialTick);
     }
 
@@ -433,23 +436,9 @@ class ComboButton extends Button {
 
     @Override
     protected void renderWidget(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        int x = getX();
-        int y = getY();
-        int bg = active ? 0xCC202020 : 0x88404040;
-        int top = isHoveredOrFocused() && active ? 0xFF8FFFFF : 0xFF55DDFF;
-        int bottom = active ? 0xFF1E6F7A : 0xFF555555;
-        int text = active ? 0xFFEAFDFF : 0xFF999999;
-
-        g.fill(x, y, x + width, y + height, bg);
-        g.fill(x, y, x + width, y + 1, top);
-        g.fill(x, y, x + 1, y + height, top);
-        g.fill(x, y + height - 1, x + width, y + height, bottom);
-        g.fill(x + width - 1, y, x + width, y + height, bottom);
-
-        var font = Minecraft.getInstance().font;
-        Component message = getMessage();
-        int tx = x + (width - font.width(message)) / 2;
-        int ty = y + (height - 8) / 2;
-        g.drawString(font, message, tx, ty, text, false);
+        CultivationGuiTextures.drawButton(g, getX(), getY(), width, height,
+                active, isHoveredOrFocused());
+        CultivationGuiTextures.drawButtonText(g, getMessage(), getX(), getY(),
+                width, height, active);
     }
 }

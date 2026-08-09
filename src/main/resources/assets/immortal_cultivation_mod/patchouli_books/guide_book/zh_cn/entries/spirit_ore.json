@@ -1,0 +1,16 @@
+{
+  "name": "灵石矿石",
+  "icon": "immortal_cultivation_mod:spirit_ore",
+  "category": "immortal_cultivation_mod:spirit_resources",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "immortal_cultivation_mod:spirit_ore",
+      "text": "$(item)灵石矿石$()是一种在地下深处生成的大型矿脉资源。必须使用$(bold)铁镐或更高级工具$()才能挖掘并掉落灵石。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)灵石矿脉$()生成在Y=0到Y=-100之间。每条矿脉非常巨大，包含200-250个矿石方块。$(br2)在挖掘过程中可能会发现灵脉核心。$(br2)可使用灵石地图或$(bold)/locate poi immortal_cultivation_mod:spirit_vein_center$()命令查找附近矿脉。"
+    }
+  ]
+}

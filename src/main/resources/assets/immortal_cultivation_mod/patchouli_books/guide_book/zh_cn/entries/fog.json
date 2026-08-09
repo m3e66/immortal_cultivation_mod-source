@@ -1,0 +1,16 @@
+{
+  "name": "雾",
+  "icon": "minecraft:glass",
+  "category": "immortal_cultivation_mod:effects",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "minecraft:glass",
+      "text": "$(thing)雾$()是一种负面状态效果，会在玩家周围生成浓密的白色雾气，使视野范围大幅降低至仅约5格。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "在“雾”效果下，你周围的世界会被延伸成看似无尽的空间，你需要找到隐藏的魔法中心才能脱离该效果。"
+    }
+  ]
+}

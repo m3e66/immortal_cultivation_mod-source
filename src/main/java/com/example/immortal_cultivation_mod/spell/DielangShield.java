@@ -5,7 +5,9 @@ import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.effect.PhotonEffects;
 import com.example.immortal_cultivation_mod.event.ServerEvents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
 
 import java.util.Map;
 import java.util.UUID;
@@ -22,28 +24,41 @@ public final class DielangShield {
     }
 
     public static boolean cast(ServerPlayer player) {
-        ShieldState current = SHIELDS.get(player.getUUID());
-        int nextStack = current == null ? 1 : Math.min(MAX_STACK, current.stack() + 1);
-        if (current != null && current.stack() >= MAX_STACK) {
-            nextStack = MAX_STACK;
-        }
-
         var data = ModAttachments.getData(player);
-        if (!ServerEvents.spendQiOrBlood(player, data, COSTS[nextStack - 1])) {
+        if (!ServerEvents.spendQiOrBlood(player, data, nextCost(player))) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return false;
         }
-
-        ShieldState updated = new ShieldState(nextStack, CAPACITY[nextStack - 1]);
-        SHIELDS.put(player.getUUID(), updated);
-        PhotonEffects.waterShield(player, nextStack);
-        sync(player);
+        activateNext(player);
         ServerEvents.syncPlayerData(player);
         return true;
     }
 
+    public static int nextCost(LivingEntity entity) {
+        ShieldState current = SHIELDS.get(entity.getUUID());
+        int stack = current == null ? 1 : Math.min(MAX_STACK, current.stack() + 1);
+        return COSTS[stack - 1];
+    }
+
+    /** Activates the same shield stack/capacity used by players after the caller pays the cost. */
+    public static boolean activateNext(LivingEntity entity) {
+        ShieldState current = SHIELDS.get(entity.getUUID());
+        int nextStack = current == null ? 1 : Math.min(MAX_STACK, current.stack() + 1);
+        ShieldState updated = new ShieldState(nextStack, CAPACITY[nextStack - 1]);
+        SHIELDS.put(entity.getUUID(), updated);
+        if (entity.level() instanceof ServerLevel level) {
+            PhotonEffects.waterShield(level, entity, nextStack);
+        }
+        sync(entity);
+        return true;
+    }
+
     public static float absorb(ServerPlayer player, float damage) {
-        ShieldState shield = SHIELDS.get(player.getUUID());
+        return absorb((LivingEntity) player, damage);
+    }
+
+    public static float absorb(LivingEntity entity, float damage) {
+        ShieldState shield = SHIELDS.get(entity.getUUID());
         if (shield == null || shield.remaining() <= 0.0F || damage <= 0.0F) {
             return damage;
         }
@@ -52,30 +67,62 @@ public final class DielangShield {
         float remainingShield = shield.remaining() - absorbed;
         float remainingDamage = damage - absorbed;
         if (remainingShield <= 0.0F) {
-            SHIELDS.remove(player.getUUID());
-            PhotonEffects.removeWaterShield(player);
+            SHIELDS.remove(entity.getUUID());
+            if (entity.level() instanceof ServerLevel level) {
+                PhotonEffects.removeWaterShield(level, entity);
+            }
         } else {
-            SHIELDS.put(player.getUUID(), new ShieldState(shield.stack(), remainingShield));
+            SHIELDS.put(entity.getUUID(), new ShieldState(shield.stack(), remainingShield));
         }
-        sync(player);
+        sync(entity);
         return remainingDamage;
     }
 
     public static void tick(ServerPlayer player) {
-        ShieldState shield = SHIELDS.get(player.getUUID());
-        if (shield != null && shield.remaining() > 0.0F && player.tickCount % 2 == 0) {
-            PhotonEffects.waterShield(player, shield.stack());
+        tick((LivingEntity) player);
+    }
+
+    public static void tick(LivingEntity entity) {
+        ShieldState shield = SHIELDS.get(entity.getUUID());
+        if (shield != null && shield.remaining() > 0.0F && entity.tickCount % 2 == 0
+                && entity.level() instanceof ServerLevel level) {
+            PhotonEffects.waterShield(level, entity, shield.stack());
         }
     }
 
+    public static boolean hasShield(LivingEntity entity) {
+        ShieldState shield = SHIELDS.get(entity.getUUID());
+        return shield != null && shield.remaining() > 0.0F;
+    }
+
+    public static float remaining(LivingEntity entity) {
+        ShieldState shield = SHIELDS.get(entity.getUUID());
+        return shield == null ? 0.0F : Math.max(0.0F, shield.remaining());
+    }
+
     public static void clear(ServerPlayer player) {
-        SHIELDS.remove(player.getUUID());
-        PhotonEffects.removeWaterShield(player);
-        PlayerShieldManager.clear(player, SHIELD_SOURCE);
+        clear((LivingEntity) player);
+    }
+
+    public static void clear(LivingEntity entity) {
+        SHIELDS.remove(entity.getUUID());
+        if (entity.level() instanceof ServerLevel level) {
+            PhotonEffects.removeWaterShield(level, entity);
+        }
+        if (entity instanceof ServerPlayer player) {
+            PlayerShieldManager.clear(player, SHIELD_SOURCE);
+        }
     }
 
     public static void sync(ServerPlayer player) {
-        ShieldState shield = SHIELDS.get(player.getUUID());
+        sync((LivingEntity) player);
+    }
+
+    private static void sync(LivingEntity entity) {
+        if (!(entity instanceof ServerPlayer player)) {
+            return;
+        }
+        ShieldState shield = SHIELDS.get(entity.getUUID());
         float amount = shield == null ? 0.0F : Math.max(0.0F, shield.remaining());
         float max = shield == null ? 0.0F : CAPACITY[Math.max(0, Math.min(CAPACITY.length - 1, shield.stack() - 1))];
         PlayerShieldManager.set(player, SHIELD_SOURCE, amount, max);

@@ -65,6 +65,12 @@ public class ModEffects {
     public static final DeferredHolder<MobEffect, MobEffect> XUYING_TA =
             MOB_EFFECTS.register("xuying_ta", XuyingTaEffect::new);
 
+    public static final DeferredHolder<MobEffect, MobEffect> XINLIAO =
+            MOB_EFFECTS.register("xinliao", XinliaoEffect::new);
+
+    public static final DeferredHolder<MobEffect, MobEffect> SHIXU_CHILIU =
+            MOB_EFFECTS.register("shixu_chiliu", ShixuChiliuEffect::new);
+
     public static void register(IEventBus bus) {
         MOB_EFFECTS.register(bus);
     }

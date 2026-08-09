@@ -9,6 +9,8 @@ import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Map;
@@ -109,6 +111,16 @@ public final class WindStep {
         ServerEvents.syncPlayerData(player);
     }
 
+    /** One paid second of the real Wind Step effect for an NPC caster. */
+    public static boolean activateNpc(PathfinderMob caster) {
+        MobEffectInstance current = caster.getEffect(ModEffects.WIND_STEP);
+        if (current != null && current.getDuration() > 10) {
+            return false;
+        }
+        refreshEffects(caster, 20);
+        return true;
+    }
+
     private static void stop(ServerPlayer player) {
         clear(player);
         player.removeEffect(MobEffects.MOVEMENT_SPEED);
@@ -116,7 +128,11 @@ public final class WindStep {
     }
 
     private static void refreshEffects(ServerPlayer player) {
-        player.addEffect(new MobEffectInstance(ModEffects.WIND_STEP, 40, 0, false, false, true));
-        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 1, false, false, true));
+        refreshEffects(player, 40);
+    }
+
+    private static void refreshEffects(LivingEntity entity, int durationTicks) {
+        entity.addEffect(new MobEffectInstance(ModEffects.WIND_STEP, durationTicks, 0, false, false, true));
+        entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, durationTicks, 1, false, false, true));
     }
 }

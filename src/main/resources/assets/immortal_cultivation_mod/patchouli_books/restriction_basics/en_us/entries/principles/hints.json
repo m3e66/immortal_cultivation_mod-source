@@ -1,0 +1,29 @@
+{
+  "name": "Comprehension and Hints",
+  "icon": "immortal_cultivation_mod:restriction_insight",
+  "category": "immortal_cultivation_mod:principles",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "immortal_cultivation_mod:restriction_insight",
+      "title": "Restriction Comprehension",
+      "text": "Using this item opens a four-orb match-three study. Reach 10,000 points and complete it to consume one item and gain one permanently stored restriction hint."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Using a Hint",
+      "text": "The Hint button spends one hint and corrects an unfinished bead by one step along a valid solution route. It costs no 300 Qi, adds no used move, and does not trigger instability."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Basic Strategy",
+      "text": "Handle lightly connected normal nodes first, watching positive and negative paths. Locked nodes move only through neighbors, so preserve room around them. Near an instability trigger, avoid leaving key nodes at 0 or 6."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Hidden Targets",
+      "text": "Hidden nodes do not reveal when they are correct. Record linked changes, solve visible targets first, then infer the hidden value. A hint follows the real solution route rather than wandering back and forth."
+    }
+  ]
+}

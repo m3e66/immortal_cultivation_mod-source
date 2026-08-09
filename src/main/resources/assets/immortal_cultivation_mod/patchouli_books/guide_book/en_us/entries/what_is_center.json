@@ -1,0 +1,20 @@
+{
+    "name": "What is a Magic Center",
+    "icon": "immortal_cultivation_mod:magic_center_block",
+    "category": "immortal_cultivation_mod:magic_center",
+    "pages": [
+        {
+            "type": "patchouli:spotlight",
+            "item": "immortal_cultivation_mod:magic_center_block",
+            "text": "The $(item)Magic Center Block$() is the $(bold)invisible$() anchor of your ritual setup. It defines the radius in which magic circles operate and provides the fuel they need to function."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "To place one, $(bold)Shift + Right-click$() with the Ritual Dagger and choose a radius. The center is placed beneath your feet.$(br2)The center block is invisible. Only its owner or an operator may dismantle it, and explosions cannot destroy it."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(bold)Right-click$() the center block (or its location) to open the control GUI. From here you can:$(br2)$(li)Add Spirit Stones as fuel$(li)Toggle the center and glyph$(li)Configure entity filters$(li)Manage the blacklist and controller whitelist"
+        }
+    ]
+}

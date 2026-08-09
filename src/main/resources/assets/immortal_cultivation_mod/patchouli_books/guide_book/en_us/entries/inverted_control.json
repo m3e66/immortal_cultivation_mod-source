@@ -1,0 +1,16 @@
+{
+    "name": "Inverted Control",
+    "icon": "minecraft:feather",
+    "category": "immortal_cultivation_mod:effects",
+    "pages": [
+        {
+            "type": "patchouli:spotlight",
+            "item": "minecraft:feather",
+            "text": "$(thing)Inverted Control$() is a disorienting status effect that reverses the player's movement inputs."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "While affected:$(br)$(li)$(bold)W$() key = move backward$(li)$(bold)S$() key = move forward$(li)$(bold)A$() key = move right$(li)$(bold)D$() key = move left$(br2)Jumping and sneaking are unaffected."
+        }
+    ]
+}

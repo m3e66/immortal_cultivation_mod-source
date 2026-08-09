@@ -2,17 +2,25 @@ package com.example.immortal_cultivation_mod.event;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attribute.ModAttributes;
+import com.example.immortal_cultivation_mod.entity.AzureSpiritSilkwormEntity;
+import com.example.immortal_cultivation_mod.entity.BloodApeDemonGeneralEntity;
+import com.example.immortal_cultivation_mod.entity.CrimsonSkyFlameFloodDragonEntity;
+import com.example.immortal_cultivation_mod.entity.CrimsonScaleFlameLizardEntity;
 import com.example.immortal_cultivation_mod.entity.CultivatorCorpseEntity;
+import com.example.immortal_cultivation_mod.entity.EscapedYuanyingCoreEntity;
 import com.example.immortal_cultivation_mod.entity.FanrenNpcEntity;
-import com.example.immortal_cultivation_mod.entity.GudiaoEntity;
 import com.example.immortal_cultivation_mod.entity.JindanCloneEntity;
 import com.example.immortal_cultivation_mod.entity.JindanCultivatorEntity;
 import com.example.immortal_cultivation_mod.entity.JindanEntity;
 import com.example.immortal_cultivation_mod.entity.ModEntities;
+import com.example.immortal_cultivation_mod.entity.SoulEntity;
+import com.example.immortal_cultivation_mod.entity.SystemManifestEntity;
+import com.example.immortal_cultivation_mod.entity.ShihunfanGhostEntity;
 import com.example.immortal_cultivation_mod.entity.XuyingShadowEntity;
 import com.example.immortal_cultivation_mod.entity.ZhujiCultivatorEntity;
 import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -26,21 +34,70 @@ public class ModEntityEvents {
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(ModEntities.ZHUJI_CULTIVATOR.get(), ZhujiCultivatorEntity.createAttributes().build());
         event.put(ModEntities.JINDAN_CULTIVATOR.get(), JindanCultivatorEntity.createAttributes().build());
+        event.put(ModEntities.LIUSAN.get(), JindanCultivatorEntity.createAttributes().build());
         event.put(ModEntities.FANREN_NPC.get(), FanrenNpcEntity.createAttributes().build());
-        event.put(ModEntities.GUDIAO.get(), GudiaoEntity.createAttributes().build());
+        event.put(ModEntities.CRIMSON_SCALE_FLAME_LIZARD.get(),
+                CrimsonScaleFlameLizardEntity.createAttributes().build());
+        event.put(ModEntities.CRIMSON_SKY_FLAME_FLOOD_DRAGON.get(),
+                CrimsonSkyFlameFloodDragonEntity.createAttributes().build());
+        event.put(ModEntities.BLOOD_APE_DEMON_GENERAL.get(),
+                BloodApeDemonGeneralEntity.createAttributes().build());
+        event.put(ModEntities.ESCAPED_YUANYING_CORE.get(),
+                EscapedYuanyingCoreEntity.createAttributes().build());
+        event.put(ModEntities.AZURE_SPIRIT_SILKWORM.get(),
+                AzureSpiritSilkwormEntity.createAttributes().build());
         event.put(ModEntities.CULTIVATOR_CORPSE.get(), CultivatorCorpseEntity.createAttributes().build());
         event.put(ModEntities.XUYING_SHADOW.get(), XuyingShadowEntity.createAttributes().build());
+        event.put(ModEntities.SOUL.get(), SoulEntity.createAttributes().build());
+        event.put(ModEntities.SHIHUNFAN_GHOST.get(), ShihunfanGhostEntity.createAttributes().build());
         event.put(ModEntities.JINDAN_CLONE.get(), JindanCloneEntity.createAttributes().build());
         event.put(ModEntities.JINDAN.get(), JindanEntity.createAttributes().build());
+        event.put(ModEntities.SYSTEM_MANIFEST.get(),
+                SystemManifestEntity.createAttributes().build());
     }
 
     @SubscribeEvent
     public static void registerSpawnPlacements(RegisterSpawnPlacementsEvent event) {
         event.register(
+                ModEntities.ZHUJI_CULTIVATOR.get(),
+                SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                Mob::checkMobSpawnRules,
+                RegisterSpawnPlacementsEvent.Operation.REPLACE
+        );
+        event.register(
+                ModEntities.JINDAN_CULTIVATOR.get(),
+                SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                Mob::checkMobSpawnRules,
+                RegisterSpawnPlacementsEvent.Operation.REPLACE
+        );
+        event.register(
                 ModEntities.FANREN_NPC.get(),
                 SpawnPlacementTypes.ON_GROUND,
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 (type, level, spawnType, pos, random) -> true,
+                RegisterSpawnPlacementsEvent.Operation.REPLACE
+        );
+        event.register(
+                ModEntities.CRIMSON_SCALE_FLAME_LIZARD.get(),
+                SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                Mob::checkMobSpawnRules,
+                RegisterSpawnPlacementsEvent.Operation.REPLACE
+        );
+        event.register(
+                ModEntities.CRIMSON_SKY_FLAME_FLOOD_DRAGON.get(),
+                SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                CrimsonSkyFlameFloodDragonEntity::checkDragonSpawnRules,
+                RegisterSpawnPlacementsEvent.Operation.REPLACE
+        );
+        event.register(
+                ModEntities.AZURE_SPIRIT_SILKWORM.get(),
+                SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                AzureSpiritSilkwormEntity::checkAzureSpawnRules,
                 RegisterSpawnPlacementsEvent.Operation.REPLACE
         );
     }
