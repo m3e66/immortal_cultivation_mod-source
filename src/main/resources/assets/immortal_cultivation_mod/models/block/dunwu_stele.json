@@ -1,0 +1,6 @@
+{
+  "parent": "builtin/entity",
+  "textures": {
+    "particle": "immortal_cultivation_mod:block/dunwu_stele"
+  }
+}

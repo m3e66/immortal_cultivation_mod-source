@@ -1,0 +1,18 @@
+{
+  "output": "immortal_cultivation_mod:sanctuary",
+  "priority": 100,
+  "allow_rotations": true,
+  "allow_mirror": false,
+  "pattern": [
+    { "x": -2, "y": 0, "z": -2, "block": "immortal_cultivation_mod:magic_circle_block", "properties": { "circle_type": "regeneration" } },
+    { "x": 0, "y": 0, "z": -2, "block": "immortal_cultivation_mod:magic_circle_block", "properties": { "circle_type": "regeneration" } },
+    { "x": 2, "y": 0, "z": -2, "block": "immortal_cultivation_mod:magic_circle_block", "properties": { "circle_type": "regeneration" } },
+    { "x": 0, "y": 0, "z": -1, "block": "immortal_cultivation_mod:magic_circle_block", "properties": { "circle_type": "defense" } },
+    { "x": -2, "y": 0, "z": 0, "block": "immortal_cultivation_mod:magic_circle_block", "properties": { "circle_type": "regeneration" } },
+    { "x": 2, "y": 0, "z": 0, "block": "immortal_cultivation_mod:magic_circle_block", "properties": { "circle_type": "regeneration" } },
+    { "x": 0, "y": 0, "z": 1, "block": "immortal_cultivation_mod:magic_circle_block", "properties": { "circle_type": "defense" } },
+    { "x": -2, "y": 0, "z": 2, "block": "immortal_cultivation_mod:magic_circle_block", "properties": { "circle_type": "regeneration" } },
+    { "x": 0, "y": 0, "z": 2, "block": "immortal_cultivation_mod:magic_circle_block", "properties": { "circle_type": "regeneration" } },
+    { "x": 2, "y": 0, "z": 2, "block": "immortal_cultivation_mod:magic_circle_block", "properties": { "circle_type": "regeneration" } }
+  ]
+}

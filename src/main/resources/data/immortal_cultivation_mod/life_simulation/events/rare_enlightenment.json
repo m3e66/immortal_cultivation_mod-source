@@ -1,0 +1,9 @@
+{
+  "id": "immortal_cultivation_mod:rare_enlightenment",
+  "minimum_age": 14,
+  "maximum_age": 5000,
+  "weight": 5,
+  "conditions": ["alive", "spiritual_root", "comprehension>=55", "!flag:rare_enlightenment"],
+  "text_key": "life.immortal_cultivation_mod.event.rare_enlightenment",
+  "effects": ["cultivation+1800", "comprehension+5", "mentality+8", "set_flag:rare_enlightenment"]
+}

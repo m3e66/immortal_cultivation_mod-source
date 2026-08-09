@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "immortal_cultivation_mod:block/lingmu_log_top",
+    "side": "immortal_cultivation_mod:block/lingmu_log"
+  }
+}

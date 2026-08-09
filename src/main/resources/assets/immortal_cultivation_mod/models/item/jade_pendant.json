@@ -1,6 +1,33 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "immortal_cultivation_mod:item/jade_pendant_inventory"
-  }
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
+	"parent": "minecraft:item/generated",
+	"textures": {
+		"layer0": "immortal_cultivation_mod:item/jade_pendant_inventory"
+	},
+	"display": {
+		"thirdperson_righthand": {
+			"scale": [1, 1, 0.3]
+		},
+		"thirdperson_lefthand": {
+			"scale": [1, 1, 0.3]
+		},
+		"firstperson_righthand": {
+			"translation": [0, 3.25, 0],
+			"scale": [1, 1, 0.3]
+		},
+		"firstperson_lefthand": {
+			"translation": [0, 3.25, 0],
+			"scale": [1, 1, 0.3]
+		},
+		"ground": {
+			"scale": [1, 1, 0.3]
+		},
+		"gui": {
+			"scale": [1, 1, 0.3]
+		},
+		"fixed": {
+			"scale": [1, 1, 0.3]
+		}
+	}
 }

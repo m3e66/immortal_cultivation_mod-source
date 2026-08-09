@@ -4,6 +4,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
@@ -21,6 +22,7 @@ public class SmokeProjectileEntity extends ThrowableItemProjectile {
 
     public SmokeProjectileEntity(Level level, LivingEntity shooter) {
         super(ModEntities.SMOKE_PROJECTILE.get(), shooter, level);
+        NpcProfile.markNpcOwnedEffect(this, shooter);
         setNoGravity(true);
     }
 
@@ -32,6 +34,14 @@ public class SmokeProjectileEntity extends ThrowableItemProjectile {
     @Override
     public void tick() {
         setNoGravity(true);
+        if (!level().isClientSide) {
+            Entity owner = getOwner();
+            NpcProfile.markNpcOwnedEffect(this, owner);
+            if (NpcProfile.isOrphanedNpcEffect(this, owner)) {
+                discard();
+                return;
+            }
+        }
         super.tick();
         if (level().isClientSide) {
             for (int i = 0; i < 4; i++) {
@@ -59,8 +69,14 @@ public class SmokeProjectileEntity extends ThrowableItemProjectile {
     }
 
     @Override
+    protected boolean canHitEntity(Entity entity) {
+        return NpcProfile.canNpcEffectHit(this, getOwner(), entity) && super.canHitEntity(entity);
+    }
+
+    @Override
     protected void onHitEntity(EntityHitResult result) {
-        if (result.getEntity() instanceof LivingEntity living) {
+        LivingEntity living = ModelBonePartEntity.resolveLiving(result.getEntity());
+        if (living != null) {
             living.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 20 * 10, 0));
         }
     }

@@ -1,0 +1,20 @@
+{
+    "name": "Fuel System",
+    "icon": "immortal_cultivation_mod:spirit_stone",
+    "category": "immortal_cultivation_mod:magic_center",
+    "pages": [
+        {
+            "type": "patchouli:spotlight",
+            "item": "immortal_cultivation_mod:spirit_stone",
+            "text": "Magic Centers require $(item)Spirit Stones$() as fuel to power connected circles. Without fuel, no effects apply. An Infinite Spirit Stone powers a center forever without being consumed."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(bold)Base Fuel Cost$()$(br2)$(li)Radius 3: 8/min$(li)Radius 5: 16/min$(li)Radius 7: 32/min$(li)Radius 9: 64/min$(li)Radius 11: 128/min$(li)Radius 13: 256/min$(br2)Above 13, cost follows the same cubic scaling curve."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(li)Radius 49: 13,709/min$(li)Radius 65: 32,000/min$(li)Radius 81: 61,925/min$(li)Radius 101: 120,053/min$(br2)Each additional circle adds 10/min. Right-clicking an Infinite Spirit Stone restores 10,000 Qi and never consumes it."
+        }
+    ]
+}

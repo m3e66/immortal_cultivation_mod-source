@@ -19,7 +19,10 @@ public class GeoRockBlockItemModel extends GeoModel<GeoRockBlockItem> {
 
     @Override
     public ResourceLocation getAnimationResource(GeoRockBlockItem animatable) {
+        String animation = "qingtong_yinhuo_ding".equals(animatable.modelName())
+                ? "qingtong_yinhuo_ding"
+                : "geo_rock";
         return ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID,
-                "animations/block/geo_rock.animation.json");
+                "animations/block/" + animation + ".animation.json");
     }
 }

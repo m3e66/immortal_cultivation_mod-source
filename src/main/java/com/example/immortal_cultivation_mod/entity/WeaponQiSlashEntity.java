@@ -1,0 +1,759 @@
+package com.example.immortal_cultivation_mod.entity;
+
+import com.example.immortal_cultivation_mod.item.QiInfusedWeapon;
+import com.example.immortal_cultivation_mod.item.WhipItem;
+import com.example.immortal_cultivation_mod.magicritual.center.ForcefieldInterceptable;
+import com.example.immortal_cultivation_mod.particle.MethodQiParticleEffects;
+import com.example.immortal_cultivation_mod.combat.CombatStateManager;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+
+public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptable {
+    private static final double SPEED = 1.4D;
+    private static final int MAX_LIFETIME_TICKS = 100;
+    private static final float MAX_DAMAGE = 1_000_000_000.0F;
+
+    private final Set<UUID> hitEntities = new HashSet<>();
+    private final Set<Long> checkedBlocks = new HashSet<>();
+    private UUID ownerUuid;
+    private UUID restrictedTargetUuid;
+    private Vec3 direction = new Vec3(0.0D, 0.0D, 1.0D);
+    private double speed = SPEED;
+    private float damage = 1.0F;
+    private double radius = 1.25D;
+    private double maxDistance = 8.0D;
+    private double distanceTraveled;
+    private int remainingBlocks;
+    private int slashStage;
+    private boolean blockBreaking = true;
+    private boolean cone;
+    private boolean expandingCone;
+    private boolean heavyAttack;
+    private boolean whip;
+    private float whipQiDamage;
+    private boolean whipHitRegistered;
+    private String element = "any";
+
+    public WeaponQiSlashEntity(EntityType<? extends WeaponQiSlashEntity> type, Level level) {
+        super(type, level);
+        setNoGravity(true);
+        noPhysics = true;
+    }
+
+    @Override
+    public Entity forcefieldOwner() {
+        return ownerUuid != null && level() instanceof ServerLevel serverLevel
+                ? serverLevel.getEntity(ownerUuid)
+                : null;
+    }
+
+    @Override
+    public Vec3 forcefieldMovement() {
+        return direction.scale(Math.min(speed,
+                Math.max(0.0D, maxDistance - distanceTraveled)));
+    }
+
+    @Override
+    public float forcefieldBarrierDamage() {
+        return damage;
+    }
+
+    @Override
+    public void forcefieldBounce(Vec3 reflectedMovement) {
+        if (reflectedMovement.lengthSqr() > 1.0E-9D) {
+            direction = safeDirection(reflectedMovement);
+            speed = reflectedMovement.length();
+        }
+        setDeltaMovement(direction.scale(speed));
+        hurtMarked = true;
+        hasImpulse = true;
+    }
+
+    @Override
+    public double forcefieldSupport(Vec3 normal) {
+        double forwardReach = speed + 0.75D;
+        SlashBasis slashBasis = basis();
+        if (cone) {
+            Vec3 up = direction.cross(slashBasis.right).normalize();
+            double radialProjection = Math.sqrt(
+                    Math.pow(normal.dot(slashBasis.right), 2.0D)
+                            + Math.pow(normal.dot(up), 2.0D));
+            return Math.abs(normal.dot(direction)) * forwardReach
+                    + radialProjection * currentConeRadius();
+        }
+        double thickness = 0.20D + radius * 0.025D;
+        return Math.abs(normal.dot(direction)) * forwardReach
+                + Math.abs(normal.dot(slashBasis.axis)) * radius
+                + Math.abs(normal.dot(slashBasis.perpendicular)) * thickness;
+    }
+
+    @Override
+    public double forcefieldMaximumSupport() {
+        double forwardReach = speed + 0.75D;
+        double radialReach = cone ? currentConeRadius() : radius;
+        if (cone) {
+            return Math.sqrt(forwardReach * forwardReach + radialReach * radialReach);
+        }
+        double thickness = 0.20D + radius * 0.025D;
+        return Math.sqrt(forwardReach * forwardReach + radialReach * radialReach
+                + thickness * thickness);
+    }
+
+    public static boolean release(ServerPlayer owner, int slashStage, boolean heavyCone) {
+        ItemStack weapon = owner.getMainHandItem();
+        boolean fistWeapon = QiInfusedWeapon.isFistWeapon(weapon);
+        if (!CombatStateManager.isInCombat(owner)
+                || !QiInfusedWeapon.outwardQiReleaseEnabled(owner)
+                || !QiInfusedWeapon.supportsOutwardQi(weapon)) {
+            return false;
+        }
+
+        double injectedQi = QiInfusedWeapon.getQi(weapon);
+        if (injectedQi <= 0.0D) {
+            return false;
+        }
+
+        WeaponQiSlashEntity slash = ModEntities.WEAPON_QI_SLASH.get().create(owner.serverLevel());
+        if (slash == null) {
+            return false;
+        }
+
+        double qiPower = injectedQi / 10.0D;
+        float injectedQiDamage =
+                QiInfusedWeapon.injectedQiDamage(weapon);
+        double baseDamage = Math.max(1.0D, QiInfusedWeapon.baseAttackDamage(weapon));
+        slash.ownerUuid = owner.getUUID();
+        slash.direction = safeDirection(owner.getLookAngle());
+        slash.damage = (float) Math.min(
+                MAX_DAMAGE,
+                baseDamage + injectedQiDamage);
+        slash.cone = fistWeapon || heavyCone;
+        slash.expandingCone = fistWeapon;
+        slash.heavyAttack = fistWeapon && heavyCone;
+        if (fistWeapon) {
+            double fourthRootPower = Math.sqrt(Math.sqrt(Math.max(0.0D, qiPower)));
+            if (heavyCone) {
+                slash.radius = Math.min(12.0D, 3.0D + fourthRootPower * 0.80D);
+                slash.maxDistance = Math.min(
+                        36.0D, 7.0D + Math.sqrt(qiPower) * 0.90D);
+            } else {
+                slash.radius = Math.min(7.0D, 1.5D + fourthRootPower * 0.50D);
+                slash.maxDistance = Math.min(
+                        24.0D, 4.0D + Math.sqrt(qiPower) * 0.60D);
+            }
+        } else if (slash.cone) {
+            slash.radius = Math.min(
+                    32.0D, 0.35D + Math.pow(qiPower, 0.65D) * 0.22D);
+            slash.maxDistance = Math.min(
+                    128.0D, 4.0D + Math.sqrt(qiPower) * 1.4D);
+        } else {
+            slash.radius = Math.min(
+                    32.0D, 2.0D + Math.sqrt(qiPower) * 0.65D);
+            slash.maxDistance = Math.min(
+                    128.0D, 40.0D + Math.sqrt(qiPower) * 1.2D);
+        }
+        slash.remainingBlocks = qiPower >= Integer.MAX_VALUE
+                ? Integer.MAX_VALUE
+                : Math.max(0, (int) Math.floor(qiPower));
+        slash.slashStage = Math.floorMod(slashStage, 3);
+        slash.blockBreaking = QiInfusedWeapon.outwardQiBlockBreakingEnabled(owner);
+
+        Vec3 right = rightVector(slash.direction);
+        Vec3 up = slash.direction.cross(right).normalize();
+        Vec3 startOffset = slash.cone
+                ? Vec3.ZERO
+                : switch (slash.slashStage) {
+                    case 0 -> right.scale(0.32D).add(up.scale(0.24D));
+                    case 1 -> right.scale(-0.28D).add(up.scale(-0.20D));
+                    default -> right.scale(0.34D);
+                };
+        Vec3 start = owner.getEyePosition()
+                .add(0.0D, -0.42D, 0.0D)
+                .add(slash.direction.scale(1.05D))
+                .add(startOffset);
+        slash.moveTo(start.x, start.y, start.z, owner.getYRot(), owner.getXRot());
+        slash.setDeltaMovement(slash.direction.scale(SPEED));
+
+        QiInfusedWeapon.consumeInjectedQiDamage(
+                weapon,
+                injectedQiDamage);
+        owner.serverLevel().addFreshEntity(slash);
+        return true;
+    }
+
+    public static boolean releaseWhip(
+            ServerPlayer owner,
+            float damage,
+            float qiDamage,
+            double range) {
+        WeaponQiSlashEntity slash = ModEntities.WEAPON_QI_SLASH.get()
+                .create(owner.serverLevel());
+        if (slash == null) {
+            return false;
+        }
+
+        slash.ownerUuid = owner.getUUID();
+        slash.direction = safeDirection(owner.getLookAngle());
+        slash.damage = Math.max(
+                1.0F, Math.min(MAX_DAMAGE, damage));
+        slash.radius = 0.9D;
+        slash.maxDistance = Math.max(1.0D, range);
+        slash.remainingBlocks = 0;
+        slash.slashStage = Math.floorMod(owner.tickCount, 3);
+        slash.blockBreaking = false;
+        slash.cone = false;
+        slash.whip = true;
+        slash.whipQiDamage = Math.max(0.0F, qiDamage);
+
+        Vec3 start = owner.getEyePosition()
+                .add(0.0D, -0.35D, 0.0D)
+                .add(slash.direction.scale(1.0D));
+        slash.moveTo(
+                start.x,
+                start.y,
+                start.z,
+                owner.getYRot(),
+                owner.getXRot());
+        slash.setDeltaMovement(slash.direction.scale(SPEED));
+        owner.serverLevel().addFreshEntity(slash);
+        return true;
+    }
+
+    public static boolean releaseNpc(
+            PathfinderMob owner,
+            LivingEntity target,
+            double range,
+            float damage,
+            double radius,
+            String element,
+            int slashStage,
+            boolean heavyCone) {
+        if (!(owner.level() instanceof ServerLevel serverLevel)
+                || target == null
+                || !isEnemy(owner, target)) {
+            return false;
+        }
+
+        WeaponQiSlashEntity slash = ModEntities.WEAPON_QI_SLASH.get().create(serverLevel);
+        if (slash == null) {
+            return false;
+        }
+
+        Vec3 ownerEye = owner.getEyePosition();
+        Vec3 targetEye = target.getEyePosition();
+        double predictionTicks = Math.min(
+                12.0D,
+                ownerEye.distanceTo(targetEye) / SPEED);
+        Vec3 predictedTargetEye = targetEye.add(
+                target.getDeltaMovement().scale(predictionTicks));
+
+        slash.ownerUuid = owner.getUUID();
+        slash.restrictedTargetUuid = heavyCone ? null : target.getUUID();
+        slash.direction = safeDirection(predictedTargetEye.subtract(ownerEye));
+        slash.damage = Math.max(1.0F, Math.min(MAX_DAMAGE, damage));
+        slash.radius = Math.max(0.2D, Math.min(32.0D, radius));
+        slash.maxDistance = Math.max(1.0D, Math.min(128.0D, range));
+        slash.remainingBlocks = 0;
+        slash.slashStage = Math.floorMod(slashStage, 3);
+        slash.blockBreaking = false;
+        boolean fistWeapon = QiInfusedWeapon.isFistWeapon(owner.getMainHandItem());
+        slash.cone = fistWeapon || heavyCone;
+        slash.expandingCone = fistWeapon;
+        slash.element = normalizeElement(element);
+
+        Vec3 right = rightVector(slash.direction);
+        Vec3 up = slash.direction.cross(right).normalize();
+        Vec3 startOffset = slash.cone
+                ? Vec3.ZERO
+                : switch (slash.slashStage) {
+                    case 0 -> right.scale(0.32D).add(up.scale(0.24D));
+                    case 1 -> right.scale(-0.28D).add(up.scale(-0.20D));
+                    default -> right.scale(0.34D);
+                };
+        Vec3 start = ownerEye
+                .add(0.0D, -0.42D, 0.0D)
+                .add(slash.direction.scale(1.05D))
+                .add(startOffset);
+        slash.moveTo(start.x, start.y, start.z, owner.getYRot(), owner.getXRot());
+        slash.setDeltaMovement(slash.direction.scale(SPEED));
+        return serverLevel.addFreshEntity(slash);
+    }
+
+    @Override
+    protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder builder) {
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        setNoGravity(true);
+        noPhysics = true;
+        if (!(level() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+
+        Entity resolvedOwner = ownerUuid == null
+                ? null
+                : serverLevel.getEntity(ownerUuid);
+        LivingEntity owner = resolvedOwner instanceof LivingEntity living
+                ? living
+                : null;
+        if (owner == null || !owner.isAlive() || tickCount > MAX_LIFETIME_TICKS
+                || distanceTraveled >= maxDistance) {
+            discard();
+            return;
+        }
+
+        Vec3 movement = direction.scale(Math.min(
+                speed, maxDistance - distanceTraveled));
+        BlockHitResult whipBlockHit = null;
+        boolean stoppedBySolidBlock = false;
+        Vec3 destination = position().add(movement);
+        BlockHitResult hit = serverLevel.clip(new ClipContext(
+                position(),
+                destination,
+                ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.NONE,
+                this));
+        if (hit.getType() != HitResult.Type.MISS) {
+            if (whip) {
+                whipBlockHit = hit;
+                destination = hit.getLocation();
+                movement = destination.subtract(position());
+            } else if (!blockBreaking) {
+                stoppedBySolidBlock = true;
+                destination = hit.getLocation();
+                movement = destination.subtract(position());
+            }
+        }
+
+        setPos(destination);
+        setDeltaMovement(movement);
+        distanceTraveled += movement.length();
+
+        SlashBasis basis = basis();
+        if (cone) {
+            renderCone(serverLevel, owner, basis);
+            hitConeTargets(serverLevel, owner, basis);
+            if (blockBreaking && owner instanceof ServerPlayer playerOwner) {
+                breakConeBlocks(serverLevel, playerOwner, basis);
+            }
+        } else {
+            renderSlash(serverLevel, owner, basis);
+            hitTargets(serverLevel, owner, basis);
+            if (blockBreaking && owner instanceof ServerPlayer playerOwner) {
+                breakBlocks(serverLevel, playerOwner, basis);
+            }
+        }
+        if (whipBlockHit != null) {
+            if (random.nextFloat() < 0.05F) {
+                if (owner instanceof ServerPlayer playerOwner) {
+                    WhipItem.createQiContactPop(
+                            playerOwner, whipBlockHit.getLocation());
+                }
+            }
+            discard();
+        } else if (stoppedBySolidBlock) {
+            discard();
+        }
+    }
+
+    private void renderCone(ServerLevel level, LivingEntity owner, SlashBasis basis) {
+        List<SimpleParticleType> particles = MethodQiParticleEffects.particlesForOwner(owner, element);
+        double coneRadius = currentConeRadius();
+        Vec3 up = direction.cross(basis.right).normalize();
+        int rings = expandingCone ? (heavyAttack ? 5 : 4) : 6;
+        int maximumPoints = expandingCone ? (heavyAttack ? 48 : 36) : 72;
+        double pointDensity = expandingCone ? 7.0D : 10.0D;
+        for (int ring = 0; ring <= rings; ring++) {
+            double ringRadius = coneRadius * ring / rings;
+            int points = ring == 0
+                    ? 1
+                    : Math.max(10, Math.min(maximumPoints,
+                    (int) Math.ceil(ringRadius * pointDensity)));
+            double phase = tickCount * 0.18D + ring * 0.4D;
+            for (int pointIndex = 0; pointIndex < points; pointIndex++) {
+                double angle = phase + Math.PI * 2.0D * pointIndex / points;
+                Vec3 radial = basis.right.scale(Math.cos(angle))
+                        .add(up.scale(Math.sin(angle)));
+                Vec3 point = position().add(radial.scale(ringRadius));
+                Vec3 velocity = direction.scale(0.08D).add(radial.scale(0.045D));
+                SimpleParticleType particle =
+                        particles.get((pointIndex + ring + tickCount) % particles.size());
+                level.sendParticles(
+                        particle,
+                        point.x,
+                        point.y,
+                        point.z,
+                        0,
+                        velocity.x,
+                        velocity.y,
+                        velocity.z,
+                        1.0D);
+            }
+        }
+    }
+
+    private void hitConeTargets(ServerLevel level, LivingEntity owner, SlashBasis basis) {
+        double coneRadius = currentConeRadius();
+        Vec3 up = direction.cross(basis.right).normalize();
+        AABB search = new AABB(position(), position()).inflate(coneRadius + 2.0D);
+        for (LivingEntity target : level.getEntitiesOfClass(
+                LivingEntity.class,
+                search,
+                living -> canHit(owner, living) && !hitEntities.contains(living.getUUID()))) {
+            Vec3 offset = target.getBoundingBox().getCenter().subtract(position());
+            double padding = Math.max(target.getBbWidth(), target.getBbHeight()) * 0.55D;
+            double forwardDistance = offset.dot(direction);
+            double rightDistance = offset.dot(basis.right);
+            double upDistance = offset.dot(up);
+            double radialDistance = Math.sqrt(
+                    rightDistance * rightDistance + upDistance * upDistance);
+            if (Math.abs(forwardDistance) > speed + 0.75D + padding
+                    || radialDistance > coneRadius + padding
+                    || !hasClearPath(level, target)) {
+                continue;
+            }
+
+            hitEntities.add(target.getUUID());
+            if (whip) {
+                if (!(owner instanceof ServerPlayer playerOwner)) {
+                    continue;
+                }
+                boolean hit = WhipItem.hitFromQiLine(
+                        playerOwner,
+                        target,
+                        damage,
+                        whipQiDamage,
+                        !whipHitRegistered);
+                if (hit) {
+                    whipHitRegistered = true;
+                }
+                if (random.nextFloat() < 0.05F) {
+                    WhipItem.createQiContactPop(
+                            playerOwner,
+                            target.getBoundingBox().getCenter());
+                }
+                continue;
+            }
+            target.invulnerableTime = 0;
+            hurtTarget(owner, target, damage);
+        }
+    }
+
+    private void breakConeBlocks(ServerLevel level, ServerPlayer owner, SlashBasis basis) {
+        double coneRadius = currentConeRadius();
+        Vec3 up = direction.cross(basis.right).normalize();
+        int radialSteps = Math.max(1, (int) Math.ceil(coneRadius));
+        for (int radialStep = 0; radialStep <= radialSteps; radialStep++) {
+            double sampleRadius = Math.min(coneRadius, radialStep);
+            int points = radialStep == 0
+                    ? 1
+                    : Math.max(8, (int) Math.ceil(Math.PI * 2.0D * sampleRadius));
+            for (int pointIndex = 0; pointIndex < points; pointIndex++) {
+                double angle = Math.PI * 2.0D * pointIndex / points;
+                Vec3 sample = position()
+                        .add(basis.right.scale(Math.cos(angle) * sampleRadius))
+                        .add(up.scale(Math.sin(angle) * sampleRadius));
+                BlockPos pos = BlockPos.containing(sample);
+                if (!checkedBlocks.add(pos.asLong())) {
+                    continue;
+                }
+                BlockState state = level.getBlockState(pos);
+                if (state.isAir()) {
+                    continue;
+                }
+                if (remainingBlocks <= 0
+                        || state.getDestroySpeed(level, pos) < 0.0F
+                        || !owner.mayUseItemAt(
+                                pos, Direction.UP, owner.getMainHandItem())) {
+                    discard();
+                    return;
+                }
+                if (level.destroyBlock(pos, false, owner)) {
+                    remainingBlocks--;
+                }
+            }
+        }
+    }
+
+    private double currentConeRadius() {
+        double progress = maxDistance <= 0.0D
+                ? 1.0D
+                : Math.max(0.0D, Math.min(1.0D, distanceTraveled / maxDistance));
+        if (expandingCone) {
+            return Math.max(0.16D, radius * (0.18D + progress * 0.82D));
+        }
+        return Math.max(0.16D, radius * (1.0D - progress));
+    }
+
+    private void renderSlash(ServerLevel level, LivingEntity owner, SlashBasis basis) {
+        List<SimpleParticleType> particles = MethodQiParticleEffects.particlesForOwner(owner, element);
+        double visualRadius = whip ? radius * 2.2D : radius;
+        int segments = Math.max(
+                24,
+                Math.min(96, (int) Math.ceil(visualRadius * 8.0D)));
+        Vec3 flow = switch (slashStage) {
+            case 0 -> basis.axis.scale(-1.0D);
+            case 1 -> basis.axis;
+            default -> basis.right.scale(-1.0D);
+        };
+
+        for (int index = 0; index <= segments; index++) {
+            double t = -1.0D + 2.0D * index / segments;
+            Vec3 point = position().add(
+                    basis.axis.scale(t * visualRadius));
+            SimpleParticleType particle = particles.get(index % particles.size());
+            Vec3 velocity = flow.scale(0.12D).add(direction.scale(0.04D));
+            level.sendParticles(
+                    particle,
+                    point.x,
+                    point.y,
+                    point.z,
+                    0,
+                    velocity.x,
+                    velocity.y,
+                    velocity.z,
+                    1.0D);
+            if ((index + tickCount) % 6 == 0) {
+                Vec3 trailingPoint = point.subtract(direction.scale(0.10D));
+                level.sendParticles(
+                        particle,
+                        trailingPoint.x,
+                        trailingPoint.y,
+                        trailingPoint.z,
+                        1,
+                        Math.abs(flow.x) * 0.025D + 0.01D,
+                        Math.abs(flow.y) * 0.025D + 0.01D,
+                        Math.abs(flow.z) * 0.025D + 0.01D,
+                        0.015D);
+            }
+        }
+    }
+
+    private void hitTargets(ServerLevel level, LivingEntity owner, SlashBasis basis) {
+        AABB search = new AABB(position(), position()).inflate(radius + 2.0D);
+        for (LivingEntity target : level.getEntitiesOfClass(
+                LivingEntity.class,
+                search,
+                living -> canHit(owner, living) && !hitEntities.contains(living.getUUID()))) {
+            Vec3 offset = target.getBoundingBox().getCenter().subtract(position());
+            double padding = Math.max(target.getBbWidth(), target.getBbHeight()) * 0.55D;
+            double forwardDistance = offset.dot(direction);
+            double axisDistance = offset.dot(basis.axis);
+            double perpendicularDistance = offset.dot(basis.perpendicular);
+            double thickness = 0.20D + radius * 0.025D;
+            if (Math.abs(forwardDistance) > speed + 0.75D + padding
+                    || Math.abs(axisDistance) > radius + padding
+                    || Math.abs(perpendicularDistance) > thickness + padding
+                    || !hasClearPath(level, target)) {
+                continue;
+            }
+
+            hitEntities.add(target.getUUID());
+            target.invulnerableTime = 0;
+            hurtTarget(owner, target, damage);
+        }
+    }
+
+    private void breakBlocks(ServerLevel level, ServerPlayer owner, SlashBasis basis) {
+        int segments = Math.max(8, Math.min(48, (int) Math.ceil(radius * 4.0D)));
+        int spread = 0;
+        for (int index = 0; index <= segments; index++) {
+            double t = -1.0D + 2.0D * index / segments;
+            Vec3 sample = position().add(basis.axis.scale(t * radius));
+            BlockPos center = BlockPos.containing(sample);
+            for (int x = -spread; x <= spread; x++) {
+                for (int y = -spread; y <= spread; y++) {
+                    for (int z = -spread; z <= spread; z++) {
+                        BlockPos pos = center.offset(x, y, z);
+                        if (!checkedBlocks.add(pos.asLong())) {
+                            continue;
+                        }
+                        BlockState state = level.getBlockState(pos);
+                        if (state.isAir()) {
+                            continue;
+                        }
+                        if (remainingBlocks <= 0
+                                || state.getDestroySpeed(level, pos) < 0.0F
+                                || !owner.mayUseItemAt(
+                                        pos, Direction.UP, owner.getMainHandItem())) {
+                            discard();
+                            return;
+                        }
+                        if (level.destroyBlock(pos, false, owner)) {
+                            remainingBlocks--;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private SlashBasis basis() {
+        Vec3 right = rightVector(direction);
+        Vec3 up = direction.cross(right).normalize();
+        Vec3 axis = switch (slashStage) {
+            case 0 -> right.add(up).normalize();
+            case 1 -> right.subtract(up).normalize();
+            default -> right;
+        };
+        Vec3 perpendicular = direction.cross(axis).normalize();
+        return new SlashBasis(right, axis, perpendicular);
+    }
+
+    private static Vec3 safeDirection(Vec3 direction) {
+        return direction.lengthSqr() < 1.0E-6D
+                ? new Vec3(0.0D, 0.0D, 1.0D)
+                : direction.normalize();
+    }
+
+    private static Vec3 rightVector(Vec3 forward) {
+        Vec3 right = new Vec3(0.0D, 1.0D, 0.0D).cross(forward);
+        if (right.lengthSqr() < 1.0E-6D) {
+            right = new Vec3(1.0D, 0.0D, 0.0D);
+        }
+        return right.normalize();
+    }
+
+    private static boolean isEnemy(LivingEntity owner, LivingEntity target) {
+        return target != owner
+                && target.isAlive()
+                && (owner instanceof CultivationNpc
+                ? NpcProfile.isCombatEnemy(owner, target)
+                : !NpcProfile.areCombatAllies(owner, target))
+                && owner.canAttack(target);
+    }
+
+    private boolean canHit(LivingEntity owner, LivingEntity target) {
+        return (restrictedTargetUuid == null || restrictedTargetUuid.equals(target.getUUID()))
+                && isEnemy(owner, target);
+    }
+
+    private boolean hasClearPath(ServerLevel level, LivingEntity target) {
+        HitResult hit = level.clip(new ClipContext(
+                position(),
+                target.getBoundingBox().getCenter(),
+                ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.NONE,
+                this));
+        return hit.getType() == HitResult.Type.MISS;
+    }
+
+    private void hurtTarget(
+            LivingEntity owner,
+            LivingEntity target,
+            float damage) {
+        if (owner instanceof ServerPlayer player) {
+            if (heavyAttack) {
+                CombatStateManager.hurtAsHeavy(
+                        owner, target, owner.damageSources().playerAttack(player), damage);
+            } else {
+                target.hurt(owner.damageSources().playerAttack(player), damage);
+            }
+        } else if (owner instanceof Mob mob) {
+            target.hurt(owner.damageSources().indirectMagic(this, mob), damage);
+        } else {
+            target.hurt(owner.damageSources().magic(), damage);
+        }
+    }
+
+    private static String normalizeElement(String element) {
+        return element == null || element.isBlank() ? "any" : element.trim();
+    }
+
+    @Override
+    protected void readAdditionalSaveData(CompoundTag tag) {
+        if (tag.hasUUID("Owner")) {
+            ownerUuid = tag.getUUID("Owner");
+        }
+        if (tag.hasUUID("RestrictedTarget")) {
+            restrictedTargetUuid = tag.getUUID("RestrictedTarget");
+        }
+        direction = safeDirection(new Vec3(
+                tag.getDouble("DirectionX"),
+                tag.getDouble("DirectionY"),
+                tag.getDouble("DirectionZ")));
+        speed = tag.contains("Speed")
+                ? Math.max(0.05D, tag.getDouble("Speed"))
+                : SPEED;
+        damage = Math.max(1.0F, tag.getFloat("Damage"));
+        radius = Math.max(0.2D, tag.getDouble("Radius"));
+        maxDistance = Math.max(1.0D, tag.getDouble("MaxDistance"));
+        distanceTraveled = Math.max(0.0D, tag.getDouble("DistanceTraveled"));
+        remainingBlocks = Math.max(0, tag.getInt("RemainingBlocks"));
+        slashStage = Math.floorMod(tag.getInt("SlashStage"), 3);
+        blockBreaking = !tag.contains("BlockBreaking") || tag.getBoolean("BlockBreaking");
+        cone = tag.getBoolean("Cone");
+        expandingCone = tag.getBoolean("ExpandingCone");
+        heavyAttack = tag.getBoolean("HeavyAttack");
+        whip = tag.getBoolean("Whip");
+        whipQiDamage = Math.max(0.0F, tag.getFloat("WhipQiDamage"));
+        whipHitRegistered = tag.getBoolean("WhipHitRegistered");
+        element = normalizeElement(tag.getString("Element"));
+        setNoGravity(true);
+        noPhysics = true;
+    }
+
+    @Override
+    protected void addAdditionalSaveData(CompoundTag tag) {
+        if (ownerUuid != null) {
+            tag.putUUID("Owner", ownerUuid);
+        }
+        if (restrictedTargetUuid != null) {
+            tag.putUUID("RestrictedTarget", restrictedTargetUuid);
+        }
+        tag.putDouble("DirectionX", direction.x);
+        tag.putDouble("DirectionY", direction.y);
+        tag.putDouble("DirectionZ", direction.z);
+        tag.putDouble("Speed", speed);
+        tag.putFloat("Damage", damage);
+        tag.putDouble("Radius", radius);
+        tag.putDouble("MaxDistance", maxDistance);
+        tag.putDouble("DistanceTraveled", distanceTraveled);
+        tag.putInt("RemainingBlocks", remainingBlocks);
+        tag.putInt("SlashStage", slashStage);
+        tag.putBoolean("BlockBreaking", blockBreaking);
+        tag.putBoolean("Cone", cone);
+        tag.putBoolean("ExpandingCone", expandingCone);
+        tag.putBoolean("HeavyAttack", heavyAttack);
+        tag.putBoolean("Whip", whip);
+        tag.putFloat("WhipQiDamage", whipQiDamage);
+        tag.putBoolean("WhipHitRegistered", whipHitRegistered);
+        tag.putString("Element", element);
+    }
+
+    @Override
+    public boolean isPickable() {
+        return false;
+    }
+
+    @Override
+    public boolean isAttackable() {
+        return false;
+    }
+
+    private record SlashBasis(Vec3 right, Vec3 axis, Vec3 perpendicular) {
+    }
+}

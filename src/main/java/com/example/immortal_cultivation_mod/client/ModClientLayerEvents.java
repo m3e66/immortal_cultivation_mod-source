@@ -2,8 +2,10 @@ package com.example.immortal_cultivation_mod.client;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.client.renderer.ZhenshiSealHelmetLayer;
+import com.example.immortal_cultivation_mod.client.renderer.XiujianHeldLayer;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -16,6 +18,12 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 public class ModClientLayerEvents {
     @SubscribeEvent
     public static void addEntityLayers(EntityRenderersEvent.AddLayers event) {
+        for (var skin : event.getSkins()) {
+            PlayerRenderer renderer = event.getSkin(skin);
+            if (renderer != null) {
+                renderer.addLayer(new XiujianHeldLayer(renderer));
+            }
+        }
         addSealLayer(event, EntityType.ZOMBIE);
         addSealLayer(event, EntityType.ZOMBIE_VILLAGER);
         addSealLayer(event, EntityType.HUSK);

@@ -3,6 +3,7 @@ package com.example.immortal_cultivation_mod.entity;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.effect.ModEffects;
+import com.example.immortal_cultivation_mod.magicritual.center.CenterEffectSupport;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -27,6 +28,7 @@ public class DingshenProjectileEntity extends ThrowableItemProjectile {
 
     public DingshenProjectileEntity(Level level, LivingEntity shooter) {
         super(ModEntities.DINGSHEN_PROJECTILE.get(), shooter, level);
+        NpcProfile.markNpcOwnedEffect(this, shooter);
         setNoGravity(true);
     }
 
@@ -38,6 +40,14 @@ public class DingshenProjectileEntity extends ThrowableItemProjectile {
     @Override
     public void tick() {
         setNoGravity(true);
+        if (!level().isClientSide) {
+            Entity owner = getOwner();
+            NpcProfile.markNpcOwnedEffect(this, owner);
+            if (NpcProfile.isOrphanedNpcEffect(this, owner)) {
+                discard();
+                return;
+            }
+        }
         super.tick();
         if (level().isClientSide) {
             level().addParticle(ParticleTypes.END_ROD,
@@ -65,13 +75,23 @@ public class DingshenProjectileEntity extends ThrowableItemProjectile {
     }
 
     @Override
+    protected boolean canHitEntity(Entity entity) {
+        return NpcProfile.canNpcEffectHit(this, getOwner(), entity) && super.canHitEntity(entity);
+    }
+
+    @Override
     protected void onHitEntity(EntityHitResult result) {
         Entity owner = getOwner();
-        if (!(owner instanceof ServerPlayer caster) || !(result.getEntity() instanceof LivingEntity target)) {
+        LivingEntity target = ModelBonePartEntity.resolveLiving(result.getEntity());
+        if (!(owner instanceof LivingEntity caster)
+                || target == null
+                || NpcProfile.areCombatAllies(caster, target)) {
             return;
         }
 
-        BindingStrength strength = bindingStrength(ModAttachments.getData(caster).cultivationLevel(), targetLevel(target));
+        BindingStrength strength = bindingStrength(
+                CenterEffectSupport.realmName(caster),
+                CenterEffectSupport.realmName(target));
         if (strength == BindingStrength.NONE) {
             return;
         }
@@ -82,11 +102,11 @@ public class DingshenProjectileEntity extends ThrowableItemProjectile {
         }
     }
 
-    private static String targetLevel(LivingEntity target) {
-        if (target instanceof Player player) {
-            return ModAttachments.getData(player).cultivationLevel();
-        }
-        return CultivationLevels.REALM_MORTAL;
+    public static boolean canBind(LivingEntity caster, LivingEntity target) {
+        return caster != null && target != null
+                && bindingStrength(
+                CenterEffectSupport.realmName(caster),
+                CenterEffectSupport.realmName(target)) != BindingStrength.NONE;
     }
 
     private static BindingStrength bindingStrength(String casterLevel, String targetLevel) {

@@ -4,6 +4,7 @@ import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.event.ServerEvents;
 import com.example.immortal_cultivation_mod.item.ForgingSystem;
+import com.example.immortal_cultivation_mod.item.IdentityItems;
 import com.example.immortal_cultivation_mod.screen.DingMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -12,6 +13,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
@@ -20,12 +22,18 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class DingBlockEntity extends GeoRockBlockEntity implements Container, MenuProvider {
     public static final int YUJIAN_SLOT = 0;
@@ -47,9 +55,16 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
     private boolean forging;
     private long temperatureSamples;
     private long temperatureTotal;
+    private UUID forgingPlayerId;
 
     public DingBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.DING.get(), pos, blockState);
+    }
+
+    public int materialSlotCount() {
+        return getBlockState().is(ModBlocks.CU_TIE_XIAODING.get())
+                ? 5
+                : MATERIAL_COUNT;
     }
 
     public static void serverTick(net.minecraft.world.level.Level level, BlockPos pos, BlockState state, DingBlockEntity ding) {
@@ -94,6 +109,7 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
             return;
         }
         captureForgingSnapshot(recipe);
+        forgingPlayerId = sp.getUUID();
         activeRecipeId = recipe.id();
         activeFireType = currentFireType();
         targetTemperature = recipe.averageTemp();
@@ -132,6 +148,9 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
             if (restore <= 0) {
                 continue;
             }
+            if (ServerEvents.isInfiniteMagicRitualSpiritStone(key)) {
+                return true;
+            }
             remaining -= restore;
             if (!player.getAbilities().instabuild) {
                 stack.shrink(1);
@@ -154,12 +173,29 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
             return;
         }
         meltAllRemainingRequiredMaterials();
+        if (failedEarly && recipe.directOutput()) {
+            stopForging();
+            return;
+        }
         double avg = temperatureSamples <= 0 ? temperature : (double) temperatureTotal / (double) temperatureSamples;
         if (failedEarly && temperatureSamples <= 0) {
             avg = temperature;
         }
         setItem(RESULT_SLOT, ForgingSystem.createMold(recipe, snapshotStacks(), avg, activeFireType));
+        if (!failedEarly) {
+            awardForgingProficiency();
+        }
         stopForging();
+    }
+
+    private void awardForgingProficiency() {
+        if (!(level instanceof ServerLevel serverLevel) || forgingPlayerId == null) {
+            return;
+        }
+        ServerPlayer player = serverLevel.getServer().getPlayerList().getPlayer(forgingPlayerId);
+        if (player != null) {
+            IdentityItems.recordSuccessfulForging(player);
+        }
     }
 
     private void meltVisibleMaterials() {
@@ -192,9 +228,11 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
             if (snapshot.isEmpty() || ForgingSystem.isReusableAdditive(snapshot)) {
                 continue;
             }
+            int remaining = Math.max(0, initialMaterialCounts[i] - meltedMaterialCounts[i]);
             ItemStack visible = getItem(MATERIAL_START + i);
-            if (!visible.isEmpty() && ItemStack.isSameItemSameComponents(visible, snapshot)) {
-                visible.shrink(visible.getCount());
+            if (remaining > 0 && !visible.isEmpty()
+                    && ItemStack.isSameItemSameComponents(visible, snapshot)) {
+                visible.shrink(Math.min(remaining, visible.getCount()));
             }
             meltedMaterialCounts[i] = initialMaterialCounts[i];
         }
@@ -205,20 +243,58 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
         progressTicks = 0;
         activeRecipeId = "";
         activeFireType = "normal_fire";
+        forgingPlayerId = null;
         clearForgingSnapshot();
         setChanged();
     }
 
     private void captureForgingSnapshot(ForgingSystem.ForgingRecipe recipe) {
         clearForgingSnapshot();
-        for (int i = 0; i < MATERIAL_COUNT; i++) {
+        int puritySeed = (int) (worldPosition.asLong()
+                ^ (level == null ? 0L : level.getGameTime()));
+        if (!recipe.directOutput()) {
+            for (int i = 0; i < materialSlotCount(); i++) {
+                ItemStack stack = getItem(MATERIAL_START + i);
+                if (stack.isEmpty()) {
+                    continue;
+                }
+                ForgingSystem.ensurePurity(stack, puritySeed + i * 9973);
+                ItemStack snapshot = stack.copy();
+                forgingSnapshot.set(i, snapshot);
+                initialMaterialCounts[i] = snapshot.getCount();
+            }
+            return;
+        }
+
+        Map<net.minecraft.world.item.Item, Integer> remaining =
+                new LinkedHashMap<>(recipe.required());
+        int remainingSpiritStones = recipe.spiritStoneCount();
+        for (int i = 0; i < materialSlotCount(); i++) {
             ItemStack stack = getItem(MATERIAL_START + i);
             if (stack.isEmpty()) {
                 continue;
             }
-            ItemStack snapshot = stack.copy();
+            int needed = remaining.getOrDefault(stack.getItem(), 0);
+            boolean spiritStoneIngredient = remainingSpiritStones > 0
+                    && ForgingSystem.isRecipeSpiritStone(stack);
+            if (needed <= 0 && !spiritStoneIngredient) {
+                continue;
+            }
+            int used = needed > 0
+                    ? Math.min(needed, stack.getCount())
+                    : Math.min(remainingSpiritStones, stack.getCount());
+            if (used <= 0) {
+                continue;
+            }
+            ForgingSystem.ensurePurity(stack, puritySeed + i * 9973);
+            ItemStack snapshot = stack.copyWithCount(used);
             forgingSnapshot.set(i, snapshot);
-            initialMaterialCounts[i] = snapshot.getCount();
+            initialMaterialCounts[i] = used;
+            if (needed > 0) {
+                remaining.put(stack.getItem(), needed - used);
+            } else {
+                remainingSpiritStones -= used;
+            }
         }
     }
 
@@ -235,7 +311,12 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
             return false;
         }
         BlockState below = level.getBlockState(worldPosition.below());
-        return below.is(Blocks.FIRE) || below.is(Blocks.SOUL_FIRE) || below.is(ModBlocks.LING_FIRE.get());
+        return below.is(BlockTags.FIRE)
+                || below.getBlock() instanceof BaseFireBlock
+                || CampfireBlock.isLitCampfire(below)
+                || below.is(Blocks.FIRE)
+                || below.is(Blocks.SOUL_FIRE)
+                || below.is(ModBlocks.LING_FIRE.get());
     }
 
     public int lowestFireTemp() {
@@ -276,7 +357,9 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
 
     private List<ItemStack> materialStacks() {
         List<ItemStack> stacks = new ArrayList<>();
-        for (int slot = MATERIAL_START; slot < MATERIAL_START + MATERIAL_COUNT; slot++) {
+        for (int slot = MATERIAL_START;
+             slot < MATERIAL_START + materialSlotCount();
+             slot++) {
             stacks.add(getItem(slot));
         }
         return stacks;
@@ -303,6 +386,7 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
             case 5 -> lowestFireTemp();
             case 6 -> highestFireTemp();
             case 7 -> fireCost();
+            case 8 -> materialSlotCount();
             default -> 0;
         };
     }
@@ -357,6 +441,23 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
     }
 
     @Override
+    public boolean canPlaceItem(int slot, ItemStack stack) {
+        if (forging) {
+            return false;
+        }
+        if (slot == YUJIAN_SLOT) {
+            return ForgingSystem.recipe(stack) != null;
+        }
+        if (slot >= MATERIAL_START
+                && slot < MATERIAL_START + MATERIAL_COUNT) {
+            ForgingSystem.ForgingRecipe recipe = ForgingSystem.recipe(getItem(YUJIAN_SLOT));
+            return slot < MATERIAL_START + materialSlotCount()
+                    && ForgingSystem.isIngredientForRecipe(recipe, stack);
+        }
+        return false;
+    }
+
+    @Override
     public boolean stillValid(Player player) {
         return level != null && level.getBlockEntity(worldPosition) == this
                 && player.distanceToSqr(worldPosition.getX() + 0.5D, worldPosition.getY() + 0.5D, worldPosition.getZ() + 0.5D) <= 64.0D;
@@ -381,6 +482,9 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
         tag.putString("activeFireType", activeFireType);
         tag.putLong("temperatureSamples", temperatureSamples);
         tag.putLong("temperatureTotal", temperatureTotal);
+        if (forgingPlayerId != null) {
+            tag.putUUID("forgingPlayer", forgingPlayerId);
+        }
         CompoundTag snapshotTag = new CompoundTag();
         ContainerHelper.saveAllItems(snapshotTag, forgingSnapshot, registries);
         tag.put("forgingSnapshot", snapshotTag);
@@ -405,6 +509,7 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
         }
         temperatureSamples = tag.getLong("temperatureSamples");
         temperatureTotal = tag.getLong("temperatureTotal");
+        forgingPlayerId = tag.hasUUID("forgingPlayer") ? tag.getUUID("forgingPlayer") : null;
         clearForgingSnapshot();
         if (tag.contains("forgingSnapshot")) {
             ContainerHelper.loadAllItems(tag.getCompound("forgingSnapshot"), forgingSnapshot, registries);

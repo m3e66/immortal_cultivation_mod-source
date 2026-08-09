@@ -1,0 +1,19 @@
+{
+    "name": "Circle Effects",
+    "icon": "minecraft:potion",
+    "category": "immortal_cultivation_mod:magic_circles",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "Magic circles provide passive effects to any living entity standing on them. The effect is applied automatically every tick as long as the Magic Center has fuel.$(br2)Low-level effects (Amplifier 0 = Level I) are applied with 1 circle."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(bold)Stacking$() - For each additional circle of the same type within the center's radius, the amplifier increases by 1. For example:$(br)1 Defense circle = Resistance I$(br)2 Defense circles = Resistance II$(br)3 Defense circles = Resistance III$(br2)You can use the Magic Center's GUI to toggle individual circle types on or off."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(bold)Entity Filtering$() - The Magic Center GUI lets you control who receives effects:$(br2)$(li)Toggle hostiles on/off$(li)Toggle passive mobs on/off$(li)Blacklist specific players by name$(br2)Blacklisted players and filtered mob types are completely unaffected by the circles."
+        }
+    ]
+}

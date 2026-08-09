@@ -1,0 +1,33 @@
+{
+  "name": "Nodes and Pathways",
+  "icon": "immortal_cultivation_mod:restriction_insight",
+  "category": "immortal_cultivation_mod:principles",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Normal Nodes",
+      "text": "Normal nodes can be moved directly. A bead turns gold when its value equals its target. An unlinked normal node changes only itself and forms the simplest independent pathway."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Linked Pathways",
+      "text": "Connected nodes move together. A positive golden path moves its neighbor in the same direction; a jade path marked with - moves its neighbor in the opposite direction. One bead may drive several paths."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Locked Nodes",
+      "text": "Gray locked beads cannot be moved directly. Adjust connected beads to push them toward their targets through formation paths. Locked nodes begin appearing at total restriction layer 46."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Unstable Nodes",
+      "text": "Red-jade pulsing beads are unstable. After the displayed movement interval, one shifts by itself and may drive linked nodes. Unstable nodes begin appearing at total restriction layer 55."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Hidden Nodes",
+      "text": "A hidden node displays ? instead of its target. Infer the value from pathway behavior or spend a restriction hint. Hidden targets and limited moves begin at total restriction layer 73."
+    }
+  ]
+}

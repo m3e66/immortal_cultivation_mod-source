@@ -1,0 +1,16 @@
+{
+    "name": "Bleeding",
+    "icon": "immortal_cultivation_mod:ritual_dagger",
+    "category": "immortal_cultivation_mod:effects",
+    "pages": [
+        {
+            "type": "patchouli:spotlight",
+            "item": "immortal_cultivation_mod:ritual_dagger",
+            "text": "$(c)Bleeding$() is a harmful status effect that deals $(bold)2 magic damage$() (1 heart) every second. It is applied as a cost for placing magic circles and center blocks."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(bold)Sources of Bleeding:$()$(br)$(li)Placing a magic circle$(li)Placing a magic center$(br2)The damage cannot be reduced by armor."
+        }
+    ]
+}

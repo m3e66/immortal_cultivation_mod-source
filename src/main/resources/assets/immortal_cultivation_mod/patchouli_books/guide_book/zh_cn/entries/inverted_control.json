@@ -1,0 +1,16 @@
+{
+  "name": "逆转控制",
+  "icon": "minecraft:feather",
+  "category": "immortal_cultivation_mod:effects",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "minecraft:feather",
+      "text": "$(thing)逆转控制$()是一种令人混乱的负面状态效果，会反转玩家的移动输入。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "在该效果下：$(br)$(li)$(bold)W$()键 = 向后移动$(li)$(bold)S$()键 = 向前移动$(li)$(bold)A$()键 = 向右移动$(li)$(bold)D$()键 = 向左移动$(br2)跳跃与潜行不受影响。"
+    }
+  ]
+}

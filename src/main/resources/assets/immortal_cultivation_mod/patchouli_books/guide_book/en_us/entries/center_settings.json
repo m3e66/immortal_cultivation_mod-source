@@ -1,0 +1,19 @@
+{
+    "name": "Center Settings",
+    "icon": "minecraft:oak_sign",
+    "category": "immortal_cultivation_mod:magic_center",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "The Magic Center GUI provides several controls to fine-tune your ritual setup.$(br2)$(bold)Circle Type Toggles$() - Each circle type (Attack, Defense, Regeneration) has an On/Off switch. Turn off types you don't want to use without breaking the circles."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(bold)Player Blacklist$() - Add players by name to prevent them from receiving circle effects.$(br2)$(bold)Controller Whitelist$() - The owner may grant other players control of settings and permission to withdraw spirit-stone fuel. Controllers cannot grant access to others or dismantle the center.$(br2)$(bold)Mob Filters$() - Choose which mob categories are affected."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "Anyone may inspect a center and donate spirit stones, but only the owner, an operator, or a whitelisted controller may remove fuel. Only the owner or an operator may dismantle the center.$(br2)All settings and access lists are saved with the center."
+        }
+    ]
+}

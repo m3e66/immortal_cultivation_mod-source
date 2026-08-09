@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "magic_ritual_mod:ritual_dagger"
+          "name": "immortal_cultivation_mod:ritual_dagger"
         }
       ]
     },
@@ -20,7 +20,7 @@
             {
               "function": "minecraft:set_components",
               "components": {
-                "patchouli:book": "magic_ritual_mod:guide_book"
+                "patchouli:book": "immortal_cultivation_mod:guide_book"
               }
             }
           ]
@@ -36,7 +36,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "magic_ritual_mod:spirit_stone",
+          "name": "immortal_cultivation_mod:spirit_stone",
           "weight": 10,
           "functions": [
             {
@@ -51,7 +51,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "magic_ritual_mod:medium_spirit_stone",
+          "name": "immortal_cultivation_mod:medium_spirit_stone",
           "weight": 4,
           "functions": [
             {
@@ -66,7 +66,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "magic_ritual_mod:high_spirit_stone",
+          "name": "immortal_cultivation_mod:high_spirit_stone",
           "weight": 1,
           "functions": [
             {

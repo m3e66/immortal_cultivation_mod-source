@@ -25,6 +25,13 @@ public class ForgingYujianItem extends Item {
                         .append(Component.literal(" x" + entry.getValue()))
                         .withStyle(ChatFormatting.DARK_AQUA));
             }
+            if (recipe.spiritStoneCount() > 0) {
+                tooltip.add(Component.literal("  ")
+                        .append(Component.translatable(
+                                "tooltip." + ImmortalCultivationMod.MODID + ".forging_yujian.any_spirit_stone"))
+                        .append(Component.literal(" x" + recipe.spiritStoneCount()))
+                        .withStyle(ChatFormatting.DARK_AQUA));
+            }
             tooltip.add(Component.translatable("tooltip." + ImmortalCultivationMod.MODID + ".forging_yujian.temp", recipe.averageTemp())
                     .withStyle(ChatFormatting.RED));
         }

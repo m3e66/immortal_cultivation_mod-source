@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod.client;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
+import com.example.immortal_cultivation_mod.entity.ModelBonePartEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
@@ -119,7 +120,7 @@ public final class ClientTargetLock {
 
     private static Entity findLookTarget(Minecraft mc) {
         if (mc.hitResult instanceof EntityHitResult entityHit && canLock(mc, entityHit.getEntity())) {
-            return entityHit.getEntity();
+            return ModelBonePartEntity.resolveParent(entityHit.getEntity());
         }
 
         Vec3 start = mc.player.getEyePosition();
@@ -131,7 +132,10 @@ public final class ClientTargetLock {
         AABB searchBox = mc.player.getBoundingBox().expandTowards(end.subtract(start)).inflate(1.0D);
 
         return mc.level.getEntities(mc.player, searchBox, entity -> canLock(mc, entity)).stream()
-                .map(entity -> hitDistance(start, end, entity).map(distance -> new TargetCandidate(entity, distance)).orElse(null))
+                .map(entity -> hitDistance(start, end, entity)
+                        .map(distance -> new TargetCandidate(
+                                ModelBonePartEntity.resolveParent(entity), distance))
+                        .orElse(null))
                 .filter(candidate -> candidate != null && candidate.distance() <= maxDistance)
                 .min(Comparator.comparingDouble(TargetCandidate::distance))
                 .map(TargetCandidate::entity)

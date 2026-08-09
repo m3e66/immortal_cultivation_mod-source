@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "immortal_cultivation_mod:item/flowing_spirit_crystal"
+  },
+  "display": {
+    "gui": {
+      "rotation": [0, 0, 0],
+      "scale": [1.25, 1.25, 0.1]
+    }
+  }
+}

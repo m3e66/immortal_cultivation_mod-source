@@ -11,16 +11,24 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.component.CustomData;
 
 import java.util.Locale;
 
 public final class QiInfusedWeapon {
+    private static final int AUTO_CHANNEL_INTERVAL_TICKS = 5;
     private static final String TAG_QI = ImmortalCultivationMod.MODID + ".weapon_qi";
+    private static final String AUTO_CHANNEL_TAG = "ImmortalCultivationAutoChannelWeaponQi";
+    private static final String OUTWARD_QI_TAG = "ImmortalCultivationOutwardQiRelease";
+    private static final String OUTWARD_QI_BLOCK_BREAKING_TAG =
+            "ImmortalCultivationOutwardQiBlockBreaking";
 
     private QiInfusedWeapon() {
     }
@@ -31,7 +39,7 @@ public final class QiInfusedWeapon {
             player.displayClientMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".qi_inject_need_weapon"), true);
             return;
         }
-        if (!hasBaseAttackDamage(stack)) {
+        if (!isWeapon(stack)) {
             player.displayClientMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".qi_inject_need_damage"), true);
             return;
         }
@@ -44,26 +52,112 @@ public final class QiInfusedWeapon {
             return;
         }
 
-        ModAttachments.setData(player, data.withQi(data.qi() - cost));
-        setQi(stack, getQi(stack) + cost);
-        player.displayClientMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".qi_injected", cost), true);
+        double added = cost;
+        if (stack.getItem() instanceof TieguShanItem) {
+            added = TieguShanItem.storeInjectedQi(stack, cost);
+            if (added <= 0.001D) {
+                player.displayClientMessage(Component.translatable(
+                        "message." + ImmortalCultivationMod.MODID + ".qi_storage_full"), true);
+                return;
+            }
+        } else {
+            setQi(stack, getQi(stack) + cost);
+        }
+
+        int spent = Math.min(data.qi(), Math.max(1, (int) Math.ceil(added)));
+        ModAttachments.setData(player, data.withQi(data.qi() - spent));
+        player.displayClientMessage(Component.translatable(
+                "message." + ImmortalCultivationMod.MODID + ".qi_injected", format(added)), true);
+        ServerEvents.syncPlayerData(player);
+    }
+
+    public static void setAutoChannel(ServerPlayer player, boolean enabled) {
+        player.getPersistentData().putBoolean(AUTO_CHANNEL_TAG, enabled);
+    }
+
+    public static void setOutwardQiRelease(ServerPlayer player, boolean enabled) {
+        player.getPersistentData().putBoolean(OUTWARD_QI_TAG, enabled);
+    }
+
+    public static boolean outwardQiReleaseEnabled(ServerPlayer player) {
+        return player.getPersistentData().getBoolean(OUTWARD_QI_TAG);
+    }
+
+    public static void setOutwardQiBlockBreaking(ServerPlayer player, boolean enabled) {
+        player.getPersistentData().putBoolean(OUTWARD_QI_BLOCK_BREAKING_TAG, enabled);
+    }
+
+    public static boolean outwardQiBlockBreakingEnabled(ServerPlayer player) {
+        CompoundTag data = player.getPersistentData();
+        return !data.contains(OUTWARD_QI_BLOCK_BREAKING_TAG)
+                || data.getBoolean(OUTWARD_QI_BLOCK_BREAKING_TAG);
+    }
+
+    public static void copyPersistentData(Player original, Player copy) {
+        if (original.getPersistentData().getBoolean(AUTO_CHANNEL_TAG)) {
+            copy.getPersistentData().putBoolean(AUTO_CHANNEL_TAG, true);
+        }
+        if (original.getPersistentData().getBoolean(OUTWARD_QI_TAG)) {
+            copy.getPersistentData().putBoolean(OUTWARD_QI_TAG, true);
+        }
+        if (original.getPersistentData().contains(OUTWARD_QI_BLOCK_BREAKING_TAG)) {
+            copy.getPersistentData().putBoolean(
+                    OUTWARD_QI_BLOCK_BREAKING_TAG,
+                    original.getPersistentData().getBoolean(OUTWARD_QI_BLOCK_BREAKING_TAG));
+        }
+    }
+
+    public static void tickAutoChannel(ServerPlayer player) {
+        if (player.tickCount % AUTO_CHANNEL_INTERVAL_TICKS != 0
+                || !player.getPersistentData().getBoolean(AUTO_CHANNEL_TAG)) {
+            return;
+        }
+
+        ItemStack stack = player.getMainHandItem();
+        if (!canAutoChannel(stack)) {
+            return;
+        }
+
+        boolean isFan = stack.getItem() instanceof TieguShanItem;
+        double currentQi = getQi(stack);
+        double limit = storageLimit(stack);
+        double room = isFan ? TieguShanItem.remainingQiStorage(stack) : limit - currentQi;
+        if (room <= 0.001D) {
+            return;
+        }
+
+        var data = ModAttachments.getData(player);
+        int maxQi = Math.max(1, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
+        int transfer = Math.min(data.qi(), Math.max(1, maxQi / 100));
+        if (transfer <= 0) {
+            return;
+        }
+
+        double added = Math.min(room, transfer);
+        int spent = Math.min(data.qi(), Math.max(1, (int) Math.ceil(added)));
+        if (isFan) {
+            added = TieguShanItem.storeInjectedQi(stack, added);
+        } else {
+            setQi(stack, Math.min(limit, currentQi + added));
+        }
+        if (added <= 0.001D) {
+            return;
+        }
+        ModAttachments.setData(player, data.withQi(data.qi() - spent));
         ServerEvents.syncPlayerData(player);
     }
 
     public static void strike(ServerPlayer player, Entity target) {
         ItemStack stack = player.getMainHandItem();
-        double qi = getQi(stack);
-        if (qi <= 0.0D) {
+        if (outwardQiReleaseEnabled(player) && supportsOutwardQi(stack)) {
             return;
         }
-
-        float bonusDamage = ForgingSystem.adjustInjectedQiDamage(stack, (float) (qi / 10.0D));
+        float bonusDamage = injectedQiDamage(stack);
         if (bonusDamage <= 0.0F) {
             return;
         }
-
         if (target.hurt(player.damageSources().playerAttack(player), bonusDamage)) {
-            setQi(stack, Math.max(0.0D, qi - bonusDamage));
+            consumeInjectedQiDamage(stack, bonusDamage);
         }
     }
 
@@ -87,7 +181,7 @@ public final class QiInfusedWeapon {
             return;
         }
 
-        double threshold = Math.max(1.0D, baseAttackDamage(stack)) * 100.0D;
+        double threshold = storageLimit(stack);
         if (qi <= threshold) {
             return;
         }
@@ -107,8 +201,10 @@ public final class QiInfusedWeapon {
         return getQi(stack) > 0.0D;
     }
 
-    private static double baseAttackDamage(ItemStack stack) {
-        double damage = 1.0D;
+    public static double baseAttackDamage(ItemStack stack) {
+        double addValue = 0.0D;
+        double addMultipliedBase = 0.0D;
+        double multipliedTotal = 1.0D;
         boolean hasAttackDamage = false;
         ItemAttributeModifiers modifiers = stack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
         for (ItemAttributeModifiers.Entry entry : modifiers.modifiers()) {
@@ -120,16 +216,68 @@ public final class QiInfusedWeapon {
             }
             hasAttackDamage = true;
             AttributeModifier modifier = entry.modifier();
-            damage = switch (modifier.operation()) {
-                case ADD_VALUE -> damage + modifier.amount();
-                case ADD_MULTIPLIED_BASE, ADD_MULTIPLIED_TOTAL -> damage * (1.0D + modifier.amount());
-            };
+            switch (modifier.operation()) {
+                case ADD_VALUE -> addValue += modifier.amount();
+                case ADD_MULTIPLIED_BASE -> addMultipliedBase += modifier.amount();
+                case ADD_MULTIPLIED_TOTAL -> multipliedTotal *= 1.0D + modifier.amount();
+            }
         }
+        double damage = (1.0D + addValue) * (1.0D + addMultipliedBase) * multipliedTotal;
         return hasAttackDamage ? Math.max(1.0D, damage) : 0.0D;
     }
 
-    private static boolean hasBaseAttackDamage(ItemStack stack) {
+    public static double attackDamageAddCoefficient(ItemStack stack) {
+        double addMultipliedBase = 0.0D;
+        double multipliedTotal = 1.0D;
+        ItemAttributeModifiers modifiers = stack.getOrDefault(
+                DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+        for (ItemAttributeModifiers.Entry entry : modifiers.modifiers()) {
+            if (!entry.attribute().is(Attributes.ATTACK_DAMAGE)
+                    || (entry.slot() != EquipmentSlotGroup.ANY
+                    && entry.slot() != EquipmentSlotGroup.MAINHAND)) {
+                continue;
+            }
+            switch (entry.modifier().operation()) {
+                case ADD_MULTIPLIED_BASE -> addMultipliedBase += entry.modifier().amount();
+                case ADD_MULTIPLIED_TOTAL -> multipliedTotal *= 1.0D + entry.modifier().amount();
+                default -> {
+                }
+            }
+        }
+        return Math.max(0.0001D, (1.0D + addMultipliedBase) * multipliedTotal);
+    }
+
+    public static boolean isWeapon(ItemStack stack) {
         return baseAttackDamage(stack) > 0.0D;
+    }
+
+    private static boolean canAutoChannel(ItemStack stack) {
+        return isWeapon(stack) && !(stack.getItem() instanceof DiggerItem);
+    }
+
+    public static boolean isSwordOrDao(ItemStack stack) {
+        return !stack.isEmpty()
+                && (stack.getItem() instanceof SwordItem
+                || stack.getItem() instanceof ThrowingKnifeItem)
+                && !HeavyIronBracerItem.isRealStack(stack)
+                && !HeavyIronBracerItem.isDebugStack(stack);
+    }
+
+    public static boolean isFistWeapon(ItemStack stack) {
+        return HeavyIronBracerItem.isRealStack(stack);
+    }
+
+    public static boolean supportsOutwardQi(ItemStack stack) {
+        return isSwordOrDao(stack) || isFistWeapon(stack);
+    }
+
+    public static boolean isSpear(ItemStack stack) {
+        return !stack.isEmpty() && stack.getItem() instanceof JingtieSpearItem;
+    }
+
+    public static double storageLimit(ItemStack stack) {
+        return Math.max(1.0D, baseAttackDamage(stack)) * 100.0D
+                * WeaponRestrictionSystem.qiStorageMultiplier(stack);
     }
 
     public static double getQi(ItemStack stack) {
@@ -140,12 +288,35 @@ public final class QiInfusedWeapon {
         return Math.max(0.0D, tag.getDouble(TAG_QI));
     }
 
+    public static float injectedQiDamage(ItemStack stack) {
+        double qi = getQi(stack);
+        if (qi <= 0.0D) {
+            return 0.0F;
+        }
+        return ForgingSystem.adjustInjectedQiDamage(
+                stack,
+                (float) (qi / 10.0D));
+    }
+
+    public static void consumeInjectedQiDamage(
+            ItemStack stack,
+            float injectedQiDamage) {
+        consumeQi(stack, Math.max(0.0F, injectedQiDamage));
+    }
+
+    public static void consumeQi(ItemStack stack, double amount) {
+        if (amount <= 0.0D) {
+            return;
+        }
+        setQi(stack, Math.max(0.0D, getQi(stack) - amount));
+    }
+
     public static Component tooltip(ItemStack stack) {
         double qi = getQi(stack);
         if (qi <= 0.0D) {
             return Component.empty();
         }
-        double damage = qi / 10.0D;
+        double damage = injectedQiDamage(stack);
         return Component.translatable(
                 "tooltip." + ImmortalCultivationMod.MODID + ".weapon_qi",
                 format(qi),
@@ -153,7 +324,7 @@ public final class QiInfusedWeapon {
         ).withStyle(ChatFormatting.AQUA);
     }
 
-    private static void setQi(ItemStack stack, double qi) {
+    static void setQi(ItemStack stack, double qi) {
         CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
         if (qi <= 0.001D) {
             tag.remove(TAG_QI);
@@ -163,7 +334,7 @@ public final class QiInfusedWeapon {
         stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
     }
 
-    private static String format(double value) {
+    static String format(double value) {
         if (Math.abs(value - Math.rint(value)) < 0.001D) {
             return String.valueOf((long) Math.rint(value));
         }

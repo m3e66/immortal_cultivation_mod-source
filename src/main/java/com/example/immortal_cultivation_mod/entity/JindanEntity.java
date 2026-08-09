@@ -3,6 +3,7 @@ package com.example.immortal_cultivation_mod.entity;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.event.ServerEvents;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
+import com.example.immortal_cultivation_mod.world.JindanPocketWorlds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -12,9 +13,11 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -27,12 +30,14 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public class JindanEntity extends PathfinderMob {
     private static final String JINDAN_ANCHOR_TAG = "ImmortalCultivationJindanAnchor";
-    private static final int REPLICATE_CHUNK_QI_COST = 2000;
+    private static final String GENERATED_CHUNK_COUNT_TAG = "ImmortalCultivationJindanGeneratedChunks";
     private static final int SOURCE_RANDOM_RADIUS_BLOCKS = 120_000;
+    private static final long FALLBACK_REPLICA_SOURCE_SEED = 0x4A494E44414E5EEDL;
     private static final EntityDataAccessor<Optional<UUID>> OWNER_UUID =
             SynchedEntityData.defineId(JindanEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
@@ -42,11 +47,13 @@ public class JindanEntity extends PathfinderMob {
     private int destOriginChunkX;
     private int destOriginChunkZ;
     private int copiedChunkCount;
+    private long replicaSourceSeed;
 
     public JindanEntity(EntityType<? extends JindanEntity> entityType, Level level) {
         super(entityType, level);
         xpReward = 0;
         setNoAi(true);
+        setNoGravity(true);
         setPersistenceRequired();
         setCustomName(Component.literal("金丹"));
         setCustomNameVisible(true);
@@ -68,6 +75,51 @@ public class JindanEntity extends PathfinderMob {
         return entityData.get(OWNER_UUID);
     }
 
+    public void setReplicaSourceSeed(long seed) {
+        long normalizedSeed = seed == 0L ? FALLBACK_REPLICA_SOURCE_SEED : seed;
+        if (replicaSourceSeed == 0L) {
+            replicaSourceSeed = normalizedSeed;
+            return;
+        }
+        if (replicaSourceSeed == normalizedSeed) {
+            return;
+        }
+
+        replicaSourceSeed = normalizedSeed;
+        hasReplicaSource = false;
+        sourceOriginChunkX = 0;
+        sourceOriginChunkZ = 0;
+        destOriginChunkX = 0;
+        destOriginChunkZ = 0;
+        copiedChunkCount = 0;
+    }
+
+    public static int generatedChunkCount(Player player) {
+        return Math.max(0, player.getPersistentData().getInt(GENERATED_CHUNK_COUNT_TAG));
+    }
+
+    public static void resetGeneratedChunkCount(Player player) {
+        player.getPersistentData().remove(GENERATED_CHUNK_COUNT_TAG);
+    }
+
+    public static void copyGeneratedChunkCount(Player original, Player copy) {
+        int count = generatedChunkCount(original);
+        if (count > 0) {
+            copy.getPersistentData().putInt(GENERATED_CHUNK_COUNT_TAG, count);
+        }
+    }
+
+    public void syncGeneratedChunkCount(ServerPlayer player) {
+        int count = Math.max(generatedChunkCount(player), Math.max(0, copiedChunkCount));
+        if (count > 0 && !hasReplicaSource) {
+            pickReplicaSource();
+        }
+        copiedChunkCount = count;
+        if (count > 0) {
+            player.getPersistentData().putInt(GENERATED_CHUNK_COUNT_TAG, count);
+        }
+    }
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
@@ -77,6 +129,20 @@ public class JindanEntity extends PathfinderMob {
     @Override
     public void tick() {
         super.tick();
+        if (!level().isClientSide && tickCount == 1
+                && JindanPocketWorlds.isJindanDimension(level().dimension())) {
+            Optional<UUID> owner = ownerUuid();
+            for (var entity : ((ServerLevel) level()).getAllEntities()) {
+                if (entity instanceof JindanEntity other
+                        && other != this
+                        && owner.isPresent()
+                        && other.ownerUuid().equals(owner)
+                        && other.getId() < getId()) {
+                    discard();
+                    return;
+                }
+            }
+        }
         setDeltaMovement(Vec3.ZERO);
     }
 
@@ -99,21 +165,23 @@ public class JindanEntity extends PathfinderMob {
 
     private void injectQiAndReplicateChunk(ServerPlayer player) {
         if (!(level() instanceof ServerLevel jindanLevel)
-                || !ModPayloads.JINDAN_DIMENSION.equals(jindanLevel.dimension())) {
+                || !JindanPocketWorlds.isOwnersPocket(player, jindanLevel.dimension())) {
             return;
         }
 
         var data = ModAttachments.getData(player);
-        if (data.qi() < REPLICATE_CHUNK_QI_COST) {
-            player.displayClientMessage(Component.literal("Need 2000 qi"), true);
+        int qiCost = ServerEvents.getJindanChunkQiCost(player);
+        if (data.qi() < qiCost) {
+            player.displayClientMessage(Component.translatable(
+                    "message.immortal_cultivation_mod.jindan_chunk_need_qi", qiCost), true);
             return;
         }
 
-        ModAttachments.setData(player, data.withQi(data.qi() - REPLICATE_CHUNK_QI_COST));
+        ModAttachments.setData(player, data.withQi(data.qi() - qiCost));
         ServerEvents.syncPlayerData(player);
 
         if (!hasReplicaSource) {
-            pickReplicaSource(player);
+            pickReplicaSource();
         }
 
         ServerLevel overworld = player.server.overworld();
@@ -129,6 +197,9 @@ public class JindanEntity extends PathfinderMob {
                 destinationChunkZ
         );
         copiedChunkCount++;
+        player.getPersistentData().putInt(
+                GENERATED_CHUNK_COUNT_TAG,
+                Math.max(generatedChunkCount(player) + 1, copiedChunkCount));
 
         spawnInjectParticles(jindanLevel);
 
@@ -138,10 +209,12 @@ public class JindanEntity extends PathfinderMob {
         }
     }
 
-    private void pickReplicaSource(ServerPlayer player) {
-        int sourceX = player.getRandom().nextInt(SOURCE_RANDOM_RADIUS_BLOCKS * 2 + 1)
+    private void pickReplicaSource() {
+        long seed = replicaSourceSeed == 0L ? FALLBACK_REPLICA_SOURCE_SEED : replicaSourceSeed;
+        RandomSource random = RandomSource.create(seed);
+        int sourceX = random.nextInt(SOURCE_RANDOM_RADIUS_BLOCKS * 2 + 1)
                 - SOURCE_RANDOM_RADIUS_BLOCKS;
-        int sourceZ = player.getRandom().nextInt(SOURCE_RANDOM_RADIUS_BLOCKS * 2 + 1)
+        int sourceZ = random.nextInt(SOURCE_RANDOM_RADIUS_BLOCKS * 2 + 1)
                 - SOURCE_RANDOM_RADIUS_BLOCKS;
         ChunkPos destination = new ChunkPos(blockPosition());
 
@@ -192,6 +265,22 @@ public class JindanEntity extends PathfinderMob {
                 getBlockZ()
         );
         moveTo(getX(), entityTop, getZ(), getYRot(), getXRot());
+        if (player.level() == level) {
+            int playerTop = level.getHeight(
+                    Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                    player.getBlockX(),
+                    player.getBlockZ()
+            );
+            player.teleportTo(
+                    level,
+                    player.getX(),
+                    playerTop,
+                    player.getZ(),
+                    Set.of(),
+                    player.getYRot(),
+                    player.getXRot()
+            );
+        }
 
         CompoundTag playerData = player.getPersistentData();
         CompoundTag anchor = playerData.contains(JINDAN_ANCHOR_TAG)
@@ -274,6 +363,15 @@ public class JindanEntity extends PathfinderMob {
     }
 
     @Override
+    public boolean isPushable() {
+        return false;
+    }
+
+    @Override
+    public void push(Entity entity) {
+    }
+
+    @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         ownerUuid().ifPresent(uuid -> tag.putUUID("Owner", uuid));
@@ -283,6 +381,7 @@ public class JindanEntity extends PathfinderMob {
         tag.putInt("ReplicaDestChunkX", destOriginChunkX);
         tag.putInt("ReplicaDestChunkZ", destOriginChunkZ);
         tag.putInt("ReplicaCopiedChunks", copiedChunkCount);
+        tag.putLong("ReplicaSourceSeed", replicaSourceSeed);
     }
 
     @Override
@@ -297,7 +396,9 @@ public class JindanEntity extends PathfinderMob {
         destOriginChunkX = tag.getInt("ReplicaDestChunkX");
         destOriginChunkZ = tag.getInt("ReplicaDestChunkZ");
         copiedChunkCount = tag.getInt("ReplicaCopiedChunks");
+        replicaSourceSeed = tag.getLong("ReplicaSourceSeed");
         setNoAi(true);
+        setNoGravity(true);
         setPersistenceRequired();
         setCustomName(Component.literal("金丹"));
         setCustomNameVisible(true);

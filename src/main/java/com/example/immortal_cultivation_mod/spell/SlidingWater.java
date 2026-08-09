@@ -1,6 +1,8 @@
 package com.example.immortal_cultivation_mod.spell;
 
 import com.example.immortal_cultivation_mod.effect.PhotonEffects;
+import com.example.immortal_cultivation_mod.entity.CultivationNpc;
+import com.example.immortal_cultivation_mod.entity.NpcProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -8,62 +10,76 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class SlidingWater {
     private static final int PUDDLE_DURATION_TICKS = 20 * 12;
     private static final int INVERTED_CONTROL_TICKS = 20 * 5;
     private static final ResourceLocation[] INVERTED_CONTROL_IDS = {
-            ResourceLocation.fromNamespaceAndPath("magic_ritual_mod", "inverted_control"),
-            ResourceLocation.fromNamespaceAndPath("magic_ritual_mod", "inverted_controls"),
-            ResourceLocation.fromNamespaceAndPath("magic_ritual_mod", "invertedcontrol")
+            ResourceLocation.fromNamespaceAndPath("immortal_cultivation_mod", "inverted_control"),
+            ResourceLocation.fromNamespaceAndPath("immortal_cultivation_mod", "inverted_controls"),
+            ResourceLocation.fromNamespaceAndPath("immortal_cultivation_mod", "invertedcontrol")
     };
-    private static final Map<ResourceKey<Level>, Map<BlockPos, Long>> PUDDLES = new ConcurrentHashMap<>();
+    private static final Map<ResourceKey<Level>, Map<BlockPos, Puddle>> PUDDLES = new ConcurrentHashMap<>();
 
     private SlidingWater() {
     }
 
     public static void createPuddle(ServerLevel level, BlockPos pos) {
-        createPuddle(level, pos, 1.0F);
+        createPuddle(level, pos, 1.0F, null);
     }
 
     public static void createPuddle(ServerLevel level, BlockPos pos, float chargeScale) {
+        createPuddle(level, pos, chargeScale, null);
+    }
+
+    public static void createPuddle(
+            ServerLevel level,
+            BlockPos pos,
+            float chargeScale,
+            Entity owner) {
         int radius = Math.max(0, Math.round(Math.max(1.0F, Math.min(2.0F, chargeScale)) - 1.0F));
+        Puddle puddle = new Puddle(
+                level.getGameTime() + PUDDLE_DURATION_TICKS,
+                owner == null ? null : owner.getUUID(),
+                owner instanceof CultivationNpc);
         for (BlockPos puddlePos : BlockPos.betweenClosed(pos.offset(-radius, 0, -radius), pos.offset(radius, 0, radius))) {
             PUDDLES.computeIfAbsent(level.dimension(), ignored -> new ConcurrentHashMap<>())
-                    .put(puddlePos.immutable(), level.getGameTime() + PUDDLE_DURATION_TICKS);
+                    .put(puddlePos.immutable(), puddle);
             PhotonEffects.puddle(level, puddlePos.getX() + 0.5D, puddlePos.getY(), puddlePos.getZ() + 0.5D);
         }
     }
 
-    public static void tick(ServerPlayer player) {
-        Map<BlockPos, Long> puddles = PUDDLES.get(player.level().dimension());
+    /** Advances puddles once per dimension, including NPC-only combat with no players present. */
+    public static void tick(ServerLevel level) {
+        Map<BlockPos, Puddle> puddles = PUDDLES.get(level.dimension());
         if (puddles == null || puddles.isEmpty()) {
             return;
         }
 
-        long now = player.level().getGameTime();
+        long now = level.getGameTime();
         for (var entry : puddles.entrySet()) {
-            if (entry.getValue() <= now) {
+            if (entry.getValue().expiresAt() <= now) {
                 puddles.remove(entry.getKey());
-                PhotonEffects.removePuddle(player.serverLevel(), entry.getKey());
+                PhotonEffects.removePuddle(level, entry.getKey());
             }
         }
         if (puddles.isEmpty()) {
+            PUDDLES.remove(level.dimension(), puddles);
             return;
         }
 
-        ServerLevel level = player.serverLevel();
-        if (player.tickCount % 5 == 0) {
+        if (now % 5L == 0L) {
             for (BlockPos pos : puddles.keySet()) {
                 level.sendParticles(ParticleTypes.SPLASH,
                         pos.getX() + 0.5D, pos.getY() + 0.04D, pos.getZ() + 0.5D,
@@ -76,13 +92,27 @@ public final class SlidingWater {
 
         for (BlockPos pos : puddles.keySet()) {
             AABB puddleBox = new AABB(pos).inflate(0.45D, 0.08D, 0.45D);
-            var targets = level.getEntitiesOfClass(LivingEntity.class, puddleBox, entity -> entity.isAlive());
+            Puddle puddle = puddles.get(pos);
+            if (puddle == null) {
+                continue;
+            }
+            LivingEntity owner = puddle.ownerId() == null
+                    || !(level.getEntity(puddle.ownerId()) instanceof LivingEntity living)
+                    ? null : living;
+            var targets = level.getEntitiesOfClass(
+                    LivingEntity.class,
+                    puddleBox,
+                    entity -> entity.isAlive()
+                            && (!puddle.npcOwned()
+                            || owner != null && NpcProfile.isCombatEnemy(owner, entity)));
             if (!targets.isEmpty()) {
                 applyInvertedControl(targets.getFirst());
                 puddles.remove(pos);
                 PhotonEffects.removePuddle(level, pos);
-                return;
             }
+        }
+        if (puddles.isEmpty()) {
+            PUDDLES.remove(level.dimension(), puddles);
         }
     }
 
@@ -100,5 +130,8 @@ public final class SlidingWater {
             }
         }
         return Optional.empty();
+    }
+
+    private record Puddle(long expiresAt, UUID ownerId, boolean npcOwned) {
     }
 }

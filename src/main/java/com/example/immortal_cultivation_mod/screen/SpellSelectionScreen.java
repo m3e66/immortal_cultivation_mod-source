@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod.screen;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
+import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.client.ClientData;
 import com.example.immortal_cultivation_mod.client.ClientSpellCombos;
 import com.example.immortal_cultivation_mod.effect.ModEffects;
@@ -14,22 +15,18 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.world.effect.MobEffect;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 public class SpellSelectionScreen extends Screen {
     private static final ResourceLocation BACKGROUND =
             ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_selection.png");
     private static final ResourceLocation COMBO_ICON =
             ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/mob_effect/spell_icon_combo.png");
-    private static final ResourceLocation UNKNOWN_ICON =
-            ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/mob_effect/unknown.png");
     private static final ResourceLocation SPELL_ROW_BACKGROUND =
             ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_background.png");
     private static final int TEXTURE_W = 1567;
@@ -38,16 +35,13 @@ public class SpellSelectionScreen extends Screen {
     private static final int ROW_TEXTURE_H = 83;
     private static final int DESIGN_W = 1567;
     private static final int DESIGN_H = 1004;
-    private static final Map<ResourceLocation, IconSize> ICON_SIZES = new HashMap<>();
-    private static final Map<String, String> SPELL_EFFECT_ICONS = Map.ofEntries(
-            Map.entry(ModSpells.DINGSHEN, "dishen"),
-            Map.entry(ModSpells.SUISHUANG_LINGXIAO, "frost_flight"),
-            Map.entry(ModSpells.HANJING_SUOZHUA, "frozen_qi"),
-            Map.entry(ModSpells.SHUANGTIAN_QI, "frozen"),
-            Map.entry(ModSpells.LIGHT_BEAM_ATTACK, "spell_damage_boost")
-    );
-
+    private static final int WHEEL_CENTER_Y = 470;
+    private static final int WHEEL_RADIUS = 92;
+    private static final int WHEEL_SLOT_SIZE = 46;
+    private static final int SCREEN_MARGIN = 4;
+    private static final int WHEEL_PANEL_GAP = 8;
     private final List<SelectionEntry> allEntries;
+    private final List<MethodHitbox> methodHitboxes = new ArrayList<>();
     private SpellListWidget listWidget;
     private Button toggleButton;
     private Button moveUpButton;
@@ -55,6 +49,13 @@ public class SpellSelectionScreen extends Screen {
     private Button yuqiModeButton;
     private Button closeButton;
     private SelectionEntry selectedEntry;
+    private SpellListEntry draggedWheelEntry;
+    private String draggedCircleSpellId;
+    private int dragTargetWheelIndex = -1;
+    private long lastSpellClickMillis;
+    private String lastSpellClickId = "";
+    private long lastMethodClickMillis;
+    private String lastMethodClickId = "";
 
     public SpellSelectionScreen() {
         super(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".spell_selection"));
@@ -146,7 +147,7 @@ public class SpellSelectionScreen extends Screen {
     }
 
     private int panelX() {
-        return (width - panelW()) / 2;
+        return Math.max(SCREEN_MARGIN, width - panelW() - SCREEN_MARGIN);
     }
 
     private int panelY() {
@@ -174,13 +175,34 @@ public class SpellSelectionScreen extends Screen {
 
     private void populateList() {
         listWidget.children().clear();
-        for (SelectionEntry entry : allEntries) {
+
+        // Keep wheel spells together in their real radial order so drag-and-drop is unambiguous.
+        for (SelectionEntry entry : wheelEntriesInOrder()) {
             listWidget.children().add(new SpellListEntry(entry));
         }
+        for (SelectionEntry entry : allEntries) {
+            if (!ClientData.isSpellVisibleInWheel(entry.id())) {
+                listWidget.children().add(new SpellListEntry(entry));
+            }
+        }
+    }
+
+    private List<SelectionEntry> wheelEntriesInOrder() {
+        ArrayList<SelectionEntry> ordered = new ArrayList<>();
+        for (int wheelIndex = 0; wheelIndex < ClientData.selectedWheelSpellCount(); wheelIndex++) {
+            for (SelectionEntry entry : allEntries) {
+                if (ClientData.selectedWheelSpellIndex(entry.id()) == wheelIndex) {
+                    ordered.add(entry);
+                    break;
+                }
+            }
+        }
+        return ordered;
     }
 
     private void toggleEntry(SelectionEntry entry) {
         ClientData.toggleSpellVisibleInWheel(entry.id());
+        populateList();
         updateMoveButtons();
     }
 
@@ -196,6 +218,7 @@ public class SpellSelectionScreen extends Screen {
             return;
         }
         ClientData.moveWheelSpell(selectedEntry.id(), offset);
+        populateList();
         updateMoveButtons();
     }
 
@@ -248,18 +271,196 @@ public class SpellSelectionScreen extends Screen {
         guiGraphics.blit(BACKGROUND, x, y, panelWidth, panelHeight,
                 0.0F, 0.0F, TEXTURE_W, TEXTURE_H, TEXTURE_W, TEXTURE_H);
 
+        if (listWidget != null) {
+            for (SpellListEntry entry : listWidget.children()) {
+                entry.rendered = false;
+            }
+        }
+
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+        renderWheelOrderCircle(guiGraphics, mouseX, mouseY);
 
         Component wheelCount = Component.literal(ClientData.selectedWheelSpellCount() + "/" + ClientData.MAX_WHEEL_SPELLS);
         guiGraphics.drawString(font, wheelCount, x + sx(870), y + sy(45), 0xFF3D3A32, false);
 
         renderActiveToggleSpells(guiGraphics, x + sx(250), y + sy(110), sx(1120));
         renderSpellDetails(guiGraphics, x + sx(978), y + sy(230), sx(390));
+        renderLearnedMethods(guiGraphics, mouseX, mouseY);
 
         if (allEntries.isEmpty()) {
             Component none = Component.translatable("screen." + ImmortalCultivationMod.MODID + ".no_spells");
             guiGraphics.drawString(font, none, (width - font.width(none)) / 2, height / 2 - 4, 0xCCCCCC, true);
         }
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (button == 0 && draggedCircleSpellId != null) {
+            int target = wheelCircleTarget(mouseX, mouseY);
+            if (target >= 0) {
+                dragTargetWheelIndex = target;
+            }
+            return true;
+        }
+        if (button == 0 && draggedWheelEntry != null) {
+            int listTop = panelY() + sy(165);
+            int listBottom = listTop + sy(618);
+            if (mouseY < listTop + sy(24)) {
+                listWidget.setScrollAmount(listWidget.getScrollAmount() - sy(12));
+            } else if (mouseY > listBottom - sy(24)) {
+                listWidget.setScrollAmount(listWidget.getScrollAmount() + sy(12));
+            }
+            int target = wheelDragTarget(mouseY);
+            if (target >= 0) {
+                dragTargetWheelIndex = target;
+            }
+            return true;
+        }
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (button == 0 && isWheelOrderDragging()) {
+            boolean circleDrag = draggedCircleSpellId != null;
+            String draggedId = circleDrag ? draggedCircleSpellId : draggedWheelEntry.entry.id();
+            int current = ClientData.selectedWheelSpellIndex(draggedId);
+            int target = circleDrag ? wheelCircleTarget(mouseX, mouseY) : wheelDragTarget(mouseY);
+            if (target < 0) {
+                target = dragTargetWheelIndex;
+            }
+            draggedWheelEntry = null;
+            draggedCircleSpellId = null;
+            dragTargetWheelIndex = -1;
+            if (current >= 0 && target >= 0 && current != target) {
+                ClientData.moveWheelSpell(draggedId, target - current);
+                populateList();
+                updateMoveButtons();
+            }
+            return true;
+        }
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    private boolean isWheelOrderDragging() {
+        return draggedWheelEntry != null || draggedCircleSpellId != null;
+    }
+
+    private int wheelDragTarget(double mouseY) {
+        int listTop = panelY() + sy(165);
+        int listBottom = listTop + sy(618);
+        if (mouseY < listTop || mouseY > listBottom || listWidget == null) {
+            return -1;
+        }
+
+        int closestIndex = -1;
+        double closestDistance = Double.MAX_VALUE;
+        for (SpellListEntry row : listWidget.children()) {
+            int wheelIndex = ClientData.selectedWheelSpellIndex(row.entry.id());
+            if (!row.rendered || wheelIndex < 0) {
+                continue;
+            }
+            double distance = Math.abs(mouseY - (row.rowY + row.rowHeight / 2.0));
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestIndex = wheelIndex;
+            }
+        }
+        return closestIndex;
+    }
+
+    private void renderWheelOrderCircle(GuiGraphics graphics, int mouseX, int mouseY) {
+        int centerX = wheelCenterX();
+        int centerY = wheelCenterY();
+        int radius = wheelRadius();
+        int slotSize = wheelSlotSize();
+
+        for (int point = 0; point < 72; point++) {
+            double angle = Math.PI * 2.0 * point / 72.0;
+            int ringX = centerX + (int) Math.round(Math.sin(angle) * radius);
+            int ringY = centerY - (int) Math.round(Math.cos(angle) * radius);
+            graphics.fill(ringX - 1, ringY - 1, ringX + 1, ringY + 1, 0x997D6C48);
+        }
+
+        int coreSize = Math.max(18, Math.round(36 * wheelScale()));
+        graphics.fill(centerX - coreSize / 2, centerY - coreSize / 2,
+                centerX + coreSize / 2, centerY + coreSize / 2, 0xDDE8DFC8);
+        graphics.renderOutline(centerX - coreSize / 2, centerY - coreSize / 2,
+                coreSize, coreSize, 0xFF8C7951);
+        Component count = Component.literal(ClientData.selectedWheelSpellCount() + "/" + ClientData.MAX_WHEEL_SPELLS);
+        graphics.drawCenteredString(font, count, centerX, centerY - font.lineHeight / 2, 0xFF4A4337);
+
+        List<SelectionEntry> ordered = wheelEntriesInOrder();
+        for (int index = 0; index < ordered.size(); index++) {
+            double angle = Math.PI * 2.0 * index / Math.max(1, ordered.size());
+            int slotCenterX = centerX + (int) Math.round(Math.sin(angle) * radius);
+            int slotCenterY = centerY - (int) Math.round(Math.cos(angle) * radius);
+            int slotX = slotCenterX - slotSize / 2;
+            int slotY = slotCenterY - slotSize / 2;
+            boolean hovered = mouseX >= slotX && mouseX < slotX + slotSize
+                    && mouseY >= slotY && mouseY < slotY + slotSize;
+            boolean dragged = ordered.get(index).id().equals(draggedCircleSpellId);
+            boolean target = isWheelOrderDragging() && dragTargetWheelIndex == index;
+
+            int fill = dragged ? 0xDD9FCFB5 : hovered ? 0xDDF5EEDC : 0xDDE8DFC8;
+            graphics.fill(slotX, slotY, slotX + slotSize, slotY + slotSize, fill);
+            graphics.renderOutline(slotX, slotY, slotSize, slotSize,
+                    target ? 0xFF2E8B57 : 0xFF8C7951);
+            TechniqueIcons.blitCentered(graphics, ordered.get(index).icon(), slotX + 2, slotY + 2,
+                    slotSize - 4, slotSize - 6);
+
+            Component order = Component.literal("[" + (index + 1) + "]");
+            int orderX = slotCenterX - font.width(order) / 2;
+            int orderY = slotY + slotSize + Math.max(1, Math.round(2 * wheelScale()));
+            graphics.drawString(font, order, orderX, orderY, 0xFF2E6E50, false);
+        }
+    }
+
+    private float wheelScale() {
+        float panelScale = panelW() / (float) DESIGN_W;
+        int availableWidth = Math.max(1, panelX() - SCREEN_MARGIN - WHEEL_PANEL_GAP);
+        float fitScale = availableWidth / (2.0F * (WHEEL_RADIUS + WHEEL_SLOT_SIZE / 2.0F));
+        return Math.max(0.35F, Math.min(panelScale, fitScale));
+    }
+
+    private int wheelRadius() {
+        return Math.max(20, Math.round(WHEEL_RADIUS * wheelScale()));
+    }
+
+    private int wheelSlotSize() {
+        return Math.max(14, Math.round(WHEEL_SLOT_SIZE * wheelScale()));
+    }
+
+    private int wheelCenterX() {
+        int left = SCREEN_MARGIN;
+        int right = Math.max(left, panelX() - WHEEL_PANEL_GAP);
+        int extent = wheelRadius() + (wheelSlotSize() + 1) / 2;
+        return Math.max(left + extent, (left + right) / 2);
+    }
+
+    private int wheelCenterY() {
+        return panelY() + sy(WHEEL_CENTER_Y);
+    }
+
+    private int wheelCircleTarget(double mouseX, double mouseY) {
+        List<SelectionEntry> ordered = wheelEntriesInOrder();
+        if (ordered.isEmpty()) {
+            return -1;
+        }
+        int centerX = wheelCenterX();
+        int centerY = wheelCenterY();
+        int radius = wheelRadius();
+        int slotSize = wheelSlotSize();
+        for (int index = 0; index < ordered.size(); index++) {
+            double angle = Math.PI * 2.0 * index / ordered.size();
+            int slotCenterX = centerX + (int) Math.round(Math.sin(angle) * radius);
+            int slotCenterY = centerY - (int) Math.round(Math.cos(angle) * radius);
+            if (mouseX >= slotCenterX - slotSize / 2.0 && mouseX < slotCenterX + slotSize / 2.0
+                    && mouseY >= slotCenterY - slotSize / 2.0 && mouseY < slotCenterY + slotSize / 2.0) {
+                return index;
+            }
+        }
+        return -1;
     }
 
     private void renderActiveToggleSpells(GuiGraphics guiGraphics, int x, int y, int maxWidth) {
@@ -291,6 +492,7 @@ public class SpellSelectionScreen extends Screen {
         addIfActive(active, ModSpells.WIND_STEP, ModEffects.WIND_STEP);
         addIfActive(active, ModSpells.YUFENG_JUE, ModEffects.YUFENG_JUE);
         addIfActive(active, ModSpells.WEIYA, ModEffects.WEIYA);
+        addIfActive(active, ModSpells.SHIXU_CHILIU, ModEffects.SHIXU_CHILIU);
         addIfActive(active, ModSpells.FENGYA, ModEffects.FENGYA);
         addIfActive(active, ModSpells.SUISHUANG_LINGXIAO, ModEffects.FROST_FLIGHT);
 
@@ -313,17 +515,111 @@ public class SpellSelectionScreen extends Screen {
 
         int detailSlotSize = sx(86);
         int detailIconSize = sx(80);
-        blitIconCentered(guiGraphics, selectedEntry.icon(), x - sx(3), y - sy(4), detailSlotSize, detailIconSize);
+        TechniqueIcons.blitCentered(guiGraphics, selectedEntry.icon(), x - sx(3), y - sy(4),
+                detailSlotSize, detailIconSize);
         guiGraphics.drawString(font, selectedEntry.name(), x + sx(98), y + sy(8), selectedEntry.nameColor(), false);
 
         Component desc = selectedEntry.description();
-        drawFittedWrapped(guiGraphics, desc, x, y + sy(96), maxWidth, sy(110), 0xFF4A443A);
+        CultivationGuiText.drawFittedWrapped(guiGraphics, font, desc, x, y + sy(96),
+                maxWidth, sy(110), 0xFF4A443A, false);
 
         int attrY = y + sy(250);
         guiGraphics.drawString(font, Component.literal(selectedEntry.costText()), x + sx(134), attrY + sy(5), 0xFF4A443A, false);
         guiGraphics.drawString(font, Component.literal(selectedEntry.requirementText()), x + sx(134), attrY + sy(50), 0xFF4A443A, false);
         guiGraphics.drawString(font, Component.literal(selectedEntry.proficiencyText()), x + sx(115), attrY + sy(100), 0xFF4A443A, false);
         guiGraphics.drawString(font, Component.literal(selectedEntry.cooldownText()), x + sx(137), attrY + sy(147), 0xFF4A443A, false);
+    }
+
+    private List<CultivationMethods.MethodDef> learnedMethods() {
+        if (ClientData.cultivationData == null) {
+            return List.of();
+        }
+        Set<String> learned = ClientData.cultivationData.methodProficiencies().keySet();
+        String active = ClientData.cultivationData.activeCultivationMethod();
+        return CultivationMethods.allMethods().stream()
+                .filter(method -> learned.contains(method.id()) || method.id().equals(active))
+                .toList();
+    }
+
+    private void renderLearnedMethods(GuiGraphics graphics, int mouseX, int mouseY) {
+        methodHitboxes.clear();
+        List<CultivationMethods.MethodDef> methods = learnedMethods();
+        if (methods.isEmpty()) {
+            return;
+        }
+
+        int left = panelX() + sx(82);
+        int right = panelX() + sx(900);
+        int y = panelY() + sy(796);
+        graphics.drawString(font,
+                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".learned_methods"),
+                left, y, 0xFF665A46, false);
+        y += sy(25);
+        int x = left;
+        int rowHeight = Math.max(14, sy(25));
+        int gap = Math.max(3, sx(7));
+        for (CultivationMethods.MethodDef method : methods) {
+            Component name = Component.translatable(method.nameKey());
+            int itemWidth = Math.min(right - left, font.width(name) + sx(20));
+            if (x + itemWidth > right) {
+                x = left;
+                y += rowHeight;
+            }
+            if (y + rowHeight > panelY() + sy(898)) {
+                break;
+            }
+            boolean hovered = mouseX >= x && mouseX < x + itemWidth
+                    && mouseY >= y && mouseY < y + rowHeight;
+            graphics.fill(x, y, x + itemWidth, y + rowHeight,
+                    hovered ? 0x44588968 : 0x247E765F);
+            graphics.renderOutline(x, y, itemWidth, rowHeight, 0x55725F3A);
+            CultivationGuiText.drawFittedSingle(
+                    graphics, font, name, x + sx(7), y + Math.max(2, sy(6)),
+                    itemWidth - sx(14), 0xFF453F35, false);
+            methodHitboxes.add(new MethodHitbox(method.id(), x, y, itemWidth, rowHeight));
+            x += itemWidth + gap;
+        }
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button == 0) {
+            int circleIndex = wheelCircleTarget(mouseX, mouseY);
+            List<SelectionEntry> wheelEntries = wheelEntriesInOrder();
+            if (circleIndex >= 0 && circleIndex < wheelEntries.size()) {
+                SelectionEntry entry = wheelEntries.get(circleIndex);
+                draggedCircleSpellId = entry.id();
+                dragTargetWheelIndex = circleIndex;
+                selectEntry(entry);
+                return true;
+            }
+            if (listWidget != null) {
+                for (SpellListEntry row : listWidget.children()) {
+                    if (row.isHandleHovered(mouseX, mouseY)
+                            && ClientData.isSpellVisibleInWheel(row.entry.id())) {
+                        draggedWheelEntry = row;
+                        dragTargetWheelIndex = ClientData.selectedWheelSpellIndex(row.entry.id());
+                        selectEntry(row.entry);
+                        return true;
+                    }
+                }
+            }
+            for (MethodHitbox hitbox : methodHitboxes) {
+                if (!hitbox.contains(mouseX, mouseY)) {
+                    continue;
+                }
+                long now = System.currentTimeMillis();
+                if (hitbox.methodId().equals(lastMethodClickId)
+                        && now - lastMethodClickMillis <= 350L
+                        && minecraft != null) {
+                    minecraft.setScreen(TechniqueDescriptionScreen.method(this, hitbox.methodId()));
+                }
+                lastMethodClickId = hitbox.methodId();
+                lastMethodClickMillis = now;
+                return true;
+            }
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
@@ -386,6 +682,12 @@ public class SpellSelectionScreen extends Screen {
 
     private class SpellListEntry extends ObjectSelectionList.Entry<SpellListEntry> {
         private final SelectionEntry entry;
+        private boolean rendered;
+        private int rowY;
+        private int rowHeight;
+        private int handleX;
+        private int handleY;
+        private int handleWidth;
 
         SpellListEntry(SelectionEntry entry) {
             this.entry = entry;
@@ -402,6 +704,9 @@ public class SpellSelectionScreen extends Screen {
             boolean visible = ClientData.isSpellVisibleInWheel(entry.id());
             int rowHeight = Math.round(width * (ROW_TEXTURE_H / (float) ROW_TEXTURE_W));
             int rowY = top + (height - rowHeight) / 2;
+            this.rendered = true;
+            this.rowY = rowY;
+            this.rowHeight = rowHeight;
             guiGraphics.blit(SPELL_ROW_BACKGROUND, left, rowY, width, rowHeight,
                     0.0F, 0.0F, ROW_TEXTURE_W, ROW_TEXTURE_H, ROW_TEXTURE_W, ROW_TEXTURE_H);
             if (selectedEntry == entry) {
@@ -410,24 +715,45 @@ public class SpellSelectionScreen extends Screen {
                 guiGraphics.fill(left, rowY, left + width, rowY + rowHeight, 0x2238FF88);
             }
 
-            boolean maxed = !visible && ClientData.selectedWheelSpellCount() >= ClientData.MAX_WHEEL_SPELLS;
             int wheelIndex = ClientData.selectedWheelSpellIndex(entry.id());
-            String marker = visible && wheelIndex >= 0 ? "[" + (wheelIndex + 1) + "]" : maxed ? "[8]" : "[ ]";
+            String marker = visible && wheelIndex >= 0 ? "[" + (wheelIndex + 1) + "]" : "[ ]";
             int markerColor = visible ? 0xFF2E6E50 : 0xFF8A8375;
 
             int slotX = left + Math.round(width * (25 / (float) ROW_TEXTURE_W));
             int slotY = rowY + Math.round(rowHeight * (7 / (float) ROW_TEXTURE_H));
             int slotSize = Math.round(rowHeight * (68 / (float) ROW_TEXTURE_H));
             int iconSize = Math.round(slotSize * 0.94F);
-            int markerX = slotX + slotSize + 8;
-            int textX = markerX + 24;
+            int handleX = slotX + slotSize + 7;
+            int markerX = handleX;
+            int textX = markerX + font.width("[8]") + 8;
+            int textY = rowY + Math.round(rowHeight * 0.25F);
 
-            blitIconCentered(guiGraphics, entry.icon(), slotX, slotY, slotSize, iconSize);
-            guiGraphics.drawString(font, marker, markerX, rowY + Math.round(rowHeight * 0.25F), markerColor, false);
+            this.handleX = handleX;
+            this.handleY = rowY;
+            this.handleWidth = font.width("[8]");
+
+            if (draggedWheelEntry == this) {
+                guiGraphics.fill(left + 2, rowY + 2, left + width - 2, rowY + rowHeight - 2, 0x443C8C68);
+            } else if (isWheelOrderDragging() && visible && dragTargetWheelIndex == wheelIndex) {
+                guiGraphics.renderOutline(left + 2, rowY + 2, width - 4, rowHeight - 4, 0xFF2E8B57);
+            }
+
+            TechniqueIcons.blitCentered(guiGraphics, entry.icon(), slotX, slotY, slotSize, iconSize);
+            guiGraphics.drawString(font, marker, markerX, textY, markerColor, false);
             drawClippedString(guiGraphics, entry.name(), textX, rowY + Math.round(rowHeight * 0.22F),
                     left + width - sx(18), entry.nameColor());
             drawClippedString(guiGraphics, Component.literal(entry.detail()), textX, rowY + Math.round(rowHeight * 0.52F),
                     left + width - sx(18), 0xFF6E685C);
+        }
+
+        private boolean isHandleHovered(double mouseX, double mouseY) {
+            int listTop = panelY() + sy(165);
+            int listBottom = listTop + sy(618);
+            return rendered
+                    && mouseX >= handleX - 3
+                    && mouseX <= handleX + handleWidth + 3
+                    && mouseY >= Math.max(handleY, listTop)
+                    && mouseY <= Math.min(handleY + rowHeight, listBottom);
         }
 
         @Override
@@ -439,6 +765,15 @@ public class SpellSelectionScreen extends Screen {
             }
 
             selectEntry(entry);
+            long now = System.currentTimeMillis();
+            if (!entry.id().startsWith(ClientSpellCombos.CAST_PREFIX)
+                    && entry.id().equals(lastSpellClickId)
+                    && now - lastSpellClickMillis <= 350L
+                    && minecraft != null) {
+                minecraft.setScreen(TechniqueDescriptionScreen.spell(SpellSelectionScreen.this, entry.id()));
+            }
+            lastSpellClickId = entry.id();
+            lastSpellClickMillis = now;
             return true;
         }
     }
@@ -453,6 +788,10 @@ public class SpellSelectionScreen extends Screen {
                 costText = "1% qi per second";
             } else if (ModSpells.ZIBAO.equals(spell.id())) {
                 costText = "all age";
+            } else if (ModSpells.LIANSHEN_SHU.equals(spell.id())) {
+                costText = "75% max qi";
+            } else if (ModSpells.SUOKONG_SHU.equals(spell.id())) {
+                costText = "100 / 700 / 2000 qi";
             } else {
                 costText = spell.qiCost() + " qi";
             }
@@ -463,9 +802,9 @@ public class SpellSelectionScreen extends Screen {
                     spell.id(),
                     spell.name(),
                     requirement,
-                    Component.translatable("spell." + ImmortalCultivationMod.MODID + "." + spell.translationKey() + ".description"),
+                    TechniqueDescriptions.spell(spell),
                     0xFF3D3A32,
-                    iconForSpell(spell),
+                    TechniqueIcons.spell(spell),
                     requirementText,
                     costText,
                     proficiencyText,
@@ -496,33 +835,6 @@ public class SpellSelectionScreen extends Screen {
                     "-");
         }
 
-        private static ResourceLocation iconForSpell(ModSpells.SpellDef spell) {
-            if (UNKNOWN_ICON.equals(spell.icon()) && Minecraft.getInstance().getResourceManager().getResource(UNKNOWN_ICON).isPresent()) {
-                return UNKNOWN_ICON;
-            }
-            String iconName = SPELL_EFFECT_ICONS.getOrDefault(spell.id(), spell.id());
-            ResourceLocation icon = ResourceLocation.fromNamespaceAndPath(
-                    ImmortalCultivationMod.MODID,
-                    "textures/mob_effect/" + iconName + ".png");
-            return Minecraft.getInstance().getResourceManager().getResource(icon).isPresent() ? icon : UNKNOWN_ICON;
-        }
-    }
-
-    private static void blitIcon(GuiGraphics guiGraphics, ResourceLocation icon, int x, int y, int size) {
-        IconSize iconSize = iconSize(icon);
-        guiGraphics.blit(icon, x, y, size, size, 0.0F, 0.0F,
-                iconSize.width(), iconSize.height(), iconSize.width(), iconSize.height());
-    }
-
-    private static void blitIconCentered(GuiGraphics guiGraphics, ResourceLocation icon, int slotX, int slotY, int slotSize, int maxSize) {
-        IconSize source = iconSize(icon);
-        float scale = Math.min(maxSize / (float) source.width(), maxSize / (float) source.height());
-        int drawW = Math.max(1, Math.round(source.width() * scale));
-        int drawH = Math.max(1, Math.round(source.height() * scale));
-        int drawX = slotX + (slotSize - drawW) / 2;
-        int drawY = slotY + (slotSize - drawH) / 2;
-        guiGraphics.blit(icon, drawX, drawY, drawW, drawH, 0.0F, 0.0F,
-                source.width(), source.height(), source.width(), source.height());
     }
 
     private void drawClippedString(GuiGraphics guiGraphics, Component text, int x, int y, int maxX, int color) {
@@ -534,46 +846,9 @@ public class SpellSelectionScreen extends Screen {
         guiGraphics.drawString(font, rendered, x, y, color, false);
     }
 
-    private void drawFittedWrapped(GuiGraphics guiGraphics, Component text, int x, int y, int maxWidth, int maxHeight, int color) {
-        float scale = 1.0F;
-        List<net.minecraft.util.FormattedCharSequence> lines = font.split(text, maxWidth);
-        while ((lines.size() * Math.ceil(10.0F * scale) > maxHeight || widest(lines) * scale > maxWidth) && scale > 0.55F) {
-            scale -= 0.05F;
-            lines = font.split(text, Math.max(20, Math.round(maxWidth / scale)));
+    private record MethodHitbox(String methodId, int x, int y, int width, int height) {
+        boolean contains(double mouseX, double mouseY) {
+            return mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height;
         }
-
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(x, y, 0.0F);
-        guiGraphics.pose().scale(scale, scale, 1.0F);
-        int lineHeight = Math.max(7, Math.round(10.0F / scale * scale));
-        int maxLines = Math.max(1, (int) Math.floor(maxHeight / (10.0F * scale)));
-        for (int i = 0; i < lines.size() && i < maxLines; i++) {
-            guiGraphics.drawString(font, lines.get(i), 0, i * lineHeight, color, false);
-        }
-        guiGraphics.pose().popPose();
-    }
-
-    private int widest(List<net.minecraft.util.FormattedCharSequence> lines) {
-        int widest = 0;
-        for (var line : lines) {
-            widest = Math.max(widest, font.width(line));
-        }
-        return widest;
-    }
-
-    private static IconSize iconSize(ResourceLocation icon) {
-        return ICON_SIZES.computeIfAbsent(icon, location -> Minecraft.getInstance().getResourceManager()
-                .getResource(location)
-                .map(resource -> {
-                    try (var input = resource.open(); NativeImage image = NativeImage.read(input)) {
-                        return new IconSize(image.getWidth(), image.getHeight());
-                    } catch (Exception ignored) {
-                        return new IconSize(16, 16);
-                    }
-                })
-                .orElse(new IconSize(16, 16)));
-    }
-
-    private record IconSize(int width, int height) {
     }
 }

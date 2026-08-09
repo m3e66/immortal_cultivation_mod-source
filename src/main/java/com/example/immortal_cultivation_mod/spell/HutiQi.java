@@ -15,6 +15,8 @@ import com.example.immortal_cultivation_mod.entity.SlidingWaterProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.SmokeProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.WindBladeProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.YihenCiProjectileEntity;
+import com.example.immortal_cultivation_mod.entity.XinliaoFireballEntity;
+import com.example.immortal_cultivation_mod.entity.StarfallProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.ZhenshanPalmEntity;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -99,6 +101,8 @@ public final class HutiQi {
                 || direct instanceof DingshenProjectileEntity
                 || direct instanceof DuanliuKongdunProjectileEntity
                 || direct instanceof YihenCiProjectileEntity
+                || direct instanceof XinliaoFireballEntity
+                || direct instanceof StarfallProjectileEntity
                 || direct instanceof LightningProjectileEntity
                 || direct instanceof ZhenshanPalmEntity) {
             return true;

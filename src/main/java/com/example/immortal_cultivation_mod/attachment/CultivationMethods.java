@@ -19,6 +19,8 @@ public class CultivationMethods {
     public static final String CHANGQING_JUE = "changqing_jue";
     public static final String FENTIAN_LIFE_RENEWAL = "fentian_life_renewal";
     public static final String HANTI_BINGQIN = "hanti_bingqin";
+    public static final String CUIGU_LIANSHEN_JUE = "cuigu_lianshen_jue";
+    public static final String JIUYOU_LIANSHI_JUE = "jiuyou_lianshi_jue";
 
     public record MethodDef(String id, String nameKey, String element, String tier, String limitLevel, boolean bloodDemon) {}
 
@@ -55,7 +57,13 @@ public class CultivationMethods {
                     CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE, false)),
             Map.entry(
             HANTI_BINGQIN, new MethodDef(HANTI_BINGQIN, "method.immortal_cultivation_mod.hanti_bingqin", SpiritRoots.ICE, "heaven",
-                    CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_LATE, false))
+                    CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_LATE, false)),
+            Map.entry(
+            CUIGU_LIANSHEN_JUE, new MethodDef(CUIGU_LIANSHEN_JUE, "method.immortal_cultivation_mod.cuigu_lianshen_jue", "none", "heaven",
+                    CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_EARLY, false)),
+            Map.entry(
+            JIUYOU_LIANSHI_JUE, new MethodDef(JIUYOU_LIANSHI_JUE, "method.immortal_cultivation_mod.jiuyou_lianshi_jue", SpiritRoots.DARK, "heaven",
+                    CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_EARLY, false))
     );
 
     public static MethodDef get(String id) {
@@ -74,7 +82,9 @@ public class CultivationMethods {
                 METHODS.get(POKONG_JUE),
                 METHODS.get(CHANGQING_JUE),
                 METHODS.get(FENTIAN_LIFE_RENEWAL),
-                METHODS.get(HANTI_BINGQIN)
+                METHODS.get(HANTI_BINGQIN),
+                METHODS.get(CUIGU_LIANSHEN_JUE),
+                METHODS.get(JIUYOU_LIANSHI_JUE)
         );
     }
 
@@ -145,6 +155,14 @@ public class CultivationMethods {
         return HANTI_BINGQIN.equals(id);
     }
 
+    public static boolean isCuiguLianshenJue(String id) {
+        return CUIGU_LIANSHEN_JUE.equals(id);
+    }
+
+    public static boolean isJiuyouLianshiJue(String id) {
+        return JIUYOU_LIANSHI_JUE.equals(id);
+    }
+
     public static boolean canGainProgress(String methodId, String cultivationLevel) {
         MethodDef def = get(methodId);
         if (def == null) {
@@ -166,7 +184,7 @@ public class CultivationMethods {
         if (def == null) {
             return 0;
         }
-        if ("any".equals(def.element())) {
+        if ("any".equals(def.element()) || "none".equals(def.element())) {
             return switch (def.tier()) {
                 case "earth" -> 120;
                 case "heaven" -> 150;

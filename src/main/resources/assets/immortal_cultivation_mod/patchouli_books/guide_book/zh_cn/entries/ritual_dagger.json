@@ -1,0 +1,16 @@
+{
+  "name": "匕首",
+  "icon": "immortal_cultivation_mod:ritual_dagger",
+  "category": "immortal_cultivation_mod:getting_started",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "immortal_cultivation_mod:ritual_dagger",
+      "text": "$(item)匕首$()是你用于创建和管理符文的主要工具。它有250点耐久，并造成4点攻击伤害。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)右键$()使用匕首可打开符文选择界面，在那里你可以选择要放置在脚下的符文类型。$(br2)$(bold)Shift + 右键$()可打开半径选择界面，在那里你可以选择不同半径来放置阵眼。"
+    }
+  ]
+}

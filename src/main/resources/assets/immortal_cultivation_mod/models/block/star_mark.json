@@ -1,0 +1,23 @@
+{
+  "ambientocclusion": false,
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "immortal_cultivation_mod:block/star_mark",
+    "mark": "immortal_cultivation_mod:block/star_mark"
+  },
+  "elements": [
+    {
+      "from": [0, 1, 0],
+      "to": [16, 1.01, 16],
+      "shade": false,
+      "faces": {
+        "up": {
+          "texture": "#mark"
+        },
+        "down": {
+          "texture": "#mark"
+        }
+      }
+    }
+  ]
+}

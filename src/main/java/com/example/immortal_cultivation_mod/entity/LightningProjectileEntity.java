@@ -9,6 +9,8 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
@@ -20,6 +22,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
@@ -38,6 +41,7 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
 
     public LightningProjectileEntity(Level level, LivingEntity shooter, boolean greater) {
         super(ModEntities.LIGHTNING_PROJECTILE.get(), shooter, level);
+        NpcProfile.markNpcOwnedEffect(this, shooter);
         setGreater(greater);
         setNoGravity(true);
 
@@ -53,6 +57,14 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
     @Override
     public void tick() {
         setNoGravity(true);
+        if (!level().isClientSide) {
+            Entity owner = getOwner();
+            NpcProfile.markNpcOwnedEffect(this, owner);
+            if (NpcProfile.isOrphanedNpcEffect(this, owner)) {
+                discard();
+                return;
+            }
+        }
         super.tick();
         lifeTicks++;
 
@@ -127,7 +139,7 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
 
         if (level() instanceof ServerLevel serverLevel) {
             lightningStrikeParticles(serverLevel, hitPos, isGreater(), chargeScale());
-            summonLightning(serverLevel, hitPos, isGreater(), chargeScale());
+            summonLightning(serverLevel, hitPos, isGreater(), chargeScale(), getOwner());
         }
 
         level().playSound(
@@ -147,11 +159,15 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
     @Override
     protected boolean canHitEntity(Entity entity) {
         Entity owner = getOwner();
-        return (owner == null || !entity.getUUID().equals(owner.getUUID())) && super.canHitEntity(entity);
+        Entity target = ModelBonePartEntity.resolveParent(entity);
+        return (owner == null || !target.getUUID().equals(owner.getUUID()))
+                && NpcProfile.canNpcEffectHit(this, owner, entity)
+                && super.canHitEntity(entity);
     }
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
+        Entity target = ModelBonePartEntity.resolveParent(result.getEntity());
         String spellId = isGreater() ? ModSpells.WULEI_ZHENGFA : ModSpells.YINLEI_JUE;
 
         float damage = com.example.immortal_cultivation_mod.spell.SpellDamageHelper.damage(
@@ -160,15 +176,9 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
                 ModSpells.get(spellId)
         );
 
-        if (getOwner() instanceof net.minecraft.world.entity.player.Player player) {
-            var data = ModAttachments.getData(player);
-            damage += data.magicAttack();
-            damage *= (float) SpiritRoots.damageMultiplier(data, ModSpells.get(spellId));
-        }
+        boolean hurt = target.hurt(damageSources().thrown(this, getOwner()), damage);
 
-        result.getEntity().hurt(damageSources().thrown(this, getOwner()), damage);
-
-        if (result.getEntity() instanceof LivingEntity living) {
+        if (hurt && target instanceof LivingEntity living) {
             living.setRemainingFireTicks(Math.max(living.getRemainingFireTicks(), isGreater() ? 60 : 30));
         }
     }
@@ -210,7 +220,12 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
         getPersistentData().putFloat("ChargeScale", scale);
     }
 
-    private static void summonLightning(ServerLevel level, Vec3 pos, boolean greater, float chargeScale) {
+    private static void summonLightning(
+            ServerLevel level,
+            Vec3 pos,
+            boolean greater,
+            float chargeScale,
+            Entity owner) {
         int strikes = greater
                 ? Math.max(7, Math.round(9.0F * chargeScale))
                 : Math.max(1, Math.round(1.0F + 6.0F * (chargeScale - 1.0F)));
@@ -222,9 +237,38 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
 
             LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level);
             if (bolt != null) {
-                bolt.moveTo(pos.x + ox, pos.y, pos.z + oz);
-                bolt.setVisualOnly(false);
+                Vec3 strike = new Vec3(pos.x + ox, pos.y, pos.z + oz);
+                bolt.moveTo(strike.x, strike.y, strike.z);
+                if (owner instanceof ServerPlayer player) {
+                    bolt.setCause(player);
+                }
+                boolean npcOwned = owner instanceof LivingEntity && owner instanceof CultivationNpc;
+                bolt.setVisualOnly(npcOwned);
                 level.addFreshEntity(bolt);
+                if (npcOwned) {
+                    applyNpcLightningDamage(level, strike, (LivingEntity) owner);
+                }
+            }
+        }
+    }
+
+    private static void applyNpcLightningDamage(
+            ServerLevel level,
+            Vec3 strike,
+            LivingEntity owner) {
+        AABB area = new AABB(
+                strike.x - 3.0D, strike.y - 3.0D, strike.z - 3.0D,
+                strike.x + 3.0D, strike.y + 9.0D, strike.z + 3.0D);
+        DamageSource damageSource = new DamageSource(
+                owner.damageSources().indirectMagic(owner, owner).typeHolder(),
+                owner, owner, strike);
+        for (LivingEntity target : level.getEntitiesOfClass(
+                LivingEntity.class,
+                area,
+                target -> target != owner && target.isAlive()
+                        && NpcProfile.isCombatEnemy(owner, target))) {
+            if (target.hurt(damageSource, 5.0F)) {
+                target.setRemainingFireTicks(Math.max(target.getRemainingFireTicks(), 30));
             }
         }
     }

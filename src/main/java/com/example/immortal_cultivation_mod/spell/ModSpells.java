@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod.spell;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
+import com.example.immortal_cultivation_mod.attachment.BodyTypes;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
@@ -11,6 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ModSpells {
     public static final String FIREBALL = "fireball";
@@ -52,8 +54,86 @@ public class ModSpells {
     public static final String XUYING_TA = "xuying_ta";
     public static final String DUANLIU_KONGDUN = "duanliu_kongdun";
     public static final String YIHEN_CI = "yihen_ci";
+    public static final String CUIGU_LIANSHEN = "cuigu_lianshen";
+    public static final String JINHUO_XINLIAO = "jinhuo_xinliao";
+    public static final String SUIGUI_XINGYUN = "suigui_xingyun";
+    public static final String DONGTIAN_JIELING = "dongtian_jieling";
+    public static final String SHIXU_CHILIU = "shixu_chiliu";
+    public static final String LIANSHEN_SHU = "lianshen_shu";
+    public static final String SUOKONG_SHU = "suokong_shu";
+
+    private static final Set<String> PREPARED_CAST_SPELLS = Set.of(
+            FIREBALL,
+            YINLEI_JUE,
+            WULEI_ZHENGFA,
+            LIUGUANG_JIANYING,
+            SLIDING_WATER,
+            LINGZHI_BULLET,
+            WIND_BLADE,
+            SMOKE_ART,
+            MICHEN_ZHANG,
+            IGNITE_FLARE,
+            ZHENSHAN_PALM,
+            ABSORB_CULTIVATION,
+            TUNTIAN,
+            DINGSHEN,
+            HANJING_SUOZHUA,
+            SHUANGTIAN_QI,
+            YUQI_SHU,
+            KONGSHI_SHU,
+            DUANLIU_KONGDUN,
+            YIHEN_CI,
+            JINHUO_XINLIAO,
+            SUIGUI_XINGYUN,
+            SUOKONG_SHU);
 
     private static final Map<String, SpellDef> SPELLS = createSpells();
+    private static final Map<String, Integer> NPC_LEARNING_TRUST = Map.ofEntries(
+            Map.entry(QI_GATHERING, 5),
+            Map.entry(CLEANSE, 6),
+            Map.entry(BEAM, 7),
+            Map.entry(FIREBALL, 8),
+            Map.entry(LINGZHI_BULLET, 9),
+            Map.entry(WIND_BLADE, 10),
+            Map.entry(WIND_STEP, 11),
+            Map.entry(SMOKE_ART, 12),
+            Map.entry(HUTI_QI, 13),
+            Map.entry(REGENERATION, 14),
+            Map.entry(MICHEN_ZHANG, 16),
+            Map.entry(SLIDING_WATER, 17),
+            Map.entry(IGNITE_FLARE, 18),
+            Map.entry(SPIRIT_SIGHT, 19),
+            Map.entry(YINLEI_JUE, 23),
+            Map.entry(LINGBENG, 24),
+            Map.entry(YUFENG_JUE, 25),
+            Map.entry(EARTH_ESCAPE, 27),
+            Map.entry(DIELANG_SHIELD, 28),
+            Map.entry(KONGSHI_SHU, 29),
+            Map.entry(YUQI_SHU, 34),
+            Map.entry(GUSHI_SHIELD, 35),
+            Map.entry(WULEI_ZHENGFA, 42),
+            Map.entry(XUYING_TA, 43),
+            Map.entry(DINGSHEN, 49),
+            Map.entry(LIGHT_BEAM_ATTACK, 50),
+            Map.entry(SIFANG_JIE, 51),
+            Map.entry(DUANLIU_KONGDUN, 52),
+            Map.entry(YIHEN_CI, 53),
+            Map.entry(WEIYA, 58),
+            Map.entry(LIUGUANG_JIANYING, 59),
+            Map.entry(ZHENSHAN_PALM, 60),
+            Map.entry(DONGTIAN_JIELING, 61),
+            Map.entry(ZIBAO, 64),
+            Map.entry(JINHUO_XINLIAO, 66),
+            Map.entry(SUIGUI_XINGYUN, 67),
+            Map.entry(SHIXU_CHILIU, 72),
+            Map.entry(FENGYA, 88),
+            Map.entry(CUIGU_LIANSHEN, 89),
+            Map.entry(HANJING_SUOZHUA, 90),
+            Map.entry(SHUANGTIAN_QI, 92),
+            Map.entry(SUISHUANG_LINGXIAO, 93),
+            Map.entry(ABSORB_CULTIVATION, 94),
+            Map.entry(TUNTIAN, 96)
+    );
 
     private static Map<String, SpellDef> createSpells() {
         Map<String, SpellDef> spells = new LinkedHashMap<>();
@@ -408,6 +488,69 @@ public class ModSpells {
                 "earth",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/mob_effect/unknown.png")
         ));
+        spells.put(CUIGU_LIANSHEN, new SpellDef(
+                CUIGU_LIANSHEN,
+                "cuigu_lianshen",
+                "",
+                0,
+                "",
+                "heaven",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/mob_effect/unknown.png")
+        ));
+        spells.put(JINHUO_XINLIAO, new SpellDef(
+                JINHUO_XINLIAO,
+                "jinhuo_xinliao",
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_MID,
+                2000,
+                SpiritRoots.FIRE,
+                "earth",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/mob_effect/unknown.png")
+        ));
+        spells.put(SUIGUI_XINGYUN, new SpellDef(
+                SUIGUI_XINGYUN,
+                "suigui_xingyun",
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_MID,
+                1500,
+                SpiritRoots.LIGHT,
+                "earth",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/mob_effect/unknown.png")
+        ));
+        spells.put(DONGTIAN_JIELING, new SpellDef(
+                DONGTIAN_JIELING,
+                "dongtian_jieling",
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_EARLY,
+                0,
+                "",
+                "earth",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/mob_effect/unknown.png")
+        ));
+        spells.put(SHIXU_CHILIU, new SpellDef(
+                SHIXU_CHILIU,
+                "shixu_chiliu",
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE,
+                500,
+                "",
+                "earth",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/mob_effect/unknown.png")
+        ));
+        spells.put(LIANSHEN_SHU, new SpellDef(
+                LIANSHEN_SHU,
+                "lianshen_shu",
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_EARLY,
+                0,
+                "",
+                "earth",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/mob_effect/unknown.png")
+        ));
+        spells.put(SUOKONG_SHU, new SpellDef(
+                SUOKONG_SHU,
+                "suokong_shu",
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
+                100,
+                "",
+                "heaven",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/mob_effect/unknown.png")
+        ));
         return Map.copyOf(spells);
     }
 
@@ -417,6 +560,10 @@ public class ModSpells {
 
     public static SpellDef get(String id) {
         return SPELLS.get(normalizeId(id));
+    }
+
+    public static int npcLearningTrustRequired(String id) {
+        return NPC_LEARNING_TRUST.getOrDefault(normalizeId(id), 100);
     }
 
     public static Component spellProficiencyDescription(ModAttachments.CultivationData data, String spellId) {
@@ -459,6 +606,21 @@ public class ModSpells {
 
     public static int cooldownTicks(String spellId) {
         String normalized = normalizeId(spellId);
+        if (JINHUO_XINLIAO.equals(normalized)) {
+            return 20 * 60;
+        }
+        if (SUIGUI_XINGYUN.equals(normalized)) {
+            return 20 * 20;
+        }
+        if (DONGTIAN_JIELING.equals(normalized)) {
+            return 20 * 60 * 10;
+        }
+        if (LIANSHEN_SHU.equals(normalized)) {
+            return 20 * 60 * 60;
+        }
+        if (SUOKONG_SHU.equals(normalized)) {
+            return 20 * 30;
+        }
         if (REGENERATION.equals(normalized)) {
             return 20;
         }
@@ -471,7 +633,22 @@ public class ModSpells {
         return 10;
     }
 
+    /** Spells whose existing client flow prepares and charges before release. */
+    public static boolean requiresPreparation(String spellId) {
+        return PREPARED_CAST_SPELLS.contains(normalizeId(spellId));
+    }
+
     public static String cooldownText(String spellId) {
+        String normalized = normalizeId(spellId);
+        if (CUIGU_LIANSHEN.equals(normalized)) {
+            return "ceil(5% Max HP / 10) min";
+        }
+        if (DONGTIAN_JIELING.equals(normalized)) {
+            return "10 min";
+        }
+        if (LIANSHEN_SHU.equals(normalized)) {
+            return "1 hour";
+        }
         int ticks = cooldownTicks(spellId);
         if (ticks % 20 == 0) {
             return (ticks / 20) + "s";
@@ -600,11 +777,34 @@ public class ModSpells {
         if ("YihenCi".equalsIgnoreCase(id) || "yihen_ci".equalsIgnoreCase(id) || "yihen ci".equalsIgnoreCase(id) || "\u5fc6\u75d5\u523a".equals(id)) {
             return YIHEN_CI;
         }
+        if ("CuiguLianshen".equalsIgnoreCase(id) || "cuigu_lianshen".equalsIgnoreCase(id) || "cuigu lianshen".equalsIgnoreCase(id) || "\u6dec\u9aa8\u70bc\u8eab".equals(id)) {
+            return CUIGU_LIANSHEN;
+        }
+        if ("JinhuoXinliao".equalsIgnoreCase(id) || "jinhuo_xinliao".equalsIgnoreCase(id)
+                || "jinhuo xinliao".equalsIgnoreCase(id) || "\u70ec\u706b\u5fc3\u71ce".equals(id)) {
+            return JINHUO_XINLIAO;
+        }
+        if ("SuiguiXingyun".equalsIgnoreCase(id) || "suigui_xingyun".equalsIgnoreCase(id)
+                || "suigui xingyun".equalsIgnoreCase(id) || "\u788e\u8f68\u661f\u9668".equals(id)) {
+            return SUIGUI_XINGYUN;
+        }
+        if ("DongtianJieling".equalsIgnoreCase(id) || "dongtian_jieling".equalsIgnoreCase(id)
+                || "dongtian jieling".equalsIgnoreCase(id) || "\u6d1e\u5929\u501f\u7075".equals(id)) {
+            return DONGTIAN_JIELING;
+        }
+        if ("ShixuChiliu".equalsIgnoreCase(id) || "shixu_chiliu".equalsIgnoreCase(id)
+                || "shixu chiliu".equalsIgnoreCase(id) || "\u65f6\u5e8f\u8fdf\u6d41".equals(id)) {
+            return SHIXU_CHILIU;
+        }
+        if ("SuokongShu".equalsIgnoreCase(id) || "suokong_shu".equalsIgnoreCase(id)
+                || "suokong shu".equalsIgnoreCase(id) || "\u9501\u7a7a\u672f".equals(id)) {
+            return SUOKONG_SHU;
+        }
         return id;
     }
 
     public static boolean meetsRequirement(String currentLevel, SpellDef spell) {
-        if (WEIYA.equals(spell.id()) || ZIBAO.equals(spell.id())) {
+        if (WEIYA.equals(spell.id()) || ZIBAO.equals(spell.id()) || DONGTIAN_JIELING.equals(spell.id())) {
             return isJindanOrHigher(currentLevel);
         }
         if (ABSORB_CULTIVATION.equals(spell.id())) {
@@ -627,7 +827,8 @@ public class ModSpells {
 
     public static boolean isInnateKnown(String spellId, String currentLevel) {
         String normalized = normalizeId(spellId);
-        return ((WEIYA.equals(normalized) || ZIBAO.equals(normalized)) && isJindanOrHigher(currentLevel))
+        return ((WEIYA.equals(normalized) || ZIBAO.equals(normalized) || DONGTIAN_JIELING.equals(normalized))
+                && isJindanOrHigher(currentLevel))
                 || (YUQI_SHU.equals(normalized)
                 && CultivationLevels.getStageIndex(currentLevel) >= CultivationLevels.getStageIndex(CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_EARLY));
     }
@@ -637,11 +838,17 @@ public class ModSpells {
         if (data == null) {
             return false;
         }
-        if (WEIYA.equals(normalized) || ZIBAO.equals(normalized)) {
+        if (WEIYA.equals(normalized) || ZIBAO.equals(normalized) || DONGTIAN_JIELING.equals(normalized)) {
             return isJindanOrHigher(data.cultivationLevel());
         }
         if (YUQI_SHU.equals(normalized)) {
             return meetsRequirement(data.cultivationLevel(), get(YUQI_SHU));
+        }
+        if (SUOKONG_SHU.equals(normalized)) {
+            return BodyTypes.VOID_BODY.equals(data.bodyType());
+        }
+        if (CUIGU_LIANSHEN.equals(normalized)) {
+            return CultivationMethods.isCuiguLianshenJue(data.activeCultivationMethod());
         }
         if (ABSORB_CULTIVATION.equals(normalized)) {
             return CultivationMethods.isReincarnationTrueArt(data.activeCultivationMethod());
@@ -682,10 +889,14 @@ public class ModSpells {
         String normalized = normalizeId(spellId);
         return !WEIYA.equals(normalized)
                 && !ZIBAO.equals(normalized)
+                && !DONGTIAN_JIELING.equals(normalized)
                 && !ABSORB_CULTIVATION.equals(normalized)
                 && !TUNTIAN.equals(normalized)
                 && !FENGYA.equals(normalized)
                 && !YUQI_SHU.equals(normalized)
+                && !CUIGU_LIANSHEN.equals(normalized)
+                && !LIANSHEN_SHU.equals(normalized)
+                && !SUOKONG_SHU.equals(normalized)
                 && !HANJING_SUOZHUA.equals(normalized)
                 && !SHUANGTIAN_QI.equals(normalized)
                 && !SUISHUANG_LINGXIAO.equals(normalized);
@@ -698,7 +909,8 @@ public class ModSpells {
                 || SPIRIT_SIGHT.equals(normalized)
                 || WIND_STEP.equals(normalized)
                 || YUFENG_JUE.equals(normalized)
-                || XUYING_TA.equals(normalized);
+                || XUYING_TA.equals(normalized)
+                || SHIXU_CHILIU.equals(normalized);
     }
 
     public static boolean isTimedToggle(String spellId) {
@@ -711,7 +923,9 @@ public class ModSpells {
     }
 
     public static List<String> innateSpellIds() {
-        return List.of(WEIYA, ZIBAO, ABSORB_CULTIVATION, TUNTIAN, FENGYA, HANJING_SUOZHUA, SHUANGTIAN_QI, SUISHUANG_LINGXIAO, YUQI_SHU);
+        return List.of(WEIYA, ZIBAO, DONGTIAN_JIELING, ABSORB_CULTIVATION, TUNTIAN, FENGYA,
+                HANJING_SUOZHUA, SHUANGTIAN_QI, SUISHUANG_LINGXIAO, YUQI_SHU, CUIGU_LIANSHEN,
+                SUOKONG_SHU);
     }
 
     private static boolean isJindanOrHigher(String currentLevel) {

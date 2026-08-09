@@ -36,6 +36,7 @@ public final class PhotonEffects {
     private static final String ICE_1_FX = "immortal_cultivation_mod:ice1";
     private static final String ICE_2_FX = "immortal_cultivation_mod:ice2";
     private static final String FLYING_SWORD_FX = "immortal_cultivation_mod:flying_sword";
+    private static final String FIREBALL_TALISMAN_TRAIL_FX = "immortal_cultivation_mod:fireball_trail";
     private static final int BEAM_DURATION_TICKS = 20 * 10;
     private static final int LINGBENG_AURA_TICKS = 6;
     private static final double WATER_SHIELD_SPIN_RADIANS_PER_TICK = Math.PI / 10.0D;
@@ -50,6 +51,26 @@ public final class PhotonEffects {
     public static void fireballProjectile(Entity projectile) {
         if (projectile.level() instanceof ServerLevel serverLevel) {
             playEntityEffect(serverLevel, projectile);
+        }
+    }
+
+    public static void fireballTalismanTrail(Entity projectile) {
+        if (!ModList.get().isLoaded("photon") || !(projectile.level() instanceof ServerLevel level)) {
+            return;
+        }
+
+        for (ServerPlayer viewer : level.players()) {
+            sendEntityEffectToPlayer(viewer, FIREBALL_TALISMAN_TRAIL_FX, List.of(projectile));
+        }
+    }
+
+    public static void removeFireballTalismanTrail(Entity projectile) {
+        if (!ModList.get().isLoaded("photon") || !(projectile.level() instanceof ServerLevel level)) {
+            return;
+        }
+
+        for (ServerPlayer viewer : level.players()) {
+            sendRemoveEntityEffectToPlayer(viewer, FIREBALL_TALISMAN_TRAIL_FX, List.of(projectile));
         }
     }
 

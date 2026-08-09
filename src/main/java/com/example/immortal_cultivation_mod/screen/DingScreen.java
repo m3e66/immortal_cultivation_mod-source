@@ -11,117 +11,438 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 public class DingScreen extends AbstractContainerScreen<DingMenu> {
-    private static final ResourceLocation INVENTORY_TEXTURE =
-            ResourceLocation.withDefaultNamespace("textures/gui/container/generic_54.png");
-    private static final ResourceLocation DING_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/ding_forge.png");
+    private static final ResourceLocation TEMPERATURE_BAR_TEXTURE =
+            elementTexture("ding_temperature_bar");
 
-    private static final int DING_TEXTURE_WIDTH = 1518;
-    private static final int DING_TEXTURE_HEIGHT = 1005;
-    private static final int DING_WIDTH = 300;
-    private static final int DING_HEIGHT = 199;
+    private static final int TEMPERATURE_SOURCE_WIDTH = 872;
+    private static final int TEMPERATURE_SOURCE_HEIGHT = 68;
 
-    private static final int TEMP_TEXT_X = 130;
-    private static final int TEMP_TEXT_Y = 34;
-    private static final int TEMP_BAR_X = 69;
-    private static final int TEMP_BAR_Y = 45;
-    private static final int TEMP_BAR_WIDTH = 162;
-    private static final int TEMP_BAR_HEIGHT = 8;
+    private static final int INK = 0xFF38352E;
+    private static final int MUTED_INK = 0xFF756F63;
+    private static final int JADE = 0xFF315E50;
+    private static final int GOLD = 0xFF9B7C43;
+    private static final int PARCHMENT = 0xC8F1ECE1;
+    private static final int PANEL_BORDER = 0xFFAAA18F;
 
-    private static final int PROGRESS_X = 86;
-    private static final int PROGRESS_Y = 176;
-    private static final int PROGRESS_WIDTH = 104;
-    private static final int PROGRESS_HEIGHT = 8;
+    private static final int HEAT_BAR_X = 55;
+    private static final int HEAT_BAR_Y = 50;
+    private static final int HEAT_BAR_WIDTH = 250;
+    private static final int HEAT_BAR_HEIGHT = 20;
+    private static final int HEAT_FILL_INSET = 6;
 
-    private static final int START_BUTTON_X = 197;
-    private static final int START_BUTTON_Y = 169;
-    private static final int START_BUTTON_WIDTH = 72;
-    private static final int START_BUTTON_HEIGHT = 22;
+    private static final int PROGRESS_X = 104;
+    private static final int PROGRESS_Y = 143;
+    private static final int PROGRESS_WIDTH = 124;
+    private static final int PROGRESS_HEIGHT = 15;
 
-    public DingScreen(DingMenu menu, Inventory inventory, Component title) {
+    private static final int START_BUTTON_X = 238;
+    private static final int START_BUTTON_Y = 138;
+    private static final int START_BUTTON_WIDTH = 76;
+    private static final int START_BUTTON_HEIGHT = 20;
+
+    public DingScreen(
+            DingMenu menu,
+            Inventory inventory,
+            Component title) {
         super(menu, inventory, title);
-        imageWidth = DING_WIDTH;
-        imageHeight = 312;
+        imageWidth = DingMenu.IMAGE_WIDTH;
+        imageHeight = DingMenu.IMAGE_HEIGHT;
         titleLabelX = -1000;
         titleLabelY = -1000;
-        inventoryLabelX = 70;
-        inventoryLabelY = 202;
+        inventoryLabelX = DingMenu.PLAYER_INV_X;
+        inventoryLabelY = 173;
+    }
+
+    private static ResourceLocation elementTexture(String name) {
+        return ResourceLocation.fromNamespaceAndPath(
+                ImmortalCultivationMod.MODID,
+                "textures/gui/elements/" + name + ".png");
     }
 
     @Override
-    protected void init() {
-        super.init();
-    }
-
-    @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+    protected void renderBg(
+            GuiGraphics graphics,
+            float partialTick,
+            int mouseX,
+            int mouseY) {
         int x = leftPos;
         int y = topPos;
-        guiGraphics.blit(DING_TEXTURE, x, y, DING_WIDTH, DING_HEIGHT,
-                0.0F, 0.0F, DING_TEXTURE_WIDTH, DING_TEXTURE_HEIGHT,
-                DING_TEXTURE_WIDTH, DING_TEXTURE_HEIGHT);
-        guiGraphics.blit(INVENTORY_TEXTURE, x + 62, y + 204, 0, 126, 176, 96, 256, 256);
+        graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        CultivationGuiTextures.drawLandscape(
+                graphics, x, y, imageWidth, imageHeight);
 
-        int barX = x + TEMP_BAR_X;
-        int barY = y + TEMP_BAR_Y;
-        int pointerX = barX + (int) (TEMP_BAR_WIDTH * (Math.max(0, Math.min(10000, menu.temperature())) / 10000.0F));
-        pointerX = Math.max(barX, Math.min(pointerX, barX + TEMP_BAR_WIDTH - 1));
-        guiGraphics.fill(pointerX - 1, barY - 4, pointerX + 2, barY + TEMP_BAR_HEIGHT + 4, 0xFFFF3333);
+        CultivationGuiTextures.drawInnerBox(
+                graphics, x + 31, y + 39, 298, 125);
 
-        guiGraphics.fill(x + PROGRESS_X, y + PROGRESS_Y,
-                x + PROGRESS_X + PROGRESS_WIDTH,
-                y + PROGRESS_Y + PROGRESS_HEIGHT,
-                0xFF4D4538);
+        renderTemperatureBar(graphics, x, y);
+        renderForgeSectionPanels(graphics, x, y);
+        renderForgeSlots(graphics, x, y);
+        renderProgressBar(graphics, x, y);
+        renderStartButton(graphics, x, y, mouseX, mouseY);
+        renderInventoryPanel(graphics, x, y);
+    }
 
-        int filledProgressWidth = 0;
-        if (menu.maxProgress() > 0) {
-            filledProgressWidth = (int) (PROGRESS_WIDTH * (menu.progress() / (float) menu.maxProgress()));
+    private void renderTemperatureBar(
+            GuiGraphics graphics,
+            int x,
+            int y) {
+        graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        graphics.blit(
+                TEMPERATURE_BAR_TEXTURE,
+                x + HEAT_BAR_X,
+                y + HEAT_BAR_Y,
+                HEAT_BAR_WIDTH,
+                HEAT_BAR_HEIGHT,
+                0.0F,
+                0.0F,
+                TEMPERATURE_SOURCE_WIDTH,
+                TEMPERATURE_SOURCE_HEIGHT,
+                TEMPERATURE_SOURCE_WIDTH,
+                TEMPERATURE_SOURCE_HEIGHT);
+
+        int trackX = x + HEAT_BAR_X + HEAT_FILL_INSET;
+        int trackWidth = HEAT_BAR_WIDTH - HEAT_FILL_INSET * 2;
+        drawTemperatureMarker(
+                graphics,
+                trackX,
+                y + HEAT_BAR_Y,
+                trackWidth,
+                menu.targetTemperature(),
+                0xFFD43D31,
+                3);
+        drawTemperatureMarker(
+                graphics,
+                trackX,
+                y + HEAT_BAR_Y,
+                trackWidth,
+                menu.temperature(),
+                0xFFF8F3DF,
+                4);
+    }
+
+    private void renderForgeSectionPanels(
+            GuiGraphics graphics,
+            int x,
+            int y) {
+        CultivationGuiTextures.drawInnerBox(
+                graphics, x + 39, y + 82, 44, 44);
+        CultivationGuiTextures.drawInnerBox(
+                graphics, x + 99, y + 82, 162, 44);
+        CultivationGuiTextures.drawInnerBox(
+                graphics, x + 277, y + 82, 44, 44);
+    }
+
+    private void drawTemperatureMarker(
+            GuiGraphics graphics,
+            int trackX,
+            int barY,
+            int trackWidth,
+            int temperature,
+            int color,
+            int extension) {
+        int markerX = trackX + Math.round(
+                (trackWidth - 1)
+                        * clampTemperature(temperature)
+                        / 10000.0F);
+        graphics.fill(
+                markerX - 1,
+                barY - extension,
+                markerX + 2,
+                barY + HEAT_BAR_HEIGHT + extension,
+                0xB0201D19);
+        graphics.fill(
+                markerX,
+                barY - extension,
+                markerX + 1,
+                barY + HEAT_BAR_HEIGHT + extension,
+                color);
+    }
+
+    private void renderForgeSlots(
+            GuiGraphics graphics,
+            int x,
+            int y) {
+        renderSlotFrame(
+                graphics,
+                x + DingMenu.YUJIAN_SLOT_X,
+                y + DingMenu.YUJIAN_SLOT_Y,
+                GOLD);
+        renderSlotFrame(
+                graphics,
+                x + DingMenu.RESULT_SLOT_X,
+                y + DingMenu.RESULT_SLOT_Y,
+                JADE);
+        for (int index = 0;
+                index < menu.materialSlotCount();
+                index++) {
+            int slotX = DingMenu.MATERIAL_START_X
+                    + index % 5 * DingMenu.MATERIAL_SLOT_SPACING;
+            int slotY = DingMenu.MATERIAL_START_Y
+                    + index / 5 * DingMenu.MATERIAL_SLOT_SPACING;
+            renderSlotFrame(
+                    graphics,
+                    x + slotX,
+                    y + slotY,
+                    PANEL_BORDER);
         }
+    }
 
-        guiGraphics.fill(x + PROGRESS_X, y + PROGRESS_Y,
-                x + PROGRESS_X + filledProgressWidth,
-                y + PROGRESS_Y + PROGRESS_HEIGHT,
-                0xFFDB7B2B);
+    private void renderProgressBar(
+            GuiGraphics graphics,
+            int x,
+            int y) {
+        int progressX = x + PROGRESS_X;
+        int progressY = y + PROGRESS_Y;
+        CultivationGuiTextures.drawProgressFrame(
+                graphics,
+                progressX,
+                progressY,
+                PROGRESS_WIDTH,
+                PROGRESS_HEIGHT);
+        int insetX = 5;
+        int insetY = 4;
+        int fillWidth = PROGRESS_WIDTH - insetX * 2;
+        int fillHeight = PROGRESS_HEIGHT - insetY * 2;
+        graphics.fill(
+                progressX + insetX,
+                progressY + insetY,
+                progressX + insetX + fillWidth,
+                progressY + insetY + fillHeight,
+                0xFF343C39);
+        int filled = Math.round(
+                fillWidth
+                        * Math.max(
+                                0.0F,
+                                Math.min(
+                                        1.0F,
+                                        menu.progress()
+                                                / (float) menu.maxProgress())));
+        graphics.fill(
+                progressX + insetX,
+                progressY + insetY,
+                progressX + insetX + filled,
+                progressY + insetY + fillHeight,
+                menu.forging() ? 0xFFD77A2C : 0xFF8E7447);
+    }
+
+    private void renderStartButton(
+            GuiGraphics graphics,
+            int x,
+            int y,
+            int mouseX,
+            int mouseY) {
+        boolean active = !menu.forging();
+        boolean hovered = active
+                && mouseX >= x + START_BUTTON_X
+                && mouseX < x + START_BUTTON_X
+                        + START_BUTTON_WIDTH
+                && mouseY >= y + START_BUTTON_Y
+                && mouseY < y + START_BUTTON_Y
+                        + START_BUTTON_HEIGHT;
+        CultivationGuiTextures.drawButton(
+                graphics,
+                x + START_BUTTON_X,
+                y + START_BUTTON_Y,
+                START_BUTTON_WIDTH,
+                START_BUTTON_HEIGHT,
+                active,
+                hovered);
+        CultivationGuiTextures.drawButtonText(
+                graphics,
+                Component.translatable(
+                        "screen." + ImmortalCultivationMod.MODID
+                                + ".ding.start"),
+                x + START_BUTTON_X,
+                y + START_BUTTON_Y,
+                START_BUTTON_WIDTH,
+                START_BUTTON_HEIGHT,
+                active);
+    }
+
+    private void renderInventoryPanel(
+            GuiGraphics graphics,
+            int x,
+            int y) {
+        int panelX = x + DingMenu.PLAYER_INV_X - 8;
+        int panelY = y + 169;
+        CultivationGuiTextures.drawInnerBox(
+                graphics, panelX, panelY, 178, 96);
+
+        for (int row = 0; row < 3; row++) {
+            for (int column = 0; column < 9; column++) {
+                renderSlotFrame(
+                        graphics,
+                        x + DingMenu.PLAYER_INV_X + column * 18,
+                        y + DingMenu.PLAYER_INV_Y + row * 18,
+                        PANEL_BORDER);
+            }
+        }
+        for (int column = 0; column < 9; column++) {
+            renderSlotFrame(
+                    graphics,
+                    x + DingMenu.PLAYER_INV_X + column * 18,
+                    y + DingMenu.PLAYER_INV_Y + 58,
+                    PANEL_BORDER);
+        }
+    }
+
+    private void renderSlotFrame(
+            GuiGraphics graphics,
+            int x,
+            int y,
+            int border) {
+        graphics.fill(x - 1, y - 1, x + 17, y + 17, border);
+        graphics.fill(x, y, x + 16, y + 16, 0xFFE7E1D5);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        guiGraphics.drawString(font,
+    protected void renderLabels(
+            GuiGraphics graphics,
+            int mouseX,
+            int mouseY) {
+        drawCentered(
+                graphics, title, imageWidth / 2, 16, INK);
+        drawCentered(
+                graphics,
                 Component.literal(menu.temperature() + " C"),
-                TEMP_TEXT_X,
-                TEMP_TEXT_Y,
-                0x3F3A35,
+                imageWidth / 2,
+                35,
+                INK);
+        graphics.drawString(
+                font,
+                Component.literal("0 C"),
+                34,
+                56,
+                MUTED_INK,
                 false);
+        graphics.drawString(
+                font,
+                Component.literal("10000 C"),
+                307,
+                56,
+                MUTED_INK,
+                false);
+        drawCentered(
+                graphics,
+                Component.translatable(
+                        "screen." + ImmortalCultivationMod.MODID
+                                + ".ding.yujian"),
+                DingMenu.YUJIAN_SLOT_X + 8,
+                78,
+                MUTED_INK);
+        drawCentered(
+                graphics,
+                Component.translatable(
+                        "screen." + ImmortalCultivationMod.MODID
+                                + ".ding.materials"),
+                imageWidth / 2,
+                75,
+                MUTED_INK);
+        drawCentered(
+                graphics,
+                Component.translatable(
+                        "screen." + ImmortalCultivationMod.MODID
+                                + ".ding.result"),
+                DingMenu.RESULT_SLOT_X + 8,
+                78,
+                MUTED_INK);
 
-        super.renderLabels(guiGraphics, mouseX, mouseY);
+        int percentage = Math.round(
+                100.0F
+                        * Math.max(
+                                0.0F,
+                                Math.min(
+                                        1.0F,
+                                        menu.progress()
+                                                / (float) menu.maxProgress())));
+        graphics.drawString(
+                font,
+                Component.translatable(
+                        "screen." + ImmortalCultivationMod.MODID
+                                + ".ding.progress",
+                        percentage),
+                35,
+                144,
+                INK,
+                false);
+        graphics.drawString(
+                font,
+                Component.translatable(
+                        "screen." + ImmortalCultivationMod.MODID
+                                + ".ding.fire_cost",
+                        menu.fireCost()),
+                35,
+                156,
+                MUTED_INK,
+                false);
+        graphics.drawString(
+                font,
+                playerInventoryTitle,
+                inventoryLabelX,
+                inventoryLabelY,
+                INK,
+                false);
+    }
+
+    private void drawCentered(
+            GuiGraphics graphics,
+            Component text,
+            int centerX,
+            int y,
+            int color) {
+        graphics.drawString(
+                font,
+                text,
+                centerX - font.width(text) / 2,
+                y,
+                color,
+                false);
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(
+            int keyCode,
+            int scanCode,
+            int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_SPACE) {
-            PacketDistributor.sendToServer(new ModPayloads.ServerboundDingActionPayload(true));
+            PacketDistributor.sendToServer(
+                    new ModPayloads.ServerboundDingActionPayload(true));
             return true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(
+            double mouseX,
+            double mouseY,
+            int button) {
         if (button == 0
+                && !menu.forging()
                 && mouseX >= leftPos + START_BUTTON_X
-                && mouseX < leftPos + START_BUTTON_X + START_BUTTON_WIDTH
+                && mouseX < leftPos + START_BUTTON_X
+                        + START_BUTTON_WIDTH
                 && mouseY >= topPos + START_BUTTON_Y
-                && mouseY < topPos + START_BUTTON_Y + START_BUTTON_HEIGHT) {
-            PacketDistributor.sendToServer(new ModPayloads.ServerboundDingActionPayload(false));
+                && mouseY < topPos + START_BUTTON_Y
+                        + START_BUTTON_HEIGHT) {
+            PacketDistributor.sendToServer(
+                    new ModPayloads.ServerboundDingActionPayload(false));
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        renderBackground(guiGraphics, mouseX, mouseY, partialTick);
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-        renderTooltip(guiGraphics, mouseX, mouseY);
+    public void render(
+            GuiGraphics graphics,
+            int mouseX,
+            int mouseY,
+            float partialTick) {
+        super.render(graphics, mouseX, mouseY, partialTick);
+        renderTooltip(graphics, mouseX, mouseY);
+    }
+
+    private static int clampTemperature(int temperature) {
+        return Math.max(0, Math.min(10000, temperature));
     }
 }

@@ -50,6 +50,7 @@ public class LightBeamProjectileEntity extends ThrowableItemProjectile {
 
     public LightBeamProjectileEntity(Level level, LivingEntity caster, int ring, int slot) {
         super(ModEntities.LIGHT_BEAM_PROJECTILE.get(), caster, level);
+        NpcProfile.markNpcOwnedEffect(this, caster);
         this.casterId = caster.getUUID();
         setRing(ring);
         setSlot(slot);
@@ -86,6 +87,14 @@ public class LightBeamProjectileEntity extends ThrowableItemProjectile {
     public void tick() {
         setNoGravity(true);
         noPhysics = isWaiting();
+        if (!level().isClientSide) {
+            Entity owner = getOwner();
+            NpcProfile.markNpcOwnedEffect(this, owner);
+            if (NpcProfile.isOrphanedNpcEffect(this, owner)) {
+                discard();
+                return;
+            }
+        }
         if (isWaiting()) {
             Entity owner = getOwner();
             if (!(owner instanceof LivingEntity caster) || !owner.isAlive()) {
@@ -122,7 +131,9 @@ public class LightBeamProjectileEntity extends ThrowableItemProjectile {
 
     @Override
     protected boolean canHitEntity(Entity entity) {
-        return !entity.getUUID().equals(casterId) && super.canHitEntity(entity);
+        return !ModelBonePartEntity.resolveParent(entity).getUUID().equals(casterId)
+                && NpcProfile.canNpcEffectHit(this, getOwner(), entity)
+                && super.canHitEntity(entity);
     }
 
     @Override
@@ -138,7 +149,8 @@ public class LightBeamProjectileEntity extends ThrowableItemProjectile {
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
-        if (isWaiting() || result.getEntity().getUUID().equals(casterId)) {
+        Entity target = ModelBonePartEntity.resolveParent(result.getEntity());
+        if (isWaiting() || target.getUUID().equals(casterId)) {
             return;
         }
 
@@ -147,12 +159,7 @@ public class LightBeamProjectileEntity extends ThrowableItemProjectile {
                 175.0F,
                 ModSpells.get(ModSpells.LIGHT_BEAM_ATTACK)
         );
-        if (getOwner() instanceof net.minecraft.world.entity.player.Player player) {
-            var data = ModAttachments.getData(player);
-            damage += data.magicAttack();
-            damage *= (float) SpiritRoots.damageMultiplier(data, ModSpells.get(ModSpells.LIGHT_BEAM_ATTACK));
-        }
-        result.getEntity().hurt(damageSources().thrown(this, getOwner()), damage);
+        target.hurt(damageSources().thrown(this, getOwner()), damage);
         if (level() instanceof ServerLevel serverLevel) {
             SpellImpactParticles.light(serverLevel, result.getLocation());
         }

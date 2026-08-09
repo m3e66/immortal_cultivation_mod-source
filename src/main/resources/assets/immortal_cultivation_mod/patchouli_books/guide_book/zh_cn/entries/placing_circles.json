@@ -1,0 +1,15 @@
+{
+  "name": "放置符文",
+  "icon": "immortal_cultivation_mod:ritual_dagger",
+  "category": "immortal_cultivation_mod:magic_circles",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "要放置符文，只需手持匕首右键点击即可。会打开一个界面，让你选择要绘制的符文类型。$(br2)符文会生成在脚下，并消耗3秒的流血效果作为代价。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "符文只有在处于阵眼$(/l)范围内时才会生效。阵眼必须拥有足够的燃料才能维持符文运作。$(br2)符文非常脆弱，被破坏后不会掉落任何物品。"
+    }
+  ]
+}

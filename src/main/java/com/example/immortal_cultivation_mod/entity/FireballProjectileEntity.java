@@ -11,11 +11,14 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -33,6 +36,7 @@ public class FireballProjectileEntity extends ThrowableItemProjectile {
 
     public FireballProjectileEntity(Level level, LivingEntity shooter) {
         super(ModEntities.FIREBALL_PROJECTILE.get(), shooter, level);
+        NpcProfile.markNpcOwnedEffect(this, shooter);
     }
 
     @Override
@@ -48,6 +52,14 @@ public class FireballProjectileEntity extends ThrowableItemProjectile {
 
     @Override
     public void tick() {
+        if (!level().isClientSide) {
+            Entity owner = getOwner();
+            NpcProfile.markNpcOwnedEffect(this, owner);
+            if (NpcProfile.isOrphanedNpcEffect(this, owner)) {
+                discard();
+                return;
+            }
+        }
         super.tick();
         if (level().isClientSide) {
             float scale = chargeScale();
@@ -96,24 +108,63 @@ public class FireballProjectileEntity extends ThrowableItemProjectile {
         if (level() instanceof ServerLevel serverLevel) {
             SpellImpactParticles.fire(serverLevel, result.getLocation());
         }
-        level().explode(this, getX(), getY(), getZ(), 2.0f * chargeScale(), false, Level.ExplosionInteraction.NONE);
+        detonate();
+    }
+
+    private void detonate() {
+        if (level().isClientSide || !isAlive()) {
+            return;
+        }
+        Entity owner = getOwner();
+        NpcProfile.markNpcOwnedEffect(this, owner);
+        if (NpcProfile.isOrphanedNpcEffect(this, owner)) {
+            discard();
+            return;
+        }
+        float power = 2.0F * chargeScale();
+        if (owner instanceof CultivationNpc && owner instanceof LivingEntity npcOwner
+                && level() instanceof ServerLevel serverLevel) {
+            serverLevel.explode(this, null, npcEnemyOnlyExplosion(npcOwner), position(),
+                    power, false, Level.ExplosionInteraction.NONE);
+        } else {
+            level().explode(this, getX(), getY(), getZ(), power, false, Level.ExplosionInteraction.NONE);
+        }
         discard();
+    }
+
+    private static ExplosionDamageCalculator npcEnemyOnlyExplosion(LivingEntity owner) {
+        return new ExplosionDamageCalculator() {
+            private boolean canAffect(Entity entity) {
+                return entity instanceof LivingEntity target && NpcProfile.isCombatEnemy(owner, target);
+            }
+
+            @Override
+            public boolean shouldDamageEntity(Explosion explosion, Entity entity) {
+                return canAffect(entity);
+            }
+
+            @Override
+            public float getKnockbackMultiplier(Entity entity) {
+                return canAffect(entity) ? super.getKnockbackMultiplier(entity) : 0.0F;
+            }
+        };
+    }
+
+    @Override
+    protected boolean canHitEntity(Entity entity) {
+        return NpcProfile.canNpcEffectHit(this, getOwner(), entity) && super.canHitEntity(entity);
     }
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
+        Entity target = ModelBonePartEntity.resolveParent(result.getEntity());
         float damage = com.example.immortal_cultivation_mod.spell.SpellDamageHelper.damage(
                 getOwner(),
                 10.0F,
                 ModSpells.get(ModSpells.FIREBALL)
         );
-        if (getOwner() instanceof net.minecraft.world.entity.player.Player player) {
-            var data = ModAttachments.getData(player);
-            damage += data.magicAttack();
-            damage *= (float) SpiritRoots.damageMultiplier(data, ModSpells.get(ModSpells.FIREBALL));
-        }
-        result.getEntity().hurt(damageSources().thrown(this, getOwner()), damage);
-        result.getEntity().igniteForSeconds(3);
+        target.hurt(damageSources().thrown(this, getOwner()), damage);
+        target.igniteForSeconds(3);
     }
 
     @Override

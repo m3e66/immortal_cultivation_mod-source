@@ -1,0 +1,28 @@
+{
+  "name": "Seven Restrictions",
+  "icon": "immortal_cultivation_mod:flying_sword",
+  "category": "immortal_cultivation_mod:principles",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Sharpness and Gathering",
+      "text": "Sharpness: +1% weapon damage per layer.$(br2)Spirit Gathering: +1% personal Qi regeneration per layer while the weapon is held."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Devouring and Flight",
+      "text": "Spirit Devouring: attacks drain 0.01% of the target's maximum Qi per layer.$(br2)Swift Flight: +0.1% flying-weapon speed per layer."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Sturdy and Storage",
+      "text": "Sturdy: +1% maximum weapon durability per layer.$(br2)Qi Storage: +1% safe injected-Qi capacity per layer."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Armor Breaking",
+      "text": "Armor Breaking: +1% damage per layer when the target is wearing armor.$(br2)Restrictions of the same type stack. Restrictions merged during evolution still contribute to the final effect."
+    }
+  ]
+}

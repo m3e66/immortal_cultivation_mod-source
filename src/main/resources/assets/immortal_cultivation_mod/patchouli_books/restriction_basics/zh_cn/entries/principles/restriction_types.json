@@ -1,0 +1,28 @@
+{
+  "name": "七类禁制",
+  "icon": "immortal_cultivation_mod:flying_sword",
+  "category": "immortal_cultivation_mod:principles",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "锋锐与聚灵",
+      "text": "锋锐禁制：每重使武器伤害提高 1%。$(br2)聚灵禁制：持有武器时，每重使自身灵气恢复提高 1%。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "噬灵与疾行",
+      "text": "噬灵禁制：每重令攻击吸取目标 0.01% 最大灵气。$(br2)疾行禁制：每重使飞行武器速度提高 0.1%。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "坚固与储灵",
+      "text": "坚固禁制：每重使武器最大耐久提高 1%。$(br2)储灵禁制：每重使武器安全储灵上限提高 1%。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "破甲禁制",
+      "text": "破甲禁制：目标穿戴护甲时，每重使武器对其造成的伤害提高 1%。$(br2)所有同类禁制都可叠加；器物蜕变后，已融合禁制仍计入最终效果。"
+    }
+  ]
+}

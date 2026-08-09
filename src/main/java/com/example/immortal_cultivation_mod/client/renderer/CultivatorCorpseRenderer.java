@@ -25,6 +25,9 @@ public class CultivatorCorpseRenderer extends LivingEntityRenderer<CultivatorCor
 
     @Override
     public ResourceLocation getTextureLocation(CultivatorCorpseEntity entity) {
+        if (!entity.getTextureId().isBlank()) {
+            return ResourceLocation.parse(entity.getTextureId());
+        }
         return Minecraft.getInstance().getSkinManager().getInsecureSkin(entity.getGameProfile()).texture();
     }
 
@@ -41,6 +44,6 @@ public class CultivatorCorpseRenderer extends LivingEntityRenderer<CultivatorCor
         }
         poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - entity.getCorpseYaw()));
         poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
-        poseStack.translate(0.0D, -1.05D, 0.0D);
+        poseStack.translate(0.0D, -0.50D, 0.0D);
     }
 }

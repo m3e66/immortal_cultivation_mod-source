@@ -11,37 +11,59 @@ import software.bernie.geckolib.animatable.client.GeoRenderProvider;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
+import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
-public class DaofuChestplateItem extends ArmorItem implements GeoItem {
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+public class DaofuChestplateItem extends ArmorItem
+        implements GeoItem, ICurioItem {
+    private final AnimatableInstanceCache cache =
+            GeckoLibUtil.createInstanceCache(this);
 
     public DaofuChestplateItem(Properties properties) {
-        super(ModArmorMaterials.DAOFU, Type.CHESTPLATE, properties.durability(240));
+        super(
+                ModArmorMaterials.DAOFU,
+                Type.CHESTPLATE,
+                properties.durability(1800));
     }
 
     @Override
-    public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
+    public void createGeoRenderer(
+            Consumer<GeoRenderProvider> consumer) {
         consumer.accept(new GeoRenderProvider() {
             private DaofuArmorRenderer renderer;
 
             @Override
-            public <T extends LivingEntity> HumanoidModel<?> getGeoArmorRenderer(T livingEntity, ItemStack itemStack,
-                                                                                 EquipmentSlot equipmentSlot,
-                                                                                 HumanoidModel<T> original) {
+            public <T extends LivingEntity>
+            HumanoidModel<?> getGeoArmorRenderer(
+                    T livingEntity,
+                    ItemStack itemStack,
+                    EquipmentSlot equipmentSlot,
+                    HumanoidModel<T> original) {
                 if (renderer == null) {
                     renderer = new DaofuArmorRenderer();
                 }
+
                 return renderer;
             }
         });
     }
 
     @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+    public boolean canEquip(
+            SlotContext slotContext,
+            ItemStack stack) {
+        return LayeredClothingSlots.OUTER_CLOTHES.equals(
+                slotContext.identifier());
     }
 
     @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
+    public void registerControllers(
+            AnimatableManager.ControllerRegistrar controllers) {
+    }
+
+    @Override
+    public AnimatableInstanceCache
+    getAnimatableInstanceCache() {
         return cache;
     }
 }

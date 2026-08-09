@@ -6,23 +6,27 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "本模组硬性需要 Curios。新增槽位：Hair、Hair Accessory、Head Accessory、Neck Accessory、Inner Clothes、Cloak、两个 Back Accessory、三个 Waist Accessory。"
+      "text": "本模组硬性需要 Curios。新增槽位：发型、发饰、头饰、颈饰、内衣、披风、两个背部饰品槽和三个腰部饰品槽。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)棺材使用 Back Accessory 槽。空棺材潜行右键已驯服僵尸或尸体可收纳，再潜行右键可放出。棺材也会显示在玩家背后。"
+      "text": "$(br)棺材使用背部饰品槽。潜行右键已驯服的僵尸或尸体可将其收纳，再次潜行右键可将其放出。棺材也会显示在玩家背后。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Flag 也使用 Back Accessory 槽。$(br2)蒙眼布、蒙眼布二、斗笠使用 Head Accessory 槽。"
+      "text": "$(br)旗帜也使用背部饰品槽。$(br2)蒙眼布、蒙眼布二和斗笠使用头饰槽。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)玉佩、镇魂铃、引魂锣使用 Waist Accessory 槽。玉佩会提高打坐速度。手持可切换工具时，按 V 可从腰部饰品槽循环工具到手中。"
+      "text": "$(br)玉佩、镇魂铃和引魂锣使用腰部饰品槽。玉佩会提高打坐速度。手持可切换工具时，按 V 可从腰部饰品槽循环切换工具。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)道服是胸甲位外观护甲，拥有单独的穿戴贴图。"
+      "text": "$(br)道服是胸甲位外观护甲，拥有独立的穿戴贴图。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)袖箭使用背部饰品槽。进入战斗状态并空手时，按住攻击键蓄满重击即可发射物品栏中位置最靠上的飞针。$(br2)飞针以一个精铁母石和一个墨玄铁锻造。每次发射消耗十点耐久而不会直接消耗飞针；注入灵气后会增加伤害，并在命中时爆炸。"
     }
   ]
 }

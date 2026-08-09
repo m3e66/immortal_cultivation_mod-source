@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "circle_type=attack": {
+      "model": "immortal_cultivation_mod:block/magic_circle_block_attack"
+    },
+    "circle_type=defense": {
+      "model": "immortal_cultivation_mod:block/magic_circle_block_defense"
+    },
+    "circle_type=regeneration": {
+      "model": "immortal_cultivation_mod:block/magic_circle_block_regeneration"
+    }
+  }
+}

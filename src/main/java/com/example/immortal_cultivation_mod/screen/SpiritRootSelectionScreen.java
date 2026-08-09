@@ -11,11 +11,12 @@ import net.minecraft.util.RandomSource;
 
 public class SpiritRootSelectionScreen extends Screen {
     private static final int WINDOW_W = 260;
-    private static final int WINDOW_H = 150;
+    private static final int WINDOW_H = 178;
     private static final int MAX_REFRESHES = 3;
 
     private final RandomSource random = RandomSource.create();
     private SpiritRoots.RootData selectedRoots;
+    private String selectedGender = "male";
     private int refreshesLeft = MAX_REFRESHES;
 
     public SpiritRootSelectionScreen() {
@@ -28,6 +29,17 @@ public class SpiritRootSelectionScreen extends Screen {
         clearWidgets();
         int x = (width - WINDOW_W) / 2;
         int y = (height - WINDOW_H) / 2;
+
+        addRenderableWidget(new StyledButton(
+                x + 20, y + 111, 100, 20,
+                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".npc.gender.male"),
+                b -> setGender("male")
+        )).active = !"male".equals(selectedGender);
+        addRenderableWidget(new StyledButton(
+                x + WINDOW_W - 120, y + 111, 100, 20,
+                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".npc.gender.female"),
+                b -> setGender("female")
+        )).active = !"female".equals(selectedGender);
 
         addRenderableWidget(new StyledButton(
                 x + 20,
@@ -44,8 +56,14 @@ public class SpiritRootSelectionScreen extends Screen {
                 100,
                 20,
                 Component.translatable("screen." + ImmortalCultivationMod.MODID + ".continue_button"),
-                b -> Minecraft.getInstance().setScreen(new BodyTypeSelectionScreen(selectedRoots.roots(), selectedRoots.grade()))
+                b -> Minecraft.getInstance().setScreen(new BodyTypeSelectionScreen(
+                        selectedRoots.roots(), selectedRoots.grade(), selectedGender))
         ));
+    }
+
+    private void setGender(String gender) {
+        selectedGender = gender;
+        init();
     }
 
     private void refreshRoots() {

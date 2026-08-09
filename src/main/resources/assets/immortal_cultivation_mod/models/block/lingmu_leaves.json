@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/leaves",
+  "textures": {
+    "all": "immortal_cultivation_mod:block/lingmu_leaves"
+  }
+}

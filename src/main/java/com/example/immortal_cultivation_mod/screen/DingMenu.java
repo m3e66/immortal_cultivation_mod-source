@@ -15,22 +15,24 @@ import net.minecraft.world.item.ItemStack;
 
 public class DingMenu extends AbstractContainerMenu {
 
-    public static final int YUJIAN_SLOT_X = 43;
-    public static final int YUJIAN_SLOT_Y = 85;
-    public static final int RESULT_SLOT_X = 243;
-    public static final int RESULT_SLOT_Y = 85;
-    public static final int MATERIAL_START_X = 92;
-    public static final int MATERIAL_START_Y = 80;
+    public static final int IMAGE_WIDTH = 360;
+    public static final int IMAGE_HEIGHT = 288;
+    public static final int YUJIAN_SLOT_X = 53;
+    public static final int YUJIAN_SLOT_Y = 94;
+    public static final int RESULT_SLOT_X = 291;
+    public static final int RESULT_SLOT_Y = 94;
+    public static final int MATERIAL_START_X = 114;
+    public static final int MATERIAL_START_Y = 89;
     public static final int MATERIAL_SLOT_SPACING = 22;
-    public static final int PLAYER_INV_X = 70;
-    public static final int PLAYER_INV_Y = 216;
+    public static final int PLAYER_INV_X = 99;
+    public static final int PLAYER_INV_Y = 187;
 
     private final Container container;
     private final ContainerData data;
     private final DingBlockEntity ding;
 
     public DingMenu(int containerId, Inventory inventory) {
-        this(containerId, inventory, new SimpleContainer(DingBlockEntity.SLOT_COUNT), new SimpleContainerData(8), null);
+        this(containerId, inventory, new SimpleContainer(DingBlockEntity.SLOT_COUNT), new SimpleContainerData(9), null);
     }
 
     public DingMenu(int containerId, Inventory inventory, DingBlockEntity ding) {
@@ -46,7 +48,7 @@ public class DingMenu extends AbstractContainerMenu {
 
             @Override
             public int getCount() {
-                return 8;
+                return 9;
             }
         }, ding);
     }
@@ -60,18 +62,36 @@ public class DingMenu extends AbstractContainerMenu {
         addSlot(new Slot(container, DingBlockEntity.YUJIAN_SLOT, YUJIAN_SLOT_X, YUJIAN_SLOT_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return ForgingSystem.recipe(stack) != null;
+                return !forging() && ForgingSystem.recipe(stack) != null;
+            }
+
+            @Override
+            public boolean mayPickup(Player player) {
+                return !forging();
             }
         });
 
         for (int i = 0; i < DingBlockEntity.MATERIAL_COUNT; i++) {
+            int materialIndex = i;
             int slotX = MATERIAL_START_X + (i % 5) * MATERIAL_SLOT_SPACING;
             int slotY = MATERIAL_START_Y + (i / 5) * MATERIAL_SLOT_SPACING;
 
             addSlot(new Slot(container, DingBlockEntity.MATERIAL_START + i, slotX, slotY) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
-                    return ForgingSystem.isForgeMaterial(stack);
+                    return !forging()
+                            && materialIndex < materialSlotCount()
+                            && isCurrentRecipeIngredient(stack);
+                }
+
+                @Override
+                public boolean mayPickup(Player player) {
+                    return !forging();
+                }
+
+                @Override
+                public boolean isActive() {
+                    return materialIndex < materialSlotCount();
                 }
             });
         }
@@ -115,6 +135,19 @@ public class DingMenu extends AbstractContainerMenu {
     public int lowTemp() { return data.get(5); }
     public int highTemp() { return data.get(6); }
     public int fireCost() { return data.get(7); }
+    public int materialSlotCount() {
+        int syncedCount = data.get(8);
+        return syncedCount <= 0
+                ? DingBlockEntity.MATERIAL_COUNT
+                : Math.min(DingBlockEntity.MATERIAL_COUNT, syncedCount);
+    }
+
+
+    private boolean isCurrentRecipeIngredient(ItemStack stack) {
+        ForgingSystem.ForgingRecipe recipe = ForgingSystem.recipe(
+                container.getItem(DingBlockEntity.YUJIAN_SLOT));
+        return ForgingSystem.isIngredientForRecipe(recipe, stack);
+    }
 
     @Override
     public boolean stillValid(Player player) {
@@ -136,8 +169,9 @@ public class DingMenu extends AbstractContainerMenu {
                 if (!moveItemStackTo(stack, DingBlockEntity.YUJIAN_SLOT, DingBlockEntity.YUJIAN_SLOT + 1, false)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (ForgingSystem.isForgeMaterial(stack)) {
-                if (!moveItemStackTo(stack, DingBlockEntity.MATERIAL_START, DingBlockEntity.MATERIAL_START + DingBlockEntity.MATERIAL_COUNT, false)) {
+            } else if (isCurrentRecipeIngredient(stack)) {
+                if (!moveItemStackTo(stack, DingBlockEntity.MATERIAL_START,
+                        DingBlockEntity.MATERIAL_START + materialSlotCount(), false)) {
                     return ItemStack.EMPTY;
                 }
             } else {

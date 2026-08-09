@@ -7,21 +7,33 @@ import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import com.example.immortal_cultivation_mod.block.ModBlocks;
 import com.example.immortal_cultivation_mod.effect.ModEffects;
+import com.example.immortal_cultivation_mod.entity.FireballTalismanProjectileEntity;
+import com.example.immortal_cultivation_mod.entity.ModelBonePartEntity;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemNameBlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -121,17 +133,52 @@ public class ModItems {
     public static final DeferredItem<Item> YIHEN_CI_SCROLL = registerItem("yihen_ci_scroll",
             () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.YIHEN_CI));
 
+    public static final DeferredItem<Item> JINHUO_XINLIAO_SCROLL = registerItem("jinhuo_xinliao_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.JINHUO_XINLIAO));
+
+    public static final DeferredItem<Item> SUIGUI_XINGYUN_SCROLL = registerItem("suigui_xingyun_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.SUIGUI_XINGYUN));
+
+    public static final DeferredItem<Item> SHIXU_CHILIU_SCROLL = registerItem("shixu_chiliu_scroll",
+            () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.SHIXU_CHILIU));
+
     public static final DeferredItem<Item> ZHUJI_CULTIVATOR_SPAWN_EGG = registerItem("zhuji_cultivator_spawn_egg",
             () -> new SpawnEggItem(com.example.immortal_cultivation_mod.entity.ModEntities.ZHUJI_CULTIVATOR.get(), 0x3E2D45, 0x74B6FF, new Item.Properties()));
 
     public static final DeferredItem<Item> JINDAN_CULTIVATOR_SPAWN_EGG = registerItem("jindan_cultivator_spawn_egg",
             () -> new SpawnEggItem(com.example.immortal_cultivation_mod.entity.ModEntities.JINDAN_CULTIVATOR.get(), 0x4C3924, 0xF6C64A, new Item.Properties()));
 
+    public static final DeferredItem<Item> LIUSAN_SPAWN_EGG = registerItem("liusan_spawn_egg",
+            () -> new SpawnEggItem(com.example.immortal_cultivation_mod.entity.ModEntities.LIUSAN.get(), 0x102D1E, 0x9DBB78, new Item.Properties()));
+
     public static final DeferredItem<Item> FANREN_NPC_SPAWN_EGG = registerItem("fanren_npc_spawn_egg",
             () -> new SpawnEggItem(com.example.immortal_cultivation_mod.entity.ModEntities.FANREN_NPC.get(), 0x8B6B4A, 0xD8C59C, new Item.Properties()));
 
-    public static final DeferredItem<Item> GUDIAO_SPAWN_EGG = registerItem("gudiao_spawn_egg",
-            () -> new SpawnEggItem(com.example.immortal_cultivation_mod.entity.ModEntities.GUDIAO.get(), 0x6F573B, 0x3C3B34, new Item.Properties()));
+    public static final DeferredItem<Item> CRIMSON_SCALE_FLAME_LIZARD_SPAWN_EGG =
+            registerItem("crimson_scale_flame_lizard_spawn_egg",
+                    () -> new SpawnEggItem(
+                            com.example.immortal_cultivation_mod.entity.ModEntities.CRIMSON_SCALE_FLAME_LIZARD.get(),
+                            0x8A1E18, 0xFF8C24, new Item.Properties()));
+
+    public static final DeferredItem<Item> CRIMSON_SKY_FLAME_FLOOD_DRAGON_SPAWN_EGG =
+            registerItem("crimson_sky_flame_flood_dragon_spawn_egg",
+                    () -> new SpawnEggItem(
+                            com.example.immortal_cultivation_mod.entity.ModEntities
+                                    .CRIMSON_SKY_FLAME_FLOOD_DRAGON.get(),
+                            0x3A0704, 0xFF5A0A, new Item.Properties()));
+
+    public static final DeferredItem<Item> BLOOD_APE_DEMON_GENERAL_SPAWN_EGG =
+            registerItem("blood_ape_demon_general_spawn_egg",
+                    () -> new SpawnEggItem(
+                            com.example.immortal_cultivation_mod.entity.ModEntities
+                                    .BLOOD_APE_DEMON_GENERAL.get(),
+                            0x35100D, 0xB83228, new Item.Properties()));
+
+    public static final DeferredItem<Item> AZURE_SPIRIT_SILKWORM_SPAWN_EGG =
+            registerItem("azure_spirit_silkworm_spawn_egg",
+                    () -> new SpawnEggItem(
+                            com.example.immortal_cultivation_mod.entity.ModEntities.AZURE_SPIRIT_SILKWORM.get(),
+                            0x66DDE0, 0xE8FFFF, new Item.Properties()));
 
     public static final DeferredItem<Item> ENLIGHTENMENT_PILL = registerItem("enlightenment_pill",
             () -> new EnlightenmentPillItem(new Item.Properties().stacksTo(16)));
@@ -143,13 +190,22 @@ public class ModItems {
             () -> new LevelUpItem(new Item.Properties().stacksTo(16), 100, false));
 
     public static final DeferredItem<Item> BIG_LEVEL_UP = registerItem("big_level_up",
-            () -> new LevelUpItem(new Item.Properties().stacksTo(16), 0, true));
+            () -> new LevelUpItem(new Item.Properties().stacksTo(16), 1000, false));
+
+    public static final DeferredItem<Item> BODY_TEMPERING_PILL = registerItem("body_tempering_pill",
+            () -> new BodyCultivationItems.BodyTemperingPillItem(new Item.Properties().stacksTo(16)));
+
+    public static final DeferredItem<Item> BLOOD_QI_PILL = registerItem("blood_qi_pill",
+            () -> new BodyCultivationItems.BloodQiPillItem(new Item.Properties().stacksTo(16)));
 
     public static final DeferredItem<Item> QI_POUCH = registerItem("qi_pouch",
             () -> new QiPouchItem(new Item.Properties().stacksTo(1)));
 
     public static final DeferredItem<Item> DEBUG_STAT_EDITOR = registerItem("debug_stat_editor",
             () -> new DebugStatEditorItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> RESTRICTION_INSIGHT = registerItem("restriction_insight",
+            () -> new RestrictionInsightItem(new Item.Properties().stacksTo(16)));
 
     public static final DeferredItem<Item> FOG_REVEALING_MIRROR = registerItem("fog_revealing_mirror",
             () -> new FogRevealingMirrorItem(new Item.Properties().stacksTo(1)));
@@ -172,11 +228,38 @@ public class ModItems {
     public static final DeferredItem<Item> FENGYAN_TALISMAN = registerItem("fengyan_talisman",
             () -> new Item(new Item.Properties().stacksTo(16)));
 
+    public static final DeferredItem<Item> FIREBALL_TALISMAN = registerItem("fireball_talisman",
+            () -> new FireballTalismanItem(new Item.Properties().stacksTo(16)));
+
     public static final DeferredItem<Item> BLOOD = registerItem("blood",
             () -> new BloodItem(new Item.Properties().stacksTo(64)));
 
     public static final DeferredItem<Item> BLOOD_CRYSTAL = registerItem("blood_crystal",
             () -> new Item(new Item.Properties().stacksTo(64)));
+
+    public static final DeferredItem<Item> CHI_LIN = registerItem("chi_lin",
+            () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON)));
+
+    public static final DeferredItem<Item> HUO_XI_BLOOD = registerItem("huo_xi_blood",
+            () -> new Item(new Item.Properties().stacksTo(64)));
+
+    public static final DeferredItem<Item> JINDAN_YAODAN = registerItem("jindan_yaodan",
+            () -> new Item(new Item.Properties().stacksTo(16).rarity(Rarity.RARE)));
+
+    public static final DeferredItem<Item> CHIYAN_BONE = registerItem("chiyan_bone",
+            () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.RARE)));
+
+    public static final DeferredItem<Item> YUANYING_YAODAN = registerItem("yuanying_yaodan",
+            () -> new Item(new Item.Properties().stacksTo(16).rarity(Rarity.EPIC)));
+
+    public static final DeferredItem<Item> YANJIAO_HORN = registerItem("yanjiao_horn",
+            () -> new Item(new Item.Properties().stacksTo(16).rarity(Rarity.RARE)));
+
+    public static final DeferredItem<Item> YAOYUAN_BONE = registerItem("yaoyuan_bone",
+            () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.RARE)));
+
+    public static final DeferredItem<Item> XUESHA_HIDE = registerItem("xuesha_hide",
+            () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.RARE)));
 
     public static final DeferredItem<Item> NUOMI = registerItem("nuomi",
             () -> new BlockItem(ModBlocks.NUOMI_DUST.get(), new Item.Properties().stacksTo(64)));
@@ -199,6 +282,47 @@ public class ModItems {
     public static final DeferredItem<Item> COPPER_COIN = registerItem("copper_coin",
             () -> new Item(new Item.Properties().stacksTo(64)));
 
+    public static final DeferredItem<Item> BIGU_PILL = registerItem("bigu_pill",
+            () -> new IdentityItems.BiguPillItem(new Item.Properties().stacksTo(16)));
+    public static final DeferredItem<Item> LOW_QI_RECOVERY_PILL = registerItem("low_qi_recovery_pill",
+            () -> new IdentityItems.QiRecoveryPillItem(new Item.Properties().stacksTo(16), 10));
+    public static final DeferredItem<Item> MIDDLE_QI_RECOVERY_PILL = registerItem("middle_qi_recovery_pill",
+            () -> new IdentityItems.QiRecoveryPillItem(new Item.Properties().stacksTo(16), 100));
+    public static final DeferredItem<Item> HIGH_QI_RECOVERY_PILL = registerItem("high_qi_recovery_pill",
+            () -> new IdentityItems.QiRecoveryPillItem(new Item.Properties().stacksTo(16), 1000));
+    public static final DeferredItem<Item> LOW_YANGJIAN_STONE = registerItem("low_yangjian_stone",
+            () -> new Item(new Item.Properties().durability(16)));
+    public static final DeferredItem<Item> MIDDLE_YANGJIAN_STONE = registerItem("middle_yangjian_stone",
+            () -> new Item(new Item.Properties().durability(32)));
+    public static final DeferredItem<Item> HIGH_YANGJIAN_STONE = registerItem("high_yangjian_stone",
+            () -> new Item(new Item.Properties().durability(64)));
+    public static final DeferredItem<Item> LOW_SWORD_GRINDSTONE = registerItem("low_sword_grindstone",
+            () -> new Item(new Item.Properties().durability(16)));
+    public static final DeferredItem<Item> MIDDLE_SWORD_GRINDSTONE = registerItem("middle_sword_grindstone",
+            () -> new Item(new Item.Properties().durability(32)));
+    public static final DeferredItem<Item> HIGH_SWORD_GRINDSTONE = registerItem("high_sword_grindstone",
+            () -> new Item(new Item.Properties().durability(64)));
+    public static final DeferredItem<Item> LOW_SABER_GRINDSTONE = registerItem("low_saber_grindstone",
+            () -> new Item(new Item.Properties().durability(16)));
+    public static final DeferredItem<Item> MIDDLE_SABER_GRINDSTONE = registerItem("middle_saber_grindstone",
+            () -> new Item(new Item.Properties().durability(32)));
+    public static final DeferredItem<Item> HIGH_SABER_GRINDSTONE = registerItem("high_saber_grindstone",
+            () -> new Item(new Item.Properties().durability(64)));
+    public static final DeferredItem<Item> FAMILY_TOKEN = registerItem("family_token",
+            () -> new IdentityItems.IdentityTokenItem(new Item.Properties().stacksTo(1), "clan_heir"));
+    public static final DeferredItem<Item> ROYAL_TOKEN = registerItem("royal_token",
+            () -> new IdentityItems.IdentityTokenItem(new Item.Properties().stacksTo(1), "royal"));
+    public static final DeferredItem<Item> PROTECTIVE_JADE_PENDANT = registerItem("protective_jade_pendant",
+            () -> new IdentityItems.ProtectivePendantItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> LETHAL_POISON = registerItem("lethal_poison",
+            () -> new IdentityItems.LethalPoisonItem(new Item.Properties().stacksTo(16)));
+    public static final DeferredItem<Item> WANTED_ORDER = registerItem("wanted_order",
+            () -> new WantedOrderItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> DISGUISE_MASK = registerItem("disguise_mask",
+            () -> new DisguiseMaskItem(new Item.Properties()));
+    public static final DeferredItem<Item> CORPSE_REFINING_SECRET = registerItem("corpse_refining_secret",
+            () -> new CultivationMethodItem(new Item.Properties().stacksTo(1), CultivationMethods.JIUYOU_LIANSHI_JUE));
+
     public static final DeferredItem<Item> COPPER_COIN_SWORD = registerItem("copper_coin_sword",
             () -> new CopperCoinSwordItem(new Item.Properties().stacksTo(1)));
 
@@ -207,6 +331,30 @@ public class ModItems {
 
     public static final DeferredItem<Item> FLAG = registerItem("flag",
             () -> new FlagItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> CLOTH_SHEATH = registerItem("cloth_sheath",
+            () -> new ClothSheathItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> SWORD_CASE = registerItem("sword_case",
+            () -> new SwordCaseItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> XIUJIAN = registerItem("xiujian",
+            () -> new XiujianItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> WHITE_WOOL_STRIP = woolStrip("white", DyeColor.WHITE);
+    public static final DeferredItem<Item> ORANGE_WOOL_STRIP = woolStrip("orange", DyeColor.ORANGE);
+    public static final DeferredItem<Item> MAGENTA_WOOL_STRIP = woolStrip("magenta", DyeColor.MAGENTA);
+    public static final DeferredItem<Item> LIGHT_BLUE_WOOL_STRIP = woolStrip("light_blue", DyeColor.LIGHT_BLUE);
+    public static final DeferredItem<Item> YELLOW_WOOL_STRIP = woolStrip("yellow", DyeColor.YELLOW);
+    public static final DeferredItem<Item> LIME_WOOL_STRIP = woolStrip("lime", DyeColor.LIME);
+    public static final DeferredItem<Item> PINK_WOOL_STRIP = woolStrip("pink", DyeColor.PINK);
+    public static final DeferredItem<Item> GRAY_WOOL_STRIP = woolStrip("gray", DyeColor.GRAY);
+    public static final DeferredItem<Item> LIGHT_GRAY_WOOL_STRIP = woolStrip("light_gray", DyeColor.LIGHT_GRAY);
+    public static final DeferredItem<Item> CYAN_WOOL_STRIP = woolStrip("cyan", DyeColor.CYAN);
+    public static final DeferredItem<Item> PURPLE_WOOL_STRIP = woolStrip("purple", DyeColor.PURPLE);
+    public static final DeferredItem<Item> BLUE_WOOL_STRIP = woolStrip("blue", DyeColor.BLUE);
+    public static final DeferredItem<Item> BROWN_WOOL_STRIP = woolStrip("brown", DyeColor.BROWN);
+    public static final DeferredItem<Item> GREEN_WOOL_STRIP = woolStrip("green", DyeColor.GREEN);
+    public static final DeferredItem<Item> RED_WOOL_STRIP = woolStrip("red", DyeColor.RED);
+    public static final DeferredItem<Item> BLACK_WOOL_STRIP = woolStrip("black", DyeColor.BLACK);
 
     public static final DeferredItem<Item> BLINDFOLD = registerItem("blindfold",
             () -> new BlindfoldItem(new Item.Properties().stacksTo(1)));
@@ -217,11 +365,20 @@ public class ModItems {
     public static final DeferredItem<Item> STRAW_HAT = registerItem("straw_hat",
             () -> new StrawHatItem(new Item.Properties().stacksTo(1)));
 
+    public static final DeferredItem<Item> NOOB_HAT = registerItem("noob_hat",
+            () -> new NoobHatItem(new Item.Properties().stacksTo(1)));
+
     public static final DeferredItem<Item> JADE_PENDANT = registerItem("jade_pendant",
             () -> new JadePendantItem(new Item.Properties().stacksTo(1)));
 
     public static final DeferredItem<Item> DAOFU_CHESTPLATE = registerItem("daofu_chestplate",
             () -> new DaofuChestplateItem(new Item.Properties()));
+
+    public static final DeferredItem<Item> NEIJIA_CHESTPLATE = registerItem("neijia_chestplate",
+            () -> new NeijiaChestplateItem(new Item.Properties()));
+
+    public static final DeferredItem<Item> ZHONGYI = registerItem("zhongyi",
+            () -> new ZhongyiItem(new Item.Properties()));
 
     public static final DeferredItem<Item> FLYING_SWORD = registerItem("flying_sword",
             () -> new FlyingSwordItem(new Item.Properties().stacksTo(1)));
@@ -232,8 +389,71 @@ public class ModItems {
     public static final DeferredItem<Item> DAO_YUJIAN = registerItem("dao_yujian",
             () -> new ForgingYujianItem(new Item.Properties().stacksTo(1)));
 
+    public static final DeferredItem<Item> JINGTIE_SPEAR_YUJIAN = registerItem("jingtie_spear_yujian",
+            () -> new ForgingYujianItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> HEAVY_IRON_BRACER_YUJIAN = registerItem("heavy_iron_bracer_yujian",
+            () -> new ForgingYujianItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> THROWING_KNIFE_YUJIAN = registerItem("throwing_knife_yujian",
+            () -> new ForgingYujianItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> FLYING_NEEDLE_YUJIAN = registerItem("flying_needle_yujian",
+            () -> new ForgingYujianItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> ZHENPAN_YUJIAN = registerItem("zhenpan_yujian",
+            () -> new ForgingYujianItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> BLANK_FORMATION_FLAG_YUJIAN = registerItem("blank_formation_flag_yujian",
+            () -> new ForgingYujianItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> DURATION_FLAG_YUJIAN = registerItem("duration_flag_yujian",
+            () -> new ForgingYujianItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> AMPLIFIER_FLAG_YUJIAN = registerItem("amplifier_flag_yujian",
+            () -> new ForgingYujianItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> SPIRIT_GATHERING_FLAG_YUJIAN = registerItem("spirit_gathering_flag_yujian",
+            () -> new ForgingYujianItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> HASTE_FLAG_YUJIAN = registerItem("haste_flag_yujian",
+            () -> new ForgingYujianItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> QI_RETURN_FLAG_YUJIAN = registerItem("qi_return_flag_yujian",
+            () -> new ForgingYujianItem(new Item.Properties().stacksTo(1)));
+
     public static final DeferredItem<Item> DAO = registerItem("dao",
             () -> new DaoItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> JINGTIE_SPEAR = registerItem("jingtie_spear",
+            () -> new JingtieSpearItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> THROWING_KNIFE = registerItem("throwing_knife",
+            () -> new ThrowingKnifeItem(new Item.Properties()
+                    .stacksTo(1)));
+    public static final DeferredItem<Item> FLYING_NEEDLE = registerItem("flying_needle",
+            () -> new FlyingNeedleItem(new Item.Properties()
+                    .stacksTo(1)));
+
+    public static final DeferredItem<Item> TIEGU_SHAN = registerItem("tiegu_shan",
+            () -> new TieguShanItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> FUCHEN = registerItem("fuchen",
+            () -> new FuchenItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> WHIP = registerItem("whip",
+            () -> new WhipItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> HEAVY_IRON_BRACER = registerItem("heavy_iron_bracer",
+            () -> new HeavyIronBracerItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> YAOYUAN_FIST_BONE = registerItem("yaoyuan_fist_bone",
+            () -> new HeavyIronBracerItem(
+                    new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 5_000, 500.0F));
+    public static final DeferredItem<Item> HEAVY_IRON_BRACER_CHESTPLATE_DEBUG =
+            registerItem("heavy_iron_bracer_chestplate_debug",
+                    () -> new HeavyIronBracerChestplateItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> YAOYUAN_FIST_BONE_CHESTPLATE_DEBUG =
+            registerItem("yaoyuan_fist_bone_chestplate_debug",
+                    () -> new YaoyuanFistBoneChestplateItem(new Item.Properties().stacksTo(1)));
 
     public static final DeferredItem<Item> SWORD_MOLD = registerItem("sword_mold",
             () -> new WeaponMoldItem(new Item.Properties().stacksTo(1)));
@@ -280,14 +500,68 @@ public class ModItems {
     public static final DeferredItem<Item> HANTI_BINGQIN_METHOD = registerItem("hanti_bingqin_method",
             () -> new CultivationMethodItem(new Item.Properties().stacksTo(1), CultivationMethods.HANTI_BINGQIN));
 
+    public static final DeferredItem<Item> CUIGU_LIANSHEN_METHOD = registerItem("cuigu_lianshen_method",
+            () -> new CultivationMethodItem(new Item.Properties().stacksTo(1), CultivationMethods.CUIGU_LIANSHEN_JUE));
+
     public static final DeferredItem<Item> LINGJIAO_SCALE = registerItem("lingjiao_scale",
             () -> new Item(new Item.Properties()));
 
-    public static final DeferredItem<Item> JIUHU = registerItem("jiuhu",
-            () -> new com.example.immortal_cultivation_mod.item.JiuhuItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> SHIHUNFAN = registerItem("shihunfan",
+            () -> new ShihunfanItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> YUANHUN_BOTTLE = registerItem("yuanhun_bottle",
+            () -> new YuanhunBottleItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> MYSTERIOUS_RING = registerItem("mysterious_ring",
+            () -> new MysteriousRingItem(new Item.Properties()
+                    .stacksTo(1)
+                    .rarity(Rarity.EPIC)));
+
+    public static final DeferredItem<Item> SYSTEM = registerItem("system",
+            () -> new OuterSystemItem(new Item.Properties()
+                    .stacksTo(1)
+                    .rarity(Rarity.EPIC)));
+
+    public static final DeferredItem<Item> LOTTERY_TICKET =
+            registerItem("lottery_ticket",
+                    () -> new Item(new Item.Properties()
+                            .stacksTo(64)
+                            .rarity(Rarity.RARE)));
+
+    public static final DeferredItem<Item> GREAT_CREATION_SHARD =
+            registerItem("great_creation_shard",
+                    () -> new GreatCreationShardItem(new Item.Properties()
+                            .stacksTo(16)
+                            .rarity(Rarity.EPIC)));
 
     public static DeferredItem<Item> registerItem(String name, Supplier<Item> itemSupplier) {
         return ITEMS.register(name, itemSupplier);
+    }
+
+    private static DeferredItem<Item> woolStrip(String name, DyeColor color) {
+        return registerItem(name + "_wool_strip",
+                () -> new WoolStripItem(new Item.Properties().stacksTo(64), color));
+    }
+
+    public static Item woolStrip(DyeColor color) {
+        return switch (color) {
+            case WHITE -> WHITE_WOOL_STRIP.get();
+            case ORANGE -> ORANGE_WOOL_STRIP.get();
+            case MAGENTA -> MAGENTA_WOOL_STRIP.get();
+            case LIGHT_BLUE -> LIGHT_BLUE_WOOL_STRIP.get();
+            case YELLOW -> YELLOW_WOOL_STRIP.get();
+            case LIME -> LIME_WOOL_STRIP.get();
+            case PINK -> PINK_WOOL_STRIP.get();
+            case GRAY -> GRAY_WOOL_STRIP.get();
+            case LIGHT_GRAY -> LIGHT_GRAY_WOOL_STRIP.get();
+            case CYAN -> CYAN_WOOL_STRIP.get();
+            case PURPLE -> PURPLE_WOOL_STRIP.get();
+            case BLUE -> BLUE_WOOL_STRIP.get();
+            case BROWN -> BROWN_WOOL_STRIP.get();
+            case GREEN -> GREEN_WOOL_STRIP.get();
+            case RED -> RED_WOOL_STRIP.get();
+            case BLACK -> BLACK_WOOL_STRIP.get();
+        };
     }
 
     public static class SpellScrollItem extends Item {
@@ -327,6 +601,87 @@ public class ModItems {
                 case SpiritRoots.DARK -> ChatFormatting.DARK_PURPLE;
                 default -> ChatFormatting.GRAY;
             };
+        }
+
+        public String spellId() {
+            return spellId;
+        }
+    }
+
+    public static class FireballTalismanItem extends Item {
+        private static final int FIREBALL_COUNT = 8;
+        private static final double RANGE = 64.0D;
+        private static final double SPEED = 2.0D;
+        private static final double TOP_ARC_SPAWN_RADIUS = 1.25D;
+        private static final double OUTWARD_CURVE_BLOCKS = 8.0D;
+        private static final int RANDOM_FIRE_TICKS = 10;
+        private static final int COOLDOWN_TICKS = 5;
+
+        public FireballTalismanItem(Properties properties) {
+            super(properties);
+        }
+
+        @Override
+        public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+            ItemStack stack = player.getItemInHand(hand);
+            if (!level.isClientSide) {
+                Vec3 eye = player.getEyePosition();
+                Vec3 look = player.getLookAngle().normalize();
+                Vec3 flatLook = new Vec3(look.x, 0.0D, look.z);
+                if (flatLook.lengthSqr() < 0.001D) {
+                    flatLook = Vec3.directionFromRotation(0.0F, player.getYRot());
+                } else {
+                    flatLook = flatLook.normalize();
+                }
+                Vec3 origin = player.position().add(0.0D, player.getBbHeight() * 0.65D, 0.0D).add(flatLook.scale(1.5D));
+                HitResult hit = player.pick(RANGE, 0.0F, false);
+                Vec3 blockTarget = hit.getType() == HitResult.Type.MISS ? eye.add(look.scale(RANGE)) : hit.getLocation();
+                EntityHitResult entityHit = pickEntity(player, eye, blockTarget);
+                LivingEntity targetEntity = entityHit == null
+                        ? null : ModelBonePartEntity.resolveLiving(entityHit.getEntity());
+                Vec3 target = targetEntity == null ? blockTarget : targetEntity.position().add(0.0D, targetEntity.getBbHeight() * 0.55D, 0.0D);
+                if (targetEntity == null && target.distanceToSqr(origin) < 16.0D) {
+                    target = origin.add(look.scale(16.0D));
+                }
+
+                Vec3 forward = target.subtract(origin).normalize();
+                Vec3 right = forward.cross(new Vec3(0.0D, 1.0D, 0.0D));
+                if (right.lengthSqr() < 0.001D) {
+                    right = new Vec3(1.0D, 0.0D, 0.0D);
+                } else {
+                    right = right.normalize();
+                }
+                for (int i = 0; i < FIREBALL_COUNT; i++) {
+                    double arcAngle = Math.PI * i / (FIREBALL_COUNT - 1);
+                    Vec3 arcDirection = right.scale(Math.cos(arcAngle))
+                            .add(0.0D, Math.sin(arcAngle), 0.0D);
+                    Vec3 outward = arcDirection.normalize().scale(OUTWARD_CURVE_BLOCKS);
+                    Vec3 fireballOrigin = origin.add(arcDirection.scale(TOP_ARC_SPAWN_RADIUS));
+                    int launchDelay = level.random.nextInt(RANDOM_FIRE_TICKS + 1);
+                    FireballTalismanProjectileEntity fireball = new FireballTalismanProjectileEntity(level, player);
+                    fireball.setPos(fireballOrigin.x, fireballOrigin.y, fireballOrigin.z);
+                    fireball.configure(target, outward, SPEED, launchDelay, targetEntity);
+                    fireball.setDeltaMovement(outward.normalize().scale(SPEED));
+                    level.addFreshEntity(fireball);
+                }
+
+                player.getCooldowns().addCooldown(this, COOLDOWN_TICKS);
+                if (!player.getAbilities().instabuild) {
+                    stack.shrink(1);
+                }
+            }
+            return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        }
+
+        private EntityHitResult pickEntity(Player player, Vec3 eye, Vec3 blockTarget) {
+            double maxDistance = Math.min(RANGE, eye.distanceTo(blockTarget));
+            Vec3 end = eye.add(player.getLookAngle().normalize().scale(maxDistance));
+            AABB search = player.getBoundingBox().expandTowards(end.subtract(eye)).inflate(1.0D);
+            return ProjectileUtil.getEntityHitResult(player.level(), player, eye, end, search,
+                    entity -> ModelBonePartEntity.resolveLiving(entity) != null
+                            && entity.isPickable()
+                            && ModelBonePartEntity.resolveParent(entity) != player
+                            && !entity.isSpectator());
         }
     }
 
@@ -409,11 +764,60 @@ public class ModItems {
 
         @Override
         public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-            if (level.isClientSide) {
-                com.example.immortal_cultivation_mod.client.ClientPayloadHandlers.openDebugStatEditor();
+            if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
+                com.example.immortal_cultivation_mod.network.ModPayloads.openDebugStatEditor(
+                        serverPlayer, serverPlayer);
             }
             return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide);
         }
+
+        @Override
+        public InteractionResult interactLivingEntity(ItemStack stack, Player player,
+                                                       net.minecraft.world.entity.LivingEntity target,
+                                                       InteractionHand hand) {
+            if (!player.isShiftKeyDown()) {
+                return super.interactLivingEntity(stack, player, target, hand);
+            }
+
+            if (target instanceof Player) {
+                if (!player.level().isClientSide
+                        && player instanceof ServerPlayer viewer
+                        && target instanceof ServerPlayer targetPlayer) {
+                    com.example.immortal_cultivation_mod.network.ModPayloads.openDebugStatEditor(
+                            viewer, targetPlayer);
+                }
+                return InteractionResult.sidedSuccess(player.level().isClientSide);
+            }
+
+            if (target instanceof net.minecraft.world.entity.PathfinderMob mob
+                    && target instanceof com.example.immortal_cultivation_mod.entity.CultivationNpc) {
+                if (!player.level().isClientSide && player instanceof ServerPlayer serverPlayer) {
+                    com.example.immortal_cultivation_mod.entity.NpcProfile.openDebugRelationship(
+                            mob, serverPlayer);
+                }
+                return InteractionResult.sidedSuccess(player.level().isClientSide);
+            }
+            return super.interactLivingEntity(stack, player, target, hand);
+        }
+
+        @Override
+        public InteractionResult useOn(UseOnContext context) {
+            Player player = context.getPlayer();
+            Level level = context.getLevel();
+            net.minecraft.core.BlockPos pos = context.getClickedPos();
+            if (player == null || !player.isShiftKeyDown()
+                    || !level.getBlockState(pos).is(ModBlocks.DUNWU_STELE.get())) {
+                return super.useOn(context);
+            }
+            if (!level.isClientSide && player instanceof ServerPlayer serverPlayer
+                    && level.getBlockEntity(pos)
+                    instanceof com.example.immortal_cultivation_mod.block.GeoRockBlockEntity stele) {
+                com.example.immortal_cultivation_mod.network.ModPayloads.openDunwuSteleEditor(
+                        serverPlayer, pos, stele.steleSpellId());
+            }
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        }
+
     }
 
     public static class CultivationMethodItem extends Item {
@@ -451,9 +855,11 @@ public class ModItems {
                 if (data.blood() >= maxBlood) {
                     return InteractionResultHolder.fail(stack);
                 }
-                ModAttachments.setData(sp, data.withBlood(Math.min(maxBlood, data.blood() + 1)));
+                int requested = sp.isShiftKeyDown() ? stack.getCount() : 1;
+                int consumed = Math.min(requested, maxBlood - data.blood());
+                ModAttachments.setData(sp, data.withBlood(data.blood() + consumed));
                 if (!sp.getAbilities().instabuild) {
-                    stack.shrink(1);
+                    stack.shrink(consumed);
                 }
                 com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
             }

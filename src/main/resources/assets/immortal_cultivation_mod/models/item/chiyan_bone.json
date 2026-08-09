@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "immortal_cultivation_mod:item/chiyan_bone"
+  },
+  "display": {
+    "gui": {
+      "rotation": [0, 0, -25],
+      "scale": [1.25, 1.25, 0.1]
+    }
+  }
+}

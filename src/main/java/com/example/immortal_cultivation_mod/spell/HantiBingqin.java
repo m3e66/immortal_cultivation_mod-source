@@ -11,6 +11,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -59,8 +60,11 @@ public final class HantiBingqin {
         }
 
         if (target != null) {
-            applyRealmScaledFreeze(player, target, ModEffects.FROZEN_QI, true);
-            target.hurt(player.damageSources().magic(), 12.0F);
+            DamageSource damageSource = new DamageSource(
+                    player.damageSources().magic().typeHolder(), player, player, start);
+            if (target.hurt(damageSource, 12.0F)) {
+                applyRealmScaledFreeze(player, target, ModEffects.FROZEN_QI, true);
+            }
         }
         ServerEvents.syncPlayerData(player);
     }

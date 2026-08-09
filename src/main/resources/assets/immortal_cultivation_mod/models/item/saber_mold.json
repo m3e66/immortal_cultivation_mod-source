@@ -1,17 +1,39 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "immortal_cultivation_mod:item/saber_mold"
-  },
-  "display": {
-    "gui": {
-      "scale": [1.45, 1.45, 1.0]
-    },
-    "ground": {
-      "scale": [0.8, 0.8, 1.0]
-    },
-    "fixed": {
-      "scale": [1.25, 1.25, 1.0]
-    }
-  }
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
+	"parent": "minecraft:item/generated",
+	"textures": {
+		"layer0": "immortal_cultivation_mod:item/saber_mold"
+	},
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [0, 90, 141],
+			"translation": [0, 5, 1.75],
+			"scale": [1.5, 1.5, 0.5]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [0, -90, -141],
+			"translation": [0, 5, 1.75],
+			"scale": [1.5, 1.5, 0.5]
+		},
+		"firstperson_righthand": {
+			"rotation": [0, 90, 141],
+			"translation": [0, 5, 1.75],
+			"scale": [1.5, 1.5, 0.5]
+		},
+		"firstperson_lefthand": {
+			"rotation": [0, -90, -141],
+			"translation": [0, 5, 1.75],
+			"scale": [1.5, 1.5, 0.5]
+		},
+		"ground": {
+			"scale": [0.8, 0.8, 0.5]
+		},
+		"gui": {
+			"scale": [1.45, 1.45, 1]
+		},
+		"fixed": {
+			"scale": [1.25, 1.25, 1]
+		}
+	}
 }

@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#minecraft:is_overworld",
+  "features": "immortal_cultivation_mod:spirit_ore_vein",
+  "step": "underground_ores"
+}

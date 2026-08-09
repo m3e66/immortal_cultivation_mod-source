@@ -1,0 +1,28 @@
+{
+  "name": "算盘操作与灵气",
+  "icon": "immortal_cultivation_mod:qi_pouch",
+  "category": "immortal_cultivation_mod:principles",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "选择算珠",
+      "text": "点击某一横行可选择该禁制节点。点击算珠左侧或“<”令其向左一格，点击右侧或“>”令其向右一格。W/S 或上下方向键切换节点，A/D 或左右方向键拨动算珠。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "灵气刻度",
+      "text": "每枚算珠的灵气值范围是 0 至 6。金色菱形代表该节点的目标值。所有节点同时到达目标时，阵路完成并自动将禁制刻入器物。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "越界无效",
+      "text": "一次拨动可能同时影响多个相连节点。如果任何受影响节点会低于 0 或高于 6，本次拨动无效，不会改变阵路，也不会消耗灵气。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "拨珠消耗",
+      "text": "每次有效拨珠消耗 300 灵气。自身灵气不足时，系统会自动消耗背包中的灵石补足；总灵气与灵石仍不足时，拨动会被拒绝。"
+    }
+  ]
+}

@@ -3,6 +3,7 @@ package com.example.immortal_cultivation_mod.entity;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.event.ServerEvents;
+import com.example.immortal_cultivation_mod.magicritual.center.ForcefieldInterceptable;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -114,7 +115,7 @@ public class DuanliuKongdunDomeEntity extends Entity {
 
     private void tickProjectiles(ServerLevel level) {
         for (Entity entity : level.getEntities(this, getBoundingBox().inflate(RADIUS + 1.5D),
-                entity -> entity instanceof Projectile || entity instanceof ZhenshanPalmEntity || entity instanceof GudiaoScratchEntity)) {
+                entity -> entity instanceof Projectile || entity instanceof ForcefieldInterceptable)) {
             double dist = entity.position().distanceTo(position());
             if (Math.abs(dist - RADIUS) <= 1.0D) {
                 entity.discard();

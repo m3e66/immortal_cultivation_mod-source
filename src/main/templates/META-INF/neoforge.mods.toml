@@ -89,14 +89,6 @@ config="${mod_id}.mixins.json"
     side="BOTH"
 
 [[dependencies.${mod_id}]]
-    modId="magic_ritual_mod"
-    type="optional"
-    reason="Uses Magic Ritual's spirit stone as this mod's qi-restoring spirit stone when present."
-    versionRange="[1.0.0,)"
-    ordering="AFTER"
-    side="BOTH"
-
-[[dependencies.${mod_id}]]
     modId="photon"
     type="optional"
     reason="Uses Photon effects for spell visuals when Photon is present."
@@ -121,9 +113,25 @@ config="${mod_id}.mixins.json"
     side="BOTH"
 
 [[dependencies.${mod_id}]]
+    modId="playeranimator"
+    type="required"
+    reason="Uses Player Animator for cultivation combat animations."
+    versionRange="[2.0.1,)"
+    ordering="AFTER"
+    side="CLIENT"
+
+[[dependencies.${mod_id}]]
     modId="patchouli"
     type="optional"
     reason="Adds the Immortal Cultivation guide book when Patchouli is present."
+    versionRange="[0,)"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="ultramarine"
+    type="required"
+    reason="Formation Pattern Jade is created from Ultramarine jade."
     versionRange="[0,)"
     ordering="AFTER"
     side="BOTH"

@@ -1,0 +1,20 @@
+{
+  "name": "什么是阵眼",
+  "icon": "immortal_cultivation_mod:magic_center_block",
+  "category": "immortal_cultivation_mod:magic_center",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "immortal_cultivation_mod:magic_center_block",
+      "text": "$(item)阵眼$()是你阵法系统的$(bold)核心$()。它决定符文的作用范围，并为其提供运行所需的燃料。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "要放置阵眼，使用$(bold)Shift + 右键$()手持匕首并选择半径。阵眼会生成在你脚下。$(br2)阵眼本身不可见，只有所有者或管理员可以拆除，爆炸也无法将其摧毁。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)右键$()阵眼可打开控制界面，在这里你可以：$(br2)$(li)添加灵石作为燃料$(li)开关中枢与阵纹$(li)配置实体过滤$(li)管理黑名单与控制者白名单"
+    }
+  ]
+}

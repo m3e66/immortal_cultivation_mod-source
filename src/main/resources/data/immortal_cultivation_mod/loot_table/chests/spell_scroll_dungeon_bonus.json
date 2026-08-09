@@ -135,6 +135,21 @@
         },
         {
           "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:jinhuo_xinliao_scroll",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:suigui_xingyun_scroll",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:shixu_chiliu_scroll",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
           "name": "immortal_cultivation_mod:reincarnation_true_art_method",
           "weight": 1
         },
@@ -161,6 +176,16 @@
         {
           "type": "minecraft:item",
           "name": "immortal_cultivation_mod:hanti_bingqin_method",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:cuigu_lianshen_method",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:corpse_refining_secret",
           "weight": 1
         },
         {

@@ -1,5 +1,6 @@
 package com.example.immortal_cultivation_mod.entity;
 
+import com.example.immortal_cultivation_mod.world.JindanPocketWorlds;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
@@ -7,6 +8,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
@@ -70,6 +72,19 @@ public class JindanCloneEntity extends PathfinderMob {
     @Override
     public void tick() {
         super.tick();
+        if (!level().isClientSide && level() instanceof ServerLevel serverLevel) {
+            Optional<UUID> ownerId = playerUuid();
+            if (ownerId.isEmpty()) {
+                discard();
+                return;
+            }
+
+            ServerPlayer owner = serverLevel.getServer().getPlayerList().getPlayer(ownerId.get());
+            if (owner != null && !JindanPocketWorlds.isJindanDimension(owner.level().dimension())) {
+                discard();
+                return;
+            }
+        }
         setDeltaMovement(Vec3.ZERO);
         lockFacing();
     }

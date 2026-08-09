@@ -18,5 +18,9 @@ public class ModScreens {
     public static final DeferredHolder<MenuType<?>, MenuType<DingMenu>> DING =
             MENUS.register("ding", () -> new MenuType<>(DingMenu::new, FeatureFlags.DEFAULT_FLAGS));
 
+    public static final DeferredHolder<MenuType<?>, MenuType<RestrictionTableMenu>> RESTRICTION_TABLE =
+            MENUS.register("restriction_table",
+                    () -> new MenuType<>(RestrictionTableMenu::new, FeatureFlags.DEFAULT_FLAGS));
+
     public static void register(IEventBus bus) { MENUS.register(bus); }
 }

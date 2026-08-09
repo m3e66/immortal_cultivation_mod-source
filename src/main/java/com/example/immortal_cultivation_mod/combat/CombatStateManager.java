@@ -1,0 +1,864 @@
+package com.example.immortal_cultivation_mod.combat;
+
+import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
+import com.example.immortal_cultivation_mod.attachment.ModAttachments;
+import com.example.immortal_cultivation_mod.effect.ModEffects;
+import com.example.immortal_cultivation_mod.entity.ModelBonePartEntity;
+import com.example.immortal_cultivation_mod.entity.WeaponQiSlashEntity;
+import com.example.immortal_cultivation_mod.item.FuchenItem;
+import com.example.immortal_cultivation_mod.item.HeavyIronBracerItem;
+import com.example.immortal_cultivation_mod.item.QiInfusedWeapon;
+import com.example.immortal_cultivation_mod.item.TieguShanItem;
+import com.example.immortal_cultivation_mod.item.ThrowingKnifeItem;
+import com.example.immortal_cultivation_mod.item.WhipItem;
+import com.example.immortal_cultivation_mod.item.XiujianItem;
+import com.example.immortal_cultivation_mod.network.CombatPayloads;
+import com.example.immortal_cultivation_mod.network.ModPayloads;
+import com.example.immortal_cultivation_mod.particle.MethodQiParticleEffects;
+import com.example.immortal_cultivation_mod.spell.ModSpells;
+import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
+
+import java.util.Map;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+public final class CombatStateManager {
+    public static final int COMBAT_DURATION_TICKS = 20 * 15;
+    public static final int POSTURE_BREAK_TICKS = 30;
+    public static final int HEAVY_CHARGE_TICKS = 10;
+    public static final int TELEPORT_CHANNEL_TICKS = 60;
+    private static final int COMBO_RESET_TICKS = 24;
+    private static final int DUPLICATE_ATTACK_WINDOW_TICKS = 3;
+    private static final int BLOCK_VFX_INTERVAL_TICKS = 3;
+
+    private static final String ENABLED_TAG = "ImmortalCultivationCombatStateEnabled";
+    private static final String COMBAT_UNTIL_TAG = "ImmortalCultivationCombatUntil";
+    private static final String MANUAL_COMBAT_TAG = "ImmortalCultivationManualCombat";
+    private static final String POSTURE_TAG = "ImmortalCultivationPosture";
+    private static final String POSTURE_BROKEN_UNTIL_TAG = "ImmortalCultivationPostureBrokenUntil";
+    private static final TagKey<Item> COMBAT_DELAYED_TELEPORT_ITEMS = TagKey.create(
+            Registries.ITEM,
+            ResourceLocation.fromNamespaceAndPath(
+                    ImmortalCultivationMod.MODID, "combat_delayed_teleport"));
+    private static final Map<UUID, RecentHit> RECENT_HITS = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> HEAVY_CHARGE_STARTS = new ConcurrentHashMap<>();
+    private static final Map<UUID, SpellPreparation> SPELL_PREPARATIONS = new ConcurrentHashMap<>();
+    private static final Map<UUID, PendingTeleport> PENDING_TELEPORTS = new ConcurrentHashMap<>();
+    private static final Map<UUID, SyncState> LAST_SYNC = new ConcurrentHashMap<>();
+    private static final Map<UUID, ComboState> COMBO_STATES = new ConcurrentHashMap<>();
+    private static final Set<UUID> BLOCKING_PLAYERS = ConcurrentHashMap.newKeySet();
+    private static final ThreadLocal<UUID> HEAVY_ATTACKER = new ThreadLocal<>();
+
+    private CombatStateManager() {
+    }
+
+    public static boolean isEnabled(ServerPlayer player) {
+        return !player.getPersistentData().contains(ENABLED_TAG)
+                || player.getPersistentData().getBoolean(ENABLED_TAG);
+    }
+
+    public static void setEnabled(ServerPlayer player, boolean enabled) {
+        player.getPersistentData().putBoolean(ENABLED_TAG, enabled);
+        if (!enabled) {
+            clear(player);
+        } else {
+            sync(player, true);
+        }
+    }
+
+    public static boolean isInCombat(ServerPlayer player) {
+        return isEnabled(player)
+                && (isManualCombat(player)
+                || player.getPersistentData().getLong(COMBAT_UNTIL_TAG)
+                > player.serverLevel().getGameTime());
+    }
+
+    public static boolean isManualCombat(ServerPlayer player) {
+        return player.getPersistentData().getBoolean(MANUAL_COMBAT_TAG);
+    }
+
+    public static void toggleManualCombat(ServerPlayer player) {
+        if (!isEnabled(player)) {
+            player.displayClientMessage(Component.translatable(
+                    "message." + ImmortalCultivationMod.MODID
+                            + ".manual_combat_system_disabled"), true);
+            return;
+        }
+        if (isManualCombat(player)) {
+            clear(player);
+            player.displayClientMessage(Component.translatable(
+                    "message." + ImmortalCultivationMod.MODID
+                            + ".manual_combat_disabled"), true);
+            return;
+        }
+
+        boolean wasActive = isInCombat(player);
+        player.getPersistentData().putBoolean(MANUAL_COMBAT_TAG, true);
+        float max = maxPosture(player);
+        if (!wasActive || !player.getPersistentData().contains(POSTURE_TAG)) {
+            player.getPersistentData().putFloat(POSTURE_TAG, max);
+        } else if (player.getPersistentData().getFloat(POSTURE_TAG) > max) {
+            player.getPersistentData().putFloat(POSTURE_TAG, max);
+        }
+        sync(player, true);
+        player.displayClientMessage(Component.translatable(
+                "message." + ImmortalCultivationMod.MODID
+                        + ".manual_combat_enabled"), true);
+    }
+
+    public static boolean isPostureBroken(ServerPlayer player) {
+        return isInCombat(player)
+                && player.getPersistentData().getLong(POSTURE_BROKEN_UNTIL_TAG)
+                > player.serverLevel().getGameTime();
+    }
+
+    public static void enterCombat(ServerPlayer player) {
+        if (!isEnabled(player) || !player.isAlive() || player.isSpectator()) {
+            return;
+        }
+        long gameTime = player.serverLevel().getGameTime();
+        boolean wasActive = isInCombat(player);
+        player.getPersistentData().putLong(COMBAT_UNTIL_TAG, gameTime + COMBAT_DURATION_TICKS);
+        float max = maxPosture(player);
+        if (!wasActive || !player.getPersistentData().contains(POSTURE_TAG)) {
+            player.getPersistentData().putFloat(POSTURE_TAG, max);
+        } else if (player.getPersistentData().getFloat(POSTURE_TAG) > max) {
+            player.getPersistentData().putFloat(POSTURE_TAG, max);
+        }
+        sync(player, !wasActive);
+    }
+
+    public static void recordHostileAction(LivingEntity attacker, LivingEntity target) {
+        if (attacker == target || !attacker.isAlive()) {
+            return;
+        }
+        if (attacker instanceof ServerPlayer player) {
+            enterCombat(player);
+        }
+        if (target instanceof ServerPlayer player) {
+            enterCombat(player);
+        }
+    }
+
+    public static void tick(ServerPlayer player) {
+        WhipItem.tickCombo(player);
+        if (SPELL_PREPARATIONS.containsKey(player.getUUID())
+                && isSpellPreparationBlocked(player)) {
+            interruptSpellPreparation(player);
+        }
+        if (!isEnabled(player)) {
+            clear(player, false);
+            return;
+        }
+        if (BLOCKING_PLAYERS.contains(player.getUUID())
+                && !canMaintainBlock(player)) {
+            setBlocking(player, false);
+        }
+        tickBlockingVfx(player);
+        tickPendingTeleport(player);
+        if (!isInCombat(player)) {
+            if (player.getPersistentData().contains(COMBAT_UNTIL_TAG)) {
+                player.getPersistentData().remove(COMBAT_UNTIL_TAG);
+                player.getPersistentData().remove(POSTURE_BROKEN_UNTIL_TAG);
+                player.getPersistentData().putFloat(POSTURE_TAG, maxPosture(player));
+                HEAVY_CHARGE_STARTS.remove(player.getUUID());
+                sync(player, true);
+            }
+            return;
+        }
+
+        long gameTime = player.serverLevel().getGameTime();
+        if (!isPostureBroken(player)
+                && player.getPersistentData().contains(POSTURE_BROKEN_UNTIL_TAG)) {
+            player.getPersistentData().remove(POSTURE_BROKEN_UNTIL_TAG);
+        }
+        if (!isPostureBroken(player) && gameTime % 20L == 0L) {
+            float max = maxPosture(player);
+            float current = currentPosture(player);
+            setPosture(player, Math.min(max, current + max * 0.01F));
+        }
+        if (gameTime % 5L == 0L) {
+            sync(player, false);
+        }
+    }
+
+    public static void lockMovement(ServerPlayer player) {
+        if (!isPostureBroken(player)) {
+            return;
+        }
+        player.xxa = 0.0F;
+        player.yya = 0.0F;
+        player.zza = 0.0F;
+        player.setSprinting(false);
+        Vec3 movement = player.getDeltaMovement();
+        player.setDeltaMovement(0.0D, Math.min(0.0D, movement.y), 0.0D);
+        player.hurtMarked = true;
+    }
+
+    public static float maxPosture(ServerPlayer player) {
+        ModAttachments.CultivationData data = ModAttachments.getData(player);
+        return Math.max(1.0F,
+                100.0F + data.physicalAttack() * 100.0F + player.getMaxHealth() * 0.5F);
+    }
+
+    public static float currentPosture(ServerPlayer player) {
+        float max = maxPosture(player);
+        if (!player.getPersistentData().contains(POSTURE_TAG)) {
+            player.getPersistentData().putFloat(POSTURE_TAG, max);
+            return max;
+        }
+        return Math.max(0.0F, Math.min(max, player.getPersistentData().getFloat(POSTURE_TAG)));
+    }
+
+    public static void damagePosture(ServerPlayer player, float amount) {
+        if (!isInCombat(player) || isPostureBroken(player) || amount <= 0.0F) {
+            return;
+        }
+        float remaining = Math.max(0.0F, currentPosture(player) - amount);
+        setPosture(player, remaining);
+        if (remaining <= 0.0F) {
+            player.getPersistentData().putLong(
+                    POSTURE_BROKEN_UNTIL_TAG,
+                    player.serverLevel().getGameTime() + POSTURE_BREAK_TICKS);
+            player.stopUsingItem();
+            setBlocking(player, false);
+            sync(player, true);
+        }
+    }
+
+    public static void applyPostDamage(ServerPlayer target, DamageSource source,
+                                       float damageTaken, float blockedDamage) {
+        if (damageTaken > 0.0F || blockedDamage > 0.0F) {
+            interruptSpellPreparation(target);
+            ModPayloads.ModPayloadsHandler.cancelQueuedCombo(target);
+        }
+        if (!isInCombat(target)) {
+            return;
+        }
+        float postureDamage = Math.max(0.0F, damageTaken) / 2.0F;
+        postureDamage += Math.max(0.0F, blockedDamage) / 3.0F;
+        if (source.is(DamageTypeTags.IS_EXPLOSION)) {
+            postureDamage += 30.0F;
+        }
+
+        Entity attackerEntity = source.getEntity();
+        if (attackerEntity instanceof LivingEntity attacker) {
+            long gameTime = target.serverLevel().getGameTime();
+            RecentHit previous = RECENT_HITS.get(target.getUUID());
+            if (previous != null
+                    && previous.attacker().equals(attacker.getUUID())
+                    && gameTime - previous.gameTime() <= 40L) {
+                postureDamage += 5.0F;
+            }
+            RECENT_HITS.put(target.getUUID(), new RecentHit(attacker.getUUID(), gameTime));
+            if (isBehind(target, attacker)) {
+                postureDamage += 10.0F;
+            }
+            if (isHeavyAttack(source)) {
+                postureDamage += Math.max(0.0F, damageTaken) * 0.2F;
+            }
+        }
+        damagePosture(target, postureDamage);
+    }
+
+    private static boolean isBehind(LivingEntity target, LivingEntity attacker) {
+        Vec3 facing = target.getLookAngle().multiply(1.0D, 0.0D, 1.0D).normalize();
+        Vec3 towardAttacker = attacker.position().subtract(target.position())
+                .multiply(1.0D, 0.0D, 1.0D)
+                .normalize();
+        return facing.lengthSqr() > 0.0D
+                && towardAttacker.lengthSqr() > 0.0D
+                && facing.dot(towardAttacker) < -0.35D;
+    }
+
+    public static void addBlockedPosture(ServerPlayer player, float blockedDamage) {
+        damagePosture(player, Math.max(0.0F, blockedDamage) / 3.0F);
+    }
+
+    public static boolean isHeavyAttack(DamageSource source) {
+        UUID heavyAttacker = HEAVY_ATTACKER.get();
+        return heavyAttacker != null
+                && source.getEntity() != null
+                && heavyAttacker.equals(source.getEntity().getUUID());
+    }
+
+    public static boolean isHeavyAttackInProgress(ServerPlayer player) {
+        UUID heavyAttacker = HEAVY_ATTACKER.get();
+        return heavyAttacker != null && heavyAttacker.equals(player.getUUID());
+    }
+
+    public static boolean isPreparingHeavyAttack(ServerPlayer player) {
+        return HEAVY_CHARGE_STARTS.containsKey(player.getUUID());
+    }
+
+    /** True only while server has a live preparation begun by the real prepared-cast input flow. */
+    public static boolean isPreparingSpell(ServerPlayer player) {
+        if (!SPELL_PREPARATIONS.containsKey(player.getUUID())) {
+            return false;
+        }
+        if (isSpellPreparationBlocked(player)) {
+            interruptSpellPreparation(player);
+            return false;
+        }
+        return true;
+    }
+
+    public static void beginSpellPreparation(
+            ServerPlayer player,
+            List<String> spellIds,
+            boolean sequential) {
+        List<String> normalized = normalizeSpellIds(spellIds);
+        if (normalized.stream().noneMatch(ModSpells::requiresPreparation)) {
+            cancelSpellPreparation(player);
+            return;
+        }
+        if (isSpellPreparationBlocked(player)) {
+            sendSpellPreparationInterrupt(player);
+            return;
+        }
+        cancelHeavyCharge(player);
+        setBlocking(player, false);
+        SPELL_PREPARATIONS.put(player.getUUID(), new SpellPreparation(
+                normalized,
+                sequential,
+                player.serverLevel().getGameTime()));
+    }
+
+    public static void cancelSpellPreparation(ServerPlayer player) {
+        SPELL_PREPARATIONS.remove(player.getUUID());
+    }
+
+    /** Consumes matching preparation when a prepared spell/combo reaches its real cast handler. */
+    public static boolean finishSpellPreparation(
+            ServerPlayer player,
+            List<String> spellIds,
+            boolean sequential,
+            float requestedChargeScale) {
+        List<String> normalized = normalizeSpellIds(spellIds);
+        SpellPreparation preparation = SPELL_PREPARATIONS.remove(player.getUUID());
+        if (normalized.stream().noneMatch(ModSpells::requiresPreparation)) {
+            return Float.isFinite(requestedChargeScale) && requestedChargeScale <= 1.001F;
+        }
+        if (preparation == null
+                || !preparation.spellIds().equals(normalized)
+                || preparation.sequential() != sequential
+                || isSpellPreparationBlocked(player)
+                || !Float.isFinite(requestedChargeScale)
+                || requestedChargeScale < 1.0F) {
+            return false;
+        }
+        long elapsed = Math.max(0L,
+                player.serverLevel().getGameTime() - preparation.startedAt());
+        float maximumCharge = 1.0F + Math.min(40L, elapsed + 2L) / 40.0F;
+        return requestedChargeScale <= maximumCharge + 0.001F;
+    }
+
+    public static void interruptSpellPreparation(ServerPlayer player) {
+        if (SPELL_PREPARATIONS.remove(player.getUUID()) != null) {
+            sendSpellPreparationInterrupt(player);
+        }
+    }
+
+    private static void sendSpellPreparationInterrupt(ServerPlayer player) {
+        PacketDistributor.sendToPlayer(
+                player, new ModPayloads.ClientboundInterruptSpellPreparationPayload());
+    }
+
+    private static boolean isSpellPreparationBlocked(ServerPlayer player) {
+        return isSpellcastingBlocked(player)
+                || player.hasEffect(ModEffects.QI_GATHERING);
+    }
+
+    public static boolean isSpellcastingBlocked(ServerPlayer player) {
+        return !player.isAlive()
+                || player.isSpectator()
+                || isPostureBroken(player)
+                || player.hasEffect(ModEffects.DAZE)
+                || player.hasEffect(ModEffects.DINGSHEN)
+                || player.hasEffect(ModEffects.FROZEN)
+                || player.hasEffect(ModEffects.FROZEN_QI);
+    }
+
+    private static List<String> normalizeSpellIds(List<String> spellIds) {
+        if (spellIds == null) {
+            return List.of();
+        }
+        return spellIds.stream()
+                .map(ModSpells::normalizeId)
+                .filter(id -> !id.isBlank() && ModSpells.get(id) != null)
+                .toList();
+    }
+
+    public static boolean isBlocking(ServerPlayer player) {
+        return BLOCKING_PLAYERS.contains(player.getUUID()) && canMaintainBlock(player);
+    }
+
+    /** Runs a mob's normal equipped-weapon hit inside the same heavy-attack marker used by players. */
+    public static boolean performNpcHeavyAttack(PathfinderMob attacker, Entity target) {
+        if (target == null || target == attacker || !target.isAlive()) {
+            return false;
+        }
+        HEAVY_ATTACKER.set(attacker.getUUID());
+        try {
+            return attacker.doHurtTarget(target);
+        } finally {
+            HEAVY_ATTACKER.remove();
+        }
+    }
+
+    public static void beginHeavyCharge(ServerPlayer player) {
+        if (!canPerformWeaponAttack(player)) {
+            return;
+        }
+        interruptSpellPreparation(player);
+        HEAVY_CHARGE_STARTS.put(player.getUUID(), player.serverLevel().getGameTime());
+    }
+
+    public static void cancelHeavyCharge(ServerPlayer player) {
+        HEAVY_CHARGE_STARTS.remove(player.getUUID());
+    }
+
+    public static void setBlocking(ServerPlayer player, boolean blocking) {
+        boolean nextBlocking = blocking && canMaintainBlock(player);
+        boolean changed = nextBlocking
+                ? BLOCKING_PLAYERS.add(player.getUUID())
+                : BLOCKING_PLAYERS.remove(player.getUUID());
+        if (!changed) {
+            return;
+        }
+        cancelHeavyCharge(player);
+        if (nextBlocking) {
+            interruptSpellPreparation(player);
+        }
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(
+                player,
+                new CombatPayloads.ClientboundSwordComboAnimationPayload(
+                        player.getUUID(),
+                        nextBlocking
+                                ? CombatPayloads.BLOCK_ANIMATION_START
+                                : CombatPayloads.BLOCK_ANIMATION_STOP));
+    }
+
+    public static boolean blockIncomingAttack(
+            ServerPlayer player, DamageSource source, float incomingDamage) {
+        if (incomingDamage <= 0.0F
+                || source.getEntity() == null
+                || source.getEntity() == player
+                || source.is(DamageTypeTags.BYPASSES_SHIELD)
+                || !BLOCKING_PLAYERS.contains(player.getUUID())
+                || !canMaintainBlock(player)) {
+            return false;
+        }
+        if (source.getEntity() instanceof LivingEntity attacker) {
+            recordHostileAction(attacker, player);
+        }
+        boolean heavy = isHeavyAttack(source);
+        damagePosture(player, heavy
+                ? Math.max(15.0F, incomingDamage * 0.9F)
+                : Math.max(0.0F, incomingDamage) / 3.0F);
+        ItemStack weapon = player.getMainHandItem();
+        weapon.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
+        if (weapon.isEmpty()) {
+            setBlocking(player, false);
+        }
+        emitBlockingVfx(player, true);
+        // A heavy strike that empties posture guard-breaks and is allowed through.
+        return !heavy || !isPostureBroken(player);
+    }
+
+    private static void tickBlockingVfx(ServerPlayer player) {
+        if (!BLOCKING_PLAYERS.contains(player.getUUID())
+                || player.tickCount % BLOCK_VFX_INTERVAL_TICKS != 0) {
+            return;
+        }
+        emitBlockingVfx(player, false);
+    }
+
+    private static void emitBlockingVfx(ServerPlayer player, boolean impact) {
+        Vec3 forward = player.getLookAngle().multiply(1.0D, 0.0D, 1.0D);
+        if (forward.lengthSqr() < 1.0E-5D) {
+            forward = new Vec3(0.0D, 0.0D, 1.0D);
+        } else {
+            forward = forward.normalize();
+        }
+        Vec3 right = new Vec3(-forward.z, 0.0D, forward.x);
+        Vec3 center = player.position()
+                .add(0.0D, player.getBbHeight() * 0.52D, 0.0D)
+                .add(forward.scale(0.9D));
+        var particleTypes = MethodQiParticleEffects.particlesForPlayer(player);
+        int segments = impact ? 24 : 12;
+        double horizontalRadius = impact ? 1.05D : 0.78D;
+        double verticalRadius = impact ? 1.15D : 0.88D;
+        double speed = impact ? 0.11D : 0.025D;
+
+        for (int i = 0; i < segments; i++) {
+            double angle = Math.PI * 2.0D * i / segments;
+            Vec3 radial = right.scale(Math.cos(angle) * horizontalRadius)
+                    .add(0.0D, Math.sin(angle) * verticalRadius, 0.0D);
+            Vec3 point = center.add(radial);
+            Vec3 velocity = radial.normalize().scale(speed).add(forward.scale(0.02D));
+            SimpleParticleType particle = particleTypes.get(i % particleTypes.size());
+            player.serverLevel().sendParticles(
+                    particle,
+                    point.x,
+                    point.y,
+                    point.z,
+                    0,
+                    velocity.x,
+                    velocity.y,
+                    velocity.z,
+                    1.0D);
+        }
+
+        if (impact) {
+            for (SimpleParticleType particle : particleTypes) {
+                player.serverLevel().sendParticles(
+                        particle,
+                        center.x,
+                        center.y,
+                        center.z,
+                        14,
+                        0.65D,
+                        0.75D,
+                        0.12D,
+                        0.12D);
+            }
+        }
+    }
+
+    public static void performNormalAttack(ServerPlayer player, int entityId) {
+        HEAVY_CHARGE_STARTS.remove(player.getUUID());
+        interruptSpellPreparation(player);
+        if (!canPerformWeaponAttack(player)) {
+            return;
+        }
+        if (XiujianItem.canFire(player)) {
+            if (XiujianItem.isHeld(player)) {
+                XiujianItem.fireNeedle(player, false);
+            }
+            return;
+        }
+        if (player.getMainHandItem().getItem() instanceof WhipItem) {
+            WhipItem.performNormalAttack(player);
+            broadcastSwordCombo(player);
+            player.swing(InteractionHand.MAIN_HAND, true);
+            return;
+        }
+        attackEntity(player, entityId, false);
+        broadcastSwordCombo(player);
+    }
+
+    public static void broadcastSwordCombo(ServerPlayer player) {
+        broadcastSwordCombo(player, false);
+    }
+
+    private static void broadcastSwordCombo(ServerPlayer player, boolean heavyCone) {
+        if (!isInCombat(player) || !isCombatWeapon(player.getMainHandItem())) {
+            return;
+        }
+        long gameTime = player.serverLevel().getGameTime();
+        ComboState previous = COMBO_STATES.get(player.getUUID());
+        if (previous != null
+                && gameTime - previous.lastTick() <= DUPLICATE_ATTACK_WINDOW_TICKS) {
+            return;
+        }
+        int slashIndex = previous == null || gameTime - previous.lastTick() > COMBO_RESET_TICKS
+                ? 0
+                : previous.nextSlash();
+        COMBO_STATES.put(player.getUUID(), new ComboState(
+                (slashIndex + 1) % 3, gameTime));
+        if (QiInfusedWeapon.isFistWeapon(player.getMainHandItem())) {
+            player.swing(InteractionHand.MAIN_HAND, true);
+            WeaponQiSlashEntity.release(player, slashIndex, heavyCone);
+            return;
+        }
+        if (player.getMainHandItem().getItem() instanceof FuchenItem) {
+            FuchenItem.playNormalAttackAnimation(player);
+        }
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(
+                player, new CombatPayloads.ClientboundSwordComboAnimationPayload(
+                        player.getUUID(), slashIndex));
+        WeaponQiSlashEntity.release(player, slashIndex, heavyCone);
+    }
+
+    public static void performHeavyAttack(ServerPlayer player, int entityId, long packedBlockPos) {
+        Long started = HEAVY_CHARGE_STARTS.remove(player.getUUID());
+        long gameTime = player.serverLevel().getGameTime();
+        if (started == null
+                || gameTime - started < HEAVY_CHARGE_TICKS
+                || !canPerformWeaponAttack(player)) {
+            return;
+        }
+
+        if (XiujianItem.canFire(player)) {
+            XiujianItem.fireNeedle(player, true);
+            return;
+        }
+
+        if (player.getMainHandItem().getItem() instanceof FuchenItem) {
+            if (FuchenItem.startHeavyAttack(player)) {
+                broadcastFuchenHeavySpin(player);
+                player.swing(InteractionHand.MAIN_HAND, true);
+            }
+            return;
+        }
+
+        if (player.getMainHandItem().getItem() instanceof ThrowingKnifeItem) {
+            if (ThrowingKnifeItem.throwHeavy(player)) {
+                broadcastThrowingKnifeHeavy(player);
+                player.swing(InteractionHand.MAIN_HAND, true);
+            }
+            return;
+        }
+
+        if (player.getMainHandItem().getItem() instanceof WhipItem) {
+            WhipItem.performHeavyAttack(player);
+            broadcastWhipHeavy(player);
+            player.swing(InteractionHand.MAIN_HAND, true);
+            return;
+        }
+
+        attackEntity(player, entityId, true);
+        if (QiInfusedWeapon.isFistWeapon(player.getMainHandItem())) {
+            broadcastSwordCombo(player, true);
+        } else if (QiInfusedWeapon.isSpear(player.getMainHandItem())) {
+            broadcastSpearHeavyThrust(player);
+        } else if (TieguShanItem.isClosed(player.getMainHandItem())) {
+            broadcastSwordCombo(player, true);
+        } else {
+            broadcastSwordCombo(player);
+        }
+        player.swing(InteractionHand.MAIN_HAND, true);
+    }
+
+    private static void broadcastSpearHeavyThrust(ServerPlayer player) {
+        COMBO_STATES.remove(player.getUUID());
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(
+                player, new CombatPayloads.ClientboundSwordComboAnimationPayload(
+                        player.getUUID(),
+                        CombatPayloads.SPEAR_HEAVY_THRUST_ANIMATION));
+        WeaponQiSlashEntity.release(player, 0, true);
+    }
+
+    private static void broadcastFuchenHeavySpin(ServerPlayer player) {
+        COMBO_STATES.remove(player.getUUID());
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(
+                player,
+                new CombatPayloads.ClientboundSwordComboAnimationPayload(
+                        player.getUUID(),
+                        CombatPayloads.FUCHEN_HEAVY_SPIN_ANIMATION));
+    }
+
+    private static void broadcastThrowingKnifeHeavy(ServerPlayer player) {
+        COMBO_STATES.remove(player.getUUID());
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(
+                player,
+                new CombatPayloads.ClientboundSwordComboAnimationPayload(
+                        player.getUUID(), 2));
+    }
+
+    private static void broadcastWhipHeavy(ServerPlayer player) {
+        COMBO_STATES.remove(player.getUUID());
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(
+                player,
+                new CombatPayloads.ClientboundSwordComboAnimationPayload(
+                        player.getUUID(),
+                        CombatPayloads.WHIP_HEAVY_ANIMATION));
+    }
+
+    private static boolean canPerformWeaponAttack(ServerPlayer player) {
+        return (canMaintainBlock(player) || XiujianItem.canFire(player))
+                && !BLOCKING_PLAYERS.contains(player.getUUID());
+    }
+
+    private static boolean canMaintainBlock(ServerPlayer player) {
+        return isInCombat(player)
+                && !isPostureBroken(player)
+                && isCombatWeapon(player.getMainHandItem());
+    }
+
+    private static boolean attackEntity(ServerPlayer player, int entityId, boolean heavy) {
+        if (entityId < 0) {
+            return false;
+        }
+        Entity hitTarget = player.serverLevel().getEntity(entityId);
+        double range = player.entityInteractionRange() + 1.0D;
+        if (hitTarget == null
+                || hitTarget == player
+                || !hitTarget.isAlive()
+                || player.distanceToSqr(hitTarget) > range * range
+                || !player.hasLineOfSight(hitTarget)) {
+            return false;
+        }
+        Entity target = ModelBonePartEntity.resolveParent(hitTarget);
+        if (target == player || !target.isAlive()) {
+            return false;
+        }
+        if (heavy) {
+            HEAVY_ATTACKER.set(player.getUUID());
+        }
+        try {
+            player.attack(target);
+        } finally {
+            HEAVY_ATTACKER.remove();
+        }
+        return true;
+    }
+
+    public static boolean hurtAsHeavy(
+            LivingEntity attacker,
+            Entity target,
+            DamageSource source,
+            float damage) {
+        HEAVY_ATTACKER.set(attacker.getUUID());
+        try {
+            return target.hurt(source, damage);
+        } finally {
+            HEAVY_ATTACKER.remove();
+        }
+    }
+
+    public static boolean isCombatWeapon(ItemStack stack) {
+        if (stack.isEmpty() || HeavyIronBracerItem.isDebugStack(stack)) {
+            return false;
+        }
+        return HeavyIronBracerItem.isRealStack(stack)
+                || stack.getItem() instanceof SwordItem
+                || stack.getItem() instanceof ThrowingKnifeItem;
+    }
+
+    public static boolean interceptTeleportUse(
+            ServerPlayer player, InteractionHand hand, ItemStack stack) {
+        if (!isInCombat(player)
+                || !stack.is(COMBAT_DELAYED_TELEPORT_ITEMS)
+                || PENDING_TELEPORTS.containsKey(player.getUUID())) {
+            if (isInCombat(player)
+                    && stack.is(COMBAT_DELAYED_TELEPORT_ITEMS)
+                    && PENDING_TELEPORTS.containsKey(player.getUUID())) {
+                player.displayClientMessage(Component.translatable(
+                        "message." + ImmortalCultivationMod.MODID + ".teleport_channel_active"), true);
+                return true;
+            }
+            return false;
+        }
+        Holder<Item> item = stack.getItem().builtInRegistryHolder();
+        PENDING_TELEPORTS.put(player.getUUID(), new PendingTeleport(
+                hand, item, player.serverLevel().getGameTime() + TELEPORT_CHANNEL_TICKS));
+        player.displayClientMessage(Component.translatable(
+                "message." + ImmortalCultivationMod.MODID + ".teleport_channel_started"), true);
+        return true;
+    }
+
+    private static void tickPendingTeleport(ServerPlayer player) {
+        PendingTeleport pending = PENDING_TELEPORTS.get(player.getUUID());
+        if (pending == null || player.serverLevel().getGameTime() < pending.executeAt()) {
+            return;
+        }
+        PENDING_TELEPORTS.remove(player.getUUID());
+        ItemStack stack = player.getItemInHand(pending.hand());
+        if (!stack.is(pending.item()) || !player.isAlive()) {
+            return;
+        }
+        InteractionResultHolder<ItemStack> result =
+                stack.use(player.serverLevel(), player, pending.hand());
+        if (result.getObject() != stack) {
+            player.setItemInHand(pending.hand(), result.getObject());
+        }
+    }
+
+    public static void clear(ServerPlayer player) {
+        clear(player, true);
+    }
+
+    private static void clear(ServerPlayer player, boolean clearSpellPreparation) {
+        player.getPersistentData().remove(COMBAT_UNTIL_TAG);
+        player.getPersistentData().remove(MANUAL_COMBAT_TAG);
+        player.getPersistentData().remove(POSTURE_BROKEN_UNTIL_TAG);
+        player.getPersistentData().putFloat(POSTURE_TAG, maxPosture(player));
+        RECENT_HITS.remove(player.getUUID());
+        HEAVY_CHARGE_STARTS.remove(player.getUUID());
+        PENDING_TELEPORTS.remove(player.getUUID());
+        COMBO_STATES.remove(player.getUUID());
+        if (clearSpellPreparation) {
+            interruptSpellPreparation(player);
+        }
+        FuchenItem.clear(player);
+        setBlocking(player, false);
+        sync(player, true);
+    }
+
+    public static void onLogout(ServerPlayer player) {
+        RECENT_HITS.remove(player.getUUID());
+        HEAVY_CHARGE_STARTS.remove(player.getUUID());
+        PENDING_TELEPORTS.remove(player.getUUID());
+        LAST_SYNC.remove(player.getUUID());
+        COMBO_STATES.remove(player.getUUID());
+        BLOCKING_PLAYERS.remove(player.getUUID());
+        SPELL_PREPARATIONS.remove(player.getUUID());
+        FuchenItem.clear(player);
+        WhipItem.clearAnimationState(player);
+    }
+
+    public static void sync(ServerPlayer player, boolean force) {
+        boolean active = isInCombat(player);
+        float max = maxPosture(player);
+        float posture = active ? currentPosture(player) : max;
+        boolean broken = active && isPostureBroken(player);
+        int remaining = active && !isManualCombat(player)
+                ? (int) Math.max(0L, player.getPersistentData().getLong(COMBAT_UNTIL_TAG)
+                - player.serverLevel().getGameTime())
+                : 0;
+        SyncState next = new SyncState(active, posture, max, remaining, broken);
+        if (!force && next.equals(LAST_SYNC.get(player.getUUID()))) {
+            return;
+        }
+        LAST_SYNC.put(player.getUUID(), next);
+        PacketDistributor.sendToPlayer(player, new CombatPayloads.ClientboundCombatStatePayload(
+                active, posture, max, remaining, broken));
+    }
+
+    private static void setPosture(ServerPlayer player, float posture) {
+        player.getPersistentData().putFloat(
+                POSTURE_TAG, Math.max(0.0F, Math.min(maxPosture(player), posture)));
+    }
+
+    private record RecentHit(UUID attacker, long gameTime) {
+    }
+
+    private record PendingTeleport(InteractionHand hand, Holder<Item> item, long executeAt) {
+    }
+
+    private record SpellPreparation(List<String> spellIds, boolean sequential, long startedAt) {
+        private SpellPreparation {
+            spellIds = List.copyOf(spellIds);
+        }
+    }
+
+    private record ComboState(int nextSlash, long lastTick) {
+    }
+
+    private record SyncState(
+            boolean active, float posture, float maxPosture, int remainingTicks, boolean broken) {
+    }
+}

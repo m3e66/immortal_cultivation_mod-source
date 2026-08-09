@@ -11,6 +11,8 @@ import com.example.immortal_cultivation_mod.entity.SlidingWaterProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.SmokeProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.WindBladeProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.YihenCiProjectileEntity;
+import com.example.immortal_cultivation_mod.entity.XinliaoFireballEntity;
+import com.example.immortal_cultivation_mod.entity.StarfallProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.ZhenshanPalmEntity;
 import com.example.immortal_cultivation_mod.event.ServerEvents;
 import net.minecraft.core.particles.ParticleTypes;
@@ -91,6 +93,8 @@ public final class GushiShield {
                 || direct instanceof DingshenProjectileEntity
                 || direct instanceof DuanliuKongdunProjectileEntity
                 || direct instanceof YihenCiProjectileEntity
+                || direct instanceof XinliaoFireballEntity
+                || direct instanceof StarfallProjectileEntity
                 || direct instanceof ZhenshanPalmEntity) {
             return true;
         }

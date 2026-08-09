@@ -38,6 +38,10 @@ public class ModKeyMappings {
             "key." + ImmortalCultivationMod.MODID + ".inject_qi",
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_V, KEY_CATEGORY));
 
+    public static final Lazy<KeyMapping> TOGGLE_COMBAT_MODE = Lazy.of(() -> new KeyMapping(
+            "key." + ImmortalCultivationMod.MODID + ".toggle_combat_mode",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Y, KEY_CATEGORY));
+
     public static final Lazy<KeyMapping> TARGET_LOCK = Lazy.of(() -> new KeyMapping(
             "key." + ImmortalCultivationMod.MODID + ".target_lock",
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, KEY_CATEGORY));
@@ -46,9 +50,21 @@ public class ModKeyMappings {
             "key." + ImmortalCultivationMod.MODID + ".release_weapon",
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_X, KEY_CATEGORY));
 
+    public static final Lazy<KeyMapping> SWORD_CASE = Lazy.of(() -> new KeyMapping(
+            "key." + ImmortalCultivationMod.MODID + ".sword_case",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Z, KEY_CATEGORY));
+
     public static final Lazy<KeyMapping> CAST_PREPARED_SPELL = Lazy.of(() -> new KeyMapping(
             "key." + ImmortalCultivationMod.MODID + ".cast_prepared_spell",
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_R, KEY_CATEGORY));
+
+    public static final Lazy<KeyMapping> DEBUG_EYE = Lazy.of(() -> new KeyMapping(
+            "key." + ImmortalCultivationMod.MODID + ".debug_eye",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_F8, KEY_CATEGORY));
+
+    public static final Lazy<KeyMapping> OPEN_SETTINGS = Lazy.of(() -> new KeyMapping(
+            "key." + ImmortalCultivationMod.MODID + ".open_settings",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_PERIOD, KEY_CATEGORY));
 
     @SubscribeEvent
     public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
@@ -58,8 +74,12 @@ public class ModKeyMappings {
         event.register(MEDITATE.get());
         event.register(OPEN_COMBO_MENU.get());
         event.register(INJECT_QI.get());
+        event.register(TOGGLE_COMBAT_MODE.get());
         event.register(TARGET_LOCK.get());
         event.register(RELEASE_WEAPON.get());
+        event.register(SWORD_CASE.get());
         event.register(CAST_PREPARED_SPELL.get());
+        event.register(DEBUG_EYE.get());
+        event.register(OPEN_SETTINGS.get());
     }
 }

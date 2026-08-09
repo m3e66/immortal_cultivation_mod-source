@@ -23,6 +23,7 @@ public final class ClientSpellCombos {
 
     private static final LinkedHashMap<String, SpellCombo> COMBOS = new LinkedHashMap<>();
     private static boolean loaded = false;
+    private static String loadedStorageKey = "";
 
     private ClientSpellCombos() {
     }
@@ -116,17 +117,31 @@ public final class ClientSpellCombos {
     }
 
     private static void ensureLoaded() {
-        if (loaded) {
+        String storageKey = ClientWorldSpellStorage.storageKey();
+        if (loaded && storageKey.equals(loadedStorageKey)) {
             return;
         }
         synchronized (COMBOS) {
-            if (loaded) {
+            if (loaded && storageKey.equals(loadedStorageKey)) {
                 return;
             }
+            COMBOS.clear();
+            loadedStorageKey = storageKey;
             Path path = comboPath();
-            if (Files.exists(path)) {
+            Path sourcePath = path;
+            boolean migrateLegacy = false;
+            if (!Files.exists(sourcePath)) {
+                Path legacyPath = Minecraft.getInstance().gameDirectory.toPath()
+                        .resolve("config")
+                        .resolve(ImmortalCultivationMod.MODID + "_spell_combos.txt");
+                if (Files.exists(legacyPath)) {
+                    sourcePath = legacyPath;
+                    migrateLegacy = true;
+                }
+            }
+            if (Files.exists(sourcePath)) {
                 try {
-                    for (String line : Files.readAllLines(path, StandardCharsets.UTF_8)) {
+                    for (String line : Files.readAllLines(sourcePath, StandardCharsets.UTF_8)) {
                         SpellCombo combo = parseLine(line);
                         if (combo != null) {
                             COMBOS.put(combo.id(), combo);
@@ -137,6 +152,9 @@ public final class ClientSpellCombos {
                 }
             }
             loaded = true;
+            if (migrateLegacy) {
+                saveAll();
+            }
         }
     }
 
@@ -179,9 +197,7 @@ public final class ClientSpellCombos {
     }
 
     private static Path comboPath() {
-        return Minecraft.getInstance().gameDirectory.toPath()
-                .resolve("config")
-                .resolve(ImmortalCultivationMod.MODID + "_spell_combos.txt");
+        return ClientWorldSpellStorage.directory().resolve("spell_combos.txt");
     }
 
     public enum CastMode {

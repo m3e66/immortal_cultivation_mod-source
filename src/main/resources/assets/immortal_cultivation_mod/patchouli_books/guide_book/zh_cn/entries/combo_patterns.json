@@ -1,0 +1,82 @@
+{
+  "name": "组合阵图",
+  "icon": "immortal_cultivation_mod:magic_circle_block",
+  "category": "immortal_cultivation_mod:magic_circles",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "以空白阵法中枢为中心摆出5x5阵图，再用仪式匕首击中中枢。$(br2)A=攻击阵纹，D=防御阵纹，R=恢复阵纹，C=中枢，X=空位。阵图允许旋转，所有未标记位置必须为空。成阵后需要灵石供能。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "护域阵心",
+      "text": "DXDXD$(br)XDRDX$(br)DXCXD$(br)XDRDX$(br)DXDXD$(br2)始终阻挡雷电。也会阻挡无主、生物拥有和黑名单玩家拥有的投射物与远程攻击实体；同时阻挡黑名单玩家、他们的其他攻击，以及已启用类别的生物。非黑名单玩家及其拥有的非雷电攻击可自由穿过。阵外爆炸无法摧毁阵内方块。边界扩大时会将附近受阻实体向外推行。物品和经验可穿过。下/中/上品灵石分别承受10/100/1000伤害；储备耗尽时阵心爆炸。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "迷尘 / 逆脉",
+      "text": "$(bold)迷尘$()$(br)RXXXR$(br)XDADX$(br)RXCXR$(br)XDADX$(br)RXXXR$(br2)$(bold)逆脉$()$(br)AXRXA$(br)XXDXX$(br)RXCXR$(br)XXDXX$(br)AXRXA"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "炽阳焚灵阵心",
+      "text": "AXXXA$(br)XAXAX$(br)RXCXR$(br)XAXAX$(br)AXXXA$(br2)每秒灼伤敌人并抽取1%最大灵气，解除冰冻，削弱治疗，强化火系术法并提高冰系术法消耗。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "回春聚灵阵心",
+      "text": "RXRXR$(br)XXDXX$(br)RXCXR$(br)XXDXX$(br)RXRXR$(br2)给予生命恢复II，每秒恢复1%最大灵气，提高自然回气，缩短燃烧，并清除轻微中毒与虚弱。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "玄冰封脉阵心",
+      "text": "DXRXD$(br)XDXDX$(br)AXCXA$(br)XRXRX$(br)DXRXD$(br2)减速、灭火、冻结并施加冰封灵气。灵气恢复减半，术法消耗提高；火系术法可削减冰封时间。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "血煞蚀元阵心",
+      "text": "AXRXA$(br)XAXAX$(br)RXCXR$(br)XAXAX$(br)AXRXA$(br2)施加凋零与虚弱，削弱治疗并提高治疗术消耗。尸修与血魔功修士受到的负面效果较弱。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "五雷引劫阵心",
+      "text": "AXDXA$(br)XRXRX$(br)AXCXA$(br)XXDXX$(br)AXXXA$(br2)每3秒轰击灵气最高的敌对目标，造成20点法术伤害加1%最大生命。潮湿或冻结目标承受更多伤害，且不会点燃方块。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "灵识巡天阵心",
+      "text": "DXAXD$(br)XRXRX$(br)AXCXA$(br)XXDXX$(br)AXXXD$(br2)显露入侵者和敌对生物；每次进入仅示警一次并显示姓名、境界；标记魂体，给予许可者灵视，并在近距离识破易容。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "淬锋重铸阵",
+      "text": "RXXXR$(br)XDXDX$(br)RXCXR$(br)XDXDX$(br)RXXXR$(br2)将可损坏的武器放入额外武器槽。阵法启用且燃料充足时，武器悬浮于阵心上方，并每秒恢复1点耐久。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "挪移传送阵心",
+      "text": "XAXAX$(br)DXRXD$(br)XRCRX$(br)DXRXD$(br)XAXAX$(br2)连接两个永久传送中枢。此阵法没有被动燃料消耗，只在传送完成时消耗传送燃料。仅当阵法启用、内部有燃料，且半径内有存活的非旁观玩家时，阵纹才会发光。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "连接传送中枢",
+      "text": "手持空阵盘右击第一个传送中枢，再手持已记录的阵盘右击第二个中枢；两次连接操作都会照常打开所点击的中枢界面。记录包含维度、坐标、所有者和唯一中枢ID。连接默认为双向；之后所有者可在界面选择双向，或指定任意一端作为单向传送起点。一个阵盘只能收纳一个阵法中枢。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "临时传送端点",
+      "text": "收纳了传送中枢的阵盘可同时维持两个临时传送中枢。在非传送中枢位置普通右击即可依次召出；第二个端点会自动与第一个建立双向连接，且各自拥有独立倒计时。实体进入任一端点范围便会自动传送。灵气与中枢能量由阵盘主人支付，并从其物品栏灵石中抽取燃料；多余灵石能量会保留在源端点直至其消失。抵达实体必须先离开范围，才能再次触发该端点。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "启动传送",
+      "text": "所有者或控制白名单中的玩家须站在阵法半径内，空手潜行右击中枢。半径内所有实体会在5秒后传送；离开半径或受到伤害会立即取消蓄力并停用组合阵法。$(br2)消耗：启动者每传送一个实体消耗100灵气，并按每格距离、每个实体消耗10点中枢能量。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "传送阵旗",
+      "text": "每面聚灵旗使传送的中枢能量燃料降低25%，且不计入普通阵旗的×1.5消耗倍率。$(br2)每面疾阵旗缩短2秒蓄力，最低0.5秒，但使中枢能量燃料提高30%。其他阵旗仍保留普通的×1.5燃料倍率，灵气消耗不变。"
+    }
+  ]
+}

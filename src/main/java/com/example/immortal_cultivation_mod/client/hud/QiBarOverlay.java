@@ -9,8 +9,12 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+
+import java.util.Locale;
 
 public class QiBarOverlay implements LayeredDraw.Layer {
     public static final ResourceLocation HUD_ID =
@@ -29,6 +33,9 @@ public class QiBarOverlay implements LayeredDraw.Layer {
         if (mc.player == null || mc.options.hideGui) return;
         var data = ClientData.cultivationData;
         if (data == null) return;
+
+        renderPostureBar(g, mc);
+        renderHeavyAttackCharge(g, mc);
 
         var levelDef = CultivationLevels.getLevelDef(data.cultivationLevel());
         int maxQi = levelDef.maxQi() + data.maxQiBonus();
@@ -72,21 +79,105 @@ public class QiBarOverlay implements LayeredDraw.Layer {
 
         renderPreparedSpell(g, mc);
         renderPreparedCharge(g, mc);
+        renderSwordCaseCharge(g, mc);
         renderShieldBar(g, mc);
     }
 
-    private void renderPreparedSpell(GuiGraphics g, Minecraft mc) {
-        Component spellName = ClientData.preparedSpellName();
-        if (spellName.getString().isEmpty()) {
+    private void renderPostureBar(GuiGraphics g, Minecraft mc) {
+        if (!ClientData.combatActive() || ClientData.maxPosture() <= 0.0F) {
             return;
         }
-        Component text = Component.translatable("hud." + ImmortalCultivationMod.MODID + ".prepared_spell", spellName);
+        int barWidth = 81;
+        int barHeight = 6;
+        Component selectedSpell = preparedSpellText();
+        int selectedWidth = selectedSpell.getString().isEmpty()
+                ? barWidth
+                : mc.font.width(selectedSpell);
+        int selectedX = preparedSpellX(g, selectedWidth);
+        int x = Mth.clamp(
+                selectedX + (selectedWidth - barWidth) / 2,
+                8,
+                Math.max(8, g.guiWidth() - barWidth - 8));
+        int y = g.guiHeight() - 45;
+        float ratio = Math.max(0.0F,
+                Math.min(1.0F, ClientData.posture() / ClientData.maxPosture()));
+        int fillWidth = Math.max(0, Math.round(barWidth * ratio));
+
+        RenderSystem.setShaderColor(0.12F, 0.10F, 0.08F, 0.88F);
+        g.blit(FILL, x, y, 0, 0, barWidth, barHeight, 1, 1);
+        if (fillWidth > 0) {
+            if (ClientData.postureBroken()) {
+                RenderSystem.setShaderColor(0.75F, 0.08F, 0.06F, 1.0F);
+            } else {
+                RenderSystem.setShaderColor(0.95F, 0.58F, 0.12F, 1.0F);
+            }
+            g.blit(FILL, x, y, 0, 0, fillWidth, barHeight, 1, 1);
+        }
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
+        Component text = ClientData.postureBroken()
+                ? Component.translatable("hud." + ImmortalCultivationMod.MODID + ".posture_broken")
+                : Component.translatable(
+                        "hud." + ImmortalCultivationMod.MODID + ".posture",
+                        Math.round(ClientData.posture()),
+                        Math.round(ClientData.maxPosture()));
+        g.drawString(mc.font, text, x, y - 10,
+                ClientData.postureBroken() ? 0xFFFF5555 : 0xFFFFC45B, true);
+    }
+
+    private void renderHeavyAttackCharge(GuiGraphics g, Minecraft mc) {
+        float progress = ClientData.heavyAttackChargeProgress();
+        if (progress <= 0.0F) {
+            return;
+        }
+        int barWidth = 102;
+        int barHeight = 6;
+        int x = g.guiWidth() / 2 - barWidth / 2;
+        int y = g.guiHeight() - 67;
+        int fill = Math.max(1, Math.round(barWidth * progress));
+        Component label = Component.translatable(
+                "hud." + ImmortalCultivationMod.MODID + ".heavy_attack",
+                Math.round(progress * 100.0F));
+        g.fill(x - 5, y - 13, x + barWidth + 5, y + barHeight + 4, 0x99000000);
+        g.fill(x, y, x + barWidth, y + barHeight, 0xFF241B16);
+        g.fill(x, y, x + fill, y + barHeight, 0xFFD85432);
+        g.drawString(mc.font, label,
+                x + barWidth / 2 - mc.font.width(label) / 2,
+                y - 11, 0xFFFFC7A8, true);
+    }
+
+    private void renderPreparedSpell(GuiGraphics g, Minecraft mc) {
+        Component text = preparedSpellText();
+        if (text.getString().isEmpty()) {
+            return;
+        }
         int textWidth = mc.font.width(text);
-        int x = g.guiWidth() / 2 + 112;
-        x = Math.min(x, g.guiWidth() - textWidth - 8);
+        int x = preparedSpellX(g, textWidth);
         int y = g.guiHeight() - 27;
         g.fill(x - 5, y - 3, x + textWidth + 5, y + 10, 0x99000000);
         g.drawString(mc.font, text, x, y, 0xFFAAEEFF, true);
+    }
+
+    private Component preparedSpellText() {
+        Component spellName = ClientData.preparedSpellName();
+        if (spellName.getString().isEmpty()) {
+            return Component.empty();
+        }
+        Component text = Component.translatable(
+                "hud." + ImmortalCultivationMod.MODID + ".prepared_spell", spellName);
+        int cooldownTicks = ClientData.preparedSpellCooldownTicks();
+        if (cooldownTicks > 0) {
+            String seconds = cooldownTicks % 20 == 0
+                    ? Integer.toString(cooldownTicks / 20)
+                    : String.format(Locale.ROOT, "%.1f", cooldownTicks / 20.0F);
+            text = text.copy().append(
+                    Component.literal("  " + seconds + "s").withStyle(ChatFormatting.RED));
+        }
+        return text;
+    }
+
+    private int preparedSpellX(GuiGraphics g, int textWidth) {
+        return Math.min(g.guiWidth() / 2 + 112, g.guiWidth() - textWidth - 8);
     }
 
     private void renderPreparedCharge(GuiGraphics g, Minecraft mc) {
@@ -103,6 +194,26 @@ public class QiBarOverlay implements LayeredDraw.Layer {
             g.fill(x, barY, x + fill, barY + barHeight, 0xFF44CCFF);
             g.drawString(mc.font, percent, x + barWidth / 2 - mc.font.width(percent) / 2, barY - 10, 0xFFAAEEFF, true);
         }
+    }
+
+    private void renderSwordCaseCharge(GuiGraphics g, Minecraft mc) {
+        float progress = ClientData.swordCaseChargeProgress();
+        if (progress <= 0.0F) {
+            return;
+        }
+        int barWidth = 120;
+        int barHeight = 7;
+        int x = g.guiWidth() / 2 - barWidth / 2;
+        int y = g.guiHeight() - 82;
+        int fill = Math.max(1, Math.round(barWidth * progress));
+        Component label = Component.translatable(
+                "hud." + ImmortalCultivationMod.MODID + ".sword_case_charge",
+                Math.round(progress * 100.0F));
+        g.fill(x - 5, y - 13, x + barWidth + 5, y + barHeight + 4, 0x99000000);
+        g.fill(x, y, x + barWidth, y + barHeight, 0xFF2A2518);
+        g.fill(x, y, x + fill, y + barHeight, 0xFFE8C45B);
+        g.drawString(mc.font, label, x + barWidth / 2 - mc.font.width(label) / 2,
+                y - 11, 0xFFFFE8A0, true);
     }
 
     private void renderShieldBar(GuiGraphics g, Minecraft mc) {

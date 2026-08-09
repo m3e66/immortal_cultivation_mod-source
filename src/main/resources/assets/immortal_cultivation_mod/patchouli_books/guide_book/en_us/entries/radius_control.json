@@ -1,0 +1,15 @@
+{
+    "name": "Radius & Bleeding",
+    "icon": "immortal_cultivation_mod:magic_center_block",
+    "category": "immortal_cultivation_mod:magic_center",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "When placing a Magic Center, choose any odd radius from 3 through 101. The center's - and + controls also change the radius by 2.$(br2)Placement applies Bleeding for a number of seconds equal to the chosen radius."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "The radius determines two things:$(br2)$(li)The area in which magic circles are detected and powered$(li)The base fuel consumption rate (larger radius = more fuel per minute)$(br2)Magic circles must be within the center's radius horizontally and within +/- 3 blocks vertically to be counted."
+        }
+    ]
+}

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "combo_type=fog": {
+      "model": "immortal_cultivation_mod:block/combo_block_fog"
+    },
+    "combo_type=inverted": {
+      "model": "immortal_cultivation_mod:block/combo_block_inverted"
+    },
+    "combo_type=forcefield": {
+      "model": "immortal_cultivation_mod:block/combo_block_forcefield"
+    }
+  }
+}

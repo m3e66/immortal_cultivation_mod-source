@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod.spell;
 
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
+import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.attribute.ModAttributes;
 import com.example.immortal_cultivation_mod.block.ModBlocks;
@@ -73,6 +74,10 @@ public final class UndeadControl {
     public static final String TAG_STUCK_TICKS = "icmPathStuckTicks";
     public static final String TAG_MODE = "icmUndeadMode";
     public static final String TAG_FENGYAN_SEALED = "icmFengyanSeal";
+    public static final String TAG_NPC_SUMMON_OWNER = "icmNpcSummonOwner";
+    public static final String TAG_NPC_SUMMON_LEVEL = "icmNpcSummonLevel";
+    public static final String TAG_NPC_SUMMON_RELEASED = "icmNpcSummonReleased";
+    private static final String TAG_CORPSE_INHERITED_MAX_HEALTH = "icmCorpseInheritedMaxHealth";
     public static final String MODE_NORMAL = "normal";
     public static final String MODE_ATTACK_HOSTILE = "attack_hostile";
     public static final String MODE_DEFENSIVE = "defensive";
@@ -98,6 +103,10 @@ public final class UndeadControl {
 
     public static void tick(LivingEntity entity) {
         if (!isUndeadServantType(entity)) {
+            return;
+        }
+        if (entity.getPersistentData().getBoolean(TAG_NPC_SUMMON_RELEASED) && !isOwned(entity)) {
+            freeze(entity);
             return;
         }
         syncGrudgeAttributeIntoData(entity);
@@ -246,6 +255,48 @@ public final class UndeadControl {
         return true;
     }
 
+    public static void initializeNpcSummon(Zombie zombie, LivingEntity summoner,
+                                           String cultivationLevel, LivingEntity target) {
+        CompoundTag tag = zombie.getPersistentData();
+        long startingGrudge = grudgeForCultivationLevel(cultivationLevel);
+        tag.putBoolean(TAG_GRUDGE_ROLLED, true);
+        tag.putBoolean(TAG_HAS_GRUDGE, true);
+        tag.putLong(TAG_GRUDGE, startingGrudge);
+        tag.putLong(TAG_TICKS, startingGrudge * TICKS_PER_GRUDGE);
+        tag.putDouble(TAG_GRUDGE_PROGRESS, startingGrudge * (double) TICKS_PER_GRUDGE);
+        tag.putString(TAG_NPC_SUMMON_LEVEL, cultivationLevel);
+        tag.remove(TAG_NPC_SUMMON_RELEASED);
+        setOwner(zombie, summoner.getUUID());
+        tag.putUUID(TAG_NPC_SUMMON_OWNER, summoner.getUUID());
+        setBase(zombie, ModAttributes.GRUDGE, startingGrudge);
+        applyRank(zombie);
+        zombie.setHealth(zombie.getMaxHealth());
+        zombie.setPersistenceRequired();
+        applyAttackCommand(zombie, target);
+    }
+
+    public static void releaseNpcSummons(ServerLevel level, UUID summonerId) {
+        for (Entity entity : level.getAllEntities()) {
+            if (entity instanceof LivingEntity living
+                    && living.getPersistentData().hasUUID(TAG_NPC_SUMMON_OWNER)
+                    && living.getPersistentData().getUUID(TAG_NPC_SUMMON_OWNER).equals(summonerId)) {
+                releaseNpcSummon(living);
+            }
+        }
+    }
+
+    public static void releaseNpcSummon(LivingEntity entity) {
+        CompoundTag tag = entity.getPersistentData();
+        tag.remove(TAG_OWNER);
+        tag.remove(TAG_NPC_SUMMON_OWNER);
+        tag.putBoolean(TAG_NPC_SUMMON_RELEASED, true);
+        tag.putBoolean(TAG_HAS_COMMAND, false);
+        clearCombatState(entity);
+        if (entity instanceof Mob mob) {
+            mob.setNoAi(true);
+        }
+    }
+
     public static boolean isOwnedByPlayer(LivingEntity entity, Player player) {
         return isOwnedBy(entity, player);
     }
@@ -277,6 +328,10 @@ public final class UndeadControl {
     }
 
     public static String levelFor(LivingEntity entity) {
+        String summonedLevel = entity.getPersistentData().getString(TAG_NPC_SUMMON_LEVEL);
+        if (!summonedLevel.isBlank() && CultivationLevels.getRealmIndex(summonedLevel) > 0) {
+            return summonedLevel;
+        }
         if (grudge(entity) < RANKS.getFirst().threshold()) {
             return CultivationLevels.REALM_MORTAL;
         }
@@ -558,8 +613,18 @@ public final class UndeadControl {
                 && entity.getPersistentData().getUUID(TAG_OWNER).equals(owner);
     }
 
+    public static boolean stopAttackAgainstOwner(LivingEntity servant, LivingEntity possibleOwner) {
+        if (!isOwnedByOwnerUuid(servant, possibleOwner.getUUID())) {
+            return false;
+        }
+        clearCombatState(servant);
+        return true;
+    }
+
     private static void setOwner(LivingEntity entity, UUID owner) {
         entity.getPersistentData().putUUID(TAG_OWNER, owner);
+        entity.getPersistentData().remove(TAG_NPC_SUMMON_OWNER);
+        entity.getPersistentData().remove(TAG_NPC_SUMMON_RELEASED);
         entity.getPersistentData().putBoolean(TAG_SEALED, false);
         if (!entity.getPersistentData().contains(TAG_MODE)) {
             entity.getPersistentData().putString(TAG_MODE, MODE_NORMAL);
@@ -594,17 +659,41 @@ public final class UndeadControl {
             return;
         }
         Rank rank = rankFor(grudge(entity));
-        var level = CultivationLevels.getLevelDef(rank.level());
-        setBase(entity, Attributes.MAX_HEALTH, level.maxHp());
-        setBase(entity, Attributes.ARMOR, Math.max(0.0D, CultivationLevels.getRealmIndex(rank.level()) * 4.0D));
+        String summonedLevel = entity.getPersistentData().getString(TAG_NPC_SUMMON_LEVEL);
+        String statLevel = !summonedLevel.isBlank() && CultivationLevels.getRealmIndex(summonedLevel) > 0
+                ? summonedLevel
+                : rank.level();
+        var level = CultivationLevels.getLevelDef(statLevel);
+        if (entity instanceof CultivatorCorpseEntity) {
+            setBase(entity, Attributes.MAX_HEALTH, corpseStackedMaxHealth(entity, rank));
+        } else {
+            setBase(entity, Attributes.MAX_HEALTH, level.maxHp());
+        }
+        setBase(entity, Attributes.ARMOR, Math.max(0.0D, CultivationLevels.getRealmIndex(statLevel) * 4.0D));
         setBase(entity, Attributes.ATTACK_DAMAGE, rank.damage());
-        setBase(entity, Attributes.MOVEMENT_SPEED, Math.min(0.38D, 0.20D + CultivationLevels.getRealmIndex(rank.level()) * 0.02D));
+        setBase(entity, Attributes.MOVEMENT_SPEED, Math.min(0.38D, 0.20D + CultivationLevels.getRealmIndex(statLevel) * 0.02D));
         setBase(entity, Attributes.FOLLOW_RANGE, 48.0D);
         if (entity.getHealth() > entity.getMaxHealth()) {
             entity.setHealth(entity.getMaxHealth());
         }
         entity.setCustomName(Component.literal(rank.name()));
         entity.setCustomNameVisible(true);
+    }
+
+    private static double corpseStackedMaxHealth(LivingEntity corpse, Rank currentRank) {
+        CompoundTag tag = corpse.getPersistentData();
+        AttributeInstance maxHealth = corpse.getAttribute(Attributes.MAX_HEALTH);
+        double currentBase = maxHealth == null ? Math.max(1.0D, corpse.getMaxHealth()) : maxHealth.getBaseValue();
+        if (!tag.contains(TAG_CORPSE_INHERITED_MAX_HEALTH)) {
+            tag.putDouble(TAG_CORPSE_INHERITED_MAX_HEALTH, Math.max(1.0D, currentBase));
+        }
+
+        double stacked = tag.getDouble(TAG_CORPSE_INHERITED_MAX_HEALTH);
+        int currentRankIndex = RANKS.indexOf(currentRank);
+        for (int i = 0; i <= currentRankIndex; i++) {
+            stacked += CultivationLevels.getLevelDef(RANKS.get(i).level()).maxHp();
+        }
+        return stacked;
     }
 
     private static void tickRankPowers(LivingEntity entity) {
@@ -810,13 +899,14 @@ public final class UndeadControl {
             return 1.0D;
         }
         int yinQi = YinQiField.sample(serverLevel, entity.blockPosition());
-        if (yinQi > 0) {
-            return yinQi;
+        double base = yinQi > 0 ? yinQi : yinQi < 0 ? 1.0D / Math.abs(yinQi) : 1.0D;
+        if (entity.tickCount % 20 == 0 && !serverLevel.getPlayers(player ->
+                player.distanceToSqr(entity) <= 25.0D
+                        && CultivationMethods.isJiuyouLianshiJue(
+                        ModAttachments.getData(player).activeCultivationMethod())).isEmpty()) {
+            return base * 21.0D;
         }
-        if (yinQi < 0) {
-            return 1.0D / Math.abs(yinQi);
-        }
-        return 1.0D;
+        return base;
     }
 
     private static boolean isSealHelmet(ItemStack stack) {
@@ -899,6 +989,26 @@ public final class UndeadControl {
             }
         }
         return current;
+    }
+
+    private static long grudgeForCultivationLevel(String cultivationLevel) {
+        int realm = CultivationLevels.getRealmIndex(cultivationLevel);
+        if (realm >= 9) {
+            return 7_812_500L;
+        }
+        if (realm >= 8) {
+            return 1_562_500L;
+        }
+        if (realm >= 5) {
+            return 312_500L;
+        }
+        return switch (realm) {
+            case 4 -> 62_500L;
+            case 3 -> 12_500L;
+            case 2 -> 2_500L;
+            case 1 -> cultivationLevel.endsWith(CultivationLevels.STAGE_EARLY) ? 100L : 500L;
+            default -> 100L;
+        };
     }
 
     private static long thresholdFor(String rankName) {

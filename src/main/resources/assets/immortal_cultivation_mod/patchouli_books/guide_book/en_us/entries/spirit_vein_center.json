@@ -1,0 +1,20 @@
+{
+    "name": "Spirit Vein Center",
+    "icon": "immortal_cultivation_mod:spirit_vein_center",
+    "category": "immortal_cultivation_mod:spirit_resources",
+    "pages": [
+        {
+            "type": "patchouli:spotlight",
+            "item": "immortal_cultivation_mod:spirit_vein_center",
+            "text": "Deep within Spirit Ore veins, you may find an $(item)Spirit Vein Center - an invisible block that automatically produces Spirit Stones over time."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "Each vein has a small chance (1 in 50 chance) of spawning a Spirit Vein Center instead of regular Spirit Ore.$(br2)The center produces 1 Spirit Stone every minute. Each spawn has a 10% chance to be Medium Grade and a 1% chance to be High Grade."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "Because the Spirit Vein Center is invisible, you may not notice it at first. Listen for the item drop sound or check with the Spirit Map to locate all vein centers in the area."
+        }
+    ]
+}

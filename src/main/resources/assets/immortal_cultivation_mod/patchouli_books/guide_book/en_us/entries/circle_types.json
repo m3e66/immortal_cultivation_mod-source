@@ -1,0 +1,19 @@
+{
+    "name": "Circle Types",
+    "icon": "immortal_cultivation_mod:magic_circle_block",
+    "category": "immortal_cultivation_mod:magic_circles",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "There are three types of magic circles, each granting a different effect to entities standing on them. Multiple circles of the same type within a Magic Center's radius will stack their effects."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(bold)Attack$() Red$() - Grants $(thing)Strength I$(). Each additional Attack circle increases the amplifier by one level.$(br2)$(bold)Defense$() Blue$() - Grants $(thing)Resistance I$(). Extra Defense circles increase the resistance level."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(bold)Regeneration$() Green$() - Grants $(thing)Regeneration I$(). More Regeneration circles increase the regeneration amplifier.$(br2)The effects are applied passively every tick as long as the Magic Center has fuel."
+        }
+    ]
+}

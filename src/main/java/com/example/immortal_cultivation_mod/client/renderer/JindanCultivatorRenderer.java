@@ -1,23 +1,29 @@
 package com.example.immortal_cultivation_mod.client.renderer;
 
-import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.client.model.JindanCultivatorModel;
 import com.example.immortal_cultivation_mod.entity.JindanCultivatorEntity;
+import com.example.immortal_cultivation_mod.entity.NpcProfile;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
+import net.minecraft.client.renderer.entity.layers.ItemInHandLayer;
 import net.minecraft.resources.ResourceLocation;
 
 public class JindanCultivatorRenderer extends HumanoidMobRenderer<JindanCultivatorEntity, JindanCultivatorModel> {
-    private static final ResourceLocation TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/entity/jindan1.png");
-
     public JindanCultivatorRenderer(EntityRendererProvider.Context context) {
         super(context, new JindanCultivatorModel(context.bakeLayer(ModelLayers.PLAYER_SLIM)), 0.5F);
+        addLayer(new HumanoidArmorLayer<>(
+                this,
+                new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_INNER_ARMOR)),
+                new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_OUTER_ARMOR)),
+                context.getModelManager()));
+        addLayer(new ItemInHandLayer<>(this, context.getItemInHandRenderer()));
     }
 
     @Override
     public ResourceLocation getTextureLocation(JindanCultivatorEntity entity) {
-        return TEXTURE;
+        return NpcProfile.skinTexture(entity, NpcProfile.JINDAN);
     }
 }

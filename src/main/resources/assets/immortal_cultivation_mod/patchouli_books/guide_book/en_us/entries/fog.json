@@ -1,0 +1,16 @@
+{
+    "name": "Fog",
+    "icon": "minecraft:glass",
+    "category": "immortal_cultivation_mod:effects",
+    "pages": [
+        {
+            "type": "patchouli:spotlight",
+            "item": "minecraft:glass",
+            "text": "$(thing)Fog$() is a harmful status effect that creates a dense white fog around the afflicted player, heavily reducing visibility to a range of only 5 blocks."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "While under the Fog effect, the world around you is transformed extending off endlessly and you must find the invisible magic center to escape."
+        }
+    ]
+}

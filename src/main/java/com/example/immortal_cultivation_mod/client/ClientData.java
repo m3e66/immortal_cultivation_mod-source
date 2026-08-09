@@ -20,20 +20,86 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClientData {
     public static final int MAX_WHEEL_SPELLS = 8;
     public static ModAttachments.CultivationData cultivationData = ModAttachments.CultivationData.createDefault();
+    public static String playerIdentity = "wandering_cultivator";
+    public static String jindanQuality = "liedan";
     private static final Set<UUID> MEDITATING_PLAYERS = ConcurrentHashMap.newKeySet();
     private static final ConcurrentHashMap<UUID, Integer> CASTING_PLAYERS = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, Integer> SPELL_COOLDOWNS = new ConcurrentHashMap<>();
     private static final LinkedHashSet<String> SELECTED_WHEEL_SPELLS = new LinkedHashSet<>();
     private static boolean wheelSelectionLoaded = false;
     private static boolean wheelSelectionFileExists = false;
+    private static String wheelSelectionStorageKey = "";
     private static float shieldAmount = 0.0F;
     private static float shieldMax = 0.0F;
     private static boolean yuqiControlAllMode = false;
     private static boolean yinYangCompassQiMode = false;
+    private static boolean autoChannelWeaponQi = false;
+    private static boolean outwardQiRelease = false;
+    private static boolean outwardQiBlockBreaking = true;
+    private static boolean jindanCreativeFlight = false;
+    private static boolean jindanFlightControlActive = false;
+    private static boolean combatStateEnabled = true;
+    private static boolean chinesePoemDescriptions = false;
+    private static boolean formationPlateQiFirst = false;
     private static boolean clientTogglesLoaded = false;
     private static String preparedSpellId = "";
+    private static String preparedSpellStorageKey = "";
+    private static String legacyPreparedSpellId = "";
     private static float preparedChargeScale = 1.0F;
     private static boolean preparedCharging = false;
+    private static boolean debugEyeEnabled = false;
+    private static float swordCaseChargeProgress = 0.0F;
+    private static int restrictionHints = 0;
+    private static boolean combatActive = false;
+    private static float posture = 0.0F;
+    private static float maxPosture = 0.0F;
+    private static int combatRemainingTicks = 0;
+    private static boolean postureBroken = false;
+    private static float heavyAttackChargeProgress = 0.0F;
+    private static String outerSystemType = "";
+    private static boolean outerSystemEquipped = false;
+
+    public static void updateOuterSystem(String type, boolean equipped) {
+        outerSystemType = type == null ? "" : type;
+        outerSystemEquipped = equipped;
+    }
+
+    public static String outerSystemType() {
+        return outerSystemType;
+    }
+
+    public static boolean outerSystemEquipped() {
+        return outerSystemEquipped;
+    }
+
+    public static boolean debugEyeEnabled() {
+        return debugEyeEnabled;
+    }
+
+    public static int restrictionHints() {
+        return restrictionHints;
+    }
+
+    public static void setRestrictionHints(int hints) {
+        restrictionHints = Math.max(0, hints);
+    }
+
+    public static void updateSwordCaseCharge(int ticks, int maxTicks) {
+        swordCaseChargeProgress = maxTicks <= 0 ? 0.0F
+                : Math.max(0.0F, Math.min(1.0F, ticks / (float) maxTicks));
+    }
+
+    public static void resetSwordCaseCharge() {
+        swordCaseChargeProgress = 0.0F;
+    }
+
+    public static float swordCaseChargeProgress() {
+        return swordCaseChargeProgress;
+    }
+
+    public static void setDebugEyeEnabled(boolean enabled) {
+        debugEyeEnabled = enabled;
+    }
 
     public static void updateMeditationState(UUID playerId, boolean meditating) {
         if (meditating) {
@@ -61,6 +127,56 @@ public class ClientData {
         CASTING_PLAYERS.entrySet().removeIf(entry -> entry.getValue() <= 0);
         SPELL_COOLDOWNS.replaceAll((id, ticks) -> ticks - 1);
         SPELL_COOLDOWNS.entrySet().removeIf(entry -> entry.getValue() <= 0);
+        if (combatRemainingTicks > 0) {
+            combatRemainingTicks--;
+        }
+    }
+
+    public static void updateCombatState(
+            boolean active, float currentPosture, float maximumPosture,
+            int remainingTicks, boolean broken) {
+        combatActive = active;
+        posture = Math.max(0.0F, currentPosture);
+        maxPosture = Math.max(0.0F, maximumPosture);
+        combatRemainingTicks = Math.max(0, remainingTicks);
+        postureBroken = broken;
+        if (!active) {
+            resetHeavyAttackCharge();
+        }
+    }
+
+    public static boolean combatActive() {
+        return combatActive;
+    }
+
+    public static float posture() {
+        return posture;
+    }
+
+    public static float maxPosture() {
+        return maxPosture;
+    }
+
+    public static int combatRemainingTicks() {
+        return combatRemainingTicks;
+    }
+
+    public static boolean postureBroken() {
+        return postureBroken;
+    }
+
+    public static void updateHeavyAttackCharge(int ticks, int maximumTicks) {
+        heavyAttackChargeProgress = maximumTicks <= 0
+                ? 0.0F
+                : Math.max(0.0F, Math.min(1.0F, ticks / (float) maximumTicks));
+    }
+
+    public static void resetHeavyAttackCharge() {
+        heavyAttackChargeProgress = 0.0F;
+    }
+
+    public static float heavyAttackChargeProgress() {
+        return heavyAttackChargeProgress;
     }
 
     public static void startSpellCooldown(String spellId, int ticks) {
@@ -77,7 +193,7 @@ public class ClientData {
     }
 
     public static String preparedSpellId() {
-        ensureClientTogglesLoaded();
+        ensurePreparedSpellLoaded();
         if (preparedSpellId == null || preparedSpellId.isBlank() || !isValidWheelId(preparedSpellId)) {
             return "";
         }
@@ -85,10 +201,10 @@ public class ClientData {
     }
 
     public static void setPreparedSpellId(String spellId) {
-        ensureClientTogglesLoaded();
+        ensurePreparedSpellLoaded();
         String normalized = normalizeWheelId(spellId);
         preparedSpellId = isValidWheelId(normalized) ? normalized : "";
-        saveClientToggles();
+        savePreparedSpell();
     }
 
     public static Component preparedSpellName() {
@@ -102,6 +218,22 @@ public class ClientData {
         }
         ModSpells.SpellDef spell = ModSpells.get(spellId);
         return spell == null ? Component.empty() : spell.name();
+    }
+
+    public static int preparedSpellCooldownTicks() {
+        String spellId = preparedSpellId();
+        if (spellId.startsWith(ClientSpellCombos.CAST_PREFIX)) {
+            ClientSpellCombos.SpellCombo combo =
+                    ClientSpellCombos.get(spellId.substring(ClientSpellCombos.CAST_PREFIX.length()));
+            if (combo == null) {
+                return 0;
+            }
+            return combo.spellIds().stream()
+                    .mapToInt(ClientData::spellCooldownTicks)
+                    .max()
+                    .orElse(0);
+        }
+        return spellCooldownTicks(spellId);
     }
 
     public static void updatePreparedCharge(float chargeScale, boolean charging) {
@@ -168,6 +300,91 @@ public class ClientData {
     public static void setYinYangCompassQiMode(boolean qiMode) {
         ensureClientTogglesLoaded();
         yinYangCompassQiMode = qiMode;
+        saveClientToggles();
+    }
+
+    public static boolean autoChannelWeaponQi() {
+        ensureClientTogglesLoaded();
+        return autoChannelWeaponQi;
+    }
+
+    public static void setAutoChannelWeaponQi(boolean enabled) {
+        ensureClientTogglesLoaded();
+        autoChannelWeaponQi = enabled;
+        saveClientToggles();
+    }
+
+    public static boolean outwardQiRelease() {
+        ensureClientTogglesLoaded();
+        return outwardQiRelease;
+    }
+
+    public static void setOutwardQiRelease(boolean enabled) {
+        ensureClientTogglesLoaded();
+        outwardQiRelease = enabled;
+        saveClientToggles();
+    }
+
+    public static boolean outwardQiBlockBreaking() {
+        ensureClientTogglesLoaded();
+        return outwardQiBlockBreaking;
+    }
+
+    public static void setOutwardQiBlockBreaking(boolean enabled) {
+        ensureClientTogglesLoaded();
+        outwardQiBlockBreaking = enabled;
+        saveClientToggles();
+    }
+
+    public static boolean jindanCreativeFlight() {
+        ensureClientTogglesLoaded();
+        return jindanCreativeFlight;
+    }
+
+    public static void setJindanCreativeFlight(boolean enabled) {
+        ensureClientTogglesLoaded();
+        jindanCreativeFlight = enabled;
+        saveClientToggles();
+    }
+
+    public static boolean jindanFlightControlActive() {
+        return jindanFlightControlActive;
+    }
+
+    public static void setJindanFlightControlActive(boolean active) {
+        jindanFlightControlActive = active;
+    }
+
+    public static boolean combatStateEnabled() {
+        ensureClientTogglesLoaded();
+        return combatStateEnabled;
+    }
+
+    public static void setCombatStateEnabled(boolean enabled) {
+        ensureClientTogglesLoaded();
+        combatStateEnabled = enabled;
+        saveClientToggles();
+    }
+
+    public static boolean chinesePoemDescriptions() {
+        ensureClientTogglesLoaded();
+        return chinesePoemDescriptions;
+    }
+
+    public static void setChinesePoemDescriptions(boolean enabled) {
+        ensureClientTogglesLoaded();
+        chinesePoemDescriptions = enabled;
+        saveClientToggles();
+    }
+
+    public static boolean formationPlateQiFirst() {
+        ensureClientTogglesLoaded();
+        return formationPlateQiFirst;
+    }
+
+    public static void setFormationPlateQiFirst(boolean qiFirst) {
+        ensureClientTogglesLoaded();
+        formationPlateQiFirst = qiFirst;
         saveClientToggles();
     }
 
@@ -287,18 +504,32 @@ public class ClientData {
     }
 
     private static void ensureWheelSelectionLoaded() {
-        if (wheelSelectionLoaded) {
+        String storageKey = ClientWorldSpellStorage.storageKey();
+        if (wheelSelectionLoaded && storageKey.equals(wheelSelectionStorageKey)) {
             return;
         }
         synchronized (SELECTED_WHEEL_SPELLS) {
-            if (wheelSelectionLoaded) {
+            if (wheelSelectionLoaded && storageKey.equals(wheelSelectionStorageKey)) {
                 return;
             }
+            SELECTED_WHEEL_SPELLS.clear();
+            wheelSelectionStorageKey = storageKey;
             Path path = wheelSelectionPath();
-            wheelSelectionFileExists = Files.exists(path);
+            Path sourcePath = path;
+            boolean migrateLegacy = false;
+            if (!Files.exists(sourcePath)) {
+                Path legacyPath = Minecraft.getInstance().gameDirectory.toPath()
+                        .resolve("config")
+                        .resolve(ImmortalCultivationMod.MODID + "_spell_wheel.txt");
+                if (Files.exists(legacyPath)) {
+                    sourcePath = legacyPath;
+                    migrateLegacy = true;
+                }
+            }
+            wheelSelectionFileExists = Files.exists(sourcePath);
             if (wheelSelectionFileExists) {
                 try {
-                    for (String line : Files.readAllLines(path, StandardCharsets.UTF_8)) {
+                    for (String line : Files.readAllLines(sourcePath, StandardCharsets.UTF_8)) {
                         String normalized = normalizeWheelId(line.trim());
                         if (!normalized.isEmpty() && isValidWheelId(normalized) && SELECTED_WHEEL_SPELLS.size() < MAX_WHEEL_SPELLS) {
                             SELECTED_WHEEL_SPELLS.add(normalized);
@@ -309,6 +540,9 @@ public class ClientData {
                 }
             }
             wheelSelectionLoaded = true;
+            if (migrateLegacy) {
+                saveWheelSelection();
+            }
         }
     }
 
@@ -323,9 +557,41 @@ public class ClientData {
     }
 
     private static Path wheelSelectionPath() {
-        return Minecraft.getInstance().gameDirectory.toPath()
-                .resolve("config")
-                .resolve(ImmortalCultivationMod.MODID + "_spell_wheel.txt");
+        return ClientWorldSpellStorage.directory().resolve("spell_wheel.txt");
+    }
+
+    private static void ensurePreparedSpellLoaded() {
+        ensureClientTogglesLoaded();
+        String storageKey = ClientWorldSpellStorage.storageKey();
+        if (storageKey.equals(preparedSpellStorageKey)) {
+            return;
+        }
+        preparedSpellStorageKey = storageKey;
+        preparedSpellId = "";
+        Path path = ClientWorldSpellStorage.directory().resolve("prepared_spell.txt");
+        if (!Files.exists(path)) {
+            String legacy = normalizeWheelId(legacyPreparedSpellId);
+            if (isValidWheelId(legacy)) {
+                preparedSpellId = legacy;
+                savePreparedSpell();
+            }
+            return;
+        }
+        try {
+            String saved = normalizeWheelId(Files.readString(path, StandardCharsets.UTF_8).trim());
+            preparedSpellId = isValidWheelId(saved) ? saved : "";
+        } catch (IOException ignored) {
+            preparedSpellId = "";
+        }
+    }
+
+    private static void savePreparedSpell() {
+        Path path = ClientWorldSpellStorage.directory().resolve("prepared_spell.txt");
+        try {
+            Files.createDirectories(path.getParent());
+            Files.writeString(path, preparedSpellId == null ? "" : preparedSpellId, StandardCharsets.UTF_8);
+        } catch (IOException ignored) {
+        }
     }
 
     private static void ensureClientTogglesLoaded() {
@@ -339,8 +605,20 @@ public class ClientData {
                 properties.load(reader);
                 yuqiControlAllMode = Boolean.parseBoolean(properties.getProperty("yuqiControlAllMode", "false"));
                 yinYangCompassQiMode = Boolean.parseBoolean(properties.getProperty("yinYangCompassQiMode", "false"));
-                String savedPreparedSpell = normalizeWheelId(properties.getProperty("preparedSpellId", ""));
-                preparedSpellId = isValidWheelId(savedPreparedSpell) ? savedPreparedSpell : "";
+                autoChannelWeaponQi = Boolean.parseBoolean(properties.getProperty("autoChannelWeaponQi", "false"));
+                outwardQiRelease = Boolean.parseBoolean(
+                        properties.getProperty("outwardQiRelease", "false"));
+                outwardQiBlockBreaking = Boolean.parseBoolean(
+                        properties.getProperty("outwardQiBlockBreaking", "true"));
+                jindanCreativeFlight = Boolean.parseBoolean(
+                        properties.getProperty("jindanCreativeFlight", "false"));
+                combatStateEnabled = Boolean.parseBoolean(
+                        properties.getProperty("combatStateEnabled", "true"));
+                chinesePoemDescriptions = Boolean.parseBoolean(
+                        properties.getProperty("chinesePoemDescriptions", "false"));
+                formationPlateQiFirst = Boolean.parseBoolean(
+                        properties.getProperty("formationPlateQiFirst", "false"));
+                legacyPreparedSpellId = properties.getProperty("preparedSpellId", "");
             } catch (IOException ignored) {
             }
         }
@@ -352,7 +630,13 @@ public class ClientData {
         Properties properties = new Properties();
         properties.setProperty("yuqiControlAllMode", Boolean.toString(yuqiControlAllMode));
         properties.setProperty("yinYangCompassQiMode", Boolean.toString(yinYangCompassQiMode));
-        properties.setProperty("preparedSpellId", preparedSpellId == null ? "" : preparedSpellId);
+        properties.setProperty("autoChannelWeaponQi", Boolean.toString(autoChannelWeaponQi));
+        properties.setProperty("outwardQiRelease", Boolean.toString(outwardQiRelease));
+        properties.setProperty("outwardQiBlockBreaking", Boolean.toString(outwardQiBlockBreaking));
+        properties.setProperty("jindanCreativeFlight", Boolean.toString(jindanCreativeFlight));
+        properties.setProperty("combatStateEnabled", Boolean.toString(combatStateEnabled));
+        properties.setProperty("chinesePoemDescriptions", Boolean.toString(chinesePoemDescriptions));
+        properties.setProperty("formationPlateQiFirst", Boolean.toString(formationPlateQiFirst));
         try {
             Files.createDirectories(path.getParent());
             try (var writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {

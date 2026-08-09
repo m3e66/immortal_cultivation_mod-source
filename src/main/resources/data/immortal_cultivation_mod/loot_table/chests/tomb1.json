@@ -10,7 +10,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "magic_ritual_mod:spirit_stone",
+          "name": "immortal_cultivation_mod:spirit_stone",
           "weight": 80,
           "functions": [
             {

@@ -11,6 +11,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -18,13 +19,43 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.WeakHashMap;
 
 public final class Fengya {
+    private static final int MAX_BLOCK_BREAKS_PER_LEVEL_TICK = 96;
+    private static final int MAX_BLOCK_CHECKS_PER_LEVEL_TICK = 512;
+    private static final int MAX_CHECKS_PER_ATTACK_TURN = 64;
+    private static final int CLOUD_PARTICLE_STRIDE = 8;
+    private static final int MAX_CLOUD_PACKETS_PER_LEVEL_TICK = 12;
+    private static final Map<ServerLevel, Deque<PendingConeBreak>> PENDING_BREAKS =
+            new WeakHashMap<>();
+
     private record ConeShape(int depth, double outerRadius) {
     }
 
     private record ConeCandidate(BlockPos pos, double distanceForward, double distanceFromCenter) {
+    }
+
+    private static final class PendingConeBreak {
+        private final UUID ownerId;
+        private final List<ConeCandidate> candidates;
+        private final int limit;
+        private int nextIndex;
+        private int destroyed;
+
+        private PendingConeBreak(UUID ownerId, List<ConeCandidate> candidates, int limit) {
+            this.ownerId = ownerId;
+            this.candidates = candidates;
+            this.limit = limit;
+        }
+
+        private boolean complete() {
+            return destroyed >= limit || nextIndex >= candidates.size();
+        }
     }
 
     private Fengya() {
@@ -67,7 +98,6 @@ public final class Fengya {
         }
         forward = forward.normalize();
 
-        int destroyed = 0;
         ConeShape shape = coneShape(limit);
         Vec3 end = origin.add(forward.scale(shape.depth()));
         double searchRadius = shape.outerRadius() + 1.0D;
@@ -81,17 +111,27 @@ public final class Fengya {
                 Math.max(origin.z, end.z) + searchRadius);
 
         List<ConeCandidate> candidates = new ArrayList<>();
+        double originX = origin.x;
+        double originY = origin.y;
+        double originZ = origin.z;
+        double forwardX = forward.x;
+        double forwardY = forward.y;
+        double forwardZ = forward.z;
         for (BlockPos pos : BlockPos.betweenClosed(min, max)) {
-            Vec3 blockCenter = Vec3.atCenterOf(pos);
-            Vec3 fromOrigin = blockCenter.subtract(origin);
-            double distanceForward = fromOrigin.dot(forward);
+            double offsetX = pos.getX() + 0.5D - originX;
+            double offsetY = pos.getY() + 0.5D - originY;
+            double offsetZ = pos.getZ() + 0.5D - originZ;
+            double distanceForward = offsetX * forwardX
+                    + offsetY * forwardY
+                    + offsetZ * forwardZ;
             if (distanceForward < 0.65D || distanceForward > shape.depth()) {
                 continue;
             }
 
-            Vec3 centerLine = origin.add(forward.scale(distanceForward));
             double radiusHere = 0.35D + (shape.outerRadius() - 0.35D) * (distanceForward / shape.depth());
-            double distanceFromCenter = blockCenter.distanceToSqr(centerLine);
+            double distanceFromCenter = Math.max(0.0D,
+                    offsetX * offsetX + offsetY * offsetY + offsetZ * offsetZ
+                            - distanceForward * distanceForward);
             if (distanceFromCenter > radiusHere * radiusHere) {
                 continue;
             }
@@ -102,22 +142,7 @@ public final class Fengya {
                 .comparingDouble(ConeCandidate::distanceForward)
                 .thenComparingDouble(ConeCandidate::distanceFromCenter));
 
-        for (ConeCandidate candidate : candidates) {
-            if (destroyed >= limit) {
-                break;
-            }
-            BlockPos pos = candidate.pos();
-            var state = level.getBlockState(pos);
-            if (state.isAir() || state.getDestroySpeed(level, pos) < 0.0F) {
-                continue;
-            }
-            if (level.destroyBlock(pos, false, player)) {
-                destroyed++;
-                level.sendParticles(ParticleTypes.CLOUD,
-                        pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
-                        5, 0.22D, 0.22D, 0.22D, 0.05D);
-            }
-        }
+        queueBlockBreaking(level, player, candidates, limit);
 
         for (int step = 1; step <= shape.depth(); step++) {
             Vec3 center = origin.add(forward.scale(step));
@@ -127,10 +152,97 @@ public final class Fengya {
 
         Vec3 burst = origin.add(forward.scale(2.0D));
         level.sendParticles(ParticleTypes.CLOUD, burst.x, burst.y, burst.z, 35, 0.7D, 0.45D, 0.7D, 0.18D);
-        if (destroyed <= 0) {
-            player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".fengya_no_blocks"));
-        }
         return true;
+    }
+
+    /**
+     * Processes large wind cones over several ticks so block updates, lighting,
+     * and particle packets cannot stall one server tick.
+     */
+    public static void tick(ServerLevel level) {
+        Deque<PendingConeBreak> pending = PENDING_BREAKS.get(level);
+        if (pending == null || pending.isEmpty()) {
+            return;
+        }
+
+        int blockBreaks = 0;
+        int blockChecks = 0;
+        int cloudPackets = 0;
+        while (!pending.isEmpty()
+                && blockBreaks < MAX_BLOCK_BREAKS_PER_LEVEL_TICK
+                && blockChecks < MAX_BLOCK_CHECKS_PER_LEVEL_TICK) {
+            PendingConeBreak attack = pending.removeFirst();
+            ServerPlayer owner = level.getServer().getPlayerList().getPlayer(attack.ownerId);
+            if (owner == null) {
+                continue;
+            }
+
+            int turnChecks = 0;
+            while (!attack.complete()
+                    && blockBreaks < MAX_BLOCK_BREAKS_PER_LEVEL_TICK
+                    && blockChecks < MAX_BLOCK_CHECKS_PER_LEVEL_TICK
+                    && turnChecks < MAX_CHECKS_PER_ATTACK_TURN) {
+                ConeCandidate candidate = attack.candidates.get(attack.nextIndex++);
+                BlockPos pos = candidate.pos();
+                blockChecks++;
+                turnChecks++;
+                if (!level.hasChunkAt(pos)) {
+                    continue;
+                }
+                var state = level.getBlockState(pos);
+                if (state.isAir() || state.getDestroySpeed(level, pos) < 0.0F) {
+                    continue;
+                }
+                if (!level.destroyBlock(pos, false, owner)) {
+                    continue;
+                }
+
+                attack.destroyed++;
+                blockBreaks++;
+                if (cloudPackets < MAX_CLOUD_PACKETS_PER_LEVEL_TICK
+                        && (attack.destroyed - 1) % CLOUD_PARTICLE_STRIDE == 0) {
+                    level.sendParticles(
+                            ParticleTypes.CLOUD,
+                            pos.getX() + 0.5D,
+                            pos.getY() + 0.5D,
+                            pos.getZ() + 0.5D,
+                            2,
+                            0.22D,
+                            0.22D,
+                            0.22D,
+                            0.05D);
+                    cloudPackets++;
+                }
+            }
+
+            if (attack.complete()) {
+                if (attack.destroyed <= 0) {
+                    owner.sendSystemMessage(Component.translatable(
+                            "message." + ImmortalCultivationMod.MODID + ".fengya_no_blocks"));
+                }
+            } else {
+                pending.addLast(attack);
+            }
+        }
+
+        if (pending.isEmpty()) {
+            PENDING_BREAKS.remove(level);
+        }
+    }
+
+    private static void queueBlockBreaking(
+            ServerLevel level,
+            ServerPlayer player,
+            List<ConeCandidate> candidates,
+            int limit) {
+        if (candidates.isEmpty()) {
+            player.sendSystemMessage(Component.translatable(
+                    "message." + ImmortalCultivationMod.MODID + ".fengya_no_blocks"));
+            return;
+        }
+        PENDING_BREAKS
+                .computeIfAbsent(level, ignored -> new java.util.ArrayDeque<>())
+                .addLast(new PendingConeBreak(player.getUUID(), candidates, limit));
     }
 
     private static ConeShape coneShape(int limit) {
@@ -146,6 +258,8 @@ public final class Fengya {
         Vec3 end = origin.add(forward.scale(shape.depth()));
         double searchRadius = shape.outerRadius() + 1.0D;
         AABB box = new AABB(origin, end).inflate(searchRadius);
+        DamageSource damageSource = new DamageSource(
+                player.damageSources().magic().typeHolder(), player, player, origin);
         for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, box, entity -> entity != player && entity.isAlive())) {
             Vec3 targetCenter = target.position().add(0.0D, target.getBbHeight() * 0.5D, 0.0D);
             Vec3 fromOrigin = targetCenter.subtract(origin);
@@ -160,7 +274,7 @@ public final class Fengya {
                 continue;
             }
 
-            target.hurt(player.damageSources().magic(), damage);
+            target.hurt(damageSource, damage);
             level.sendParticles(ParticleTypes.CLOUD,
                     target.getX(), target.getY() + target.getBbHeight() * 0.5D, target.getZ(),
                     12, 0.35D, 0.35D, 0.35D, 0.08D);

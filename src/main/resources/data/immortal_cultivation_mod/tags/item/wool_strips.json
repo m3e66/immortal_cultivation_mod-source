@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+    "immortal_cultivation_mod:white_wool_strip",
+    "immortal_cultivation_mod:orange_wool_strip",
+    "immortal_cultivation_mod:magenta_wool_strip",
+    "immortal_cultivation_mod:light_blue_wool_strip",
+    "immortal_cultivation_mod:yellow_wool_strip",
+    "immortal_cultivation_mod:lime_wool_strip",
+    "immortal_cultivation_mod:pink_wool_strip",
+    "immortal_cultivation_mod:gray_wool_strip",
+    "immortal_cultivation_mod:light_gray_wool_strip",
+    "immortal_cultivation_mod:cyan_wool_strip",
+    "immortal_cultivation_mod:purple_wool_strip",
+    "immortal_cultivation_mod:blue_wool_strip",
+    "immortal_cultivation_mod:brown_wool_strip",
+    "immortal_cultivation_mod:green_wool_strip",
+    "immortal_cultivation_mod:red_wool_strip",
+    "immortal_cultivation_mod:black_wool_strip"
+  ]
+}

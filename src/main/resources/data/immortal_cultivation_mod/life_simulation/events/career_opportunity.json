@@ -1,0 +1,28 @@
+{
+  "id": "immortal_cultivation_mod:career_opportunity",
+  "minimum_age": 16,
+  "maximum_age": 70,
+  "weight": 13,
+  "conditions": ["alive", "occupation:laborer", "!flag:career_chosen"],
+  "text_key": "life.immortal_cultivation_mod.event.career_opportunity",
+  "choices": [
+    {
+      "id": "herbalist",
+      "text_key": "life.immortal_cultivation_mod.choice.become_herbalist",
+      "result_key": "life.immortal_cultivation_mod.result.become_herbalist",
+      "effects": ["occupation:herbalist", "medical+8", "set_flag:career_chosen"]
+    },
+    {
+      "id": "merchant",
+      "text_key": "life.immortal_cultivation_mod.choice.become_merchant",
+      "result_key": "life.immortal_cultivation_mod.result.become_merchant",
+      "effects": ["occupation:merchant", "wealth+180", "charisma+4", "set_flag:career_chosen"]
+    },
+    {
+      "id": "smith",
+      "text_key": "life.immortal_cultivation_mod.choice.become_smith",
+      "result_key": "life.immortal_cultivation_mod.result.become_smith",
+      "effects": ["occupation:smith", "health+4", "combat+3", "set_flag:career_chosen"]
+    }
+  ]
+}
