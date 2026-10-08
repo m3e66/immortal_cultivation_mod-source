@@ -1,18 +1,19 @@
 package com.example.immortal_cultivation_mod.spell;
 
 import com.example.immortal_cultivation_mod.entity.StarfallProjectileEntity;
+import com.example.immortal_cultivation_mod.entity.SpellTriggerProjectileEntity;
+import java.util.function.Consumer;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
 public final class SuiguiXingyun {
-    private static final double AIM_RANGE = 96.0D;
     private static final double IMPACT_SPREAD = 18.0D;
     private static final DustParticleOptions GOLD_DUST =
             new DustParticleOptions(new Vector3f(1.0F, 0.72F, 0.12F), 1.35F);
@@ -23,11 +24,42 @@ public final class SuiguiXingyun {
     }
 
     public static boolean cast(ServerPlayer caster, float chargeScale) {
-        HitResult hit = caster.pick(AIM_RANGE, 0.0F, false);
-        Vec3 target = hit.getType() == HitResult.Type.MISS
-                ? caster.getEyePosition().add(caster.getLookAngle().scale(48.0D))
-                : hit.getLocation();
-        return castAt(caster, target, chargeScale);
+        return cast(caster, null, chargeScale, ignored -> { });
+    }
+
+    public static boolean cast(
+            ServerPlayer caster,
+            float chargeScale,
+            Consumer<Entity> projectileHook) {
+        return cast(caster, null, chargeScale, projectileHook);
+    }
+
+    public static boolean cast(
+            LivingEntity caster,
+            LivingEntity target,
+            float chargeScale,
+            Consumer<Entity> projectileHook) {
+        if (!(caster.level() instanceof ServerLevel level)) {
+            return false;
+        }
+        Vec3 start = caster.getEyePosition().add(caster.getLookAngle().scale(0.65D));
+        Vec3 aim = target == null
+                ? caster.getLookAngle()
+                : target.getBoundingBox().getCenter().subtract(start);
+        SpellTriggerProjectileEntity trigger = new SpellTriggerProjectileEntity(
+                level, caster, ModSpells.SUIGUI_XINGYUN, chargeScale);
+        trigger.setPos(start.x, start.y, start.z);
+        trigger.shoot(aim.x, aim.y, aim.z, 2.2F, 0.0F);
+        projectileHook.accept(trigger);
+        return level.addFreshEntity(trigger);
+    }
+
+    public static boolean activateTriggeredSpell(
+            ServerLevel level,
+            LivingEntity caster,
+            Vec3 impact,
+            float chargeScale) {
+        return castAt(caster, impact, chargeScale);
     }
 
     public static boolean castAt(LivingEntity caster, Vec3 target, float chargeScale) {

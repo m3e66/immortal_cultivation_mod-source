@@ -1,4 +1,10 @@
 {
   "replace": false,
-  "values": []
+  "values": [
+    "immortal_cultivation_mod:cultivation_hairpin",
+    "immortal_cultivation_mod:hair_ribbon",
+    "immortal_cultivation_mod:hair_crown",
+    "immortal_cultivation_mod:jade_hair_ornament",
+    "immortal_cultivation_mod:decorative_hair_beads"
+  ]
 }

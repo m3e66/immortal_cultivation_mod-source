@@ -19,6 +19,10 @@ import java.util.function.Consumer;
 public class GeoRockBlockItem extends BlockItem implements GeoItem {
     private static final RawAnimation QINGTONG_DING_IDLE =
             RawAnimation.begin().thenLoop("idle");
+    private static final RawAnimation CU_TIE_DING_IDLE =
+            RawAnimation.begin().thenLoop("idle");
+    private static final RawAnimation RESTRICTION_TABLE_IDLE =
+            RawAnimation.begin().thenLoop("animation.restriction_table.idle");
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public GeoRockBlockItem(Block block, Properties properties) {
@@ -51,9 +55,19 @@ public class GeoRockBlockItem extends BlockItem implements GeoItem {
                 this,
                 "qingtong_ding_item",
                 0,
-                state -> "qingtong_yinhuo_ding".equals(modelName())
-                        ? state.setAndContinue(QINGTONG_DING_IDLE)
-                        : PlayState.STOP));
+                state -> {
+                    String model = modelName();
+                    if ("qingtong_yinhuo_ding".equals(model) || "chi_jin_sanyang_ding".equals(model)) {
+                        return state.setAndContinue(QINGTONG_DING_IDLE);
+                    }
+                    if ("cu_tie_xiaoding".equals(model)) {
+                        return state.setAndContinue(CU_TIE_DING_IDLE);
+                    }
+                    if ("restriction_table".equals(model)) {
+                        return state.setAndContinue(RESTRICTION_TABLE_IDLE);
+                    }
+                    return PlayState.STOP;
+                }));
     }
 
     @Override

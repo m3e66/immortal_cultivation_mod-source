@@ -23,9 +23,11 @@ import net.minecraft.world.item.component.CustomData;
 import java.util.Locale;
 
 public final class QiInfusedWeapon {
+    public static final double QI_PER_BONUS_DAMAGE = 20.0D;
     private static final int AUTO_CHANNEL_INTERVAL_TICKS = 5;
     private static final String TAG_QI = ImmortalCultivationMod.MODID + ".weapon_qi";
     private static final String AUTO_CHANNEL_TAG = "ImmortalCultivationAutoChannelWeaponQi";
+    private static final String OUTWARD_QI_AUTO_FIT_TAG = "ImmortalCultivationOutwardQiAutoFit";
     private static final String OUTWARD_QI_TAG = "ImmortalCultivationOutwardQiRelease";
     private static final String OUTWARD_QI_BLOCK_BREAKING_TAG =
             "ImmortalCultivationOutwardQiBlockBreaking";
@@ -93,7 +95,20 @@ public final class QiInfusedWeapon {
                 || data.getBoolean(OUTWARD_QI_BLOCK_BREAKING_TAG);
     }
 
+    public static void setOutwardQiAutoFit(ServerPlayer player, boolean enabled) {
+        player.getPersistentData().putBoolean(OUTWARD_QI_AUTO_FIT_TAG, enabled);
+    }
+
+    public static boolean outwardQiAutoFitEnabled(ServerPlayer player) {
+        var data = player.getPersistentData();
+        return !data.contains(OUTWARD_QI_AUTO_FIT_TAG) || data.getBoolean(OUTWARD_QI_AUTO_FIT_TAG);
+    }
+
     public static void copyPersistentData(Player original, Player copy) {
+        if (original.getPersistentData().contains(OUTWARD_QI_AUTO_FIT_TAG)) {
+            copy.getPersistentData().putBoolean(OUTWARD_QI_AUTO_FIT_TAG,
+                    original.getPersistentData().getBoolean(OUTWARD_QI_AUTO_FIT_TAG));
+        }
         if (original.getPersistentData().getBoolean(AUTO_CHANNEL_TAG)) {
             copy.getPersistentData().putBoolean(AUTO_CHANNEL_TAG, true);
         }
@@ -121,7 +136,8 @@ public final class QiInfusedWeapon {
         boolean isFan = stack.getItem() instanceof TieguShanItem;
         double currentQi = getQi(stack);
         double limit = storageLimit(stack);
-        double room = isFan ? TieguShanItem.remainingQiStorage(stack) : limit - currentQi;
+        double room = isFan ? TieguShanItem.remainingQiStorage(stack)
+                : limit - currentQi;
         if (room <= 0.001D) {
             return;
         }
@@ -189,6 +205,7 @@ public final class QiInfusedWeapon {
         int durabilityLoss = Math.max(1, (int) Math.ceil((qi - threshold) / 10.0D));
         int nextDamage = stack.getDamageValue() + durabilityLoss;
         if (nextDamage >= stack.getMaxDamage()) {
+            WeaponShardSystem.dropBroken(stack.copyWithCount(1),player.serverLevel(),player);
             stack.shrink(1);
             stack.setDamageValue(0);
             player.displayClientMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".qi_overflow_broke"), true);
@@ -264,7 +281,7 @@ public final class QiInfusedWeapon {
     }
 
     public static boolean isFistWeapon(ItemStack stack) {
-        return HeavyIronBracerItem.isRealStack(stack);
+        return HeavyIronBracerItem.isRealStack(stack) || stack.getItem() instanceof com.example.immortal_cultivation_mod.pagoda.GoldenGourdItem;
     }
 
     public static boolean supportsOutwardQi(ItemStack stack) {
@@ -295,13 +312,15 @@ public final class QiInfusedWeapon {
         }
         return ForgingSystem.adjustInjectedQiDamage(
                 stack,
-                (float) (qi / 10.0D));
+                (float) (qi / QI_PER_BONUS_DAMAGE));
     }
 
     public static void consumeInjectedQiDamage(
             ItemStack stack,
             float injectedQiDamage) {
-        consumeQi(stack, Math.max(0.0F, injectedQiDamage));
+        // Preserve the existing 10% charge drain independently of the damage conversion.
+        // Forging's Qi-efficiency modifiers continue to affect both bonus and payment.
+        consumeQi(stack, Math.max(0.0F, injectedQiDamage) * QI_PER_BONUS_DAMAGE * 0.1D);
     }
 
     public static void consumeQi(ItemStack stack, double amount) {
@@ -311,11 +330,15 @@ public final class QiInfusedWeapon {
         setQi(stack, Math.max(0.0D, getQi(stack) - amount));
     }
 
+    /** Appended by ItemTooltipEvent, after vanilla attributes and advanced item information. */
+    public static void appendStoredQiTooltips(ItemStack stack, java.util.List<Component> lines) {
+        if (getQi(stack) > 0.0D) {
+            lines.add(tooltip(stack));
+        }
+    }
+
     public static Component tooltip(ItemStack stack) {
         double qi = getQi(stack);
-        if (qi <= 0.0D) {
-            return Component.empty();
-        }
         double damage = injectedQiDamage(stack);
         return Component.translatable(
                 "tooltip." + ImmortalCultivationMod.MODID + ".weapon_qi",
@@ -338,6 +361,6 @@ public final class QiInfusedWeapon {
         if (Math.abs(value - Math.rint(value)) < 0.001D) {
             return String.valueOf((long) Math.rint(value));
         }
-        return String.format(Locale.ROOT, "%.1f", value);
+        return String.format(Locale.ROOT, "%.2f", value).replaceAll("0+$", "").replaceAll("\\.$", "");
     }
 }

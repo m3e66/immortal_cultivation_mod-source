@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "W W",
+    "WTW",
+    "WAW"
+  ],
+  "key": {
+    "W": {
+      "item": "immortal_cultivation_mod:white_wool_strip"
+    },
+    "T": {
+      "item": "immortal_cultivation_mod:spirit_guiding_thread"
+    },
+    "A": {
+      "item": "immortal_cultivation_mod:light_blue_wool_strip"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:cultivation_fapao",
+    "count": 1
+  }
+}

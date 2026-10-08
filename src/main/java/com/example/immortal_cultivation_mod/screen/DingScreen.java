@@ -1,7 +1,12 @@
 package com.example.immortal_cultivation_mod.screen;
 
+import com.example.immortal_cultivation_mod.block.DingBlockEntity;
+
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
+import com.example.immortal_cultivation_mod.client.DaoGuidanceClient;
+import com.example.immortal_cultivation_mod.client.ForgingVisualState;
+import com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -31,12 +36,12 @@ public class DingScreen extends AbstractContainerScreen<DingMenu> {
     private static final int HEAT_FILL_INSET = 6;
 
     private static final int PROGRESS_X = 104;
-    private static final int PROGRESS_Y = 143;
+    private static final int PROGRESS_Y = 163;
     private static final int PROGRESS_WIDTH = 124;
     private static final int PROGRESS_HEIGHT = 15;
 
     private static final int START_BUTTON_X = 238;
-    private static final int START_BUTTON_Y = 138;
+    private static final int START_BUTTON_Y = 158;
     private static final int START_BUTTON_WIDTH = 76;
     private static final int START_BUTTON_HEIGHT = 20;
 
@@ -50,7 +55,13 @@ public class DingScreen extends AbstractContainerScreen<DingMenu> {
         titleLabelX = -1000;
         titleLabelY = -1000;
         inventoryLabelX = DingMenu.PLAYER_INV_X;
-        inventoryLabelY = 173;
+        inventoryLabelY = 193;
+    }
+
+    @Override
+    public void removed() {
+        ForgingVisualState.clear(minecraft == null ? null : minecraft.player);
+        super.removed();
     }
 
     private static ResourceLocation elementTexture(String name) {
@@ -72,7 +83,7 @@ public class DingScreen extends AbstractContainerScreen<DingMenu> {
                 graphics, x, y, imageWidth, imageHeight);
 
         CultivationGuiTextures.drawInnerBox(
-                graphics, x + 31, y + 39, 298, 125);
+                graphics, x + 31, y + 39, 298, 145);
 
         renderTemperatureBar(graphics, x, y);
         renderForgeSectionPanels(graphics, x, y);
@@ -125,11 +136,11 @@ public class DingScreen extends AbstractContainerScreen<DingMenu> {
             int x,
             int y) {
         CultivationGuiTextures.drawInnerBox(
-                graphics, x + 39, y + 82, 44, 44);
+                graphics, x + 39, y + 82, 34, 62);
         CultivationGuiTextures.drawInnerBox(
-                graphics, x + 99, y + 82, 162, 44);
+                graphics, x + 83, y + 82, 190, 62);
         CultivationGuiTextures.drawInnerBox(
-                graphics, x + 277, y + 82, 44, 44);
+                graphics, x + 287, y + 82, 34, 62);
     }
 
     private void drawTemperatureMarker(
@@ -173,12 +184,13 @@ public class DingScreen extends AbstractContainerScreen<DingMenu> {
                 y + DingMenu.RESULT_SLOT_Y,
                 JADE);
         for (int index = 0;
-                index < menu.materialSlotCount();
+                index < DingBlockEntity.MATERIAL_COUNT;
                 index++) {
+            if (!menu.getSlot(DingBlockEntity.MATERIAL_START + index).isActive()) continue;
             int slotX = DingMenu.MATERIAL_START_X
-                    + index % 5 * DingMenu.MATERIAL_SLOT_SPACING;
+                    + index % 10 * DingMenu.MATERIAL_SLOT_SPACING;
             int slotY = DingMenu.MATERIAL_START_Y
-                    + index / 5 * DingMenu.MATERIAL_SLOT_SPACING;
+                    + index / 10 * DingMenu.MATERIAL_SLOT_SPACING;
             renderSlotFrame(
                     graphics,
                     x + slotX,
@@ -264,7 +276,7 @@ public class DingScreen extends AbstractContainerScreen<DingMenu> {
             int x,
             int y) {
         int panelX = x + DingMenu.PLAYER_INV_X - 8;
-        int panelY = y + 169;
+        int panelY = y + 189;
         CultivationGuiTextures.drawInnerBox(
                 graphics, panelX, panelY, 178, 96);
 
@@ -362,7 +374,7 @@ public class DingScreen extends AbstractContainerScreen<DingMenu> {
                                 + ".ding.progress",
                         percentage),
                 35,
-                144,
+                164,
                 INK,
                 false);
         graphics.drawString(
@@ -372,7 +384,7 @@ public class DingScreen extends AbstractContainerScreen<DingMenu> {
                                 + ".ding.fire_cost",
                         menu.fireCost()),
                 35,
-                156,
+                176,
                 MUTED_INK,
                 false);
         graphics.drawString(
@@ -439,7 +451,33 @@ public class DingScreen extends AbstractContainerScreen<DingMenu> {
             int mouseY,
             float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
+        renderGuidanceHighlight(graphics);
         renderTooltip(graphics, mouseX, mouseY);
+    }
+
+    private void renderGuidanceHighlight(GuiGraphics graphics) {
+        int pulse = 145 + (int) (Math.sin(System.currentTimeMillis() / 180.0D) * 65.0D);
+        int color = (Math.max(70, Math.min(230, pulse)) << 24) | 0xF0C66B;
+        if (DaoGuidanceClient.isCurrentAction(DaoGuidanceContent.FORGE_MATERIAL)) {
+            graphics.renderOutline(leftPos + DingMenu.MATERIAL_START_X - 3,
+                    topPos + DingMenu.MATERIAL_START_Y - 3,
+                    DingMenu.MATERIAL_SLOT_SPACING * 5,
+                    DingMenu.MATERIAL_SLOT_SPACING * 2, color);
+        } else if (DaoGuidanceClient.isCurrentAction(DaoGuidanceContent.FORGE_MOLD)) {
+            graphics.renderOutline(leftPos + DingMenu.YUJIAN_SLOT_X - 3,
+                    topPos + DingMenu.YUJIAN_SLOT_Y - 3, 24, 24, color);
+        } else if (DaoGuidanceClient.isCurrentAction(DaoGuidanceContent.FORGE_HEAT)
+                || DaoGuidanceClient.isCurrentAction(DaoGuidanceContent.FORGE_MELT)) {
+            graphics.renderOutline(leftPos + START_BUTTON_X - 3,
+                    topPos + START_BUTTON_Y - 3,
+                    START_BUTTON_WIDTH + 6, START_BUTTON_HEIGHT + 6, color);
+            graphics.renderOutline(leftPos + HEAT_BAR_X - 3,
+                    topPos + HEAT_BAR_Y - 3,
+                    HEAT_BAR_WIDTH + 6, HEAT_BAR_HEIGHT + 6, color);
+        } else if (DaoGuidanceClient.isCurrentAction(DaoGuidanceContent.FORGE_COMPLETE)) {
+            graphics.renderOutline(leftPos + DingMenu.RESULT_SLOT_X - 3,
+                    topPos + DingMenu.RESULT_SLOT_Y - 3, 24, 24, color);
+        }
     }
 
     private static int clampTemperature(int temperature) {

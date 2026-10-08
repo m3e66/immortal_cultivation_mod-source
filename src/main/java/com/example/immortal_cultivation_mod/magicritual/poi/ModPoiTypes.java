@@ -10,12 +10,15 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ModPoiTypes {
-   public static final DeferredRegister<PoiType> POI_TYPES = DeferredRegister.create(Registries.POINT_OF_INTEREST_TYPE, "immortal_cultivation_mod");
-   public static final DeferredHolder<PoiType, PoiType> SPIRIT_VEIN_CENTER_POI = POI_TYPES.register(
-      "spirit_vein_center", () -> new PoiType(ImmutableSet.copyOf(((Block)ModBlocks.SPIRIT_VEIN_CENTER.get()).getStateDefinition().getPossibleStates()), 0, 1)
-   );
+   public static final DeferredRegister<PoiType> POI_TYPES;
+   public static final DeferredHolder<PoiType, PoiType> SPIRIT_VEIN_CENTER_POI;
 
    public static void register(IEventBus eventBus) {
       POI_TYPES.register(eventBus);
+   }
+
+   static {
+      POI_TYPES = DeferredRegister.create(Registries.POINT_OF_INTEREST_TYPE, "immortal_cultivation_mod");
+      SPIRIT_VEIN_CENTER_POI = POI_TYPES.register("spirit_vein_center", () -> new PoiType(ImmutableSet.copyOf(((Block)ModBlocks.SPIRIT_VEIN_CENTER.get()).getStateDefinition().getPossibleStates()), 0, 1));
    }
 }

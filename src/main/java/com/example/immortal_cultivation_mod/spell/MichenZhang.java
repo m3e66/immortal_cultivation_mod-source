@@ -37,8 +37,8 @@ public final class MichenZhang {
     public static boolean cast(ServerPlayer player, float chargeScale) {
         var data = ModAttachments.getData(player);
         float scale = Math.max(1.0F, Math.min(2.0F, chargeScale));
-        int cost = Math.max(1, Math.round(COST * (1.0F + 4.0F * (scale - 1.0F))));
-        if (!ServerEvents.spendQiOrBlood(player, data, cost)) {
+        int cost = SpellCharge.qiCost(COST, scale);
+        if (!ServerEvents.spendSpellQiOrBlood(player, data, cost)) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return false;
         }

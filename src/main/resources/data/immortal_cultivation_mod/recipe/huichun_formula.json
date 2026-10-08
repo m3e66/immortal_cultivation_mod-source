@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "immortal_cultivation_mod:ninglu_zhi"
+    },
+    {
+      "item": "immortal_cultivation_mod:ninglu_zhi"
+    },
+    {
+      "item": "immortal_cultivation_mod:ziyun_vine"
+    }
+  ],
+  "result": {
+    "id": "immortal_cultivation_mod:huichun_formula",
+    "count": 1
+  }
+}

@@ -17,6 +17,8 @@ public final class OuterSystemData {
     public static final String DESTROYED = "Destroyed";
     public static final String TYPE = "Type";
     public static final String PREVIOUS_TYPE = "PreviousType";
+    /** Debug-editor override for the system granted by the Outer Demon Body. */
+    public static final String DEBUG_TYPE = "DebugType";
     public static final String BOOT_SHOWN = "BootShown";
     public static final String QUEST = "Quest";
     private static final ResourceLocation SYSTEM_SLOT_MODIFIER =

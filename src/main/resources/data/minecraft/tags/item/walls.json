@@ -1,0 +1,16 @@
+{
+  "replace": false,
+  "values": [
+    "immortal_cultivation_mod:oak_plank_wall",
+    "immortal_cultivation_mod:spruce_plank_wall",
+    "immortal_cultivation_mod:birch_plank_wall",
+    "immortal_cultivation_mod:jungle_plank_wall",
+    "immortal_cultivation_mod:acacia_plank_wall",
+    "immortal_cultivation_mod:dark_oak_plank_wall",
+    "immortal_cultivation_mod:mangrove_plank_wall",
+    "immortal_cultivation_mod:cherry_plank_wall",
+    "immortal_cultivation_mod:bamboo_plank_wall",
+    "immortal_cultivation_mod:crimson_plank_wall",
+    "immortal_cultivation_mod:warped_plank_wall"
+  ]
+}

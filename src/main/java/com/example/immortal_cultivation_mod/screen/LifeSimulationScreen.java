@@ -145,6 +145,13 @@ public class LifeSimulationScreen extends Screen {
             return;
         }
         initTabWidgets(selectedTab, x, y, life);
+        addActionButton(
+                x + 475,
+                y + 350,
+                126,
+                "screen.immortal_cultivation_mod.life.settle",
+                "settle",
+                true);
     }
 
     private void initTabWidgets(

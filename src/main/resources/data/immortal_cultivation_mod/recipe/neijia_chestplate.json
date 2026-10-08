@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "I I",
+    "LRL",
+    "LIL"
+  ],
+  "key": {
+    "I": {
+      "item": "immortal_cultivation_mod:xuanduan_iron_shard"
+    },
+    "L": {
+      "item": "immortal_cultivation_mod:rock_badger_hide"
+    },
+    "R": {
+      "item": "immortal_cultivation_mod:red_wool_strip"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:neijia_chestplate",
+    "count": 1
+  }
+}

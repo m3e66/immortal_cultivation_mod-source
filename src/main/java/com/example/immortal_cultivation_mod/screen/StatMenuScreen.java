@@ -5,25 +5,33 @@ import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
+import com.example.immortal_cultivation_mod.attribute.ModAttributes;
 import com.example.immortal_cultivation_mod.client.ClientData;
+import com.example.immortal_cultivation_mod.client.DaoGuidanceClient;
+import com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent;
+import com.example.immortal_cultivation_mod.network.DaoGuidancePayloads;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
+import com.example.immortal_cultivation_mod.spell.UndeadControl;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-public class StatMenuScreen extends Screen {
+public class StatMenuScreen extends FittedMenuScreen {
     private static final ResourceLocation JINDAN_BUTTON_TEXTURE =
             ResourceLocation.fromNamespaceAndPath(
                     ImmortalCultivationMod.MODID,
                     "textures/gui/jindan_button.png");
+    private static final ResourceLocation VOID_BREAK_BUTTON_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(
+                    ImmortalCultivationMod.MODID,
+                    "textures/gui/break_void.png");
     private static final ResourceLocation STAT_ICONS =
             elementTexture("stat_icons");
     private static final ResourceLocation PERSON =
@@ -116,10 +124,11 @@ public class StatMenuScreen extends Screen {
     private AbstractButton breakthroughBtn;
     private AbstractButton proficiencyBtn;
     private AbstractButton jindanBtn;
+    private AbstractButton voidBreakBtn;
 
     public StatMenuScreen() {
         super(Component.translatable(
-                "screen." + ImmortalCultivationMod.MODID + ".stat_menu"));
+                "screen." + ImmortalCultivationMod.MODID + ".stat_menu"), WINDOW_W + 58, WINDOW_H + 16);
     }
 
     private static ResourceLocation elementTexture(String name) {
@@ -129,10 +138,14 @@ public class StatMenuScreen extends Screen {
     }
 
     @Override
-    protected void init() {
+    protected void initMenu() {
         skillButtons.clear();
         int x = left();
         int y = top();
+
+        PacketDistributor.sendToServer(
+                new DaoGuidancePayloads.ServerboundDaoGuidanceActionPayload(
+                        DaoGuidanceContent.OPEN_STATS));
 
         addSkillButton("hp", x + SKILL_BUTTON_X, y + SKILL_BUTTON_Y);
         addSkillButton(
@@ -165,7 +178,7 @@ public class StatMenuScreen extends Screen {
                         "screen." + ImmortalCultivationMod.MODID
                                 + ".proficiency_menu"),
                 ignored -> minecraft.setScreen(
-                        new ProficiencyMenuScreen())));
+                         new ProficiencyMenuScreen())));
 
         breakthroughBtn = addRenderableWidget(
                 new CultivationGuiButton(
@@ -195,6 +208,24 @@ public class StatMenuScreen extends Screen {
                     minecraft.setScreen(null);
                 },
                 JINDAN_BUTTON_TEXTURE));
+
+        voidBreakBtn = addRenderableWidget(new TexturedIconButton(
+                x + PROFILE_X + PROFILE_W - 27,
+                y + PROFILE_Y + 29,
+                22,
+                22,
+                Component.translatable(
+                        "screen." + ImmortalCultivationMod.MODID
+                                + ".open_cosmic_void_portal"),
+                ignored -> {
+                    PacketDistributor.sendToServer(
+                            new ModPayloads
+                                    .ServerboundOpenCosmicVoidPortalPayload());
+                    minecraft.setScreen(null);
+                },
+                VOID_BREAK_BUTTON_TEXTURE,
+                64,
+                64));
     }
 
     private int left() {
@@ -220,7 +251,7 @@ public class StatMenuScreen extends Screen {
     }
 
     @Override
-    public void render(
+    protected void renderMenu(
             GuiGraphics graphics,
             int mouseX,
             int mouseY,
@@ -232,6 +263,7 @@ public class StatMenuScreen extends Screen {
         CultivationGuiTextures.drawLandscape(
                 graphics, x, y, WINDOW_W, WINDOW_H);
         renderPanels(graphics, x, y);
+        renderGuidanceHighlights(graphics, x, y);
         renderTabs(graphics, x, y, mouseX, mouseY);
 
         drawCenteredScaled(
@@ -255,7 +287,7 @@ public class StatMenuScreen extends Screen {
                     120,
                     0xFFAA3333,
                     false);
-            super.render(graphics, mouseX, mouseY, partialTick);
+            super.renderMenu(graphics, mouseX, mouseY, partialTick);
             return;
         }
 
@@ -265,30 +297,50 @@ public class StatMenuScreen extends Screen {
                 ? CultivationLevels.REALM_MORTAL
                 : data.cultivationLevel();
         var levelDef = CultivationLevels.getLevelDef(level);
-        int maxHp = Math.max(
-                1,
-                levelDef.maxHp() + data.maxHpBonus());
+        boolean livingCorpse = ClientData.livingCorpse()
+                && minecraft != null
+                && minecraft.player != null;
+        long zombieGrudge = livingCorpse
+                ? Math.max(0L, Math.round(
+                        minecraft.player.getAttributeValue(ModAttributes.GRUDGE)))
+                : 0L;
+        Component displayedLevel = livingCorpse
+                ? Component.translatable(
+                        "zombie_rank." + ImmortalCultivationMod.MODID + "."
+                                + UndeadControl.rankIdForGrudge(zombieGrudge))
+                : CultivationLevels.displayName(level);
+        int maxHp = livingCorpse
+                ? Math.max(1, Math.round(minecraft.player.getMaxHealth()))
+                : Math.max(1, levelDef.maxHp() + data.maxHpBonus());
         int maxQi = levelDef.maxQi() + data.maxQiBonus();
         boolean jindanOrHigher =
                 CultivationLevels.getStageIndex(level)
                         >= CultivationLevels.getStageIndex(
                                 CultivationLevels.REALM_JINDAN
                                         + CultivationLevels.STAGE_EARLY);
+        boolean huashenOrHigher =
+                CultivationLevels.getStageIndex(level)
+                        >= CultivationLevels.getStageIndex(
+                                CultivationLevels.REALM_HUASHEN
+                                        + CultivationLevels.STAGE_EARLY);
 
         renderProfile(
-                graphics, data, level, jindanOrHigher, x, y);
+                graphics, data, displayedLevel, jindanOrHigher, x, y);
         renderTraits(graphics, data, x, y);
         renderSkills(graphics, data, maxHp, maxQi, x, y);
-        renderCultivationDetails(graphics, data, level, x, y);
+        renderCultivationDetails(
+                graphics, data, level, livingCorpse, zombieGrudge, x, y);
 
         String nextStage = CultivationLevels.getNextStage(level);
         long progressNeeded =
                 CultivationLevels.getTotalQiNeeded(level);
         boolean fullProgress =
-                data.cultivationProgress() >= progressNeeded;
+                !livingCorpse
+                        && data.cultivationProgress() >= progressNeeded;
         boolean needsPill =
                 CultivationLevels.needsBreakthroughPill(level);
         boolean canBreakthrough = nextStage != null
+                && !livingCorpse
                 && fullProgress
                 && (!needsPill || hasBreakthroughPill(minecraft));
 
@@ -297,11 +349,13 @@ public class StatMenuScreen extends Screen {
             button.visible = true;
         }
         breakthroughBtn.active = canBreakthrough;
-        breakthroughBtn.visible = nextStage != null;
+        breakthroughBtn.visible = nextStage != null && !livingCorpse;
         jindanBtn.active = jindanOrHigher;
         jindanBtn.visible = jindanOrHigher;
+        voidBreakBtn.active = huashenOrHigher;
+        voidBreakBtn.visible = huashenOrHigher;
 
-        super.render(graphics, mouseX, mouseY, partialTick);
+        super.renderMenu(graphics, mouseX, mouseY, partialTick);
     }
 
     private void renderPanels(
@@ -347,6 +401,7 @@ public class StatMenuScreen extends Screen {
             int mouseX,
             int mouseY) {
         graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        // The upper tab is decorative; only the lower tab opens proficiency.
         graphics.blit(
                 TOP_TAB,
                 x + TOP_TAB_X,
@@ -387,10 +442,33 @@ public class StatMenuScreen extends Screen {
         }
     }
 
+    private void renderGuidanceHighlights(
+            GuiGraphics graphics, int x, int y) {
+        int pulse = 150 + (int) (Math.sin(System.currentTimeMillis() / 180.0D) * 60.0D);
+        int color = (Math.max(70, Math.min(230, pulse)) << 24) | 0xE3B95F;
+        if (DaoGuidanceClient.isCurrentAction(DaoGuidanceContent.OPEN_STATS)) {
+            graphics.renderOutline(x + PROFILE_X - 2, y + PROFILE_Y - 2,
+                    PROFILE_W + 4, PROFILE_H + 4, color);
+            graphics.renderOutline(x + ROOT_X - 2, y + ROOT_Y - 2,
+                    ROOT_W + 4, ROOT_H + 4, color);
+            graphics.renderOutline(x + AGE_X - 2, y + AGE_Y - 2,
+                    AGE_W + 4, AGE_H + 4, color);
+        }
+        if (DaoGuidanceClient.isCurrentAction(DaoGuidanceContent.ACTIVATE_METHOD)) {
+            graphics.renderOutline(x + METHOD_X - 2, y + METHOD_Y - 2,
+                    METHOD_W + 4, METHOD_H + 4, color);
+        }
+        if (DaoGuidanceClient.isCurrentAction(DaoGuidanceContent.BREAKTHROUGH_ATTEMPT)) {
+            graphics.renderOutline(x + BREAKTHROUGH_X - 3,
+                    y + BREAKTHROUGH_Y - 3,
+                    BREAKTHROUGH_W + 6, BREAKTHROUGH_H + 6, color);
+        }
+    }
+
     private void renderProfile(
             GuiGraphics graphics,
             ModAttachments.CultivationData data,
-            String level,
+            Component level,
             boolean jindanOrHigher,
             int x,
             int y) {
@@ -407,12 +485,14 @@ public class StatMenuScreen extends Screen {
                 PERSON_HEIGHT,
                 PERSON_WIDTH,
                 PERSON_HEIGHT);
+        int levelTextWidth = PROFILE_W - 12;
+        int levelTextCenter = x + PROFILE_X + PROFILE_W / 2;
         drawCenteredScaled(
                 graphics,
-                Component.literal(level),
-                x + PROFILE_X + PROFILE_W / 2,
+                level,
+                levelTextCenter,
                 y + PROFILE_Y + 5,
-                jindanOrHigher ? PROFILE_W - 38 : PROFILE_W - 12,
+                levelTextWidth,
                 VALUE_COLOR,
                 false);
 
@@ -430,7 +510,7 @@ public class StatMenuScreen extends Screen {
                 PROFILE_W - 10,
                 INK,
                 false);
-        if (jindanOrHigher) {
+        if (jindanOrHigher || CultivationLevels.REALM_HALF_JINDAN.equals(data.cultivationLevel())) {
             drawCenteredScaled(
                     graphics,
                     Component.translatable(
@@ -478,8 +558,10 @@ public class StatMenuScreen extends Screen {
                 2,
                 labelled(
                         "luck",
-                        Component.literal(
-                                Integer.toString(data.luck()))),
+                        ClientData.debugEyeEnabled() ? Component.literal(data.luck() + " · ")
+                                .append(com.example.immortal_cultivation_mod.fate.LuckSystem.state(data.luck()))
+                                : com.example.immortal_cultivation_mod.fate.LuckSystem.ownDisplay(
+                                        minecraft == null ? null : minecraft.player, data.luck())),
                 x,
                 y,
                 VALUE_COLOR);
@@ -612,8 +694,8 @@ public class StatMenuScreen extends Screen {
                 y,
                 2,
                 "energy",
-                40,
-                data.maxEnergyBonus(),
+                10,
+                data.maxThoughts(),
                 data.maxEnergyBonus() / 40,
                 0xFF735F2D);
         drawSkillLine(
@@ -655,6 +737,8 @@ public class StatMenuScreen extends Screen {
             GuiGraphics graphics,
             ModAttachments.CultivationData data,
             String level,
+            boolean livingCorpse,
+            long zombieGrudge,
             int x,
             int y) {
         drawCenteredScaled(
@@ -735,21 +819,50 @@ public class StatMenuScreen extends Screen {
                 VALUE_COLOR,
                 false);
 
-        long progressNeeded =
-                CultivationLevels.getTotalQiNeeded(level);
-        float ratio = progressNeeded <= 0L
-                ? 1.0F
-                : Math.max(
-                        0.0F,
-                        Math.min(
-                                1.0F,
-                                data.cultivationProgress()
-                                        / (float) progressNeeded));
+        long progressNeeded = CultivationLevels.getTotalQiNeeded(level);
+        float ratio;
+        Component progressLabel;
+        Component progressValue;
+        if (livingCorpse) {
+            long currentThreshold = UndeadControl.currentRankThreshold(zombieGrudge);
+            long nextThreshold = UndeadControl.nextRankThreshold(zombieGrudge);
+            ratio = nextThreshold < 0L
+                    ? 1.0F
+                    : Math.max(
+                            0.0F,
+                            Math.min(
+                                    1.0F,
+                                    (zombieGrudge - currentThreshold)
+                                            / (float) Math.max(
+                                                    1L,
+                                                    nextThreshold - currentThreshold)));
+            progressLabel = Component.translatable(
+                    "screen." + ImmortalCultivationMod.MODID
+                            + ".grudge_progress");
+            progressValue = nextThreshold < 0L
+                    ? Component.translatable(
+                            "screen." + ImmortalCultivationMod.MODID
+                                    + ".zombie_progress_value_max",
+                            zombieGrudge)
+                    : Component.literal(zombieGrudge + "/" + nextThreshold);
+        } else {
+            ratio = progressNeeded <= 0L
+                    ? 1.0F
+                    : Math.max(
+                            0.0F,
+                            Math.min(
+                                    1.0F,
+                                    data.cultivationProgress()
+                                            / (float) progressNeeded));
+            progressLabel = Component.translatable(
+                    "screen." + ImmortalCultivationMod.MODID
+                            + ".cultivation_progress");
+            progressValue = Component.literal(
+                    data.cultivationProgress() + "/" + progressNeeded);
+        }
         drawScaled(
                 graphics,
-                Component.translatable(
-                        "screen." + ImmortalCultivationMod.MODID
-                                + ".cultivation_progress"),
+                progressLabel,
                 x + PROGRESS_X,
                 y + PROGRESS_Y - 11,
                 PROGRESS_W,
@@ -785,10 +898,7 @@ public class StatMenuScreen extends Screen {
                 JADE);
         drawCenteredScaled(
                 graphics,
-                Component.literal(
-                        data.cultivationProgress()
-                                + "/"
-                                + progressNeeded),
+                progressValue,
                 x + PROGRESS_X + PROGRESS_W / 2,
                 y + PROGRESS_Y + 4,
                 PROGRESS_W - 8,
@@ -919,6 +1029,9 @@ public class StatMenuScreen extends Screen {
         if (jindanBtn != null) {
             jindanBtn.visible = visible;
         }
+        if (voidBreakBtn != null) {
+            voidBreakBtn.visible = visible;
+        }
     }
 
     private boolean hasBreakthroughPill(
@@ -992,6 +1105,8 @@ public class StatMenuScreen extends Screen {
 
     private static final class TexturedIconButton extends Button {
         private final ResourceLocation texture;
+        private final int textureWidth;
+        private final int textureHeight;
 
         private TexturedIconButton(
                 int x,
@@ -1001,6 +1116,20 @@ public class StatMenuScreen extends Screen {
                 Component message,
                 OnPress onPress,
                 ResourceLocation texture) {
+            this(x, y, width, height, message, onPress,
+                    texture, 138, 139);
+        }
+
+        private TexturedIconButton(
+                int x,
+                int y,
+                int width,
+                int height,
+                Component message,
+                OnPress onPress,
+                ResourceLocation texture,
+                int textureWidth,
+                int textureHeight) {
             super(
                     x,
                     y,
@@ -1010,6 +1139,8 @@ public class StatMenuScreen extends Screen {
                     onPress,
                     DEFAULT_NARRATION);
             this.texture = texture;
+            this.textureWidth = textureWidth;
+            this.textureHeight = textureHeight;
         }
 
         @Override
@@ -1034,10 +1165,10 @@ public class StatMenuScreen extends Screen {
                     getHeight(),
                     0.0F,
                     0.0F,
-                    138,
-                    139,
-                    138,
-                    139);
+                    textureWidth,
+                    textureHeight,
+                    textureWidth,
+                    textureHeight);
             graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
         }
     }

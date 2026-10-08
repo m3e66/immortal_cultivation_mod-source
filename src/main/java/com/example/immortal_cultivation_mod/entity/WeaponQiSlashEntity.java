@@ -2,16 +2,15 @@ package com.example.immortal_cultivation_mod.entity;
 
 import com.example.immortal_cultivation_mod.item.QiInfusedWeapon;
 import com.example.immortal_cultivation_mod.item.WhipItem;
+import com.example.immortal_cultivation_mod.effect.ExternalQiVfxShape;
 import com.example.immortal_cultivation_mod.magicritual.center.ForcefieldInterceptable;
 import com.example.immortal_cultivation_mod.particle.MethodQiParticleEffects;
 import com.example.immortal_cultivation_mod.combat.CombatStateManager;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,6 +32,7 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
     private static final double SPEED = 1.4D;
     private static final int MAX_LIFETIME_TICKS = 100;
     private static final float MAX_DAMAGE = 1_000_000_000.0F;
+    private static final int MAX_BLOCK_BREAKS = 65_536;
 
     private final Set<UUID> hitEntities = new HashSet<>();
     private final Set<Long> checkedBlocks = new HashSet<>();
@@ -45,6 +45,9 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
     private double maxDistance = 8.0D;
     private double distanceTraveled;
     private int remainingBlocks;
+    private int[] sectionBlocks;
+    private ExternalQiVfxShape.BladeMask activeSections = ExternalQiVfxShape.ALL_SECTIONS;
+    private int sectionImpactsThisTick;
     private int slashStage;
     private boolean blockBreaking = true;
     private boolean cone;
@@ -59,6 +62,18 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
         super(type, level);
         setNoGravity(true);
         noPhysics = true;
+    }
+
+    /** Grow width with the released damage, while retaining each weapon's base silhouette and size limit. */
+    public static double damageScaledRadius(double baseRadius, float damage, double maximum) {
+        double strength = Float.isNaN(damage) ? 0 : Math.max(0, damage);
+        return Math.min(maximum, Math.max(.2, baseRadius) * Math.sqrt(1 + strength / 10));
+    }
+
+    /** Lifetime terrain capacity; actual work still shares SpellDestruction's global tick budget. */
+    public static int damageScaledBlockBudget(float damage) {
+        double strength = Float.isNaN(damage) ? 0 : Math.max(0, damage);
+        return (int) Math.min(MAX_BLOCK_BREAKS, Math.ceil(strength * 16));
     }
 
     @Override
@@ -77,6 +92,11 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
     @Override
     public float forcefieldBarrierDamage() {
         return damage;
+    }
+
+    @Override
+    public boolean forcefieldPassThrough() {
+        return false;
     }
 
     @Override
@@ -102,25 +122,31 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
             return Math.abs(normal.dot(direction)) * forwardReach
                     + radialProjection * currentConeRadius();
         }
-        double thickness = 0.20D + radius * 0.025D;
+        double thickness = ExternalQiVfxShape.halfThickness(radius);
         return Math.abs(normal.dot(direction)) * forwardReach
-                + Math.abs(normal.dot(slashBasis.axis)) * radius
+                + Math.abs(normal.dot(slashBasis.axis)) * ExternalQiVfxShape.bladeReach(radius)
                 + Math.abs(normal.dot(slashBasis.perpendicular)) * thickness;
     }
 
     @Override
     public double forcefieldMaximumSupport() {
         double forwardReach = speed + 0.75D;
-        double radialReach = cone ? currentConeRadius() : radius;
+        double radialReach = cone ? currentConeRadius() : ExternalQiVfxShape.bladeReach(radius);
         if (cone) {
             return Math.sqrt(forwardReach * forwardReach + radialReach * radialReach);
         }
-        double thickness = 0.20D + radius * 0.025D;
+        double thickness = ExternalQiVfxShape.halfThickness(radius);
         return Math.sqrt(forwardReach * forwardReach + radialReach * radialReach
                 + thickness * thickness);
     }
 
     public static boolean release(ServerPlayer owner, int slashStage, boolean heavyCone) {
+        return release(owner, slashStage, heavyCone, heavyCone);
+    }
+
+    public boolean allowsTerrainBreaking() { return blockBreaking; }
+
+    public static boolean release(ServerPlayer owner, int slashStage, boolean heavyCone, boolean heavyWeaponAttack) {
         ItemStack weapon = owner.getMainHandItem();
         boolean fistWeapon = QiInfusedWeapon.isFistWeapon(weapon);
         if (!CombatStateManager.isInCombat(owner)
@@ -173,15 +199,21 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
             slash.maxDistance = Math.min(
                     128.0D, 40.0D + Math.sqrt(qiPower) * 1.2D);
         }
-        slash.remainingBlocks = qiPower >= Integer.MAX_VALUE
-                ? Integer.MAX_VALUE
-                : Math.max(0, (int) Math.floor(qiPower));
+        slash.radius = damageScaledRadius(slash.radius, slash.damage,
+                fistWeapon ? (heavyCone ? 12 : 7) : ExternalQiVfxShape.MAX_RADIUS);
+        slash.remainingBlocks = damageScaledBlockBudget(slash.damage);
         slash.slashStage = Math.floorMod(slashStage, 3);
-        slash.blockBreaking = QiInfusedWeapon.outwardQiBlockBreakingEnabled(owner);
+        slash.blockBreaking = heavyWeaponAttack && QiInfusedWeapon.outwardQiBlockBreakingEnabled(owner);
+        slash.radius = Math.clamp(slash.radius * com.example.immortal_cultivation_mod.combat.ExternalQiSize.scale(owner),
+                .2, ExternalQiVfxShape.MAX_RADIUS);
+        double originalRadius = slash.radius;
+        slash.radius = ExternalQiSpaceFit.fit(owner, slash.direction, slash.slashStage, slash.radius, slash.cone);
+        boolean fittedToSpace = slash.radius < originalRadius;
+
 
         Vec3 right = rightVector(slash.direction);
         Vec3 up = slash.direction.cross(right).normalize();
-        Vec3 startOffset = slash.cone
+        Vec3 startOffset = (slash.cone || fittedToSpace)
                 ? Vec3.ZERO
                 : switch (slash.slashStage) {
                     case 0 -> right.scale(0.32D).add(up.scale(0.24D));
@@ -199,6 +231,9 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
                 weapon,
                 injectedQiDamage);
         owner.serverLevel().addFreshEntity(slash);
+        com.example.immortal_cultivation_mod.guidance.DaoGuidanceSystem.record(
+                owner,
+                com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent.EXTERNAL_QI);
         return true;
     }
 
@@ -217,14 +252,18 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
         slash.direction = safeDirection(owner.getLookAngle());
         slash.damage = Math.max(
                 1.0F, Math.min(MAX_DAMAGE, damage));
-        slash.radius = 0.9D;
+        slash.radius = damageScaledRadius(0.9D, slash.damage, ExternalQiVfxShape.MAX_RADIUS);
+        slash.radius = Math.clamp(slash.radius * com.example.immortal_cultivation_mod.combat.ExternalQiSize.scale(owner),
+                .2, ExternalQiVfxShape.MAX_RADIUS);
         slash.maxDistance = Math.max(1.0D, range);
-        slash.remainingBlocks = 0;
+        slash.remainingBlocks = damageScaledBlockBudget(slash.damage);
         slash.slashStage = Math.floorMod(owner.tickCount, 3);
+        // Whip external Qi is emitted by its normal attack, not its charged strike.
         slash.blockBreaking = false;
         slash.cone = false;
         slash.whip = true;
         slash.whipQiDamage = Math.max(0.0F, qiDamage);
+        slash.radius = ExternalQiSpaceFit.fit(owner, slash.direction, slash.slashStage, slash.radius, false);
 
         Vec3 start = owner.getEyePosition()
                 .add(0.0D, -0.35D, 0.0D)
@@ -272,11 +311,11 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
         slash.restrictedTargetUuid = heavyCone ? null : target.getUUID();
         slash.direction = safeDirection(predictedTargetEye.subtract(ownerEye));
         slash.damage = Math.max(1.0F, Math.min(MAX_DAMAGE, damage));
-        slash.radius = Math.max(0.2D, Math.min(32.0D, radius));
+        slash.radius = damageScaledRadius(radius, slash.damage, ExternalQiVfxShape.MAX_RADIUS);
         slash.maxDistance = Math.max(1.0D, Math.min(128.0D, range));
-        slash.remainingBlocks = 0;
+        slash.remainingBlocks = damageScaledBlockBudget(slash.damage);
         slash.slashStage = Math.floorMod(slashStage, 3);
-        slash.blockBreaking = false;
+        slash.blockBreaking = serverLevel.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_MOBGRIEFING);
         boolean fistWeapon = QiInfusedWeapon.isFistWeapon(owner.getMainHandItem());
         slash.cone = fistWeapon || heavyCone;
         slash.expandingCone = fistWeapon;
@@ -325,6 +364,11 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
             return;
         }
 
+        if (usesBladeSections()) {
+            tickBladeSections(serverLevel, owner);
+            return;
+        }
+
         Vec3 movement = direction.scale(Math.min(
                 speed, maxDistance - distanceTraveled));
         BlockHitResult whipBlockHit = null;
@@ -356,15 +400,19 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
         if (cone) {
             renderCone(serverLevel, owner, basis);
             hitConeTargets(serverLevel, owner, basis);
-            if (blockBreaking && owner instanceof ServerPlayer playerOwner) {
-                breakConeBlocks(serverLevel, playerOwner, basis);
+            if (blockBreaking) {
+                breakConeBlocks(serverLevel, owner, basis);
             }
         } else {
             renderSlash(serverLevel, owner, basis);
             hitTargets(serverLevel, owner, basis);
-            if (blockBreaking && owner instanceof ServerPlayer playerOwner) {
-                breakBlocks(serverLevel, playerOwner, basis);
+            if (blockBreaking) {
+                breakBlocks(serverLevel, owner, basis);
             }
+        }
+        if (whipBlockHit != null || stoppedBySolidBlock) {
+            sendVisual(serverLevel, owner, com.example.immortal_cultivation_mod.network.HigherWeaponPayloads.Visual.QI_IMPACT,
+                    destination, destination.add(direction), Math.min(1.4, .45 + radius * .06));
         }
         if (whipBlockHit != null) {
             if (random.nextFloat() < 0.05F) {
@@ -380,39 +428,118 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
     }
 
     private void renderCone(ServerLevel level, LivingEntity owner, SlashBasis basis) {
-        List<SimpleParticleType> particles = MethodQiParticleEffects.particlesForOwner(owner, element);
-        double coneRadius = currentConeRadius();
-        Vec3 up = direction.cross(basis.right).normalize();
-        int rings = expandingCone ? (heavyAttack ? 5 : 4) : 6;
-        int maximumPoints = expandingCone ? (heavyAttack ? 48 : 36) : 72;
-        double pointDensity = expandingCone ? 7.0D : 10.0D;
-        for (int ring = 0; ring <= rings; ring++) {
-            double ringRadius = coneRadius * ring / rings;
-            int points = ring == 0
-                    ? 1
-                    : Math.max(10, Math.min(maximumPoints,
-                    (int) Math.ceil(ringRadius * pointDensity)));
-            double phase = tickCount * 0.18D + ring * 0.4D;
-            for (int pointIndex = 0; pointIndex < points; pointIndex++) {
-                double angle = phase + Math.PI * 2.0D * pointIndex / points;
-                Vec3 radial = basis.right.scale(Math.cos(angle))
-                        .add(up.scale(Math.sin(angle)));
-                Vec3 point = position().add(radial.scale(ringRadius));
-                Vec3 velocity = direction.scale(0.08D).add(radial.scale(0.045D));
-                SimpleParticleType particle =
-                        particles.get((pointIndex + ring + tickCount) % particles.size());
-                level.sendParticles(
-                        particle,
-                        point.x,
-                        point.y,
-                        point.z,
-                        0,
-                        velocity.x,
-                        velocity.y,
-                        velocity.z,
-                        1.0D);
+        sendVisual(level, owner, com.example.immortal_cultivation_mod.network.HigherWeaponPayloads.Visual.QI_CONE,
+                position().subtract(getDeltaMovement()), position(), currentConeRadius());
+    }
+
+    private boolean usesBladeSections() {
+        return !cone && !whip;
+    }
+
+    private void initBladeSections() {
+        if (sectionBlocks != null) return;
+        int count = ExternalQiVfxShape.sectionCount(radius);
+        sectionBlocks = new int[count];
+        activeSections = activeSections.and(ExternalQiVfxShape.allSections(radius));
+        // Distribute the original capacity evenly across many local strips, without adding capacity.
+        for (int i = 0; i < count; i++) {
+            sectionBlocks[i] = remainingBlocks / count
+                    + ((i + 1) * (remainingBlocks % count) / count - i * (remainingBlocks % count) / count);
+        }
+    }
+
+    private void tickBladeSections(ServerLevel level, LivingEntity owner) {
+        initBladeSections();
+        sectionImpactsThisTick = 0;
+        Vec3 movement = direction.scale(Math.min(speed, maxDistance - distanceTraveled));
+        setPos(position().add(movement));
+        setDeltaMovement(movement);
+        distanceTraveled += movement.length();
+        SlashBasis basis = basis();
+        traceBladeSections(level, owner, basis);
+        if (activeSections.empty()) {
+            // Clear the last client fragments immediately, rather than leaving an old full slash behind.
+            renderSlash(level, owner, basis);
+            discard();
+            return;
+        }
+        // Terrain resolves first so a consumed section cannot render or hurt through the obstacle.
+        renderSlash(level, owner, basis);
+        hitTargets(level, owner, basis);
+    }
+
+    private void stopSection(ServerLevel level, LivingEntity owner, int section, Vec3 at) {
+        activeSections = activeSections.without(section);
+        // Large walls can consume dozens of strips at once; keep contact VFX traffic bounded.
+        if (sectionImpactsThisTick++ >= 4) return;
+        sendVisual(level, owner, com.example.immortal_cultivation_mod.network.HigherWeaponPayloads.Visual.QI_IMPACT,
+                at, at.add(direction), Math.min(1.4, .45 + radius * .06));
+    }
+
+    private void traceBladeSections(ServerLevel level, LivingEntity owner, SlashBasis basis) {
+        double reach = ExternalQiVfxShape.bladeReach(radius);
+        int count = sectionBlocks.length;
+        // Sample each strip separately, including both boundaries, with at most half-block gaps.
+        int samples = Math.max(2, (int) Math.ceil(reach * 4 / count));
+        Vec3 movement = getDeltaMovement();
+        int forwardSteps = Math.max(1, Math.min(8, (int) Math.ceil(movement.length() * 2)));
+        for (int step = 0; step <= forwardSteps; step++) {
+            Vec3 center = position().subtract(movement.scale(1 - step / (double) forwardSteps));
+            for (int section = 0; section < count; section++) {
+                for (int sampleIndex = 0; sampleIndex <= samples; sampleIndex++) {
+                    if (!activeSections.active(section)) break;
+                    double t = net.minecraft.util.Mth.lerp(sampleIndex / (double) samples,
+                            ExternalQiVfxShape.particleStart(radius, section), ExternalQiVfxShape.particleEnd(radius, section));
+                    double thickness = ExternalQiVfxShape.halfThickness(radius) * ExternalQiVfxShape.bladeTaper(radius, t);
+                    int bands = Math.max(1, (int) Math.ceil(thickness * 2));
+                    Vec3 point = ExternalQiVfxShape.crescent(center, direction, basis.axis, radius, t);
+                    for (int band = 0; band <= bands; band++) {
+                        Vec3 sample = point.add(basis.perpendicular.scale(thickness * (-1 + 2.0 * band / bands)));
+                        BlockPos pos = BlockPos.containing(sample);
+                        if (!level.hasChunkAt(pos)) {
+                            stopSection(level, owner, section, sample);
+                            break;
+                        }
+                        if (checkedBlocks.contains(pos.asLong())) continue;
+                        BlockState state = level.getBlockState(pos);
+                        if (state.isAir()) continue;
+                        if (!blockBreaking) {
+                            if (!state.getCollisionShape(level, pos).isEmpty()) {
+                                stopSection(level, owner, section, sample);
+                                break;
+                            }
+                            continue;
+                        }
+                        if (sectionBlocks[section] <= 0 || state.getDestroySpeed(level, pos) < 0
+                                || (owner instanceof ServerPlayer player && !player.mayUseItemAt(pos, Direction.UP, player.getMainHandItem()))
+                                || !com.example.immortal_cultivation_mod.spell.SpellDestruction.canExternalQiBreakBlock(level, pos, owner)
+                                || !com.example.immortal_cultivation_mod.spell.SpellDestruction.breakExternalQiBlock(level, pos, false, owner)) {
+                            stopSection(level, owner, section, sample);
+                            break;
+                        }
+                        // Accepted queue entries count once, even if a neighbouring section samples the same block.
+                        checkedBlocks.add(pos.asLong());
+                        remainingBlocks--;
+                        if (--sectionBlocks[section] == 0) {
+                            stopSection(level, owner, section, sample);
+                            break;
+                        }
+                    }
+                }
             }
         }
+    }
+
+    private void sendVisual(ServerLevel level, LivingEntity owner,
+            com.example.immortal_cultivation_mod.network.HigherWeaponPayloads.Visual shape,
+            Vec3 from, Vec3 to, double size) {
+        var particles = MethodQiParticleEffects.particlesForOwner(owner, element);
+        String particle = particles.isEmpty() ? "method_qi_neutral"
+                : net.minecraft.core.registries.BuiltInRegistries.PARTICLE_TYPE.getKey(particles.getFirst()).getPath();
+        com.example.immortal_cultivation_mod.network.HigherWeaponPayloads.send(level, shape, from, to, size,
+                com.example.immortal_cultivation_mod.effect.ExternalQiVfxShape.color(particle),
+                usesBladeSections() ? activeSections : ExternalQiVfxShape.ALL_SECTIONS,
+                shape == com.example.immortal_cultivation_mod.network.HigherWeaponPayloads.Visual.QI_IMPACT ? -1 : getId());
     }
 
     private void hitConeTargets(ServerLevel level, LivingEntity owner, SlashBasis basis) {
@@ -462,7 +589,7 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
         }
     }
 
-    private void breakConeBlocks(ServerLevel level, ServerPlayer owner, SlashBasis basis) {
+    private void breakConeBlocks(ServerLevel level, LivingEntity owner, SlashBasis basis) {
         double coneRadius = currentConeRadius();
         Vec3 up = direction.cross(basis.right).normalize();
         int radialSteps = Math.max(1, (int) Math.ceil(coneRadius));
@@ -477,7 +604,7 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
                         .add(basis.right.scale(Math.cos(angle) * sampleRadius))
                         .add(up.scale(Math.sin(angle) * sampleRadius));
                 BlockPos pos = BlockPos.containing(sample);
-                if (!checkedBlocks.add(pos.asLong())) {
+                if (!level.hasChunkAt(pos) || !checkedBlocks.add(pos.asLong())) {
                     continue;
                 }
                 BlockState state = level.getBlockState(pos);
@@ -486,12 +613,12 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
                 }
                 if (remainingBlocks <= 0
                         || state.getDestroySpeed(level, pos) < 0.0F
-                        || !owner.mayUseItemAt(
-                                pos, Direction.UP, owner.getMainHandItem())) {
+                        || (owner instanceof ServerPlayer player && !player.mayUseItemAt(
+                                pos, Direction.UP, player.getMainHandItem()))) {
                     discard();
                     return;
                 }
-                if (level.destroyBlock(pos, false, owner)) {
+                if (com.example.immortal_cultivation_mod.spell.SpellDestruction.breakExternalQiBlock(level,pos, false, owner)) {
                     remainingBlocks--;
                 }
             }
@@ -509,65 +636,34 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
     }
 
     private void renderSlash(ServerLevel level, LivingEntity owner, SlashBasis basis) {
-        List<SimpleParticleType> particles = MethodQiParticleEffects.particlesForOwner(owner, element);
-        double visualRadius = whip ? radius * 2.2D : radius;
-        int segments = Math.max(
-                24,
-                Math.min(96, (int) Math.ceil(visualRadius * 8.0D)));
-        Vec3 flow = switch (slashStage) {
-            case 0 -> basis.axis.scale(-1.0D);
-            case 1 -> basis.axis;
-            default -> basis.right.scale(-1.0D);
+        var shape = switch (slashStage) {
+            case 0 -> com.example.immortal_cultivation_mod.network.HigherWeaponPayloads.Visual.QI_RISING;
+            case 1 -> com.example.immortal_cultivation_mod.network.HigherWeaponPayloads.Visual.QI_FALLING;
+            default -> com.example.immortal_cultivation_mod.network.HigherWeaponPayloads.Visual.QI_LEVEL;
         };
-
-        for (int index = 0; index <= segments; index++) {
-            double t = -1.0D + 2.0D * index / segments;
-            Vec3 point = position().add(
-                    basis.axis.scale(t * visualRadius));
-            SimpleParticleType particle = particles.get(index % particles.size());
-            Vec3 velocity = flow.scale(0.12D).add(direction.scale(0.04D));
-            level.sendParticles(
-                    particle,
-                    point.x,
-                    point.y,
-                    point.z,
-                    0,
-                    velocity.x,
-                    velocity.y,
-                    velocity.z,
-                    1.0D);
-            if ((index + tickCount) % 6 == 0) {
-                Vec3 trailingPoint = point.subtract(direction.scale(0.10D));
-                level.sendParticles(
-                        particle,
-                        trailingPoint.x,
-                        trailingPoint.y,
-                        trailingPoint.z,
-                        1,
-                        Math.abs(flow.x) * 0.025D + 0.01D,
-                        Math.abs(flow.y) * 0.025D + 0.01D,
-                        Math.abs(flow.z) * 0.025D + 0.01D,
-                        0.015D);
-            }
-        }
+        sendVisual(level, owner, shape, position().subtract(getDeltaMovement()), position(), radius);
     }
 
     private void hitTargets(ServerLevel level, LivingEntity owner, SlashBasis basis) {
-        AABB search = new AABB(position(), position()).inflate(radius + 2.0D);
+        double reach = ExternalQiVfxShape.bladeReach(radius);
+        AABB search = new AABB(position(), position()).inflate(reach + 2.0D);
         for (LivingEntity target : level.getEntitiesOfClass(
                 LivingEntity.class,
                 search,
                 living -> canHit(owner, living) && !hitEntities.contains(living.getUUID()))) {
             Vec3 offset = target.getBoundingBox().getCenter().subtract(position());
-            double padding = Math.max(target.getBbWidth(), target.getBbHeight()) * 0.55D;
+            double padding = projectedHalfSize(target, basis.axis);
             double forwardDistance = offset.dot(direction);
             double axisDistance = offset.dot(basis.axis);
             double perpendicularDistance = offset.dot(basis.perpendicular);
-            double thickness = 0.20D + radius * 0.025D;
-            if (Math.abs(forwardDistance) > speed + 0.75D + padding
-                    || Math.abs(axisDistance) > radius + padding
-                    || Math.abs(perpendicularDistance) > thickness + padding
-                    || !hasClearPath(level, target)) {
+            if (usesBladeSections() && !overlapsActiveSection(axisDistance, padding, reach)) continue;
+            double thickness = ExternalQiVfxShape.halfThickness(radius) * ExternalQiVfxShape.bladeTaper(
+                    radius, Math.max(0, Math.abs(axisDistance) - padding) / reach);
+            if (Math.abs(forwardDistance) > speed + 0.75D + projectedHalfSize(target, direction)
+                    || Math.abs(axisDistance) > reach + padding
+                    || Math.abs(perpendicularDistance) > thickness + projectedHalfSize(target, basis.perpendicular)
+                    || !(usesBladeSections() ? hasClearBladePath(level, target, basis, axisDistance, reach)
+                            : hasClearPath(level, target))) {
                 continue;
             }
 
@@ -577,48 +673,78 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
         }
     }
 
-    private void breakBlocks(ServerLevel level, ServerPlayer owner, SlashBasis basis) {
-        int segments = Math.max(8, Math.min(48, (int) Math.ceil(radius * 4.0D)));
-        int spread = 0;
-        for (int index = 0; index <= segments; index++) {
-            double t = -1.0D + 2.0D * index / segments;
-            Vec3 sample = position().add(basis.axis.scale(t * radius));
-            BlockPos center = BlockPos.containing(sample);
-            for (int x = -spread; x <= spread; x++) {
-                for (int y = -spread; y <= spread; y++) {
-                    for (int z = -spread; z <= spread; z++) {
-                        BlockPos pos = center.offset(x, y, z);
-                        if (!checkedBlocks.add(pos.asLong())) {
-                            continue;
-                        }
-                        BlockState state = level.getBlockState(pos);
-                        if (state.isAir()) {
-                            continue;
-                        }
-                        if (remainingBlocks <= 0
-                                || state.getDestroySpeed(level, pos) < 0.0F
-                                || !owner.mayUseItemAt(
-                                        pos, Direction.UP, owner.getMainHandItem())) {
-                            discard();
-                            return;
-                        }
-                        if (level.destroyBlock(pos, false, owner)) {
-                            remainingBlocks--;
-                        }
+    private void breakBlocks(ServerLevel level, LivingEntity owner, SlashBasis basis) {
+        // Sample the blade's thickness as well as its length and swept path.
+        // Fixed size limits and the shared destruction queue bound the work.
+        double reach = ExternalQiVfxShape.bladeReach(radius);
+        int segments = Math.max(8, Math.min((int) (ExternalQiVfxShape.bladeReach(ExternalQiVfxShape.MAX_RADIUS) * 4),
+                (int) Math.ceil(reach * 4.0D)));
+        Vec3 movement = getDeltaMovement();
+        int forwardSteps = Math.max(1, Math.min(8, (int) Math.ceil(movement.length() * 2)));
+        for (int step = 0; step <= forwardSteps; step++) {
+            Vec3 center = position().subtract(movement.scale(1 - step / (double) forwardSteps));
+            for (int index = 0; index <= segments; index++) {
+                double t = -1.0D + 2.0D * index / segments;
+                double thickness = ExternalQiVfxShape.halfThickness(radius) * ExternalQiVfxShape.bladeTaper(radius, t);
+                int thicknessSteps = Math.max(1, (int) Math.ceil(thickness * 2));
+                Vec3 bladePoint = ExternalQiVfxShape.crescent(center, direction, basis.axis, radius, t);
+                for (int band = 0; band <= thicknessSteps; band++) {
+                    double offset = thickness * (-1 + 2 * band / (double) thicknessSteps);
+                    BlockPos pos = BlockPos.containing(bladePoint.add(basis.perpendicular.scale(offset)));
+                    if (!level.hasChunkAt(pos) || checkedBlocks.contains(pos.asLong())) continue;
+                    BlockState state = level.getBlockState(pos);
+                    // Do not retain every air sample for the entire flight.
+                    if (state.isAir()) continue;
+                    checkedBlocks.add(pos.asLong());
+                    if (remainingBlocks <= 0 || state.getDestroySpeed(level, pos) < 0.0F
+                            || (owner instanceof ServerPlayer player && !player.mayUseItemAt(
+                                    pos, Direction.UP, player.getMainHandItem()))) {
+                        discard();
+                        return;
+                    }
+                    if (com.example.immortal_cultivation_mod.spell.SpellDestruction.breakExternalQiBlock(level, pos, false, owner)) {
+                        remainingBlocks--;
                     }
                 }
             }
         }
     }
 
+    private static double projectedHalfSize(LivingEntity target, Vec3 axis) {
+        AABB box = target.getBoundingBox();
+        return .5 * (box.getXsize() * Math.abs(axis.x) + box.getYsize() * Math.abs(axis.y)
+                + box.getZsize() * Math.abs(axis.z));
+    }
+
+    private boolean overlapsActiveSection(double distance, double padding, double reach) {
+        for (int section = 0; section < ExternalQiVfxShape.sectionCount(radius); section++) {
+            if (!activeSections.active(section)) continue;
+            double low = reach * ExternalQiVfxShape.particleStart(radius, section);
+            double high = reach * ExternalQiVfxShape.particleEnd(radius, section);
+            if (distance + padding >= low && distance - padding <= high) return true;
+        }
+        return false;
+    }
+
+    private boolean hasClearBladePath(ServerLevel level, LivingEntity target, SlashBasis basis,
+                                      double axisDistance, double reach) {
+        // Trace from the surviving section, not from the possibly obstructed middle of the slash.
+        for (int section = 0; section < ExternalQiVfxShape.sectionCount(radius); section++) {
+            if (!activeSections.active(section)) continue;
+            double padding = projectedHalfSize(target, basis.axis);
+            if (axisDistance + padding < reach * ExternalQiVfxShape.particleStart(radius, section)
+                    || axisDistance - padding > reach * ExternalQiVfxShape.particleEnd(radius, section)) continue;
+            double t = Math.clamp(axisDistance / reach, ExternalQiVfxShape.particleStart(radius, section), ExternalQiVfxShape.particleEnd(radius, section));
+            Vec3 start = ExternalQiVfxShape.crescent(position(), direction, basis.axis, radius, t);
+            if (level.clip(new ClipContext(start, target.getBoundingBox().getCenter(),
+                    ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this)).getType() == HitResult.Type.MISS) return true;
+        }
+        return false;
+    }
+
     private SlashBasis basis() {
         Vec3 right = rightVector(direction);
-        Vec3 up = direction.cross(right).normalize();
-        Vec3 axis = switch (slashStage) {
-            case 0 -> right.add(up).normalize();
-            case 1 -> right.subtract(up).normalize();
-            default -> right;
-        };
+        Vec3 axis = com.example.immortal_cultivation_mod.effect.ExternalQiVfxShape.axis(direction, slashStage);
         Vec3 perpendicular = direction.cross(axis).normalize();
         return new SlashBasis(right, axis, perpendicular);
     }
@@ -665,17 +791,25 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
             LivingEntity owner,
             LivingEntity target,
             float damage) {
+        boolean damaged;
         if (owner instanceof ServerPlayer player) {
+            var source = new net.minecraft.world.damagesource.DamageSource(
+                    owner.damageSources().playerAttack(player).typeHolder(), this, player, position());
             if (heavyAttack) {
-                CombatStateManager.hurtAsHeavy(
-                        owner, target, owner.damageSources().playerAttack(player), damage);
+                damaged = CombatStateManager.hurtAsHeavy(
+                        owner, target, source, damage);
             } else {
-                target.hurt(owner.damageSources().playerAttack(player), damage);
+                damaged = target.hurt(source, damage);
             }
         } else if (owner instanceof Mob mob) {
-            target.hurt(owner.damageSources().indirectMagic(this, mob), damage);
+            damaged = target.hurt(owner.damageSources().indirectMagic(this, mob), damage);
         } else {
-            target.hurt(owner.damageSources().magic(), damage);
+            damaged = target.hurt(owner.damageSources().indirectMagic(this, owner), damage);
+        }
+        if (damaged && level() instanceof ServerLevel serverLevel) {
+            Vec3 at = target.getBoundingBox().getCenter();
+            sendVisual(serverLevel, owner, com.example.immortal_cultivation_mod.network.HigherWeaponPayloads.Visual.QI_IMPACT,
+                    at, at.add(direction), Math.min(1.4, .45 + radius * .06));
         }
     }
 
@@ -688,9 +822,7 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
         if (tag.hasUUID("Owner")) {
             ownerUuid = tag.getUUID("Owner");
         }
-        if (tag.hasUUID("RestrictedTarget")) {
-            restrictedTargetUuid = tag.getUUID("RestrictedTarget");
-        }
+        restrictedTargetUuid = tag.hasUUID("RestrictedTarget") ? tag.getUUID("RestrictedTarget") : null;
         direction = safeDirection(new Vec3(
                 tag.getDouble("DirectionX"),
                 tag.getDouble("DirectionY"),
@@ -699,10 +831,11 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
                 ? Math.max(0.05D, tag.getDouble("Speed"))
                 : SPEED;
         damage = Math.max(1.0F, tag.getFloat("Damage"));
-        radius = Math.max(0.2D, tag.getDouble("Radius"));
+        radius = Math.clamp(tag.getDouble("Radius"), 0.05D, ExternalQiVfxShape.MAX_RADIUS);
         maxDistance = Math.max(1.0D, tag.getDouble("MaxDistance"));
         distanceTraveled = Math.max(0.0D, tag.getDouble("DistanceTraveled"));
         remainingBlocks = Math.max(0, tag.getInt("RemainingBlocks"));
+        restoreBladeSections(tag);
         slashStage = Math.floorMod(tag.getInt("SlashStage"), 3);
         blockBreaking = !tag.contains("BlockBreaking") || tag.getBoolean("BlockBreaking");
         cone = tag.getBoolean("Cone");
@@ -714,6 +847,42 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
         element = normalizeElement(tag.getString("Element"));
         setNoGravity(true);
         noPhysics = true;
+    }
+
+    private void restoreBladeSections(CompoundTag tag) {
+        int[] saved = tag.getIntArray("SectionBlocks");
+        sectionBlocks = null;
+        activeSections = ExternalQiVfxShape.ALL_SECTIONS;
+        if (saved.length == 0 || saved.length > 128) return;
+        var oldMask = new ExternalQiVfxShape.BladeMask(tag.getLong("ActiveSections"), tag.getLong("ActiveSectionsHigh"));
+        int count = ExternalQiVfxShape.sectionCount(radius);
+        if (saved.length == count) {
+            sectionBlocks = saved;
+            activeSections = oldMask.and(ExternalQiVfxShape.allSections(radius));
+            return;
+        }
+        if (count < saved.length) {
+            sectionBlocks = new int[count];
+            activeSections = ExternalQiVfxShape.allSections(radius);
+            for (int old = 0; old < saved.length; old++) {
+                int piece = Math.min(count - 1, (int) ((old + .5) * count / saved.length));
+                sectionBlocks[piece] += Math.max(0, saved[old]);
+                if (!oldMask.active(old)) activeSections = activeSections.without(piece);
+            }
+            return;
+        }
+        // Subdivide in-flight older slashes without reviving consumed pieces or adding capacity.
+        int[] children = new int[saved.length];
+        int[] assigned = new int[saved.length];
+        for (int i = 0; i < count; i++) children[Math.min(saved.length - 1, (int) ((i + .5) * saved.length / count))]++;
+        sectionBlocks = new int[count];
+        activeSections = new ExternalQiVfxShape.BladeMask(0, 0);
+        for (int i = 0; i < count; i++) {
+            int parent = Math.min(saved.length - 1, (int) ((i + .5) * saved.length / count));
+            int capacity = Math.max(0, saved[parent]);
+            sectionBlocks[i] = capacity / children[parent] + (assigned[parent]++ < capacity % children[parent] ? 1 : 0);
+            if (oldMask.active(parent)) activeSections = activeSections.with(i);
+        }
     }
 
     @Override
@@ -733,6 +902,11 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
         tag.putDouble("MaxDistance", maxDistance);
         tag.putDouble("DistanceTraveled", distanceTraveled);
         tag.putInt("RemainingBlocks", remainingBlocks);
+        if (sectionBlocks != null) {
+            tag.putIntArray("SectionBlocks", sectionBlocks);
+            tag.putLong("ActiveSections", activeSections.low());
+            tag.putLong("ActiveSectionsHigh", activeSections.high());
+        }
         tag.putInt("SlashStage", slashStage);
         tag.putBoolean("BlockBreaking", blockBreaking);
         tag.putBoolean("Cone", cone);

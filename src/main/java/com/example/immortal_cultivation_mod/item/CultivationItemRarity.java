@@ -99,25 +99,29 @@ public final class CultivationItemRarity {
         putMod(values, 0,
                 "debug_stat_editor", "zhenshi_seal_helmet", "heavy_iron_bracer_chestplate_debug",
                 "yaoyuan_fist_bone_chestplate_debug",
-                "zhuji_cultivator_spawn_egg", "jindan_cultivator_spawn_egg",
-                "fanren_npc_spawn_egg",
+                "lianqi_cultivator_spawn_egg", "zhuji_cultivator_spawn_egg", "jindan_cultivator_spawn_egg",
+                "fanren_npc_spawn_egg", "hotel_npc_spawn_egg",
                 "crimson_scale_flame_lizard_spawn_egg",
                 "crimson_sky_flame_flood_dragon_spawn_egg",
                 "blood_ape_demon_general_spawn_egg",
-                "azure_spirit_silkworm_spawn_egg");
+                "zhuji_vault_guardian_spawn_egg",
+                "jindan_vault_guardian_spawn_egg",
+                "azure_spirit_silkworm_spawn_egg",
+                "kongming_beetle_spawn_egg");
 
         putMod(values, 2,
-                "blood", "nuomi", "nuomi_seed", "red_string", "copper_coin",
+                "blood", "nuomi", "nuomi_seed", "red_string", "copper_coin", "steamed_bun",
                 "white_wool_strip", "orange_wool_strip", "magenta_wool_strip",
                 "light_blue_wool_strip", "yellow_wool_strip", "lime_wool_strip",
                 "pink_wool_strip", "gray_wool_strip", "light_gray_wool_strip",
                 "cyan_wool_strip", "purple_wool_strip", "blue_wool_strip",
                 "brown_wool_strip", "green_wool_strip", "red_wool_strip",
                 "black_wool_strip", "nuomi_plant", "qingling_grass",
-                "cloth_sheath", "xiujian", "wanted_order");
+                "cloth_sheath", "sword_sheath", "dao_sheath", "xiujian", "wanted_order");
 
         putMod(values, 5,
-                "nuomi_zhou", "bigu_pill", "low_qi_recovery_pill",
+                "nuomi_zhou", "wine", "noodle_bowl", "braised_pork", "roast_duck",
+                "bigu_pill", "low_qi_recovery_pill",
                 "low_yangjian_stone", "low_sword_grindstone", "low_saber_grindstone",
                 "lethal_poison", "chiyan_flower", "ninglu_zhi", "ziyun_vine",
                 "jinwen_fruit", "blindfold", "blindfold2", "straw_hat", "flag");
@@ -139,6 +143,8 @@ public final class CultivationItemRarity {
                 "basic_breathing_method",
                 "body_tempering_pill", "blood_qi_pill",
                 "blood_crystal", "zhenhun_bell", "yinhun_gong");
+
+        putMod(values, 20, "lingmu_clasp");
 
         putMod(values, 35,
                 "lingbeng_scroll", "earth_escape_scroll",
@@ -165,7 +171,7 @@ public final class CultivationItemRarity {
                 "heavy_iron_bracer_yujian",
                 "small_level_up",
                 "jiuye_xianlan", "family_token", "disguise_mask","star_dust_stone",
-                "sword_case");
+                "sword_case", "kongming_stone", "xuanduan_iron_shard");
 
         putMod(values, 75,
                 "dielang_shield_scroll",
@@ -174,6 +180,23 @@ public final class CultivationItemRarity {
                 "wulei_zhengfa_scroll",
                 "sifang_jie_scroll",
                 "gushi_shield_scroll",
+                "xuanyan_huti_scroll",
+                "liufeng_xiejin_scroll",
+                "xuesha_hushen_scroll",
+                "jingling_fanzhao_scroll",
+                "yuangang_hujie_scroll",
+                "jinmang_chuansha_scroll",
+                "jinfeng_zhi_scroll", "wanren_chuanxin_scroll",
+                "jingji_tusheng_scroll", "wanteng_jiaosha_scroll",
+                "yanbao_dan_scroll", "chiyan_longjuan_scroll",
+                "diyan_qiang_scroll", "shanbeng_yin_scroll",
+                "shuiren_lianzhan_scroll", "canglang_chong_scroll",
+                "leishan_scroll", "wulei_hongding_scroll",
+                "bingzhui_yu_scroll", "hanyu_fengdi_scroll",
+                "yaoguang_shan_scroll", "tianguang_guansha_scroll",
+                "yingxi_scroll", "tianfeng_zhui_scroll",
+                "muling_shengxi_scroll", "xue_guiyuan_shu_scroll",
+                "shengxi_baofa_scroll",
                 "xuying_ta_scroll",
                 "duanliu_kongdun_scroll",
                 "yihen_ci_scroll",
@@ -187,12 +210,12 @@ public final class CultivationItemRarity {
                 "high_sword_grindstone",
                 "high_saber_grindstone",
                 "big_level_up",
-                "royal_token");
+                "royal_token", "spirit_guiding_gear");
 
         putMod(values, 100,
                 "blood_demon_jindan_method",
                 "corpse_refining_secret",
-                "qiannian_lingmu_heart");
+                "qiannian_lingmu_heart", "damaged_forging_furnace_core");
 
         putMod(values, 150,
                 "pokong_jue_method",
@@ -201,6 +224,9 @@ public final class CultivationItemRarity {
                 "blood_demon_yuanying_method",
                 "feijian_yujian", "dao_yujian", "jingtie_spear_yujian",
                 "flying_needle_yujian",
+                "zhenhun_bell_yujian", "yinhun_gong_yujian",
+                "fog_revealing_mirror_yujian", "yinyang_compass_yujian",
+                "yuanhun_bottle_yujian",
                 "protective_jade_pendant", "fog_revealing_mirror");
 
         putMod(values, 250,

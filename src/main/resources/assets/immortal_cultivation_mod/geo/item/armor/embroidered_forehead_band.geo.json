@@ -1,0 +1,91 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.embroidered_forehead_band",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 2,
+				"visible_bounds_height": 3.5,
+				"visible_bounds_offset": [0, 1.25, 0]
+			},
+			"bones": [
+				{
+					"name": "armorHead",
+					"pivot": [0, 24, 0],
+					"cubes": [
+						{
+							"origin": [4.15, 28.65, -4.25],
+							"size": [0.2, 0.9, 8.5],
+							"uv": {
+								"north": {"uv": [96, 0], "uv_size": [32, 32]},
+								"east": {"uv": [96, 0], "uv_size": [32, 32]},
+								"south": {"uv": [96, 0], "uv_size": [32, 32]},
+								"west": {"uv": [96, 0], "uv_size": [32, 32]},
+								"up": {"uv": [128, 32], "uv_size": [-32, -32]},
+								"down": {"uv": [128, 32], "uv_size": [-32, -32]}
+							}
+						},
+						{
+							"origin": [-4.35, 28.65, -4.25],
+							"size": [0.2, 0.9, 8.5],
+							"uv": {
+								"north": {"uv": [96, 0], "uv_size": [32, 32]},
+								"east": {"uv": [96, 0], "uv_size": [32, 32]},
+								"south": {"uv": [96, 0], "uv_size": [32, 32]},
+								"west": {"uv": [96, 0], "uv_size": [32, 32]},
+								"up": {"uv": [128, 32], "uv_size": [-32, -32]},
+								"down": {"uv": [128, 32], "uv_size": [-32, -32]}
+							}
+						},
+						{
+							"origin": [-4.25, 28.65, -4.4],
+							"size": [8.5, 0.9, 0.15],
+							"uv": {
+								"north": {"uv": [96, 0], "uv_size": [32, 32]},
+								"east": {"uv": [96, 0], "uv_size": [32, 32]},
+								"south": {"uv": [96, 0], "uv_size": [32, 32]},
+								"west": {"uv": [96, 0], "uv_size": [32, 32]},
+								"up": {"uv": [128, 32], "uv_size": [-32, -32]},
+								"down": {"uv": [128, 32], "uv_size": [-32, -32]}
+							}
+						},
+						{
+							"origin": [-4.25, 28.65, 4.15],
+							"size": [8.5, 0.9, 0.2],
+							"uv": {
+								"north": {"uv": [96, 0], "uv_size": [32, 32]},
+								"east": {"uv": [96, 0], "uv_size": [32, 32]},
+								"south": {"uv": [96, 0], "uv_size": [32, 32]},
+								"west": {"uv": [96, 0], "uv_size": [32, 32]},
+								"up": {"uv": [128, 32], "uv_size": [-32, -32]},
+								"down": {"uv": [128, 32], "uv_size": [-32, -32]}
+							}
+						},
+						{
+							"origin": [-1.5, 27.7, -4.6],
+							"size": [3, 2.8, 0],
+							"uv": {
+								"north": {"uv": [64, 96], "uv_size": [32, 32]},
+								"south": {"uv": [64, 96], "uv_size": [32, 32]}
+							}
+						}
+					]
+				},
+				{
+					"name": "armorBody",
+					"pivot": [0, 24, 0]
+				},
+				{
+					"name": "armorRightBoot",
+					"pivot": [2, 12, 0]
+				},
+				{
+					"name": "armorLeftBoot",
+					"pivot": [-2, 12, 0]
+				}
+			]
+		}
+	]
+}

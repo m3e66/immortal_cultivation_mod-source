@@ -1,0 +1,7 @@
+{
+  "type": "immortal_cultivation_mod:abandoned_spirit_mine",
+  "biomes": "#immortal_cultivation_mod:has_structure/abandoned_spirit_mine",
+  "mineshaft_type": "normal",
+  "spawn_overrides": {},
+  "step": "underground_structures"
+}

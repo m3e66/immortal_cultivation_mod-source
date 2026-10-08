@@ -1,5 +1,7 @@
 package com.example.immortal_cultivation_mod.attachment;
 
+import net.minecraft.network.chat.Component;
+
 import java.util.List;
 import java.util.Map;
 
@@ -7,6 +9,7 @@ public class CultivationLevels {
     public static final String REALM_MORTAL = "\u51e1\u4eba";
     public static final String REALM_LIANQI = "\u7ec3\u6c14";
     public static final String REALM_ZHUJI = "\u7b51\u57fa";
+    public static final String REALM_HALF_JINDAN = "半步金丹";
     public static final String REALM_JINDAN = "\u91d1\u4e39";
     public static final String REALM_YUANYING = "\u5143\u5a74";
     public static final String REALM_HUASHEN = "\u5316\u795e";
@@ -18,6 +21,10 @@ public class CultivationLevels {
     public static final String STAGE_EARLY = "\u524d\u671f";
     public static final String STAGE_MID = "\u4e2d\u671f";
     public static final String STAGE_LATE = "\u540e\u671f";
+
+    private static final List<String> DISPLAY_REALMS = List.of(
+            REALM_LIANQI, REALM_ZHUJI, REALM_JINDAN, REALM_YUANYING, REALM_HUASHEN,
+            REALM_LIANXU, REALM_HETI, REALM_DACHENG, REALM_DUJIE);
 
     public static final LevelDef LEVEL_MORTAL = new LevelDef(REALM_MORTAL, "", 20, 100, 20, 0.0D, 10L);
 
@@ -81,7 +88,59 @@ public class CultivationLevels {
             ))
     );
 
+    public static Component displayName(String cultivationLevel) {
+        if (cultivationLevel == null || cultivationLevel.isBlank()) return Component.empty();
+        if (REALM_MORTAL.equals(cultivationLevel)) return realmDisplayName(REALM_MORTAL);
+        if (REALM_HALF_JINDAN.equals(cultivationLevel)) return realmDisplayName(REALM_HALF_JINDAN);
+        for (String realm : DISPLAY_REALMS) {
+            if (realm.equals(cultivationLevel)) return realmDisplayName(realm);
+            if (cultivationLevel.startsWith(realm)) {
+                String stage = cultivationLevel.substring(realm.length());
+                String stageKey = stageTranslationKey(stage);
+                if (stageKey != null) return Component.translatable("cultivation.immortal_cultivation_mod.level_format",
+                        realmDisplayName(realm), Component.translatable(stageKey));
+            }
+        }
+        return Component.literal(cultivationLevel);
+    }
+    public static Component realmDisplayName(String realm) {
+        if (realm == null || realm.isBlank()) return Component.empty();
+        String key = switch (realm) {
+            case REALM_MORTAL -> "cultivation.immortal_cultivation_mod.realm.mortal";
+            case REALM_LIANQI -> "cultivation.immortal_cultivation_mod.realm.lianqi";
+            case REALM_ZHUJI -> "cultivation.immortal_cultivation_mod.realm.zhuji";
+            case REALM_HALF_JINDAN -> "cultivation.immortal_cultivation_mod.realm.half_jindan";
+            case REALM_JINDAN -> "cultivation.immortal_cultivation_mod.realm.jindan";
+            case REALM_YUANYING -> "cultivation.immortal_cultivation_mod.realm.yuanying";
+            case REALM_HUASHEN -> "cultivation.immortal_cultivation_mod.realm.huashen";
+            case REALM_LIANXU -> "cultivation.immortal_cultivation_mod.realm.lianxu";
+            case REALM_HETI -> "cultivation.immortal_cultivation_mod.realm.heti";
+            case REALM_DACHENG -> "cultivation.immortal_cultivation_mod.realm.dacheng";
+            case REALM_DUJIE -> "cultivation.immortal_cultivation_mod.realm.dujie";
+            default -> null;
+        };
+        return key == null ? Component.literal(realm) : Component.translatable(key);
+    }
+    public static Component stageDisplayName(String stage) {
+        if (stage == null || stage.isBlank()) return Component.empty();
+        String key = stageTranslationKey(stage);
+        return key == null ? Component.literal(stage) : Component.translatable(key);
+    }
+    private static String stageTranslationKey(String stage) {
+        return switch (stage) {
+            case STAGE_EARLY -> "cultivation.immortal_cultivation_mod.stage.early";
+            case STAGE_MID -> "cultivation.immortal_cultivation_mod.stage.middle";
+            case STAGE_LATE -> "cultivation.immortal_cultivation_mod.stage.late";
+            default -> null;
+        };
+    }
+
     public static RealmDef getRealm(String realm) {
+        if (REALM_HALF_JINDAN.equals(realm)) {
+            var late = REALMS.get(REALM_ZHUJI).getStage(STAGE_LATE);
+            return new RealmDef(REALM_HALF_JINDAN, List.of(new StageDef("", late.maxHp(), late.maxAge(), late.maxQi(),
+                    late.armor(), late.qiNeeded() * 2, late.breakthroughFailMultiplier())));
+        }
         return REALMS.get(realm);
     }
 
@@ -90,6 +149,11 @@ public class CultivationLevels {
     }
 
     public static LevelDef getLevelDef(String cultivationLevel) {
+        if (REALM_HALF_JINDAN.equals(cultivationLevel)) {
+            var stage = getRealm(REALM_HALF_JINDAN).stages().get(0);
+            // Half-step retains Foundation Establishment combat/access rules, with its own progress cost.
+            return new LevelDef(REALM_ZHUJI, STAGE_LATE, stage.maxHp(), stage.maxAge(), stage.maxQi(), stage.armor(), stage.qiNeeded());
+        }
         if (isMortal(cultivationLevel)) {
             return LEVEL_MORTAL;
         }
@@ -106,6 +170,7 @@ public class CultivationLevels {
     }
 
     public static String getNextStage(String currentLevel) {
+        if (REALM_HALF_JINDAN.equals(currentLevel)) return REALM_JINDAN + STAGE_EARLY;
         if (isMortal(currentLevel)) {
             return REALM_LIANQI + STAGE_EARLY;
         }
@@ -118,6 +183,7 @@ public class CultivationLevels {
     }
 
     public static String getPreviousStage(String currentLevel) {
+        if (REALM_HALF_JINDAN.equals(currentLevel)) return REALM_ZHUJI + STAGE_LATE;
         if (isMortal(currentLevel)) {
             return null;
         }
@@ -130,6 +196,8 @@ public class CultivationLevels {
     }
 
     public static int getStageIndex(String currentLevel) {
+        // Failure state stays below Golden Core without shifting normal stage indices.
+        if (REALM_HALF_JINDAN.equals(currentLevel)) return getStageIndex(REALM_ZHUJI + STAGE_LATE);
         if (isMortal(currentLevel)) {
             return 0;
         }
@@ -145,7 +213,7 @@ public class CultivationLevels {
         LevelDef levelDef = getLevelDef(currentLevel);
         return switch (levelDef.realm()) {
             case REALM_LIANQI -> 1;
-            case REALM_ZHUJI -> 2;
+            case REALM_ZHUJI, REALM_HALF_JINDAN -> 2;
             case REALM_JINDAN -> 3;
             case REALM_YUANYING -> 4;
             case REALM_HUASHEN -> 5;

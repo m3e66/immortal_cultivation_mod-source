@@ -37,7 +37,7 @@ public class LingFireBlock extends Block {
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         entity.igniteForSeconds(4.0F);
         if (!level.isClientSide && entity instanceof LivingEntity living) {
-            living.addEffect(new MobEffectInstance(ModEffects.QI_FIRE_BURN, 90, 0, false, false, false));
+            living.addEffect(new MobEffectInstance(ModEffects.QI_FIRE_BURN, 90, 0, false, false, true));
         }
         super.entityInside(state, level, pos, entity);
     }

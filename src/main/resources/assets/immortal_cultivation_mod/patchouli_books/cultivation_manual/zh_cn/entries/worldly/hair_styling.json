@@ -1,0 +1,18 @@
+{
+  "name": "发型台",
+  "icon": "immortal_cultivation_mod:hair_styling_table",
+  "category": "immortal_cultivation_mod:worldly",
+  "sortnum": 11,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "预览与调整",
+      "text": "与发型台交互，选择发型并预览角色。调整颜色、头盔下的发型显示方式，也可载入皮肤参考辅助预览。$(br2)参考皮肤只帮助搭配与预览；调整草稿不会立即替换真实装备。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "保存外观",
+      "text": "确认修改并保存，新的发型与颜色才会应用到角色的发型栏。可保存常用颜色，之后再次选取。$(br2)选择中文语言后，发型台的按钮、颜色选项、提示与皮肤载入状态会显示中文。"
+    }
+  ]
+}

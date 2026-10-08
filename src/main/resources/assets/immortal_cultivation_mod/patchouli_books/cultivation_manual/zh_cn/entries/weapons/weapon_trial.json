@@ -1,0 +1,23 @@
+{
+  "name": "兵器渡劫",
+  "icon": "immortal_cultivation_mod:flying_sword",
+  "category": "immortal_cultivation_mod:weapons",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "人替兵器承劫",
+      "text": "开始晋阶后会连续降下天雷。手持渡劫兵器时，雷击由持有者承受；必须坚持到整场雷劫结束。$(br2)兵器自身的力量与品阶决定雷劫强度。渡劫前应准备好气血、防御与恢复手段。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "脱手与耐久",
+      "text": "兵器未被手持时，天雷会直接消耗兵器耐久。放入普通背包栏也不能代替手持承劫。$(br2)耐久耗尽则兵器破碎，晋阶失败。耐久损耗会保留；拾起正在渡劫的兵器并不会取消剩余雷击。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "死亡后果",
+      "text": "渡劫期间持有者死亡，兵器会强制掉落，即使开启了 keepInventory。剩余雷击会继续针对掉落兵器。$(br2)坚持到最后并让兵器存活，才算完成晋阶。"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Forging with Spirit Fire",
+  "icon": "immortal_cultivation_mod:cu_tie_xiaoding",
+  "category": "immortal_cultivation_mod:forging",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Fire Beneath the Ding",
+      "text": "Shoot supported empty ground with a filled vessel, then place the Ding directly above that fire.$(br2)The floating essence released by sneaking does not substitute for a burning forge block. Open the Ding, insert the recipe slip and materials, and inspect its temperature and flame requirements.$(br2)Bronze Fire-Guiding Ding and Crimson Gold Sanyang Ding have lids: sneak-right-click only opens or closes the lid, without opening the menu. With the lid open, ordinary right-click opens the menu; a closed lid prevents menu access. Leaving the menu keeps the lid open. Inserted items appear inside its basin. With Debug Eye enabled, hold the stat editor and sneak-right-click to resize the Ding."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Choose a Suitable Flame",
+      "text": "Ordinary heat supports basic forging; higher-grade items require a flame that can reach the recipe target.$(br2)Flames also have different forging properties. Some suit wooden items; others favor metal weapons, spirit attacks, or tribulation resistance. Consult the filled vessel tooltip for its actual effect."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Heat and Lifetime",
+      "text": "Start forging, apply heat, and watch temperature and melting progress until an item is produced.$(br2)Placed spirit fire expires, but lasts longer directly beneath a Ding. Moving the Ding does not restart its timer. Floating capturable essences follow no such ground-fire timer. Closing the menu ends the forging pose without canceling the batch."
+    }
+  ]
+}

@@ -1,6 +1,9 @@
 {
   "replace": false,
   "values": [
-    "immortal_cultivation_mod:daofu_chestplate"
+    "immortal_cultivation_mod:daofu_chestplate",
+    "immortal_cultivation_mod:yunjian",
+    "immortal_cultivation_mod:cultivation_fapao",
+    "immortal_cultivation_mod:yuanling_pao"
   ]
 }

@@ -18,6 +18,10 @@ public class ModKeyMappings {
             "key." + ImmortalCultivationMod.MODID + ".open_stat_menu",
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_H, KEY_CATEGORY));
 
+    public static final Lazy<KeyMapping> OPEN_DAO_GUIDANCE = Lazy.of(() -> new KeyMapping(
+            "key." + ImmortalCultivationMod.MODID + ".open_dao_guidance",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_J, KEY_CATEGORY));
+
     public static final Lazy<KeyMapping> OPEN_SPELL_WHEEL = Lazy.of(() -> new KeyMapping(
             "key." + ImmortalCultivationMod.MODID + ".open_spell_wheel",
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_TAB, KEY_CATEGORY));
@@ -30,10 +34,6 @@ public class ModKeyMappings {
             "key." + ImmortalCultivationMod.MODID + ".meditate",
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_C, KEY_CATEGORY));
 
-    public static final Lazy<KeyMapping> OPEN_COMBO_MENU = Lazy.of(() -> new KeyMapping(
-            "key." + ImmortalCultivationMod.MODID + ".open_combo_menu",
-            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_O, KEY_CATEGORY));
-
     public static final Lazy<KeyMapping> INJECT_QI = Lazy.of(() -> new KeyMapping(
             "key." + ImmortalCultivationMod.MODID + ".inject_qi",
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_V, KEY_CATEGORY));
@@ -41,6 +41,10 @@ public class ModKeyMappings {
     public static final Lazy<KeyMapping> TOGGLE_COMBAT_MODE = Lazy.of(() -> new KeyMapping(
             "key." + ImmortalCultivationMod.MODID + ".toggle_combat_mode",
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Y, KEY_CATEGORY));
+
+    public static final Lazy<KeyMapping> SPIRITUAL_SENSE = Lazy.of(() -> new KeyMapping(
+            "key." + ImmortalCultivationMod.MODID + ".spiritual_sense",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_U, KEY_CATEGORY));
 
     public static final Lazy<KeyMapping> TARGET_LOCK = Lazy.of(() -> new KeyMapping(
             "key." + ImmortalCultivationMod.MODID + ".target_lock",
@@ -69,12 +73,13 @@ public class ModKeyMappings {
     @SubscribeEvent
     public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
         event.register(OPEN_STAT_MENU.get());
+        event.register(OPEN_DAO_GUIDANCE.get());
         event.register(OPEN_SPELL_WHEEL.get());
         event.register(OPEN_SPELL_SELECTION.get());
         event.register(MEDITATE.get());
-        event.register(OPEN_COMBO_MENU.get());
         event.register(INJECT_QI.get());
         event.register(TOGGLE_COMBAT_MODE.get());
+        event.register(SPIRITUAL_SENSE.get());
         event.register(TARGET_LOCK.get());
         event.register(RELEASE_WEAPON.get());
         event.register(SWORD_CASE.get());

@@ -1,6 +1,8 @@
 package com.example.immortal_cultivation_mod.spell;
 
+import com.example.immortal_cultivation_mod.entity.DefensePiercingProjectile;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 
 import java.util.Map;
 import java.util.UUID;
@@ -27,11 +29,16 @@ public final class BloodQiShield {
     }
 
     public static float absorb(ServerPlayer player, float damage) {
+        return absorb(player, null, damage);
+    }
+
+    public static float absorb(ServerPlayer player, DamageSource source, float damage) {
         ShieldState state = SHIELDS.get(player.getUUID());
         if (state == null || damage <= 0.0F) {
             return damage;
         }
-        float absorbed = Math.min(damage, state.remaining());
+        float multiplier = DefensePiercingProjectile.shieldMultiplier(source);
+        float absorbed = Math.min(damage * multiplier, state.remaining());
         float remaining = state.remaining() - absorbed;
         if (remaining <= 0.0F) {
             clear(player);
@@ -39,7 +46,7 @@ public final class BloodQiShield {
             SHIELDS.put(player.getUUID(), new ShieldState(remaining, state.max()));
             PlayerShieldManager.set(player, SHIELD_SOURCE, remaining, state.max());
         }
-        return damage - absorbed;
+        return Math.max(0.0F, damage - absorbed / multiplier);
     }
 
     public static void clear(ServerPlayer player) {

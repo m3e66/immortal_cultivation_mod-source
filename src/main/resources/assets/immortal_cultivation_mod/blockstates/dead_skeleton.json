@@ -1,0 +1,9 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "immortal_cultivation_mod:block/dead_skeleton"
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "MMM",
+    "MMM",
+    "MMM"
+  ],
+  "key": {
+    "M": { "item": "immortal_cultivation_mod:medicine_cabinet_small" }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:medicine_cabinet_large",
+    "count": 1
+  }
+}
+

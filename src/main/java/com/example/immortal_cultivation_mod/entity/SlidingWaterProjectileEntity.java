@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod.entity;
 
 import com.example.immortal_cultivation_mod.spell.SlidingWater;
+import com.example.immortal_cultivation_mod.spell.HanlanNingyuanJing;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -85,6 +86,9 @@ public class SlidingWaterProjectileEntity extends ThrowableItemProjectile {
     protected void onHitEntity(EntityHitResult result) {
         LivingEntity target = ModelBonePartEntity.resolveLiving(result.getEntity());
         if (level() instanceof ServerLevel serverLevel && target != null) {
+            if (getOwner() instanceof LivingEntity caster) {
+                HanlanNingyuanJing.applyDampFromWater(caster, target, 140);
+            }
             SlidingWater.createPuddle(
                     serverLevel,
                     target.blockPosition(),

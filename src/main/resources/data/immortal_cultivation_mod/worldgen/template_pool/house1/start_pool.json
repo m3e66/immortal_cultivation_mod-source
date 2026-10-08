@@ -1,0 +1,15 @@
+{
+  "name": "immortal_cultivation_mod:house1/start_pool",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "immortal_cultivation_mod:house1",
+        "processors": "immortal_cultivation_mod:house1_clear_terrain",
+        "projection": "rigid"
+      }
+    }
+  ]
+}

@@ -57,11 +57,11 @@ public class FuchenItem extends SwordItem implements GeoItem {
     private static final String BINDING_TAG = "ImmortalCultivationFuchenBinding";
     private static final int SPIN_COUNT = 5;
     private static final int SPIN_INTERVAL_TICKS = 4;
-    private static final float SPIN_DAMAGE = 1.5F;
+    private static final float SPIN_DAMAGE_PERCENT = 150.0F / 7.0F;
     private static final double SPIN_RADIUS = 3.0D;
     private static final int BIND_DURATION_TICKS = 60;
     private static final int BIND_COOLDOWN_TICKS = 200;
-    private static final float BIND_DAMAGE_PER_SECOND = 1.2F;
+    private static final float BIND_DAMAGE_PERCENT_PER_SECOND = 120.0F / 7.0F;
     private static final double BIND_REACH = 5.0D;
 
     private static final RawAnimation IDLE_ANIMATION =
@@ -153,17 +153,20 @@ public class FuchenItem extends SwordItem implements GeoItem {
             return InteractionResult.CONSUME;
         }
 
+        WeaponSkillAttack attack = WeaponSkillAttack.capture(stack);
         if (ForcefieldCenterBehavior.interceptAttackPath(
                 serverPlayer,
                 serverPlayer.getEyePosition(),
                 target.getBoundingBox().getCenter(),
                 (float) Math.max(1.0D,
                         serverPlayer.getAttributeValue(Attributes.ATTACK_DAMAGE)))) {
+            attack.consumeInjectedQi();
             serverPlayer.swing(hand, true);
             serverPlayer.getCooldowns().addCooldown(this, BIND_COOLDOWN_TICKS);
             return InteractionResult.CONSUME;
         }
 
+        attack.consumeInjectedQi();
         long gameTime = serverPlayer.serverLevel().getGameTime();
         finishBindingsOwnedBy(serverPlayer, true);
         BindState previousState = BOUND_TARGETS.get(target.getUUID());
@@ -196,7 +199,8 @@ public class FuchenItem extends SwordItem implements GeoItem {
                 stack,
                 gameTime + 20L,
                 gameTime + BIND_DURATION_TICKS,
-                3));
+                3,
+                attack));
         boolean alternate = WRAP_TRIGGER_TOGGLES.merge(
                 serverPlayer.getUUID(), true, (previous, ignored) -> !previous);
         triggerItemAnimation(
@@ -241,11 +245,13 @@ public class FuchenItem extends SwordItem implements GeoItem {
         }
         long gameTime = serverLevel.getGameTime();
         ItemStack weapon = attacker.getMainHandItem();
+        WeaponSkillAttack attack = WeaponSkillAttack.capture(weapon);
+        attack.consumeInjectedQi();
         SPIN_ATTACKS.put(attacker.getUUID(), new SpinState(
                 gameTime,
                 0,
                 weapon,
-                QiInfusedWeapon.injectedQiDamage(weapon)));
+                attack));
         if (attacker instanceof ServerPlayer player) {
             boolean alternate = SPIN_TRIGGER_TOGGLES.merge(
                     player.getUUID(), true, (previous, ignored) -> !previous);
@@ -282,6 +288,7 @@ public class FuchenItem extends SwordItem implements GeoItem {
             return;
         }
         if (!attacker.isAlive()
+                || attacker.getMainHandItem() != state.weapon
                 || !(attacker.getMainHandItem().getItem() instanceof FuchenItem)
                 || !(attacker.level() instanceof ServerLevel serverLevel)) {
             SPIN_ATTACKS.remove(attacker.getUUID());
@@ -292,15 +299,7 @@ public class FuchenItem extends SwordItem implements GeoItem {
         if (gameTime < state.nextPulseTick) {
             return;
         }
-        boolean damaged = strikeNearbyEnemies(attacker, state);
-        if (damaged
-                && !state.injectedQiConsumed
-                && state.injectedQiDamage > 0.0F) {
-            QiInfusedWeapon.consumeInjectedQiDamage(
-                    state.weapon,
-                    state.injectedQiDamage);
-            state.injectedQiConsumed = true;
-        }
+        strikeNearbyEnemies(attacker, state);
         emitSpinParticles(attacker);
         state.completedSpins++;
         if (state.completedSpins >= SPIN_COUNT) {
@@ -318,8 +317,7 @@ public class FuchenItem extends SwordItem implements GeoItem {
         Vec3 center = attacker.position().add(0.0D, attacker.getBbHeight() * 0.5D, 0.0D);
         double radiusSqr = SPIN_RADIUS * SPIN_RADIUS;
         boolean damaged = false;
-        float pulseDamage = SPIN_DAMAGE
-                + state.injectedQiDamage / SPIN_COUNT;
+        float pulseDamage = state.attack.damage(SPIN_DAMAGE_PERCENT);
         DamageSource pulseSource = attacker.damageSources()
                 .indirectMagic(attacker, attacker);
         for (LivingEntity target : level.getEntitiesOfClass(
@@ -397,6 +395,12 @@ public class FuchenItem extends SwordItem implements GeoItem {
         }
     }
 
+    /** Releases an incoming binding when an emergency escape artifact activates. */
+    public static void releaseBoundTarget(LivingEntity target) {
+        BindState state = BOUND_TARGETS.get(target.getUUID());
+        if (state != null && !target.level().isClientSide) finishBinding(target, state);
+    }
+
     private static void tickBoundTarget(LivingEntity target) {
         BindState state = BOUND_TARGETS.get(target.getUUID());
         if (state == null) {
@@ -420,7 +424,7 @@ public class FuchenItem extends SwordItem implements GeoItem {
             return;
         }
         target.hurt(owner.damageSources().indirectMagic(owner, owner),
-                BIND_DAMAGE_PER_SECOND);
+                state.attack.damage(BIND_DAMAGE_PERCENT_PER_SECOND));
         state.hitsRemaining--;
         state.nextDamageTick += 20L;
         if (state.hitsRemaining <= 0) {
@@ -642,18 +646,17 @@ public class FuchenItem extends SwordItem implements GeoItem {
         private long nextPulseTick;
         private int completedSpins;
         private final ItemStack weapon;
-        private final float injectedQiDamage;
-        private boolean injectedQiConsumed;
+        private final WeaponSkillAttack attack;
 
         private SpinState(
                 long nextPulseTick,
                 int completedSpins,
                 ItemStack weapon,
-                float injectedQiDamage) {
+                WeaponSkillAttack attack) {
             this.nextPulseTick = nextPulseTick;
             this.completedSpins = completedSpins;
             this.weapon = weapon;
-            this.injectedQiDamage = injectedQiDamage;
+            this.attack = attack;
         }
     }
 
@@ -665,6 +668,7 @@ public class FuchenItem extends SwordItem implements GeoItem {
         private long nextDamageTick;
         private final long expiresAt;
         private int hitsRemaining;
+        private final WeaponSkillAttack attack;
 
         private BindState(
                 UUID ownerId,
@@ -673,7 +677,8 @@ public class FuchenItem extends SwordItem implements GeoItem {
                 ItemStack boundStack,
                 long nextDamageTick,
                 long expiresAt,
-                int hitsRemaining) {
+                int hitsRemaining,
+                WeaponSkillAttack attack) {
             this.ownerId = ownerId;
             this.plumeId = plumeId;
             this.animatableId = animatableId;
@@ -681,6 +686,7 @@ public class FuchenItem extends SwordItem implements GeoItem {
             this.nextDamageTick = nextDamageTick;
             this.expiresAt = expiresAt;
             this.hitsRemaining = hitsRemaining;
+            this.attack = attack;
         }
     }
 }

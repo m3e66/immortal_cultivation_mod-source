@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "C C",
+    "CDC",
+    "CCC"
+  ],
+  "key": {
+    "C": {
+      "item": "immortal_cultivation_mod:chitong_sui"
+    },
+    "D": {
+      "item": "immortal_cultivation_mod:cu_tie_xiaoding"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:qingtong_yinhuo_ding",
+    "count": 1
+  }
+}

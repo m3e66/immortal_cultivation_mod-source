@@ -3,6 +3,7 @@ package com.example.immortal_cultivation_mod.particle;
 import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
+import com.example.immortal_cultivation_mod.config.ModServerConfig;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,12 +20,18 @@ import java.util.UUID;
 public final class MethodQiParticleEffects {
     private static final int PULSE_INTERVAL_TICKS = 2;
     private static final int PULSES_PER_QI_USE = 3;
+    private static final String SHOW_QI_USE_PARTICLES_KEY =
+            "immortal_cultivation_mod:show_qi_use_particles";
     private static final Map<UUID, PendingEmission> PENDING = new HashMap<>();
 
     private MethodQiParticleEffects() {
     }
 
     public static void emit(ServerPlayer player, String methodId, int qiSpent) {
+        if (!showQiUseParticles(player)) {
+            PENDING.remove(player.getUUID());
+            return;
+        }
         CultivationMethods.MethodDef method = CultivationMethods.get(methodId);
         if (method == null || qiSpent <= 0) {
             return;
@@ -58,6 +65,10 @@ public final class MethodQiParticleEffects {
     }
 
     public static void tick(ServerPlayer player) {
+        if (!showQiUseParticles(player)) {
+            PENDING.remove(player.getUUID());
+            return;
+        }
         PendingEmission pending = PENDING.get(player.getUUID());
         if (pending == null || player.tickCount < pending.nextPulseTick) {
             return;
@@ -88,6 +99,30 @@ public final class MethodQiParticleEffects {
             holders = particlesFor(method.element());
         }
         return resolveParticles(holders);
+    }
+
+    public static void setQiUseParticlesEnabled(
+            ServerPlayer player, boolean enabled) {
+        player.getPersistentData().putBoolean(
+                SHOW_QI_USE_PARTICLES_KEY, enabled);
+        if (!enabled) {
+            PENDING.remove(player.getUUID());
+        }
+    }
+
+    /**
+     * Whether ordinary vision receives this player's automatic Qi-use
+     * particles. Spiritual sense deliberately queries the same state so a
+     * hidden emission can remain spiritually perceptible without respawning
+     * the normal world particles.
+     */
+    public static boolean showQiUseParticles(ServerPlayer player) {
+        if (!ModServerConfig.showQiUseParticles()) {
+            return false;
+        }
+        return !player.getPersistentData().contains(SHOW_QI_USE_PARTICLES_KEY)
+                || player.getPersistentData().getBoolean(
+                        SHOW_QI_USE_PARTICLES_KEY);
     }
 
     public static List<SimpleParticleType> particlesForOwner(

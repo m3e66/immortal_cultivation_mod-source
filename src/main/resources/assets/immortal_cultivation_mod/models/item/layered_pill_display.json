@@ -1,0 +1,89 @@
+{
+  "parent": "minecraft:item/generated",
+  "display": {
+    "gui": {
+      "scale": [
+        2.679688,
+        2.679688,
+        1
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        -90,
+        25
+      ],
+      "translation": [
+        1.13,
+        3.2,
+        1.13
+      ],
+      "scale": [
+        1.684375,
+        1.684375,
+        0.3
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        -90,
+        25
+      ],
+      "translation": [
+        1.13,
+        3.2,
+        1.13
+      ],
+      "scale": [
+        1.684375,
+        1.684375,
+        0.3
+      ]
+    },
+    "thirdperson_righthand": {
+      "translation": [
+        0,
+        3,
+        1
+      ],
+      "scale": [
+        1.301562,
+        1.301562,
+        0.3
+      ]
+    },
+    "thirdperson_lefthand": {
+      "translation": [
+        0,
+        3,
+        1
+      ],
+      "scale": [
+        1.301562,
+        1.301562,
+        0.3
+      ]
+    },
+    "ground": {
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        1.53125,
+        1.53125,
+        0.3
+      ]
+    },
+    "fixed": {
+      "scale": [
+        2.296875,
+        2.296875,
+        0.3
+      ]
+    }
+  }
+}

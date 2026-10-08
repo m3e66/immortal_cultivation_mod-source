@@ -2,6 +2,7 @@ package com.example.immortal_cultivation_mod.screen;
 
 import com.example.immortal_cultivation_mod.network.OuterSystemPayloads;
 import com.example.immortal_cultivation_mod.system.OuterSystemType;
+import com.example.immortal_cultivation_mod.system.SystemShop;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +34,11 @@ public class SystemScreen extends Screen {
     private static final int SHOP_ROWS = 7;
     private static final int SHOP_ROW_H = 24;
     private static final int SHOP_SCROLLBAR_W = 14;
+    private static final int SHOP_CATEGORY_COLUMNS = 5;
+    private static final int SHOP_CATEGORY_BUTTON_W = 88;
+    private static final int SHOP_CATEGORY_BUTTON_H = 16;
+    private static final int SHOP_CATEGORY_GAP = 4;
+    private static final int SHOP_CATEGORY_ROW_GAP = 2;
     private static final int GACHA_W = 620;
     private static final int GACHA_H = 390;
     private static final int GACHA_ROWS = 7;
@@ -159,21 +165,25 @@ public class SystemScreen extends Screen {
         });
         addRenderableWidget(searchBox);
 
-        int categoryX = x + 20;
-        for (ShopCategory category : ShopCategory.values()) {
+        ShopCategory[] categories = ShopCategory.values();
+        for (int i = 0; i < categories.length; i++) {
+            ShopCategory category = categories[i];
+            int categoryX = x + 20 + (i % SHOP_CATEGORY_COLUMNS)
+                    * (SHOP_CATEGORY_BUTTON_W + SHOP_CATEGORY_GAP);
+            int categoryY = y + 68 + (i / SHOP_CATEGORY_COLUMNS)
+                    * (SHOP_CATEGORY_BUTTON_H + SHOP_CATEGORY_ROW_GAP);
             SystemGuiButton button =
                     addRenderableWidget(new SystemGuiButton(
                             categoryX,
-                            y + 68,
-                            72,
-                            16,
+                            categoryY,
+                            SHOP_CATEGORY_BUTTON_W,
+                            SHOP_CATEGORY_BUTTON_H,
                             category.label(),
                             () -> {
                                 shopCategory = category;
                                 resetList();
                             }));
             categoryButtons.add(button);
-            categoryX += 76;
         }
 
         int footerY = y + SHOP_H - 29;
@@ -291,6 +301,10 @@ public class SystemScreen extends Screen {
     }
 
     private void performShopAction() {
+        performShopAction(hasShiftDown());
+    }
+
+    private void performShopAction(boolean buyStack) {
         if (selectedIndex < 0) {
             return;
         }
@@ -300,7 +314,7 @@ public class SystemScreen extends Screen {
                 if (selectedIndex < entries.size()) {
                     PacketDistributor.sendToServer(
                             new OuterSystemPayloads.ServerboundShopBuy(
-                                    entries.get(selectedIndex).id()));
+                                    entries.get(selectedIndex).id(), buyStack));
                 }
             }
             case RECYCLE -> {
@@ -379,14 +393,19 @@ public class SystemScreen extends Screen {
         } else {
             renderKillGrowth(graphics, x, y);
         }
+        // Widgets are contained by ContentLayout already. AbstractWidget checks
+        // hover coordinates against the scissor in screen space, whereas these
+        // widget coordinates are in the fitted content space.
+        graphics.disableScissor();
         super.render(
                 graphics, contentMouseX, contentMouseY, partialTick);
         graphics.pose().popPose();
-        graphics.disableScissor();
-        if (!hoveredStack.isEmpty()) {
-            graphics.renderTooltip(font, hoveredStack, uiMouseX, uiMouseY);
-        }
         graphics.pose().popPose();
+        // Tooltips use GuiGraphics' real viewport bounds, so render them after
+        // leaving both the content transform and the desktop transform.
+        if (!hoveredStack.isEmpty()) {
+            graphics.renderTooltip(font, hoveredStack, mouseX, mouseY);
+        }
     }
 
     private void renderShop(
@@ -985,27 +1004,20 @@ public class SystemScreen extends Screen {
     }
 
     private int stock(ShopEntry entry) {
-        return switch (entry.rarity()) {
-            case "common" -> -1;
-            case "uncommon" -> Math.max(
-                    0,
-                    16 - state.getCompound("ShopPurchases")
-                            .getInt(entry.id()));
-            case "rare" -> {
-                int maximum = 1 + Math.floorMod(
-                        31 * entry.id().hashCode()
-                                + Long.hashCode(state.getLong("ShopDay")),
-                        4);
-                yield Math.max(
-                        0,
-                        maximum - state.getCompound("ShopPurchases")
-                                .getInt(entry.id()));
-            }
-            case "unique" -> containsString(
+        if ("unique".equals(entry.rarity())) {
+            return containsString(
                     state.getList("ShopUniqueBought", Tag.TAG_STRING),
                     entry.id()) ? 0 : 1;
-            default -> 0;
-        };
+        }
+        int maximum = SystemShop.dailyStock(
+                entry.id(), entry.price(), state.getLong("ShopDay"));
+        if (maximum < 0) {
+            return -1;
+        }
+        return Math.max(
+                0,
+                maximum - state.getCompound("ShopPurchases")
+                        .getInt(entry.id()));
     }
 
     private List<ShopEntry> filteredCatalog() {
@@ -1351,12 +1363,14 @@ public class SystemScreen extends Screen {
     }
 
     private float uiScale() {
-        float availableWidth = Math.max(1.0F, width - SCREEN_MARGIN);
-        float availableHeight = Math.max(1.0F, height - SCREEN_MARGIN);
-        float fitScale = Math.min(
-                availableWidth / baseWindowWidth(),
-                availableHeight / baseWindowHeight());
-        return Math.max(0.1F, Math.min(DEFAULT_UI_SCALE, fitScale));
+        return (float) MenuViewport.fit(width - SCREEN_MARGIN, height - SCREEN_MARGIN,
+                baseWindowWidth(), baseWindowHeight(), DEFAULT_UI_SCALE).scale();
+    }
+
+    @Override
+    public void resize(net.minecraft.client.Minecraft minecraft, int width, int height) {
+        windowState.endDrag();
+        super.resize(minecraft, width, height);
     }
 
     private int desktopWidth() {
@@ -1376,7 +1390,13 @@ public class SystemScreen extends Screen {
     }
 
     private int listTop() {
-        return top() + 101;
+        return top() + 101 + (categoryRowCount() - 1)
+                * (SHOP_CATEGORY_BUTTON_H + SHOP_CATEGORY_ROW_GAP);
+    }
+
+    private static int categoryRowCount() {
+        return Math.max(1, (ShopCategory.values().length + SHOP_CATEGORY_COLUMNS - 1)
+                / SHOP_CATEGORY_COLUMNS);
     }
 
     @Override
@@ -1494,6 +1514,9 @@ public class SystemScreen extends Screen {
                 && index < currentListSize()) {
             selectedIndex = index;
             updateButtons();
+            if (shopMode == ShopMode.BUY && hasShiftDown()) {
+                performShopAction(true);
+            }
             return true;
         }
         return false;
@@ -1690,9 +1713,13 @@ public class SystemScreen extends Screen {
     private enum ShopCategory {
         ALL("all"),
         PILL("pill"),
+        FOOD("food"),
         MATERIAL("material"),
+        TALISMAN("talisman"),
         WEAPON("weapon"),
+        ACCESSORY("accessory"),
         SPELL("spell"),
+        FORMATION("formation"),
         BLOCK("block");
 
         private final String id;

@@ -7,16 +7,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.Input;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
-import net.neoforged.neoforge.client.event.InputEvent.InteractionKeyMappingTriggered;
-import net.neoforged.neoforge.client.event.ViewportEvent.ComputeFogColor;
-import net.neoforged.neoforge.client.event.ViewportEvent.RenderFog;
+import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
 public class ModClientEvents {
@@ -40,40 +40,43 @@ public class ModClientEvents {
       });
    }
 
-   public static void onInteractionKey(InteractionKeyMappingTriggered event) {
+   public static void onInteractionKey(InputEvent.InteractionKeyMappingTriggered event) {
       if (event.isUseItem() && event.getHand() == InteractionHand.MAIN_HAND) {
          Minecraft mc = Minecraft.getInstance();
-         if (mc.player != null) {
-            if (mc.player.getMainHandItem().is((Item)ModItems.RITUAL_DAGGER.get())) {
-               event.setCanceled(true);
-               if (Screen.hasShiftDown()) {
-                  mc.setScreen(new RadiusSelectionScreen());
-               } else {
-                  mc.setScreen(new CircleSelectionScreen());
-               }
+         if (mc.player != null && mc.player.getMainHandItem().is((Item)ModItems.RITUAL_DAGGER.get())) {
+            event.setCanceled(true);
+            if (Screen.hasShiftDown()) {
+               mc.setScreen(new RadiusSelectionScreen());
+            } else {
+               mc.setScreen(new CircleSelectionScreen());
             }
          }
       }
+
    }
 
-   public static void onComputeFogColor(ComputeFogColor event) {
-      if (event.getCamera().getEntity() instanceof LivingEntity living) {
+   public static void onComputeFogColor(ViewportEvent.ComputeFogColor event) {
+      Entity var2 = event.getCamera().getEntity();
+      if (var2 instanceof LivingEntity living) {
          if (living.hasEffect(ModEffects.FOG)) {
             event.setRed(1.0F);
             event.setGreen(1.0F);
             event.setBlue(1.0F);
          }
       }
+
    }
 
-   public static void onRenderFog(RenderFog event) {
-      if (event.getCamera().getEntity() instanceof LivingEntity living) {
+   public static void onRenderFog(ViewportEvent.RenderFog event) {
+      Entity var2 = event.getCamera().getEntity();
+      if (var2 instanceof LivingEntity living) {
          if (living.hasEffect(ModEffects.FOG)) {
             event.setNearPlaneDistance(0.0F);
             event.setFarPlaneDistance(5.0F);
             event.setCanceled(true);
          }
       }
+
    }
 
    public static void onMovementInput(MovementInputUpdateEvent event) {
@@ -82,5 +85,6 @@ public class ModClientEvents {
          input.leftImpulse = -input.leftImpulse;
          input.forwardImpulse = -input.forwardImpulse;
       }
+
    }
 }

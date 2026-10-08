@@ -8,16 +8,16 @@
   ],
   "key": {
     "N": {
-      "item": "minecraft:iron_nugget"
+      "item": "immortal_cultivation_mod:xuanduan_iron_shard"
     },
     "L": {
-      "item": "minecraft:leather"
+      "item": "immortal_cultivation_mod:rock_badger_hide"
     },
     "T": {
-      "item": "minecraft:tripwire_hook"
+      "item": "immortal_cultivation_mod:spirit_guiding_gear"
     },
     "R": {
-      "item": "minecraft:redstone"
+      "item": "immortal_cultivation_mod:zhenwen_jade"
     }
   },
   "result": {

@@ -37,7 +37,9 @@ public final class YufengJue {
         }
 
         var data = ModAttachments.getData(player);
-        if (!ServerEvents.spendQiOrBlood(player, data, QI_PER_SECOND)) {
+        int cost = com.example.immortal_cultivation_mod.entity.TalismanWardEntity
+                .adjustFlightQiCost(player, QI_PER_SECOND);
+        if (!ServerEvents.spendSpellQiOrBlood(player, data, cost)) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return;
         }
@@ -75,7 +77,9 @@ public final class YufengJue {
         }
 
         var data = ModAttachments.getData(player);
-        if (!ServerEvents.spendQiOrBlood(player, data, QI_PER_SECOND)) {
+        int cost = com.example.immortal_cultivation_mod.entity.TalismanWardEntity
+                .adjustFlightQiCost(player, QI_PER_SECOND);
+        if (!ServerEvents.spendSustainedQiOrBlood(player, data, cost)) {
             stop(player);
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return;

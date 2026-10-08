@@ -4,16 +4,17 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type;
 import net.minecraft.resources.ResourceLocation;
 
 public record ServerboundPlaceCirclePayload(String circleType) implements CustomPacketPayload {
-   public static final Type<ServerboundPlaceCirclePayload> TYPE = new Type(ResourceLocation.fromNamespaceAndPath("immortal_cultivation_mod", "place_circle"));
-   public static final StreamCodec<ByteBuf, ServerboundPlaceCirclePayload> STREAM_CODEC = StreamCodec.composite(
-      ByteBufCodecs.STRING_UTF8, ServerboundPlaceCirclePayload::circleType, ServerboundPlaceCirclePayload::new
-   );
+   public static final CustomPacketPayload.Type<ServerboundPlaceCirclePayload> TYPE = new CustomPacketPayload.Type(ResourceLocation.fromNamespaceAndPath("immortal_cultivation_mod", "place_circle"));
+   public static final StreamCodec<ByteBuf, ServerboundPlaceCirclePayload> STREAM_CODEC;
 
-   public Type<? extends CustomPacketPayload> type() {
+   public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
       return TYPE;
+   }
+
+   static {
+      STREAM_CODEC = StreamCodec.composite(ByteBufCodecs.STRING_UTF8, ServerboundPlaceCirclePayload::circleType, ServerboundPlaceCirclePayload::new);
    }
 }

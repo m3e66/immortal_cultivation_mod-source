@@ -11,6 +11,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
@@ -56,6 +57,16 @@ public final class SpiritSilkProjectileEntity extends ThrowableItemProjectile {
                     MobEffects.MOVEMENT_SLOWDOWN, 20 * 6, 2, false, true, true));
         }
         discardWithParticles(result);
+    }
+
+    @Override
+    protected void onHitBlock(BlockHitResult result) {
+        super.onHitBlock(result);
+        if (level() instanceof ServerLevel serverLevel
+                && getOwner() instanceof AzureSpiritSilkwormEntity silkworm) {
+            BeastMoveBlockBreaker.breakSphere(serverLevel, silkworm,
+                    result.getLocation(), 1.1D, 1.0D, 6, 2.0F);
+        }
     }
 
     @Override

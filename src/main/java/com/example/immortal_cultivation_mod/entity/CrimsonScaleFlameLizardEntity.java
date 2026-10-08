@@ -396,6 +396,10 @@ public class CrimsonScaleFlameLizardEntity extends Monster implements GeoEntity 
         if (level().isClientSide || !isAlive()) {
             return;
         }
+        if (BeastDazeControl.blocksMoves(this)) {
+            cancelActionForDaze();
+            return;
+        }
 
         if (breathCooldown > 0) {
             breathCooldown--;
@@ -534,6 +538,13 @@ public class CrimsonScaleFlameLizardEntity extends Monster implements GeoEntity 
             Vec3 away = target.position().subtract(position());
             target.knockback(1.8D, -away.x, -away.z);
         }
+        BeastMoveBlockBreaker.breakBox(serverLevel, this,
+                new AABB(getX() - TAIL_SWEEP_RANGE, getY(),
+                        getZ() - TAIL_SWEEP_RANGE,
+                        getX() + TAIL_SWEEP_RANGE,
+                        getY() + Math.min(2.0D, getBbHeight() + 0.5D),
+                        getZ() + TAIL_SWEEP_RANGE),
+                getBoundingBox().getCenter(), 28, 4.0F);
         serverLevel.sendParticles(ParticleTypes.SWEEP_ATTACK,
                 getX(), getY() + 0.75D, getZ(),
                 18, 2.1D, 0.35D, 2.1D, 0.0D);
@@ -581,7 +592,7 @@ public class CrimsonScaleFlameLizardEntity extends Monster implements GeoEntity 
 
     @Override
     public boolean doHurtTarget(Entity entity) {
-        if (getActionState() != ACTION_NONE) {
+        if (BeastDazeControl.blocksMoves(this) || getActionState() != ACTION_NONE) {
             return false;
         }
         boolean hurt = super.doHurtTarget(entity);
@@ -624,8 +635,16 @@ public class CrimsonScaleFlameLizardEntity extends Monster implements GeoEntity 
     }
 
     private void beginAction(byte action, int ticks) {
+        if (BeastDazeControl.blocksMoves(this)) {
+            return;
+        }
         entityData.set(ACTION_STATE, action);
         entityData.set(ACTION_TICKS, Math.max(1, ticks));
+    }
+
+    private void cancelActionForDaze() {
+        entityData.set(ACTION_STATE, ACTION_NONE);
+        entityData.set(ACTION_TICKS, 0);
     }
 
     public byte getActionState() {

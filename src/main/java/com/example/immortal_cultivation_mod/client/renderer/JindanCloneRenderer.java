@@ -9,12 +9,11 @@ import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
 public class JindanCloneRenderer extends HumanoidMobRenderer<JindanCloneEntity, PlayerModel<JindanCloneEntity>> {
-    public JindanCloneRenderer(EntityRendererProvider.Context context) {
-        super(context, new PlayerModel<>(context.bakeLayer(ModelLayers.PLAYER_SLIM), true), 0.5F);
-    }
+   public JindanCloneRenderer(EntityRendererProvider.Context context) {
+      super(context, new PlayerModel(context.bakeLayer(ModelLayers.PLAYER_SLIM), true), 0.5F);
+   }
 
-    @Override
-    public ResourceLocation getTextureLocation(JindanCloneEntity entity) {
-        return Minecraft.getInstance().getSkinManager().getInsecureSkin(entity.getGameProfile()).texture();
-    }
+   public ResourceLocation getTextureLocation(JindanCloneEntity entity) {
+      return Minecraft.getInstance().getSkinManager().getInsecureSkin(entity.getGameProfile()).texture();
+   }
 }

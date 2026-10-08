@@ -1,5 +1,5 @@
 {
-  "name": "七类禁制",
+  "name": "装备禁制",
   "icon": "immortal_cultivation_mod:flying_sword",
   "category": "immortal_cultivation_mod:principles",
   "sortnum": 4,
@@ -23,6 +23,11 @@
       "type": "patchouli:text",
       "title": "破甲禁制",
       "text": "破甲禁制：目标穿戴护甲时，每重使武器对其造成的伤害提高 1%。$(br2)所有同类禁制都可叠加；器物蜕变后，已融合禁制仍计入最终效果。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "护具禁制",
+      "text": "放入护具或衣物后仅显示适用禁制。护身每层减伤0.25%；辟火、御爆、御矢、轻身每层减少0.5%对应伤害。穿戴装备可叠加，总减伤上限80%。坚固与聚灵亦适用。外观栏不生效。"
     }
   ]
 }

@@ -1,0 +1,16 @@
+{
+  "structures": [
+    {
+      "structure": "immortal_cultivation_mod:small_sect1",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "frequency": 0.5,
+    "frequency_reduction_method": "default",
+    "spacing": 112,
+    "separation": 56,
+    "salt": 197531247
+  }
+}

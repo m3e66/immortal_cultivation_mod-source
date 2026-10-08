@@ -1,0 +1,23 @@
+{
+  "name": "人生模拟",
+  "icon": "immortal_cultivation_mod:cultivation_manual",
+  "category": "immortal_cultivation_mod:worldly",
+  "sortnum": 10,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "开始与选择",
+      "text": "进入人生模拟系统，创建新的人生。阅读事件与可选行动，再作决定。$(br2)此前的选择会影响之后的经历与机缘。真实修士与模拟人生是不同的状态，不要把模拟中的境界当作角色已经获得的境界。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "手动结算",
+      "text": "模拟仍在进行时，可使用“手动结算”提前结束当前人生，按已有经历与成就结算。无需等待高境界角色寿终。$(br2)结算会结束本次模拟，不能继续同一段人生。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "领取奖励",
+      "text": "模拟结束后查看继承奖励，并选择领取。只有实际领取，奖励才会应用到真实角色。$(br2)同一次人生的奖励不能反复领取；结算界面出现不代表所有奖励已经同时获得。"
+    }
+  ]
+}

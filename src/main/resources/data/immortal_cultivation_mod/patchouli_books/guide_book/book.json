@@ -1,8 +1,8 @@
 {
   "name": "immortal_cultivation_mod.magic_ritual.book.name",
   "landing_text": "immortal_cultivation_mod.magic_ritual.book.landing",
-  "version": 1,
-  "creative_tab": "immortal_cultivation_mod:magic_ritual_tab",
+  "version": 2,
+  "creative_tab": "immortal_cultivation_mod:immortal_tab",
   "use_resource_pack": true,
   "model": "immortal_cultivation_mod:cultivation_manual",
   "book_texture": "immortal_cultivation_mod:textures/gui/cultivation_manual_book.png",

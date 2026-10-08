@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "immortal_cultivation_mod:ziyun_vine"
+    },
+    {
+      "item": "immortal_cultivation_mod:ziyun_vine"
+    },
+    {
+      "item": "immortal_cultivation_mod:ziyun_vine"
+    },
+    {
+      "item": "immortal_cultivation_mod:harmonizing_herb"
+    },
+    {
+      "item": "immortal_cultivation_mod:harmonizing_herb"
+    },
+    {
+      "item": "immortal_cultivation_mod:catalyst_blossom"
+    }
+  ],
+  "result": {
+    "id": "immortal_cultivation_mod:body_tempering_formula",
+    "count": 1
+  }
+}

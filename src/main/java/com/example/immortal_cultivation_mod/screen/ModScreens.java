@@ -22,5 +22,17 @@ public class ModScreens {
             MENUS.register("restriction_table",
                     () -> new MenuType<>(RestrictionTableMenu::new, FeatureFlags.DEFAULT_FLAGS));
 
+    public static final DeferredHolder<MenuType<?>, MenuType<TalismanDrawingMenu>> TALISMAN_DRAWING =
+            MENUS.register("talisman_drawing",
+                    () -> new MenuType<>(TalismanDrawingMenu::new, FeatureFlags.DEFAULT_FLAGS));
+
+    public static final DeferredHolder<MenuType<?>, MenuType<MedicineDrawerMenu>> MEDICINE_DRAWER =
+            MENUS.register("medicine_drawer",
+                    () -> new MenuType<>(MedicineDrawerMenu::new, FeatureFlags.DEFAULT_FLAGS));
+
+
+    public static final DeferredHolder<MenuType<?>, MenuType<DebugWeaponEditorMenu>> DEBUG_WEAPON_EDITOR =
+            MENUS.register("debug_weapon_editor", () -> new MenuType<>(DebugWeaponEditorMenu::new, FeatureFlags.DEFAULT_FLAGS));
+
     public static void register(IEventBus bus) { MENUS.register(bus); }
 }

@@ -9,7 +9,6 @@ import com.example.immortal_cultivation_mod.magicritual.network.ModPayloads;
 import com.example.immortal_cultivation_mod.magicritual.poi.ModPoiTypes;
 import com.example.immortal_cultivation_mod.magicritual.ui.ModClientEvents;
 import com.example.immortal_cultivation_mod.magicritual.ui.ModMenuTypes;
-import com.example.immortal_cultivation_mod.magicritual.ui.ModTabs;
 import com.example.immortal_cultivation_mod.magicritual.worldgen.ModFeatures;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -24,7 +23,6 @@ public final class MagicRitualMod {
    public static void register(IEventBus modEventBus) {
       ModItems.ITEMS.register(modEventBus);
       ModBlocks.BLOCKS.register(modEventBus);
-      ModTabs.CREATIVE_TABS.register(modEventBus);
       ModBlockEntities.register(modEventBus);
       ModMenuTypes.register(modEventBus);
       ModEffects.register(modEventBus);

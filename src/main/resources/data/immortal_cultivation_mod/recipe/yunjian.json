@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "GSG",
+    "WWW",
+    " W "
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:gold_nugget"
+    },
+    "S": {
+      "item": "minecraft:string"
+    },
+    "W": {
+      "item": "immortal_cultivation_mod:white_wool_strip"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:yunjian",
+    "count": 1
+  }
+}

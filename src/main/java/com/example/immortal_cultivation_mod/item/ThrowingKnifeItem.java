@@ -50,6 +50,8 @@ public class ThrowingKnifeItem extends Item {
                 || !throwFromHand(serverPlayer, hand, false)) {
             return InteractionResultHolder.fail(stack);
         }
+        com.example.immortal_cultivation_mod.network.WeaponUseAnimations.play(serverPlayer,
+                com.example.immortal_cultivation_mod.network.WeaponUseAnimations.Type.KNIFE);
         return InteractionResultHolder.consume(player.getItemInHand(hand));
     }
 

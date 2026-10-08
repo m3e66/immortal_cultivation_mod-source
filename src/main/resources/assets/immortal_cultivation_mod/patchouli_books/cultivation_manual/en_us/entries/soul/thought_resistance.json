@@ -1,0 +1,18 @@
+{
+  "name": "Thoughts and Control",
+  "icon": "immortal_cultivation_mod:yangshen_pill",
+  "category": "immortal_cultivation_mod:soul",
+  "sortnum": 9,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Resist Control",
+      "text": "Thoughts help retain control when an ability attempts to restrict your actions. Sustained control pressure drains Thoughts; rapid repeated applications do not multiply that drain.$(br2)At an empty bar, this protection is lost and control becomes more dangerous. Deliberate exhaustion is not required to learn the lesson."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Recover and Preserve",
+      "text": "Watch the Thoughts bar and escape sustained control. Restore Thoughts through recovery or suitable pills such as Spirit Nourishing.$(br2)Against several control users, preserve a reserve rather than exhausting the entire bar on the first restraint."
+    }
+  ]
+}

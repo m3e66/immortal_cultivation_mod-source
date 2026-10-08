@@ -1,0 +1,16 @@
+{
+  "structures": [
+    {
+      "structure": "immortal_cultivation_mod:daoist_temple",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "frequency": 0.5,
+    "frequency_reduction_method": "default",
+    "spacing": 80,
+    "separation": 40,
+    "salt": 146973381
+  }
+}

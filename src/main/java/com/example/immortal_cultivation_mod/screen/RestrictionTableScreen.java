@@ -41,15 +41,22 @@ public class RestrictionTableScreen extends AbstractContainerScreen<RestrictionT
     private static final int LEFT_COUNT_X = 48;
     private static final int RIGHT_COUNT_X = 311;
 
-    private static final ResourceLocation[] SIGILS = {
-            sigil("sharpness"),
-            sigil("spirit_gathering"),
-            sigil("spirit_devouring"),
-            sigil("swift_flight"),
-            sigil("sturdy"),
-            sigil("qi_storage"),
-            sigil("armor_breaking")
-    };
+    // Reuse the existing carved sigil artwork for the new defensive formations.
+    private ResourceLocation sigilFor(WeaponRestrictionSystem.RestrictionType type) {
+        return sigil(switch (type) {
+            case PROTECTION -> "sturdy";
+            case FIRE_PROTECTION -> "spirit_devouring";
+            case BLAST_PROTECTION -> "armor_breaking";
+            case PROJECTILE_PROTECTION -> "sharpness";
+            case FEATHER_FALLING -> "swift_flight";
+            default -> type.id();
+        });
+    }
+
+    private List<WeaponRestrictionSystem.RestrictionType> visibleTypes() {
+        return WeaponRestrictionSystem.availableTypes(menu.getSlot(0).getItem());
+    }
+
     private final int[] selected = new int[WeaponRestrictionSystem.RestrictionType.values().length];
     private CarvedButton carveButton;
     private CarvedButton evolveButton;
@@ -82,7 +89,10 @@ public class RestrictionTableScreen extends AbstractContainerScreen<RestrictionT
         refreshButtons();
     }
 
-    private void adjust(int index, int direction) {
+    private void adjust(int visibleIndex, int direction) {
+        var types = visibleTypes();
+        if (visibleIndex >= types.size()) return;
+        int index = types.get(visibleIndex).ordinal();
         int step = Screen.hasShiftDown() ? 10 : 1;
         if (direction < 0) {
             selected[index] = Math.max(0, selected[index] - step);
@@ -98,6 +108,9 @@ public class RestrictionTableScreen extends AbstractContainerScreen<RestrictionT
     }
 
     private void refreshButtons() {
+        for (var type : WeaponRestrictionSystem.RestrictionType.values()) {
+            if (!WeaponRestrictionSystem.canApply(menu.getSlot(0).getItem(), type)) selected[type.ordinal()] = 0;
+        }
         if (carveButton != null) {
             carveButton.visible = menu.progress() < 72;
             carveButton.active = !menu.active() && !menu.getSlot(0).getItem().isEmpty()
@@ -121,7 +134,7 @@ public class RestrictionTableScreen extends AbstractContainerScreen<RestrictionT
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (!menu.active() && (button == 0 || button == 1)) {
-            for (int i = 0; i < selected.length; i++) {
+            for (int i = 0; i < visibleTypes().size(); i++) {
                 if (isOverSigil(i, mouseX, mouseY)) {
                     adjust(i, button == 0 ? 1 : -1);
                     return true;
@@ -137,7 +150,7 @@ public class RestrictionTableScreen extends AbstractContainerScreen<RestrictionT
         int y = topPos;
         CultivationGuiTextures.drawLandscape(graphics, x, y, imageWidth, imageHeight);
 
-        for (int i = 0; i < selected.length; i++) {
+        for (int i = 0; i < visibleTypes().size(); i++) {
             renderRestrictionRow(graphics, i, mouseX, mouseY);
         }
         renderCoreRow(graphics, mouseX, mouseY);
@@ -167,7 +180,7 @@ public class RestrictionTableScreen extends AbstractContainerScreen<RestrictionT
         int sigilX = index < 4 ? LEFT_SIGIL_X : RIGHT_SIGIL_X;
         int rowY = ROW_Y[row];
         boolean hovered = isOverSigil(index, mouseX, mouseY);
-        boolean chosen = selected[index] > 0;
+        boolean chosen = selected[visibleTypes().get(index).ordinal()] > 0;
         int background = chosen ? PARCHMENT_SELECTED
                 : hovered ? PARCHMENT_HOVER : PARCHMENT_ROW;
         int border = hovered ? GOLD_BRIGHT : chosen ? JADE_BRIGHT : PARCHMENT_BORDER;
@@ -180,7 +193,7 @@ public class RestrictionTableScreen extends AbstractContainerScreen<RestrictionT
         graphics.renderOutline(leftPos + sigilX - 1, topPos + rowY,
                 SIGIL_FRAME_SIZE, SIGIL_FRAME_SIZE, border);
         graphics.setColor(0.19F, 0.35F, 0.31F, 1.0F);
-        graphics.blit(SIGILS[index], leftPos + sigilX, topPos + rowY + 1,
+        graphics.blit(sigilFor(visibleTypes().get(index)), leftPos + sigilX, topPos + rowY + 1,
                 SIGIL_SIZE, SIGIL_SIZE, 0.0F, 0.0F, 128, 128, 128, 128);
         graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
         if (menu.active()) {
@@ -232,18 +245,18 @@ public class RestrictionTableScreen extends AbstractContainerScreen<RestrictionT
                         menu.progress()),
                 imageWidth / 2, 105, INK);
 
-        WeaponRestrictionSystem.RestrictionType[] types = WeaponRestrictionSystem.RestrictionType.values();
-        for (int i = 0; i < types.length; i++) {
+        var types = visibleTypes();
+        for (int i = 0; i < types.size(); i++) {
             boolean left = i < 4;
             int row = left ? i : i - 4;
             Component name = Component.translatable("screen." + ImmortalCultivationMod.MODID
-                    + ".restriction_table.short." + types[i].id());
+                    + ".restriction_table.short." + types.get(i).id());
             int nameX = left ? 61 : 221;
             drawFittedText(graphics, name, nameX, ROW_Y[row] + 10, 78,
-                    selected[i] > 0 ? INK : MUTED_INK);
+                    selected[types.get(i).ordinal()] > 0 ? INK : MUTED_INK);
             int countX = left ? LEFT_COUNT_X : RIGHT_COUNT_X;
-            drawCenteredText(graphics, Component.literal(Integer.toString(selected[i])), countX,
-                    ROW_Y[row] + 10, selected[i] > 0 ? JADE : MUTED_INK);
+            drawCenteredText(graphics, Component.literal(Integer.toString(selected[types.get(i).ordinal()])), countX,
+                    ROW_Y[row] + 10, selected[types.get(i).ordinal()] > 0 ? JADE : MUTED_INK);
         }
 
         Component layers = Component.translatable("screen." + ImmortalCultivationMod.MODID
@@ -276,9 +289,9 @@ public class RestrictionTableScreen extends AbstractContainerScreen<RestrictionT
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
-        for (int i = 0; i < selected.length; i++) {
+        for (int i = 0; i < visibleTypes().size(); i++) {
             if (isOverRow(i, mouseX, mouseY)) {
-                WeaponRestrictionSystem.RestrictionType type = WeaponRestrictionSystem.RestrictionType.values()[i];
+                WeaponRestrictionSystem.RestrictionType type = visibleTypes().get(i);
                 graphics.renderTooltip(font, List.of(
                         Component.translatable("restriction." + ImmortalCultivationMod.MODID + "." + type.id())
                                 .getVisualOrderText(),

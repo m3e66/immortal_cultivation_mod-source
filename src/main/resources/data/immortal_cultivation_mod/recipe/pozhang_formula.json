@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "immortal_cultivation_mod:chiyan_flower"
+    },
+    {
+      "item": "immortal_cultivation_mod:chiyan_flower"
+    },
+    {
+      "item": "immortal_cultivation_mod:shihun_grass"
+    }
+  ],
+  "result": {
+    "id": "immortal_cultivation_mod:pozhang_formula",
+    "count": 1
+  }
+}

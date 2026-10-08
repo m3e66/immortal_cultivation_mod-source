@@ -2,12 +2,14 @@ package com.example.immortal_cultivation_mod.spell;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
-import com.example.immortal_cultivation_mod.effect.PhotonEffects;
+import com.example.immortal_cultivation_mod.effect.NativeSpellEffects;
+import com.example.immortal_cultivation_mod.entity.DefensePiercingProjectile;
 import com.example.immortal_cultivation_mod.event.ServerEvents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.damagesource.DamageSource;
 
 import java.util.Map;
 import java.util.UUID;
@@ -25,7 +27,7 @@ public final class DielangShield {
 
     public static boolean cast(ServerPlayer player) {
         var data = ModAttachments.getData(player);
-        if (!ServerEvents.spendQiOrBlood(player, data, nextCost(player))) {
+        if (!ServerEvents.spendSpellQiOrBlood(player, data, nextCost(player))) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return false;
         }
@@ -47,29 +49,35 @@ public final class DielangShield {
         ShieldState updated = new ShieldState(nextStack, CAPACITY[nextStack - 1]);
         SHIELDS.put(entity.getUUID(), updated);
         if (entity.level() instanceof ServerLevel level) {
-            PhotonEffects.waterShield(level, entity, nextStack);
+            NativeSpellEffects.waterShield(level, entity, nextStack);
         }
         sync(entity);
         return true;
     }
 
     public static float absorb(ServerPlayer player, float damage) {
-        return absorb((LivingEntity) player, damage);
+        return absorb((LivingEntity) player, null, damage);
     }
 
     public static float absorb(LivingEntity entity, float damage) {
+        return absorb(entity, null, damage);
+    }
+
+    public static float absorb(LivingEntity entity, DamageSource source, float damage) {
         ShieldState shield = SHIELDS.get(entity.getUUID());
         if (shield == null || shield.remaining() <= 0.0F || damage <= 0.0F) {
             return damage;
         }
 
-        float absorbed = Math.min(damage, shield.remaining());
+        float multiplier = DefensePiercingProjectile.shieldMultiplier(source);
+        float absorbed = Math.min(damage * multiplier, shield.remaining());
         float remainingShield = shield.remaining() - absorbed;
-        float remainingDamage = damage - absorbed;
+        float remainingDamage = Math.max(0.0F, damage - absorbed / multiplier);
         if (remainingShield <= 0.0F) {
             SHIELDS.remove(entity.getUUID());
+            com.example.immortal_cultivation_mod.combat.CombatFeedbackEvents.shieldBreak(entity, source, absorbed);
             if (entity.level() instanceof ServerLevel level) {
-                PhotonEffects.removeWaterShield(level, entity);
+                NativeSpellEffects.removeWaterShield(level, entity);
             }
         } else {
             SHIELDS.put(entity.getUUID(), new ShieldState(shield.stack(), remainingShield));
@@ -84,9 +92,9 @@ public final class DielangShield {
 
     public static void tick(LivingEntity entity) {
         ShieldState shield = SHIELDS.get(entity.getUUID());
-        if (shield != null && shield.remaining() > 0.0F && entity.tickCount % 2 == 0
+        if (shield != null && shield.remaining() > 0.0F && entity.tickCount % 10 == 0
                 && entity.level() instanceof ServerLevel level) {
-            PhotonEffects.waterShield(level, entity, shield.stack());
+            NativeSpellEffects.waterShield(level, entity, shield.stack());
         }
     }
 
@@ -107,7 +115,7 @@ public final class DielangShield {
     public static void clear(LivingEntity entity) {
         SHIELDS.remove(entity.getUUID());
         if (entity.level() instanceof ServerLevel level) {
-            PhotonEffects.removeWaterShield(level, entity);
+            NativeSpellEffects.removeWaterShield(level, entity);
         }
         if (entity instanceof ServerPlayer player) {
             PlayerShieldManager.clear(player, SHIELD_SOURCE);

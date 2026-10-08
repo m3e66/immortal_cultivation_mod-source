@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "immortal_cultivation_mod:block/talisman_drawing_table" },
+    "facing=east": { "model": "immortal_cultivation_mod:block/talisman_drawing_table" },
+    "facing=south": { "model": "immortal_cultivation_mod:block/talisman_drawing_table" },
+    "facing=west": { "model": "immortal_cultivation_mod:block/talisman_drawing_table" }
+  }
+}

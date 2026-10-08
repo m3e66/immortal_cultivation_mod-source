@@ -1,5 +1,7 @@
 package com.example.immortal_cultivation_mod.entity;
 
+import com.example.immortal_cultivation_mod.config.BlockBreakingSettings;
+
 import com.example.immortal_cultivation_mod.item.ShihunfanItem;
 import com.example.immortal_cultivation_mod.magicritual.center.ForcefieldInterceptable;
 import java.util.Comparator;
@@ -209,6 +211,8 @@ public class ShihunfanSoulWaveEntity extends Entity implements ForcefieldInterce
     }
 
     private void breakWaveFront(ServerLevel level, ServerPlayer owner) {
+        if (!BlockBreakingSettings.enabled(owner,
+                BlockBreakingSettings.Category.WEAPONS)) return;
         Vec3 side = new Vec3(-direction.z, 0.0D, direction.x);
         for (int lateral = -6; lateral <= 6; lateral++) {
             for (int vertical = -2; vertical <= 2; vertical++) {
@@ -224,7 +228,9 @@ public class ShihunfanSoulWaveEntity extends Entity implements ForcefieldInterce
                 if (state.isAir() || state.getDestroySpeed(level, pos) < 0.0F) {
                     continue;
                 }
-                level.destroyBlock(pos, false, owner);
+                BlockBreakingSettings.runWithSource(
+                        BlockBreakingSettings.Category.WEAPONS, owner,
+                        () -> com.example.immortal_cultivation_mod.spell.SpellDestruction.breakBlock(level,pos, false, owner));
             }
         }
     }

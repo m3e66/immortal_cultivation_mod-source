@@ -1,0 +1,17 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": [
+    "minecraft:dark_forest",
+    "minecraft:old_growth_pine_taiga",
+    "minecraft:old_growth_spruce_taiga",
+    "minecraft:swamp",
+    "minecraft:mangrove_swamp",
+    "minecraft:lush_caves"
+  ],
+  "spawners": {
+    "type": "immortal_cultivation_mod:green_patterned_spirit_devouring_rat",
+    "weight": 9,
+    "minCount": 2,
+    "maxCount": 4
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "immortal_cultivation_mod:water_avoiding_pearl",
+    "immortal_cultivation_mod:soul_anchor_pearl",
+    "immortal_cultivation_mod:enlightenment_leaf",
+    "immortal_cultivation_mod:tribulation_doll",
+    "immortal_cultivation_mod:purified_tribulation_doll",
+    "immortal_cultivation_mod:fortune_guard_coin"
+  ]
+}

@@ -207,6 +207,12 @@ public final class AzureSpiritSilkwormEntity extends Animal implements GeoEntity
             }
             return;
         }
+        if (BeastDazeControl.blocksMoves(this)) {
+            entityData.set(SPIT_TICKS, 0);
+            cocoonTicks = 0;
+            entityData.set(COCOONED, false);
+            return;
+        }
 
         if (spitCooldown > 0) {
             spitCooldown--;
@@ -312,6 +318,9 @@ public final class AzureSpiritSilkwormEntity extends Animal implements GeoEntity
         if (!hurt || level().isClientSide || !isAlive()) {
             return hurt;
         }
+        if (BeastDazeControl.blocksMoves(this)) {
+            return hurt;
+        }
         if (source.getEntity() instanceof LivingEntity attacker && attacker != this) {
             if (spitCooldown <= 0) {
                 spitAt(attacker);
@@ -324,6 +333,9 @@ public final class AzureSpiritSilkwormEntity extends Animal implements GeoEntity
     }
 
     private void spitAt(LivingEntity attacker) {
+        if (BeastDazeControl.blocksMoves(this)) {
+            return;
+        }
         SpiritSilkProjectileEntity projectile =
                 new SpiritSilkProjectileEntity(level(), this);
         projectile.setPos(getX(), getEyeY() - 0.1D, getZ());
@@ -344,6 +356,9 @@ public final class AzureSpiritSilkwormEntity extends Animal implements GeoEntity
     }
 
     private void startCocoon() {
+        if (BeastDazeControl.blocksMoves(this)) {
+            return;
+        }
         cocoonTicks = 20 * 5;
         cocoonCooldown = 20 * 25;
         entityData.set(COCOONED, true);

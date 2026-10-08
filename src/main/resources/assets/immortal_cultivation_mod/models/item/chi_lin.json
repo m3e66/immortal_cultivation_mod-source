@@ -2,5 +2,12 @@
   "parent": "minecraft:item/generated",
   "textures": {
     "layer0": "immortal_cultivation_mod:item/chi_lin"
+  },
+  "display": {
+    "gui": {
+      "rotation": [0, 0, 0],
+      "translation": [-0.25, -0.25, 0],
+      "scale": [1.05, 1.05, 1]
+    }
   }
 }

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "immortal_cultivation_mod:item/male_long_sect_disciple_hair"
+  }
+}

@@ -18,7 +18,7 @@ public final class DuanliuKongdun {
 
     public static boolean cast(ServerPlayer player) {
         var data = ModAttachments.getData(player);
-        if (!ServerEvents.spendQiOrBlood(player, data, COST)) {
+        if (!ServerEvents.spendSpellQiOrBlood(player, data, COST)) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return false;
         }

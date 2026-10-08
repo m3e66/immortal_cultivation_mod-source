@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " Z ",
+    " I ",
+    " S "
+  ],
+  "key": {
+    "Z": {
+      "item": "immortal_cultivation_mod:zhenwen_jade"
+    },
+    "I": {
+      "item": "immortal_cultivation_mod:jingtie_motherstone"
+    },
+    "S": {
+      "item": "immortal_cultivation_mod:qiannian_lingmu_heart"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:ritual_dagger",
+    "count": 1
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "immortal_cultivation_mod:qingling_grass"
+    },
+    {
+      "item": "immortal_cultivation_mod:qingling_grass"
+    },
+    {
+      "item": "immortal_cultivation_mod:lingquan_leaf"
+    }
+  ],
+  "result": {
+    "id": "immortal_cultivation_mod:huiling_formula",
+    "count": 1
+  }
+}

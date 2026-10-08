@@ -5,14 +5,14 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-/** A moving real attack whose hit logic must be stopped before crossing a forcefield. */
 public interface ForcefieldInterceptable {
-   @Nullable
-   Entity forcefieldOwner();
+   @Nullable Entity forcefieldOwner();
 
    Vec3 forcefieldMovement();
 
    float forcefieldBarrierDamage();
+
+   default boolean forcefieldPassThrough() { return false; }
 
    default void forcefieldBounce(Vec3 reflectedMovement) {
       Entity entity = (Entity)this;
@@ -27,16 +27,14 @@ public interface ForcefieldInterceptable {
 
    default double forcefieldSupport(Vec3 normal) {
       AABB box = ((Entity)this).getBoundingBox();
-      return Math.abs(normal.x) * box.getXsize() * 0.5D
-            + Math.abs(normal.y) * box.getYsize() * 0.5D
-            + Math.abs(normal.z) * box.getZsize() * 0.5D;
+      return Math.abs(normal.x) * box.getXsize() * (double)0.5F + Math.abs(normal.y) * box.getYsize() * (double)0.5F + Math.abs(normal.z) * box.getZsize() * (double)0.5F;
    }
 
    default double forcefieldMaximumSupport() {
       AABB box = ((Entity)this).getBoundingBox();
-      double halfX = box.getXsize() * 0.5D;
-      double halfY = box.getYsize() * 0.5D;
-      double halfZ = box.getZsize() * 0.5D;
+      double halfX = box.getXsize() * (double)0.5F;
+      double halfY = box.getYsize() * (double)0.5F;
+      double halfZ = box.getZsize() * (double)0.5F;
       return Math.sqrt(halfX * halfX + halfY * halfY + halfZ * halfZ);
    }
 }

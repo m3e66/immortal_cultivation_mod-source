@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": { "layer0": "immortal_cultivation_mod:item/spirit_marrow_treasure_ink" }
+}

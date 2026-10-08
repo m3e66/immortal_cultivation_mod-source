@@ -1,0 +1,13 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "immortal_cultivation_mod:item/damaged_forging_furnace_core"
+  },
+  "display": {
+    "gui": {
+      "rotation": [0, 0, 0],
+      "translation": [-0.5, -1, 0],
+      "scale": [0.9, 0.9, 1]
+    }
+  }
+}

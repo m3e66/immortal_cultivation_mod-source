@@ -1,0 +1,14 @@
+{
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
+	"parent": "minecraft:item/generated",
+	"textures": {
+		"layer0": "immortal_cultivation_mod:item/enlightenment_leaf"
+	},
+	"display": {
+		"gui": {
+			"translation": [-0.75, 0, 0],
+			"scale": [1.07692, 1.07692, 1.07692]
+		}
+	}
+}

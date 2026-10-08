@@ -16,4 +16,9 @@ public enum CircleType implements StringRepresentable {
    public String getSerializedName() {
       return this.name;
    }
+
+   // $FF: synthetic method
+   private static CircleType[] $values() {
+      return new CircleType[]{ATTACK, DEFENSE, REGENERATION};
+   }
 }

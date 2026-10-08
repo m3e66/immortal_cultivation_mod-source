@@ -29,6 +29,7 @@ public class FanrenNpcEntity extends PathfinderMob implements CultivationNpc {
 
     public FanrenNpcEntity(EntityType<? extends FanrenNpcEntity> entityType, Level level) {
         super(entityType, level);
+        moveControl = new NpcMoveControl(this);
         xpReward = 0;
         setPersistenceRequired();
     }

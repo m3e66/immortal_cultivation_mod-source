@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "minecraft:paper" },
+    { "item": "immortal_cultivation_mod:yuanying_yaodan" },
+    { "item": "immortal_cultivation_mod:yanjiao_horn" }
+  ],
+  "result": {
+    "id": "immortal_cultivation_mod:dragon_flame_seed_yujian",
+    "count": 1
+  }
+}

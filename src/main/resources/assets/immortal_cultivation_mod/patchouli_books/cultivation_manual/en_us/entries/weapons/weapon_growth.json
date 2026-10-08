@@ -1,0 +1,18 @@
+{
+  "name": "Restrictions and Advancement",
+  "icon": "immortal_cultivation_mod:restriction_table",
+  "category": "immortal_cultivation_mod:weapons",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Carve Restrictions",
+      "text": "Place a weapon in the Restriction Table, select restrictions, and solve the Ling Shu Abacus. Only success writes the selected layers into the weapon.$(br2)The item tooltip shows its tier and current restriction progress. Failure grants no selected layers and can cause backlash."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "A Cycle of 72",
+      "text": "Each artifact tier has a 72-layer cycle. At a full cycle, use Evolve in the Restriction Table to attempt advancement.$(br2)Weapon evolution starts a tribulation rather than advancing unconditionally. After success, existing restrictions merge into the weapon, the current cycle resets, and the next tier begins."
+    }
+  ]
+}

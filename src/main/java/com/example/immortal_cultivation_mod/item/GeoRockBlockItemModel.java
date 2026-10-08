@@ -7,21 +7,31 @@ import software.bernie.geckolib.model.GeoModel;
 public class GeoRockBlockItemModel extends GeoModel<GeoRockBlockItem> {
     @Override
     public ResourceLocation getModelResource(GeoRockBlockItem animatable) {
+        String modelName = animatable.modelName().endsWith("_spell_scroll_block")
+                ? "realm_spell_scroll_block"
+                : animatable.modelName();
         return ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID,
-                "geo/block/" + animatable.modelName() + ".geo.json");
+                "geo/block/" + modelName + ".geo.json");
     }
 
     @Override
     public ResourceLocation getTextureResource(GeoRockBlockItem animatable) {
+        String textureName = animatable.modelName().endsWith("_spell_scroll_block")
+                ? "zhuji_spell_scroll_block"
+                : animatable.modelName();
         return ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID,
-                "textures/block/" + animatable.modelName() + ".png");
+                "textures/block/" + textureName + ".png");
     }
 
     @Override
     public ResourceLocation getAnimationResource(GeoRockBlockItem animatable) {
-        String animation = "qingtong_yinhuo_ding".equals(animatable.modelName())
-                ? "qingtong_yinhuo_ding"
-                : "geo_rock";
+        String animation = switch (animatable.modelName()) {
+            case "qingtong_yinhuo_ding" -> "qingtong_yinhuo_ding";
+            case "cu_tie_xiaoding" -> "cu_tie_xiaoding";
+            case "chi_jin_sanyang_ding" -> "chi_jin_sanyang_ding";
+            case "restriction_table" -> "restriction_table";
+            default -> "geo_rock";
+        };
         return ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID,
                 "animations/block/" + animation + ".animation.json");
     }

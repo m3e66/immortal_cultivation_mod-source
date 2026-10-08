@@ -4,6 +4,7 @@ import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 public class CultivationMethods {
@@ -21,6 +22,16 @@ public class CultivationMethods {
     public static final String HANTI_BINGQIN = "hanti_bingqin";
     public static final String CUIGU_LIANSHEN_JUE = "cuigu_lianshen_jue";
     public static final String JIUYOU_LIANSHI_JUE = "jiuyou_lianshi_jue";
+    public static final String DARI_BATI_JUE = "dari_bati_jue";
+    public static final String GANGTING_XIAOKONG_LU = "gangting_xiaokong_lu";
+    public static final String XUANYUE_SUIFENG_JUE = "xuanyue_suifeng_jue";
+    public static final String HANLAN_NINGYUAN_JING = "hanlan_ningyuan_jing";
+    /** Stored as hundredths of one percent inside the already-persistent proficiency map. */
+    private static final String SOLAR_POWER_KEY = "__dari_solar_power";
+    /** Stored as hundredths of one point inside the already-persistent proficiency map. */
+    private static final String FENGLEI_MOMENTUM_KEY = "__gangting_fenglei_momentum";
+    /** Stored as hundredths of one point inside the already-persistent proficiency map. */
+    private static final String CHANGQING_LIFE_FORCE_KEY = "__changqing_life_force";
 
     public record MethodDef(String id, String nameKey, String element, String tier, String limitLevel, boolean bloodDemon) {}
 
@@ -50,7 +61,7 @@ public class CultivationMethods {
             POKONG_JUE, new MethodDef(POKONG_JUE, "method.immortal_cultivation_mod.pokong_jue", SpiritRoots.WIND, "earth",
                     CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE, false)),
             Map.entry(
-            CHANGQING_JUE, new MethodDef(CHANGQING_JUE, "method.immortal_cultivation_mod.changqing_jue", SpiritRoots.WATER + "," + SpiritRoots.EARTH, "earth",
+            CHANGQING_JUE, new MethodDef(CHANGQING_JUE, "method.immortal_cultivation_mod.changqing_jue", SpiritRoots.WOOD, "earth",
                     CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE, false)),
             Map.entry(
             FENTIAN_LIFE_RENEWAL, new MethodDef(FENTIAN_LIFE_RENEWAL, "method.immortal_cultivation_mod.fentian_life_renewal", SpiritRoots.FIRE, "earth",
@@ -63,7 +74,19 @@ public class CultivationMethods {
                     CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_EARLY, false)),
             Map.entry(
             JIUYOU_LIANSHI_JUE, new MethodDef(JIUYOU_LIANSHI_JUE, "method.immortal_cultivation_mod.jiuyou_lianshi_jue", SpiritRoots.DARK, "heaven",
-                    CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_EARLY, false))
+                    CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_EARLY, false)),
+            Map.entry(
+            DARI_BATI_JUE, new MethodDef(DARI_BATI_JUE, "method.immortal_cultivation_mod.dari_bati_jue", SpiritRoots.FIRE + "," + SpiritRoots.LIGHT, "heaven",
+                    CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_LATE, false)),
+            Map.entry(
+            GANGTING_XIAOKONG_LU, new MethodDef(GANGTING_XIAOKONG_LU, "method.immortal_cultivation_mod.gangting_xiaokong_lu", SpiritRoots.WIND + "," + SpiritRoots.THUNDER, "heaven",
+                    CultivationLevels.REALM_YUANYING + CultivationLevels.STAGE_LATE, false)),
+            Map.entry(
+            XUANYUE_SUIFENG_JUE, new MethodDef(XUANYUE_SUIFENG_JUE, "method.immortal_cultivation_mod.xuanyue_suifeng_jue", SpiritRoots.METAL + "," + SpiritRoots.EARTH, "heaven",
+                    CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_EARLY, false)),
+            Map.entry(
+            HANLAN_NINGYUAN_JING, new MethodDef(HANLAN_NINGYUAN_JING, "method.immortal_cultivation_mod.hanlan_ningyuan_jing", SpiritRoots.WATER + "," + SpiritRoots.ICE, "heaven",
+                    CultivationLevels.REALM_YUANYING + CultivationLevels.STAGE_LATE, false))
     );
 
     public static MethodDef get(String id) {
@@ -84,7 +107,11 @@ public class CultivationMethods {
                 METHODS.get(FENTIAN_LIFE_RENEWAL),
                 METHODS.get(HANTI_BINGQIN),
                 METHODS.get(CUIGU_LIANSHEN_JUE),
-                METHODS.get(JIUYOU_LIANSHI_JUE)
+                METHODS.get(JIUYOU_LIANSHI_JUE),
+                METHODS.get(DARI_BATI_JUE),
+                METHODS.get(GANGTING_XIAOKONG_LU),
+                METHODS.get(XUANYUE_SUIFENG_JUE),
+                METHODS.get(HANLAN_NINGYUAN_JING)
         );
     }
 
@@ -161,6 +188,78 @@ public class CultivationMethods {
 
     public static boolean isJiuyouLianshiJue(String id) {
         return JIUYOU_LIANSHI_JUE.equals(id);
+    }
+
+    public static boolean isDariBatiJue(String id) {
+        return DARI_BATI_JUE.equals(id);
+    }
+
+    public static boolean isGangtingXiaokongLu(String id) {
+        return GANGTING_XIAOKONG_LU.equals(id);
+    }
+
+    public static boolean isXuanyueSuifengJue(String id) {
+        return XUANYUE_SUIFENG_JUE.equals(id);
+    }
+
+    public static boolean isHanlanNingyuanJing(String id) {
+        return HANLAN_NINGYUAN_JING.equals(id);
+    }
+
+    public static float solarPower(ModAttachments.CultivationData data) {
+        if (data == null) {
+            return 0.0F;
+        }
+        return Math.max(0, Math.min(10_000,
+                data.methodProficiencies().getOrDefault(SOLAR_POWER_KEY, 0))) / 100.0F;
+    }
+
+    public static ModAttachments.CultivationData withSolarPower(
+            ModAttachments.CultivationData data, float solarPower) {
+        Map<String, Integer> updated = new HashMap<>(data.methodProficiencies());
+        updated.put(SOLAR_POWER_KEY, Math.max(0, Math.min(10_000,
+                Math.round(solarPower * 100.0F))));
+        return data.withMethodProficiencies(updated);
+    }
+
+    public static float fengleiMomentum(ModAttachments.CultivationData data) {
+        if (data == null) {
+            return 0.0F;
+        }
+        return Math.max(0, Math.min(10_000,
+                data.methodProficiencies().getOrDefault(FENGLEI_MOMENTUM_KEY, 0))) / 100.0F;
+    }
+
+    public static ModAttachments.CultivationData withFengleiMomentum(
+            ModAttachments.CultivationData data, float momentum) {
+        Map<String, Integer> updated = new HashMap<>(data.methodProficiencies());
+        updated.put(FENGLEI_MOMENTUM_KEY, Math.max(0, Math.min(10_000,
+                Math.round(momentum * 100.0F))));
+        return data.withMethodProficiencies(updated);
+    }
+
+    public static float changqingLifeForce(ModAttachments.CultivationData data) {
+        if (data == null) {
+            return 0.0F;
+        }
+        return Math.max(0, Math.min(10_000,
+                data.methodProficiencies().getOrDefault(CHANGQING_LIFE_FORCE_KEY, 0))) / 100.0F;
+    }
+
+    public static ModAttachments.CultivationData withChangqingLifeForce(
+            ModAttachments.CultivationData data, float lifeForce) {
+        Map<String, Integer> updated = new HashMap<>(data.methodProficiencies());
+        updated.put(CHANGQING_LIFE_FORCE_KEY, Math.max(0, Math.min(10_000,
+                Math.round(lifeForce * 100.0F))));
+        return data.withMethodProficiencies(updated);
+    }
+
+    public static int solarPowerCap(ModAttachments.CultivationData data) {
+        int proficiency = data == null ? 0 : data.methodProficiency(DARI_BATI_JUE);
+        if (proficiency >= 500) {
+            return 100;
+        }
+        return proficiency >= 100 ? 80 : 60;
     }
 
     public static boolean canGainProgress(String methodId, String cultivationLevel) {

@@ -1,0 +1,14 @@
+{
+  "type": "neoforge:add_table",
+  "conditions": [
+    {
+      "condition": "minecraft:any_of",
+      "terms": [
+        { "condition": "neoforge:loot_table_id", "loot_table_id": "immortal_cultivation_mod:entities/blood_ape_demon_general" },
+        { "condition": "neoforge:loot_table_id", "loot_table_id": "immortal_cultivation_mod:entities/jindan_vault_guardian" },
+        { "condition": "neoforge:loot_table_id", "loot_table_id": "immortal_cultivation_mod:entities/crimson_sky_flame_flood_dragon" }
+      ]
+    }
+  ],
+  "table": "immortal_cultivation_mod:entities/weapon_care_boss_bonus"
+}

@@ -16,16 +16,16 @@ import net.minecraft.world.item.ItemStack;
 public class DingMenu extends AbstractContainerMenu {
 
     public static final int IMAGE_WIDTH = 360;
-    public static final int IMAGE_HEIGHT = 288;
-    public static final int YUJIAN_SLOT_X = 53;
+    public static final int IMAGE_HEIGHT = 308;
+    public static final int YUJIAN_SLOT_X = 48;
     public static final int YUJIAN_SLOT_Y = 94;
-    public static final int RESULT_SLOT_X = 291;
+    public static final int RESULT_SLOT_X = 296;
     public static final int RESULT_SLOT_Y = 94;
-    public static final int MATERIAL_START_X = 114;
+    public static final int MATERIAL_START_X = 91;
     public static final int MATERIAL_START_Y = 89;
-    public static final int MATERIAL_SLOT_SPACING = 22;
+    public static final int MATERIAL_SLOT_SPACING = 18;
     public static final int PLAYER_INV_X = 99;
-    public static final int PLAYER_INV_Y = 187;
+    public static final int PLAYER_INV_Y = 207;
 
     private final Container container;
     private final ContainerData data;
@@ -58,6 +58,7 @@ public class DingMenu extends AbstractContainerMenu {
         this.container = container;
         this.data = data;
         this.ding = ding;
+        container.startOpen(inventory.player);
 
         addSlot(new Slot(container, DingBlockEntity.YUJIAN_SLOT, YUJIAN_SLOT_X, YUJIAN_SLOT_Y) {
             @Override
@@ -69,12 +70,22 @@ public class DingMenu extends AbstractContainerMenu {
             public boolean mayPickup(Player player) {
                 return !forging();
             }
+
+            @Override
+            public int getMaxStackSize() {
+                return 1;
+            }
+
+            @Override
+            public int getMaxStackSize(ItemStack stack) {
+                return 1;
+            }
         });
 
         for (int i = 0; i < DingBlockEntity.MATERIAL_COUNT; i++) {
             int materialIndex = i;
-            int slotX = MATERIAL_START_X + (i % 5) * MATERIAL_SLOT_SPACING;
-            int slotY = MATERIAL_START_Y + (i / 5) * MATERIAL_SLOT_SPACING;
+            int slotX = MATERIAL_START_X + (i % 10) * MATERIAL_SLOT_SPACING;
+            int slotY = MATERIAL_START_Y + (i / 10) * MATERIAL_SLOT_SPACING;
 
             addSlot(new Slot(container, DingBlockEntity.MATERIAL_START + i, slotX, slotY) {
                 @Override
@@ -91,7 +102,16 @@ public class DingMenu extends AbstractContainerMenu {
 
                 @Override
                 public boolean isActive() {
-                    return materialIndex < materialSlotCount();
+                    // Old saves can still contain items beyond the new capacity.
+                    // Expose those slots for retrieval, but never accept new inputs.
+                    return materialIndex < materialSlotCount() || hasItem();
+                }
+
+                @Override
+                public int getMaxStackSize(ItemStack stack) {
+                    return ForgingSystem.canStackInForgingRecipe(stack)
+                            ? super.getMaxStackSize(stack)
+                            : 1;
                 }
             });
         }
@@ -127,6 +147,17 @@ public class DingMenu extends AbstractContainerMenu {
         }
     }
 
+    public boolean usesForge(DingBlockEntity forge) {
+        return ding == forge;
+    }
+
+    @Override
+    public void removed(Player player) {
+        super.removed(player);
+        container.stopOpen(player);
+        if (ding != null) ding.stopViewing(player);
+    }
+
     public int temperature() { return data.get(0); }
     public int targetTemperature() { return data.get(1); }
     public int progress() { return data.get(2); }
@@ -138,8 +169,8 @@ public class DingMenu extends AbstractContainerMenu {
     public int materialSlotCount() {
         int syncedCount = data.get(8);
         return syncedCount <= 0
-                ? DingBlockEntity.MATERIAL_COUNT
-                : Math.min(DingBlockEntity.MATERIAL_COUNT, syncedCount);
+                ? DingBlockEntity.LARGE_FORGE_SLOTS
+                : Math.min(DingBlockEntity.GOLDEN_CORE_FORGE_SLOTS, syncedCount);
     }
 
 

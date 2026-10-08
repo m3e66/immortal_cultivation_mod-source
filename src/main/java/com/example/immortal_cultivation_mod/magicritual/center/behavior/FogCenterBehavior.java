@@ -10,35 +10,30 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 
 public final class FogCenterBehavior implements MagicCenterBehavior {
-   @Override
    public void serverTick(CenterContext context) {
-      if (!context.center().shouldTriggerEvery(context.level().getGameTime(), 20)) {
-         return;
-      }
-      for (LivingEntity entity : CenterBehaviorUtil.livingEntities(context)) {
-         if (!context.center().isAffectedByCircle(entity)) {
-            continue;
+      if (context.center().shouldTriggerEvery(context.level().getGameTime(), 20)) {
+         for(LivingEntity entity : CenterBehaviorUtil.livingEntities(context)) {
+            if (context.center().isAffectedByCircle(entity)) {
+               if (entity instanceof ServerPlayer) {
+                  ServerPlayer player = (ServerPlayer)entity;
+                  FogEffect.applyFromCenter(player, context.pos(), context.center().getRadius());
+               } else {
+                  entity.addEffect(new MobEffectInstance(ModEffects.FOG, 60, 0, true, false, true));
+               }
+            }
          }
-         if (entity instanceof ServerPlayer player) {
-            FogEffect.applyFromCenter(player, context.pos(), context.center().getRadius());
-         } else {
-            entity.addEffect(new MobEffectInstance(ModEffects.FOG, 60, 0,
-                  true, false, true));
-         }
+
       }
    }
 
-   @Override
    public int getFuelCostPerMinute(CenterContext context) {
-      return (int)Math.ceil(CenterFuelController.baseRadiusCost(context.center().getRadius()) * 1.5D);
+      return (int)Math.ceil((double)CenterFuelController.baseRadiusCost(context.center().getRadius()) * (double)1.5F);
    }
 
-   @Override
    public boolean supportsHostileMobSetting() {
       return true;
    }
 
-   @Override
    public boolean supportsPassiveMobSetting() {
       return true;
    }

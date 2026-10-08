@@ -1,0 +1,494 @@
+{
+  "credit": "Made with Blockbench",
+  "textures": {
+    "glass": "minecraft:block/glass",
+    "cork": "immortal_cultivation_mod:item/flame_vessel_cork",
+    "particle": "minecraft:block/glass"
+  },
+  "elements": [
+    {
+      "name": "glass_bottle",
+      "from": [
+        2,
+        1,
+        2
+      ],
+      "to": [
+        14,
+        17.5,
+        14
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#glass"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#glass"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#glass"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#glass"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#glass"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#glass"
+        }
+      }
+    },
+    {
+      "name": "glass_neck",
+      "from": [
+        4,
+        17.5,
+        4
+      ],
+      "to": [
+        12,
+        18.7,
+        12
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#glass"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#glass"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#glass"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#glass"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#glass"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#glass"
+        }
+      }
+    },
+    {
+      "name": "wooden_stopper",
+      "from": [
+        5,
+        18.35,
+        5
+      ],
+      "to": [
+        11,
+        19.85,
+        11
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1,
+            1,
+            1.5,
+            1.5
+          ],
+          "texture": "#cork"
+        },
+        "east": {
+          "uv": [
+            1,
+            1,
+            1.5,
+            1.5
+          ],
+          "texture": "#cork"
+        },
+        "south": {
+          "uv": [
+            1,
+            1,
+            1.5,
+            1.5
+          ],
+          "texture": "#cork"
+        },
+        "west": {
+          "uv": [
+            1,
+            1,
+            1.5,
+            1.5
+          ],
+          "texture": "#cork"
+        },
+        "up": {
+          "uv": [
+            1,
+            1,
+            1.5,
+            1.5
+          ],
+          "texture": "#cork"
+        },
+        "down": {
+          "uv": [
+            1,
+            1,
+            1.5,
+            1.5
+          ],
+          "texture": "#cork"
+        }
+      }
+    },
+    {
+      "name": "stopper_top_light",
+      "from": [
+        5,
+        19.84,
+        5
+      ],
+      "to": [
+        8,
+        19.87,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            9,
+            1,
+            9.5,
+            1.5
+          ],
+          "texture": "#cork"
+        },
+        "east": {
+          "uv": [
+            9,
+            1,
+            9.5,
+            1.5
+          ],
+          "texture": "#cork"
+        },
+        "south": {
+          "uv": [
+            9,
+            1,
+            9.5,
+            1.5
+          ],
+          "texture": "#cork"
+        },
+        "west": {
+          "uv": [
+            9,
+            1,
+            9.5,
+            1.5
+          ],
+          "texture": "#cork"
+        },
+        "up": {
+          "uv": [
+            9,
+            1,
+            9.5,
+            1.5
+          ],
+          "texture": "#cork"
+        },
+        "down": {
+          "uv": [
+            9,
+            1,
+            9.5,
+            1.5
+          ],
+          "texture": "#cork"
+        }
+      }
+    },
+    {
+      "name": "stopper_top_medium",
+      "from": [
+        8,
+        19.84,
+        5
+      ],
+      "to": [
+        11,
+        19.87,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1,
+            1,
+            1.5,
+            1.5
+          ],
+          "texture": "#cork"
+        },
+        "east": {
+          "uv": [
+            1,
+            1,
+            1.5,
+            1.5
+          ],
+          "texture": "#cork"
+        },
+        "south": {
+          "uv": [
+            1,
+            1,
+            1.5,
+            1.5
+          ],
+          "texture": "#cork"
+        },
+        "west": {
+          "uv": [
+            1,
+            1,
+            1.5,
+            1.5
+          ],
+          "texture": "#cork"
+        },
+        "up": {
+          "uv": [
+            1,
+            1,
+            1.5,
+            1.5
+          ],
+          "texture": "#cork"
+        },
+        "down": {
+          "uv": [
+            1,
+            1,
+            1.5,
+            1.5
+          ],
+          "texture": "#cork"
+        }
+      }
+    },
+    {
+      "name": "stopper_top_dark",
+      "from": [
+        5,
+        19.84,
+        8
+      ],
+      "to": [
+        8,
+        19.87,
+        11
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1,
+            9,
+            1.5,
+            9.5
+          ],
+          "texture": "#cork"
+        },
+        "east": {
+          "uv": [
+            1,
+            9,
+            1.5,
+            9.5
+          ],
+          "texture": "#cork"
+        },
+        "south": {
+          "uv": [
+            1,
+            9,
+            1.5,
+            9.5
+          ],
+          "texture": "#cork"
+        },
+        "west": {
+          "uv": [
+            1,
+            9,
+            1.5,
+            9.5
+          ],
+          "texture": "#cork"
+        },
+        "up": {
+          "uv": [
+            1,
+            9,
+            1.5,
+            9.5
+          ],
+          "texture": "#cork"
+        },
+        "down": {
+          "uv": [
+            1,
+            9,
+            1.5,
+            9.5
+          ],
+          "texture": "#cork"
+        }
+      }
+    },
+    {
+      "name": "stopper_top_corner",
+      "from": [
+        8,
+        19.84,
+        8
+      ],
+      "to": [
+        11,
+        19.87,
+        11
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            9,
+            9,
+            9.5,
+            9.5
+          ],
+          "texture": "#cork"
+        },
+        "east": {
+          "uv": [
+            9,
+            9,
+            9.5,
+            9.5
+          ],
+          "texture": "#cork"
+        },
+        "south": {
+          "uv": [
+            9,
+            9,
+            9.5,
+            9.5
+          ],
+          "texture": "#cork"
+        },
+        "west": {
+          "uv": [
+            9,
+            9,
+            9.5,
+            9.5
+          ],
+          "texture": "#cork"
+        },
+        "up": {
+          "uv": [
+            9,
+            9,
+            9.5,
+            9.5
+          ],
+          "texture": "#cork"
+        },
+        "down": {
+          "uv": [
+            9,
+            9,
+            9.5,
+            9.5
+          ],
+          "texture": "#cork"
+        }
+      }
+    }
+  ],
+  "ambientocclusion": false
+}

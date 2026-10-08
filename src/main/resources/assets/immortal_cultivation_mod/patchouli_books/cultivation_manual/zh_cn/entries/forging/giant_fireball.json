@@ -1,0 +1,18 @@
+{
+  "name": "巨型火球与地形",
+  "icon": "immortal_cultivation_mod:thunder_flame_seed",
+  "category": "immortal_cultivation_mod:forging",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "范围攻击",
+      "text": "巨型火球命中后，对范围内符合攻击条件的生灵造成伤害，并施加对应灵火的持续燃烧。离开地面火焰后，燃烧仍会持续到熄灭。$(br2)大型火球也能瞬间破坏普通地形与范围内液体。受保护位置、容器与不可破坏方块仍遵守保护规则。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "方块破坏设置",
+      "text": "打开修炼设置，选择第一项“方块破坏”。可以分别控制术法、兵器、外放灵气、火种瓶与其他攻击造成的地形变化。$(br2)关闭火种瓶地形破坏后，巨型火球仍可伤害生灵。关闭地形破坏不等于关闭战斗效果。"
+    }
+  ]
+}

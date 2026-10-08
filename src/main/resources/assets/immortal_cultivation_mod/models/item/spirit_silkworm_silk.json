@@ -5,8 +5,21 @@
   },
   "display": {
     "gui": {
-      "rotation": [0, 0, 0],
-      "scale": [1.35, 1.35, 0.1]
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
     }
   }
 }

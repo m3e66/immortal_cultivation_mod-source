@@ -45,24 +45,40 @@ public class ClothSheathItem extends Item implements GeoItem, ICurioItem {
                                       top.theillusivec4.curios.api.type.capability.ICuriosItemHandler handler,
                                       top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler backStacks,
                                       ItemStack hand) {
+        boolean foundEmptySheath = false;
         for (int slot = 0; slot < backStacks.getSlots(); slot++) {
             ItemStack equipped = backStacks.getStackInSlot(slot);
-            if (!equipped.is(ModItems.CLOTH_SHEATH.get())) {
+            boolean cloth = equipped.is(ModItems.CLOTH_SHEATH.get());
+            RigidSheathItem rigid = equipped.getItem() instanceof RigidSheathItem item ? item : null;
+            if (!cloth && rigid == null) {
                 continue;
             }
-            ItemStack sheath = equipped.copy();
-            ItemStack stored = getStoredWeapon(sheath, player.registryAccess());
-            if (hand.isEmpty() && stored.isEmpty()) {
-                return true;
+
+            if (!hand.isEmpty() && rigid != null && !rigid.acceptsWeapon(hand)) {
+                continue;
             }
-            setStoredWeapon(sheath, hand, player.registryAccess());
+
+            ItemStack sheath = equipped.copy();
+            ItemStack stored = cloth
+                    ? getStoredWeapon(sheath, player.registryAccess())
+                    : RigidSheathItem.getStoredWeapon(sheath, player.registryAccess());
+            if (hand.isEmpty() && stored.isEmpty()) {
+                foundEmptySheath = true;
+                continue;
+            }
+            if (cloth) {
+                setStoredWeapon(sheath, hand, player.registryAccess());
+            } else {
+                RigidSheathItem.setStoredWeapon(sheath, hand, player.registryAccess());
+            }
             handler.setEquippedCurio(BACK_ACCESSORY, slot, sheath);
             player.setItemInHand(InteractionHand.MAIN_HAND, stored);
             player.displayClientMessage(Component.translatable(
-                    "message." + ImmortalCultivationMod.MODID + ".cloth_sheath_swapped"), true);
+                    "message." + ImmortalCultivationMod.MODID
+                            + (cloth ? ".cloth_sheath_swapped" : ".rigid_sheath_swapped")), true);
             return true;
         }
-        return false;
+        return foundEmptySheath;
     }
 
     public static ItemStack getStoredWeapon(ItemStack sheath, net.minecraft.core.HolderLookup.Provider registries) {
@@ -85,7 +101,7 @@ public class ClothSheathItem extends Item implements GeoItem, ICurioItem {
     }
 
     public static boolean isWideWeapon(ItemStack weapon) {
-        if (weapon.is(ModItems.DAO.get())) {
+        if (weapon.is(ModItems.DAO.get()) || weapon.is(ModItems.FLAME_PATTERN_DAO.get()) || weapon.is(ModItems.BLACK_IRON_GREATSWORD.get())) {
             return true;
         }
         CompoundTag root = weapon.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();

@@ -1,0 +1,47 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.earthbreaker_hammer.idle": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "root": {
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "animation.earthbreaker_hammer.attack": {
+      "animation_length": 0.75,
+      "bones": {
+        "root": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            ".12": [
+              -30,
+              0,
+              -8
+            ],
+            ".28": [
+              65,
+              0,
+              12
+            ],
+            ".55": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    }
+  }
+}

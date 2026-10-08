@@ -6,8 +6,8 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 public class ShihunfanRenderer extends GeoEntityRenderer<ShihunfanEntity> {
-    public ShihunfanRenderer(EntityRendererProvider.Context context) {
-        super(context, new ShihunfanModel());
-        shadowRadius = 0.45F;
-    }
+   public ShihunfanRenderer(EntityRendererProvider.Context context) {
+      super(context, new ShihunfanModel());
+      this.shadowRadius = 0.45F;
+   }
 }

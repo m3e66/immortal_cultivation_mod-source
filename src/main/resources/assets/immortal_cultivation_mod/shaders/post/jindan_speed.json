@@ -1,0 +1,19 @@
+{
+  "targets": [
+    "jindan_swap"
+  ],
+  "passes": [
+    {
+      "name": "immortal_cultivation_mod:jindan_speed",
+      "intarget": "minecraft:main",
+      "outtarget": "jindan_swap",
+      "use_linear_filter": true
+    },
+    {
+      "name": "blit",
+      "intarget": "jindan_swap",
+      "outtarget": "minecraft:main",
+      "use_linear_filter": true
+    }
+  ]
+}

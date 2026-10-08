@@ -1,4 +1,25 @@
 {
   "replace": false,
-  "values": []
+  "values": [
+    "immortal_cultivation_mod:male_short_layered_hair",
+    "immortal_cultivation_mod:male_long_cultivation_hair",
+    "immortal_cultivation_mod:male_high_ponytail_hair",
+    "immortal_cultivation_mod:male_messy_medium_hair",
+    "immortal_cultivation_mod:male_slicked_back_hair",
+    "immortal_cultivation_mod:male_half_up_long_hair",
+    "immortal_cultivation_mod:male_warrior_ponytail_hair",
+    "immortal_cultivation_mod:male_loose_shoulder_length_hair",
+    "immortal_cultivation_mod:male_topknot_hair",
+    "immortal_cultivation_mod:male_long_sect_disciple_hair",
+    "immortal_cultivation_mod:female_long_straight_hair",
+    "immortal_cultivation_mod:female_high_ponytail_hair",
+    "immortal_cultivation_mod:female_twin_ponytail_hair",
+    "immortal_cultivation_mod:female_half_up_cultivation_hair",
+    "immortal_cultivation_mod:female_long_side_bangs_hair",
+    "immortal_cultivation_mod:female_braided_long_hair",
+    "immortal_cultivation_mod:female_double_bun_hair",
+    "immortal_cultivation_mod:female_low_ponytail_hair",
+    "immortal_cultivation_mod:female_flowing_shoulder_length_hair",
+    "immortal_cultivation_mod:female_immortal_cultivator_hair"
+  ]
 }

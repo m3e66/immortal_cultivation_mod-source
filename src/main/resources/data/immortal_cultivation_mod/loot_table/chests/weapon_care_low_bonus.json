@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        { "type": "minecraft:item", "name": "immortal_cultivation_mod:low_sword_grindstone", "weight": 3 },
+        { "type": "minecraft:item", "name": "immortal_cultivation_mod:low_saber_grindstone", "weight": 3 },
+        { "type": "minecraft:item", "name": "immortal_cultivation_mod:low_yangjian_stone", "weight": 2 },
+        { "type": "minecraft:empty", "weight": 16 }
+      ]
+    }
+  ]
+}

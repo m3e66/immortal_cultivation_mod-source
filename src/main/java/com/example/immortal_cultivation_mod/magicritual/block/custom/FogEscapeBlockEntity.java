@@ -2,7 +2,7 @@ package com.example.immortal_cultivation_mod.magicritual.block.custom;
 
 import com.example.immortal_cultivation_mod.magicritual.effect.ModEffects;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup.Provider;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
@@ -12,6 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
 import org.jetbrains.annotations.Nullable;
@@ -25,22 +26,23 @@ public class FogEscapeBlockEntity extends BlockEntity {
    private static final String TAG_RETURN_PITCH = "return_pitch";
    private static final String TAG_SOURCE_CENTER = "source_center";
    private static final String TAG_SOURCE_RADIUS = "source_radius";
-   private ResourceKey<Level> returnDimension = Level.OVERWORLD;
+   private ResourceKey<Level> returnDimension;
    private double returnX;
    private double returnY;
    private double returnZ;
    private float returnYaw;
    private float returnPitch;
    private boolean hasSourceCenter;
-   private BlockPos sourceCenter = BlockPos.ZERO;
+   private BlockPos sourceCenter;
    private int sourceRadius;
 
    public FogEscapeBlockEntity(BlockPos pos, BlockState state) {
-      super(ModBlockEntities.FOG_ESCAPE_BE.get(), pos, state);
+      super((BlockEntityType)ModBlockEntities.FOG_ESCAPE_BE.get(), pos, state);
+      this.returnDimension = Level.OVERWORLD;
+      this.sourceCenter = BlockPos.ZERO;
    }
 
-   public void setReturnLocation(ServerPlayer player, @Nullable BlockPos sourceCenter,
-                                 int sourceRadius) {
+   public void setReturnLocation(ServerPlayer player, @Nullable BlockPos sourceCenter, int sourceRadius) {
       this.returnDimension = player.level().dimension();
       this.returnX = player.getX();
       this.returnY = player.getY();
@@ -60,76 +62,72 @@ public class FogEscapeBlockEntity extends BlockEntity {
          if (returnLevel == null) {
             returnLevel = server.overworld();
          }
+
          BlockPos returnPos = this.findOutsideMagicCircle(returnLevel);
          player.removeEffect(ModEffects.FOG);
-         player.teleportTo(
-            returnLevel, (double)returnPos.getX() + 0.5, (double)returnPos.getY(), (double)returnPos.getZ() + 0.5, this.returnYaw, this.returnPitch
-         );
+         player.teleportTo(returnLevel, (double)returnPos.getX() + (double)0.5F, (double)returnPos.getY(), (double)returnPos.getZ() + (double)0.5F, this.returnYaw, this.returnPitch);
       }
+
    }
 
    private BlockPos findOutsideMagicCircle(ServerLevel level) {
       BlockPos originalPos = BlockPos.containing(this.returnX, this.returnY, this.returnZ);
       if (this.hasSourceCenter) {
          return this.findOutsideCenter(level, this.sourceCenter, this.sourceRadius);
-      }
-      BlockPos nearestCenter = null;
-      int nearestDistance = Integer.MAX_VALUE;
-      int nearestRadius = 0;
+      } else {
+         BlockPos nearestCenter = null;
+         int nearestDistance = Integer.MAX_VALUE;
+         int nearestRadius = 0;
+         int highestCenterY = Math.min(originalPos.getY(), level.getMaxBuildHeight() - 1);
 
-      int highestCenterY = Math.min(originalPos.getY(), level.getMaxBuildHeight() - 1);
-      for (MagicCenterBlockEntity center : MagicCenterBlockEntity.getLoadedCentersNear(
-            level, originalPos, MagicCenterBlockEntity.MAX_RADIUS)) {
-         BlockPos centerPos = center.getBlockPos();
-         if (centerPos.getY() > highestCenterY || centerPos.getY() < level.getMinBuildHeight()) {
-            continue;
+         for(MagicCenterBlockEntity center : MagicCenterBlockEntity.getLoadedCentersNear(level, originalPos, 303)) {
+            BlockPos centerPos = center.getBlockPos();
+            if (centerPos.getY() <= highestCenterY && centerPos.getY() >= level.getMinBuildHeight()) {
+               int dx = centerPos.getX() - originalPos.getX();
+               int dz = centerPos.getZ() - originalPos.getZ();
+               int radius = center.getRadius();
+               int distance = dx * dx + dz * dz;
+               if (distance <= radius * radius && distance < nearestDistance) {
+                  nearestCenter = centerPos;
+                  nearestDistance = distance;
+                  nearestRadius = radius;
+               }
+            }
          }
-         int dx = centerPos.getX() - originalPos.getX();
-         int dz = centerPos.getZ() - originalPos.getZ();
-         int radius = center.getRadius();
-         int distance = dx * dx + dz * dz;
-         if (distance <= radius * radius && distance < nearestDistance) {
-            nearestCenter = centerPos;
-            nearestDistance = distance;
-            nearestRadius = radius;
-         }
-      }
 
-      if (nearestCenter == null) {
-         return safeSurfacePos(level, originalPos.getX(), originalPos.getZ());
+         if (nearestCenter == null) {
+            return safeSurfacePos(level, originalPos.getX(), originalPos.getZ());
+         } else {
+            return this.findOutsideCenter(level, nearestCenter, nearestRadius);
+         }
       }
-      return this.findOutsideCenter(level, nearestCenter, nearestRadius);
    }
 
    private BlockPos findOutsideCenter(ServerLevel level, BlockPos center, int radius) {
-      double offsetX = this.returnX - ((double)center.getX() + 0.5D);
-      double offsetZ = this.returnZ - ((double)center.getZ() + 0.5D);
+      double offsetX = this.returnX - ((double)center.getX() + (double)0.5F);
+      double offsetZ = this.returnZ - ((double)center.getZ() + (double)0.5F);
       double length = Math.sqrt(offsetX * offsetX + offsetZ * offsetZ);
-      if (length < 0.001D) {
-         offsetX = 1.0D;
-         offsetZ = 0.0D;
-         length = 1.0D;
+      if (length < 0.001) {
+         offsetX = (double)1.0F;
+         offsetZ = (double)0.0F;
+         length = (double)1.0F;
       }
 
       int escapeDistance = radius + 2;
-      int targetX = (int)Math.floor(center.getX() + 0.5D
-            + offsetX / length * escapeDistance);
-      int targetZ = (int)Math.floor(center.getZ() + 0.5D
-            + offsetZ / length * escapeDistance);
+      int targetX = (int)Math.floor((double)center.getX() + (double)0.5F + offsetX / length * (double)escapeDistance);
+      int targetZ = (int)Math.floor((double)center.getZ() + (double)0.5F + offsetZ / length * (double)escapeDistance);
       return safeSurfacePos(level, targetX, targetZ);
    }
 
    private static BlockPos safeSurfacePos(ServerLevel level, int x, int z) {
-      int y = level.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, x, z);
-
-      while (!level.getBlockState(new BlockPos(x, y, z)).isAir() || !level.getBlockState(new BlockPos(x, y + 1, z)).isAir()) {
-         y++;
+      int y;
+      for(y = level.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, x, z); !level.getBlockState(new BlockPos(x, y, z)).isAir() || !level.getBlockState(new BlockPos(x, y + 1, z)).isAir(); ++y) {
       }
 
       return new BlockPos(x, y, z);
    }
 
-   protected void saveAdditional(CompoundTag tag, Provider registries) {
+   protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
       super.saveAdditional(tag, registries);
       tag.putString("return_dimension", this.returnDimension.location().toString());
       tag.putDouble("return_x", this.returnX);
@@ -138,12 +136,13 @@ public class FogEscapeBlockEntity extends BlockEntity {
       tag.putFloat("return_yaw", this.returnYaw);
       tag.putFloat("return_pitch", this.returnPitch);
       if (this.hasSourceCenter) {
-         tag.putLong(TAG_SOURCE_CENTER, this.sourceCenter.asLong());
-         tag.putInt(TAG_SOURCE_RADIUS, this.sourceRadius);
+         tag.putLong("source_center", this.sourceCenter.asLong());
+         tag.putInt("source_radius", this.sourceRadius);
       }
+
    }
 
-   protected void loadAdditional(CompoundTag tag, Provider registries) {
+   protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
       super.loadAdditional(tag, registries);
       ResourceLocation dimensionId = ResourceLocation.tryParse(tag.getString("return_dimension"));
       if (dimensionId == null) {
@@ -156,10 +155,8 @@ public class FogEscapeBlockEntity extends BlockEntity {
       this.returnZ = tag.getDouble("return_z");
       this.returnYaw = tag.getFloat("return_yaw");
       this.returnPitch = tag.getFloat("return_pitch");
-      this.hasSourceCenter = tag.contains(TAG_SOURCE_CENTER)
-            && tag.getInt(TAG_SOURCE_RADIUS) > 0;
-      this.sourceCenter = this.hasSourceCenter
-            ? BlockPos.of(tag.getLong(TAG_SOURCE_CENTER)) : BlockPos.ZERO;
-      this.sourceRadius = this.hasSourceCenter ? tag.getInt(TAG_SOURCE_RADIUS) : 0;
+      this.hasSourceCenter = tag.contains("source_center") && tag.getInt("source_radius") > 0;
+      this.sourceCenter = this.hasSourceCenter ? BlockPos.of(tag.getLong("source_center")) : BlockPos.ZERO;
+      this.sourceRadius = this.hasSourceCenter ? tag.getInt("source_radius") : 0;
    }
 }

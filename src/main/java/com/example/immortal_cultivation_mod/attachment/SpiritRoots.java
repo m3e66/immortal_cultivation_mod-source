@@ -102,8 +102,45 @@ public final class SpiritRoots {
         if (data == null || spell == null || data.spiritRoots() == null) {
             return false;
         }
-        String element = spell.element();
-        return !NONE.equals(element) && data.spiritRoots().contains(element);
+        return matchesAny(data.spiritRoots(), spell.element());
+    }
+
+    public static boolean matchesAny(List<String> available, String elementSpec) {
+        if (available == null || available.isEmpty() || elementSpec == null || elementSpec.isBlank()) {
+            return false;
+        }
+        for (String element : elementSpec.split(",")) {
+            String clean = element.trim();
+            if (!clean.isEmpty() && !NONE.equals(clean) && available.contains(clean)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean elementMatches(String elementSpec, String element) {
+        if (elementSpec == null || element == null || element.isBlank()) {
+            return false;
+        }
+        for (String candidate : elementSpec.split(",")) {
+            if (element.equals(candidate.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String primaryElement(String elementSpec) {
+        if (elementSpec == null) {
+            return "";
+        }
+        for (String candidate : elementSpec.split(",")) {
+            String clean = candidate.trim();
+            if (ALL_ELEMENTS.contains(clean)) {
+                return clean;
+            }
+        }
+        return elementSpec.trim();
     }
 
     public static float damageMultiplier(ModAttachments.CultivationData data, ModSpells.SpellDef spell) {

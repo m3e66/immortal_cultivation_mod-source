@@ -1,0 +1,21 @@
+Particle texture credits
+
+Iron's Spells: Elden Ring - Particle Library
+Author: shuimo0413
+Copyright (c) 2026 shuimo0413
+Repository: https://github.com/shuimo0413/Iron-Elden-Ring-Particle-library
+License: MIT; full text in META-INF/licenses/iron-elden-ring-particles-MIT.txt
+Revision: daf3835d00bca03fb1ab52135a05e23e3e5b5020
+
+Bundled unchanged textures:
+  ash_mote.png
+  ember_mote_0.png
+  frost_mist.png
+  holy_mote_0.png
+  nature_leaf_small.png
+
+Integration: client-side environmental leaf drift, herb spirit motes, frost mist,
+heat embers, and realm-pressure ash. Original particle textures are used unchanged;
+Minecraft particle behavior and integration were written for this mod.
+
+Additional spell accents: carian_spark.png, void_mote_0.png (unchanged).

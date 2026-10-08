@@ -1,16 +1,30 @@
 {
-  "name": "\u4fee\u70bc\u5165\u95e8",
+  "name": "修炼入门",
   "icon": "immortal_cultivation_mod:enlightenment_pill",
   "category": "immortal_cultivation_mod:basics",
   "sortnum": 0,
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "\u4f7f\u7528\u542f\u8499\u4e39\u53ef\u4ee5\u4ece\u51e1\u4eba\u8e0f\u5165\u7ec3\u6c14\u671f\u3002$(br2)\u5c5e\u6027\u83dc\u5355\u4f1a\u663e\u793a\u7075\u6c14\u3001\u5883\u754c\u3001\u6700\u5927\u751f\u547d\u3001\u6700\u5927\u5bff\u5143\u3001\u6c14\u8fd0\u3001\u9053\u5fb7\u3001\u7075\u9b42\u3001\u5ff5\u5934\u3001\u7075\u6839\u548c\u4fee\u4e3a\u8fdb\u5ea6\u3002"
+      "text": "新凡人会自动开启引道第零章。使用“打开引道”按键追踪目标；HUD与章节页面会显示最近山地古洞府的方向、距离以及X/Z坐标。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "immortal_cultivation_mod:enlightenment_pill",
+      "text": "古洞府内有两个物资箱：其中一个固定包含且仅包含一枚启灵丹，另一个装有筑基散修物资。取得启灵丹即可完成第零章。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)\u7075\u6c14\u6761\u663e\u793a\u5728\u9965\u997f\u6761\u4e0a\u65b9\u3002\u51e1\u4eba\u4ecd\u7136\u80fd\u770b\u5230\u7075\u6c14\u6761\uff0c\u4f46\u4e0d\u4f1a\u81ea\u7136\u56de\u590d\u7075\u6c14\u3002$(br2)\u9644\u8fd1\u7075\u8109\u4e2d\u5fc3\u4ea7\u751f\u7684\u9ad8\u6d53\u5ea6\u73af\u5883\u7075\u6c14\u4f1a\u52a0\u5feb\u81ea\u7136\u56de\u6c14\u3002\u6bcf25\u70b9\u73af\u5883\u7075\u6c14\u4f7f\u56de\u6c14\u901f\u5ea6\u63d0\u9ad825%\u3002$(br2)\u6253\u5750\u9700\u8981\u7ad9\u5728\u5730\u9762\u4e0a\uff0c\u6253\u5750\u65f6\u4e0d\u80fd\u79fb\u52a8\u3002"
+      "text": "服用启灵丹后完成启灵与独立选择界面，才能踏入练气。选择未完成时不能直接退出。$(br2)修炼状态显示境界、灵根、气血、灵气、寿元、念头与修炼进度。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(br)灵气条显示在饥饿条上方。凡人仍然能看到灵气条，但不会自然回复灵气。$(br2)附近灵脉中心产生的高浓度环境灵气会加快自然回气。每25点环境灵气使回气速度提高25%。$(br2)打坐需要站在地面上，打坐时不能移动。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "引道支篇",
+      "text": "打开引道可追踪真实操作目标。遇到对应物品或系统时，会发现新的支篇。$(br2)知识提示使用“已了解”确认；操作目标须实际完成。修仙手册中的对应章节可随时查阅。"
     }
   ]
 }

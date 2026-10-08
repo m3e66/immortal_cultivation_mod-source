@@ -22,12 +22,18 @@ public class SpellDamageHelper {
 
             if (spell != null) {
                 damage *= (float) SpiritRoots.damageMultiplier(data, spell);
+                if (spell.element().split(",").length > 0
+                        && java.util.Arrays.stream(spell.element().split(","))
+                        .map(String::trim)
+                        .anyMatch(SpiritRoots.THUNDER::equals)) {
+                    damage *= GangtingXiaokongLu.thunderPowerMultiplier(player);
+                }
             }
 
         } else if (owner instanceof PathfinderMob mob && mob instanceof CultivationNpc npc) {
             damage += (float) mob.getAttributeValue(Attributes.ATTACK_DAMAGE);
-            if (spell != null && NpcProfile.spiritRootIds(mob, npc.npcArchetype())
-                    .contains(spell.element())) {
+            if (spell != null && SpiritRoots.matchesAny(
+                    NpcProfile.spiritRootIds(mob, npc.npcArchetype()), spell.element())) {
                 damage *= 2.0F;
             }
         }
@@ -36,6 +42,6 @@ public class SpellDamageHelper {
             damage *= 1.5F;
         }
 
-        return damage;
+        return damage * (float) com.example.immortal_cultivation_mod.pagoda.GourdSystem.multiplier(owner);
     }
 }

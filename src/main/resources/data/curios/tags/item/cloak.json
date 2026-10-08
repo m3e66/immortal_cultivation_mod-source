@@ -1,4 +1,7 @@
 {
   "replace": false,
-  "values": []
+  "values": [
+    "immortal_cultivation_mod:doupeng",
+    "immortal_cultivation_mod:hechang"
+  ]
 }

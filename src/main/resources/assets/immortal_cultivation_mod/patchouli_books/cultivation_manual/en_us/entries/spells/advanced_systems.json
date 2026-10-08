@@ -10,14 +10,6 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)The combo menu is opened with O. Create Spell opens the combo list, and Order + adds learned spells to the combo.$(br2)Combo cast mode is saved per combo: ordered casts fire one by one, while all-at-once casts separate projectile spells into a small hexagon in front of the caster."
-    },
-    {
-      "type": "patchouli:text",
-      "text": "$(br)Toggle spells used inside a combo last 10 seconds instead of staying on forever. Multiple copies of the same toggle in one combo stack their duration."
-    },
-    {
-      "type": "patchouli:text",
       "text": "$(br)Yuqi Shu: learned automatically at Foundation Establishment Early.$(br)Use it while looking at a released flying sword to call it behind you. The button in its spell description switches between calling only the looked-at sword and calling all owned swords in a 3-block area."
     },
     {

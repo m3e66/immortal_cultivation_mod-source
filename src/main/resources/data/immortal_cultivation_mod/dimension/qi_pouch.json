@@ -1,0 +1,26 @@
+{
+  "type": "immortal_cultivation_mod:qi_pouch",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "immortal_cultivation_mod:empty",
+      "structure_overrides": [],
+      "layers": [
+        {
+          "block": "minecraft:bedrock",
+          "height": 1
+        },
+        {
+          "block": "minecraft:stone",
+          "height": 3
+        },
+        {
+          "block": "minecraft:grass_block",
+          "height": 1
+        }
+      ],
+      "features": false,
+      "lakes": false
+    }
+  }
+}

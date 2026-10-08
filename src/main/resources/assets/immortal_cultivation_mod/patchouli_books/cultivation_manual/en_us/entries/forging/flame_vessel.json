@@ -1,0 +1,23 @@
+{
+  "name": "Flame Vessel",
+  "icon": "immortal_cultivation_mod:flame_vessel",
+  "category": "immortal_cultivation_mod:forging",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Craft and Capture",
+      "text": "Craft an empty vessel with three glass blocks and one copper ingot: copper at top center, glass at both middle sides and bottom center.$(br2)Right-click a floating special flame with an empty vessel. Each vessel holds one essence; its tooltip identifies the flame and its forging capabilities."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Release and Shoot",
+      "text": "$(bold)Sneak-right-click$(): releases the capturable floating essence and empties the vessel.$(br2)$(bold)Tap and release right-click$(): spends Qi to fire a normal flare, without consuming the stored essence.$(br2)A normal creature hit places no fire block. Shoot supported empty ground to create forge fire."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Charge a Giant Fireball",
+      "text": "Hold right-click with a filled vessel to gather a larger fireball. Release to fire; holding to full charge fires automatically.$(br2)Stronger charge requires more Qi. Insufficient Qi prevents continued charging or firing. Switching items interrupts use."
+    }
+  ]
+}

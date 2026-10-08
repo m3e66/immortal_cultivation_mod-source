@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "S S",
+    "WWW"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:string"
+    },
+    "W": {
+      "item": "immortal_cultivation_mod:white_wool_strip"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:miansha",
+    "count": 1
+  }
+}

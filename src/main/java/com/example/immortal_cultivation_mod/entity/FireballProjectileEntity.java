@@ -2,7 +2,6 @@ package com.example.immortal_cultivation_mod.entity;
 
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
-import com.example.immortal_cultivation_mod.effect.PhotonEffects;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -28,7 +27,6 @@ public class FireballProjectileEntity extends ThrowableItemProjectile {
     private static final EntityDataAccessor<Float> DATA_CHARGE_SCALE =
             SynchedEntityData.defineId(FireballProjectileEntity.class, EntityDataSerializers.FLOAT);
 
-    private int photonEffectAttempts;
 
     public FireballProjectileEntity(EntityType<? extends ThrowableItemProjectile> entityType, Level level) {
         super(entityType, level);
@@ -95,10 +93,6 @@ public class FireballProjectileEntity extends ThrowableItemProjectile {
                         0.0D);
             }
         }
-        if (!level().isClientSide && photonEffectAttempts < 5) {
-            photonEffectAttempts++;
-            PhotonEffects.fireballProjectile(this);
-        }
     }
 
     @Override
@@ -128,6 +122,10 @@ public class FireballProjectileEntity extends ThrowableItemProjectile {
                     power, false, Level.ExplosionInteraction.NONE);
         } else {
             level().explode(this, getX(), getY(), getZ(), power, false, Level.ExplosionInteraction.NONE);
+        }
+        if (level() instanceof ServerLevel serverLevel) {
+            ElementalTechniqueAreaEntity.damageFireSensitiveAreas(
+                    serverLevel, position(), 3.0D * chargeScale(), 28);
         }
         discard();
     }

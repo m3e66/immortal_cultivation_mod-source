@@ -4,12 +4,15 @@
       "processor_type": "minecraft:block_ignore",
       "blocks": [
         {
-          "Name": "minecraft:air"
-        },
-        {
           "Name": "minecraft:structure_block"
         }
       ]
+    },
+    {
+      "processor_type": "immortal_cultivation_mod:long_table_connection"
+    },
+    {
+      "processor_type": "immortal_cultivation_mod:solid_foundation"
     }
   ]
 }

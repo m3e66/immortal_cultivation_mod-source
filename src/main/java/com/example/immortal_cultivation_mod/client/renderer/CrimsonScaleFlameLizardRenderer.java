@@ -7,23 +7,15 @@ import com.mojang.math.Axis;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
-public final class CrimsonScaleFlameLizardRenderer
-        extends GeoEntityRenderer<CrimsonScaleFlameLizardEntity> {
-    public CrimsonScaleFlameLizardRenderer(EntityRendererProvider.Context context) {
-        super(context, new CrimsonScaleFlameLizardModel());
-        withScale(CrimsonScaleFlameLizardEntity.MODEL_SCALE);
-        shadowRadius = 1.05F;
-    }
+public final class CrimsonScaleFlameLizardRenderer extends GeoEntityRenderer<CrimsonScaleFlameLizardEntity> {
+   public CrimsonScaleFlameLizardRenderer(EntityRendererProvider.Context context) {
+      super(context, new CrimsonScaleFlameLizardModel());
+      this.withScale(1.18F);
+      this.shadowRadius = 1.05F;
+   }
 
-    @Override
-    protected void applyRotations(CrimsonScaleFlameLizardEntity animatable,
-                                  PoseStack poseStack,
-                                  float ageInTicks,
-                                  float rotationYaw,
-                                  float partialTick,
-                                  float nativeScale) {
-        super.applyRotations(animatable, poseStack, ageInTicks, rotationYaw, partialTick, nativeScale);
-        poseStack.mulPose(Axis.YP.rotationDegrees(
-                CrimsonScaleFlameLizardEntity.RENDERER_YAW_OFFSET));
-    }
+   protected void applyRotations(CrimsonScaleFlameLizardEntity animatable, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTick, float nativeScale) {
+      super.applyRotations(animatable, poseStack, ageInTicks, rotationYaw, partialTick, nativeScale);
+      poseStack.mulPose(Axis.YP.rotationDegrees(-90.0F));
+   }
 }

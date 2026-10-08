@@ -2,6 +2,7 @@ package com.example.immortal_cultivation_mod.event;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
+import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -78,7 +79,8 @@ public final class JindanTribulation {
             return;
         }
         if (!player.isAlive() || player.isRemoved()) {
-            clear(player);
+            if (!player.isAlive()) failOnDeath(player);
+            else clear(player);
             return;
         }
         if (!(player.level() instanceof ServerLevel level)) {
@@ -146,6 +148,23 @@ public final class JindanTribulation {
 
     public static boolean isActive(ServerPlayer player) {
         return ACTIVE.containsKey(player.getUUID());
+    }
+
+    /** Failure changes the original attachment before NeoForge copies it on respawn. */
+    public static boolean failOnDeath(ServerPlayer player) {
+        if (ACTIVE.remove(player.getUUID()) == null) return false;
+        var data = ModAttachments.getData(player);
+        int ageLimit = CultivationLevels.getLevelDef(CultivationLevels.REALM_HALF_JINDAN).maxAge();
+        // Leave at least one year after the normal ten-year death penalty; failure must not become a mortal reset.
+        ModAttachments.setData(player, data.withCultivationLevel(CultivationLevels.REALM_HALF_JINDAN)
+                .withCultivationProgress(0).withQi(0).withMeditating(false)
+                .withAgePenalty(Math.min(data.agePenalty(), Math.max(0, ageLimit - 11))));
+        player.getPersistentData().remove("ImmortalCultivationPendingJindanBreakthrough");
+        ServerEvents.setJindanQuality(player, "liedan");
+        sendOverlay(player, OVERLAY_END, 0, 0);
+        player.sendSystemMessage(Component.translatable("message.immortal_cultivation_mod.jindan_trial_death",
+                CultivationLevels.getTotalQiNeeded(CultivationLevels.REALM_HALF_JINDAN)));
+        return true;
     }
 
     private static void tickStrikeSequence(ServerLevel level, ServerPlayer player, int tick) {
@@ -743,7 +762,7 @@ public final class JindanTribulation {
         sendOverlay(player, OVERLAY_END, 0, 0.0F);
         String level = CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_EARLY;
         player.sendSystemMessage(Component.translatable(
-                "message." + ImmortalCultivationMod.MODID + ".breakthrough_success", level));
+                "message." + ImmortalCultivationMod.MODID + ".breakthrough_success", CultivationLevels.displayName(level)));
         player.sendSystemMessage(Component.translatable(
                 "message." + ImmortalCultivationMod.MODID + ".jindan_quality",
                 Component.translatable("jindan_quality." + ImmortalCultivationMod.MODID + "." + quality)));

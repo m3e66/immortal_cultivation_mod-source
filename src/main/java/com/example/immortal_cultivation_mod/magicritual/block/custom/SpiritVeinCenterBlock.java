@@ -11,17 +11,17 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class SpiritVeinCenterBlock extends Block implements EntityBlock {
-   private static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 16.0, 16.0);
+   private static final VoxelShape SHAPE = Block.box((double)0.0F, (double)0.0F, (double)0.0F, (double)16.0F, (double)16.0F, (double)16.0F);
 
-   public SpiritVeinCenterBlock(Properties properties) {
+   public SpiritVeinCenterBlock(BlockBehaviour.Properties properties) {
       super(properties);
    }
 
@@ -42,25 +42,31 @@ public class SpiritVeinCenterBlock extends Block implements EntityBlock {
    }
 
    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-      return !level.isClientSide && level.getBlockEntity(pos) instanceof SpiritVeinCenterBlockEntity be && be.releaseStoredSpiritStones()
-         ? InteractionResult.SUCCESS
-         : InteractionResult.sidedSuccess(level.isClientSide);
+      InteractionResult var10000;
+      if (!level.isClientSide) {
+         BlockEntity var7 = level.getBlockEntity(pos);
+         if (var7 instanceof SpiritVeinCenterBlockEntity) {
+            SpiritVeinCenterBlockEntity be = (SpiritVeinCenterBlockEntity)var7;
+            if (be.releaseStoredSpiritStones()) {
+               var10000 = InteractionResult.SUCCESS;
+               return var10000;
+            }
+         }
+      }
+
+      var10000 = InteractionResult.sidedSuccess(level.isClientSide);
+      return var10000;
    }
 
-   @Nullable
-   public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+   public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
       return new SpiritVeinCenterBlockEntity(pos, state);
    }
 
-   @Nullable
-   public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-      return createTickerHelper(type, ModBlockEntities.SPIRIT_VEIN_CENTER_BE.get(), SpiritVeinCenterBlockEntity::tick);
+   public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+      return createTickerHelper(type, (BlockEntityType)ModBlockEntities.SPIRIT_VEIN_CENTER_BE.get(), SpiritVeinCenterBlockEntity::tick);
    }
 
-   @SuppressWarnings("unchecked")
-   private static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(
-      BlockEntityType<A> type, BlockEntityType<E> expectedType, BlockEntityTicker<? super E> ticker
-   ) {
+   private static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> type, BlockEntityType<E> expectedType, BlockEntityTicker<? super E> ticker) {
       return expectedType == type ? (BlockEntityTicker<A>)ticker : null;
    }
 }

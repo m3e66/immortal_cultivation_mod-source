@@ -1,0 +1,6 @@
+{
+  "parent": "immortal_cultivation_mod:item/herb_display",
+  "textures": {
+    "layer0": "immortal_cultivation_mod:item/harmonizing_herb"
+  }
+}

@@ -17,18 +17,15 @@ import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.placement.RarityFilter;
 
 public class ModPlacedFeatures {
-   public static final ResourceKey<PlacedFeature> SPIRIT_ORE_VEIN_PLACED_KEY = ResourceKey.create(
-      Registries.PLACED_FEATURE, ResourceLocation.fromNamespaceAndPath("immortal_cultivation_mod", "spirit_ore_vein")
-   );
+   public static final ResourceKey<PlacedFeature> SPIRIT_ORE_VEIN_PLACED_KEY;
 
    public static void bootstrap(BootstrapContext<PlacedFeature> context) {
       Holder<ConfiguredFeature<?, ?>> configuredFeature = context.lookup(Registries.CONFIGURED_FEATURE).getOrThrow(ModConfiguredFeatures.SPIRIT_ORE_VEIN_KEY);
-      List<PlacementModifier> modifiers = List.of(
-         RarityFilter.onAverageOnceEvery(4),
-         InSquarePlacement.spread(),
-         HeightRangePlacement.uniform(VerticalAnchor.absolute(80), VerticalAnchor.absolute(120)),
-         BiomeFilter.biome()
-      );
+      List<PlacementModifier> modifiers = List.of(RarityFilter.onAverageOnceEvery(4), InSquarePlacement.spread(), HeightRangePlacement.uniform(VerticalAnchor.absolute(80), VerticalAnchor.absolute(120)), BiomeFilter.biome());
       PlacementUtils.register(context, SPIRIT_ORE_VEIN_PLACED_KEY, configuredFeature, modifiers);
+   }
+
+   static {
+      SPIRIT_ORE_VEIN_PLACED_KEY = ResourceKey.create(Registries.PLACED_FEATURE, ResourceLocation.fromNamespaceAndPath("immortal_cultivation_mod", "spirit_ore_vein"));
    }
 }

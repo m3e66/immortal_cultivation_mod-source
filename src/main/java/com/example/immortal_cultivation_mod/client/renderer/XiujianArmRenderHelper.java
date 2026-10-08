@@ -12,32 +12,17 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 public final class XiujianArmRenderHelper {
-    private static final float ARM_SCALE = 0.48F;
+   private static final float ARM_SCALE = 0.48F;
 
-    private XiujianArmRenderHelper() {
-    }
+   private XiujianArmRenderHelper() {
+   }
 
-    public static void render(
-            XiujianItemRenderer renderer,
-            ItemStack stack,
-            HumanoidModel<?> model,
-            HumanoidArm armSide,
-            PoseStack poseStack,
-            MultiBufferSource buffer,
-            int packedLight) {
-        ModelPart arm = armSide == HumanoidArm.RIGHT
-                ? model.rightArm
-                : model.leftArm;
-        arm.translateAndRotate(poseStack);
-        poseStack.translate(0.2D, 0.0D, -0.05D);
-        poseStack.mulPose(Axis.ZP.rotationDegrees(90.0F));
-        poseStack.scale(ARM_SCALE, ARM_SCALE, ARM_SCALE);
-        renderer.renderByItem(
-                stack,
-                ItemDisplayContext.FIXED,
-                poseStack,
-                buffer,
-                packedLight,
-                OverlayTexture.NO_OVERLAY);
-    }
+   public static void render(XiujianItemRenderer renderer, ItemStack stack, HumanoidModel<?> model, HumanoidArm armSide, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+      ModelPart arm = armSide == HumanoidArm.RIGHT ? model.rightArm : model.leftArm;
+      arm.translateAndRotate(poseStack);
+      poseStack.translate(0.2, (double)0.0F, -0.05);
+      poseStack.mulPose(Axis.ZP.rotationDegrees(90.0F));
+      poseStack.scale(0.48F, 0.48F, 0.48F);
+      renderer.renderByItem(stack, ItemDisplayContext.FIXED, poseStack, buffer, packedLight, OverlayTexture.NO_OVERLAY);
+   }
 }

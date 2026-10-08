@@ -1,0 +1,23 @@
+{
+  "name": "Weapon Tribulations",
+  "icon": "immortal_cultivation_mod:flying_sword",
+  "category": "immortal_cultivation_mod:principles",
+  "sortnum": 7,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Carry the Weapon",
+      "text": "Advancement brings a sequence of lightning strikes. While the trial weapon is held, its holder takes the lightning and must survive the full sequence.$(br2)The weapon's own power and tier determine the trial strength. Prepare health, defenses, and recovery before beginning."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Unheld Weapons",
+      "text": "When the weapon is not held, lightning wears down its durability directly. Keeping it in an ordinary inventory slot does not count as holding it.$(br2)Zero durability shatters the weapon and fails advancement. Wear remains; picking up a trial weapon does not cancel the remaining strikes."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Death During the Trial",
+      "text": "If its holder dies during the trial, the weapon forcibly drops even with keepInventory enabled. Remaining lightning continues against the dropped weapon.$(br2)Advancement succeeds only when the weapon survives the complete sequence."
+    }
+  ]
+}

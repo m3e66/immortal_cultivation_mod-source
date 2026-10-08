@@ -4,15 +4,18 @@ import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.effect.ModEffects;
-import com.example.immortal_cultivation_mod.effect.PhotonEffects;
+import com.example.immortal_cultivation_mod.entity.CultivationNpc;
 import com.example.immortal_cultivation_mod.event.ServerEvents;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +23,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class Weiya {
-    private static final double RADIUS = 16.0D;
     private static final int REFRESH_TICKS = 40;
     private static final Map<UUID, Boolean> ACTIVE = new ConcurrentHashMap<>();
     private static final Map<UUID, Long> TIMED_UNTIL = new ConcurrentHashMap<>();
@@ -38,13 +40,13 @@ public final class Weiya {
 
         var data = ModAttachments.getData(player);
 
-        if (CultivationLevels.isMortal(data.cultivationLevel())) {
+        if (!player.isAlive() || CultivationLevels.isMortal(data.cultivationLevel())) {
             return;
         }
 
         int cost = qiCostPerSecond(data);
 
-        if (!ServerEvents.spendQiOrBlood(player, data, cost)) {
+        if (!ServerEvents.spendSpellQiOrBlood(player, data, cost)) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return;
         }
@@ -52,8 +54,6 @@ public final class Weiya {
         ACTIVE.put(id, true);
         refreshCaster(player);
 
-        PhotonEffects.weiyaStop(player);
-        PhotonEffects.weiyaStart(player);
 
         ServerEvents.syncPlayerData(player);
     }
@@ -71,19 +71,20 @@ public final class Weiya {
 
         var data = ModAttachments.getData(player);
 
-        if (CultivationLevels.isMortal(data.cultivationLevel())) {
+        if (!player.isAlive() || CultivationLevels.isMortal(data.cultivationLevel())) {
             stop(player);
             return;
         }
 
         refreshCaster(player);
-        applyPressure(player, data.cultivationLevel());
+        if (player.tickCount % 5 == 0) applyPressure(player, data.cultivationLevel());
 
         if (timedUntil != null || player.tickCount % 20 != 0) {
             return;
         }
 
-        if (!ServerEvents.spendQiOrBlood(player, data, qiCostPerSecond(data))) {
+        if (!ServerEvents.spendSustainedQiOrBlood(
+                player, data, qiCostPerSecond(data))) {
             stop(player);
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return;
@@ -100,7 +101,6 @@ public final class Weiya {
         ACTIVE.remove(player.getUUID());
         TIMED_UNTIL.remove(player.getUUID());
         player.removeEffect(ModEffects.WEIYA);
-        PhotonEffects.weiyaStop(player);
     }
 
     public static void activateTimed(ServerPlayer player, int durationTicks) {
@@ -114,8 +114,6 @@ public final class Weiya {
         long current = TIMED_UNTIL.getOrDefault(id, now);
         TIMED_UNTIL.put(id, Math.max(now, current) + durationTicks);
         refreshCaster(player);
-        PhotonEffects.weiyaStop(player);
-        PhotonEffects.weiyaStart(player);
         ServerEvents.syncPlayerData(player);
     }
 
@@ -125,35 +123,73 @@ public final class Weiya {
     }
 
     private static void refreshCaster(ServerPlayer player) {
-        player.addEffect(new MobEffectInstance(ModEffects.WEIYA, REFRESH_TICKS, 0, false, false, true));
+        int stage = CultivationLevels.getStageIndex(ModAttachments.getData(player).cultivationLevel());
+        var old = player.getEffect(ModEffects.WEIYA);
+        if (old != null && old.getAmplifier() == stage && old.getDuration() > 25) return;
+        if (old != null && old.getAmplifier() != stage) player.removeEffect(ModEffects.WEIYA);
+        player.addEffect(new MobEffectInstance(ModEffects.WEIYA, REFRESH_TICKS, stage, false, false, true));
     }
 
     private static void applyPressure(ServerPlayer caster, String casterLevel) {
+        double radius = radius(casterLevel);
         List<LivingEntity> targets = caster.level().getEntitiesOfClass(
                 LivingEntity.class,
-                new AABB(caster.blockPosition()).inflate(RADIUS),
+                caster.getBoundingBox().inflate(radius),
                 target -> target != caster && target.isAlive()
+                        && contains(caster.position(), radius, target.position())
         );
 
         for (LivingEntity target : targets) {
-            PressureStrength strength = pressureStrength(casterLevel, targetLevel(target));
+            applyPressureEffects(casterLevel, target);
+        }
+    }
 
-            if (strength == PressureStrength.NONE) {
-                continue;
-            }
+    /**
+     * Applies the same realm comparison as active 威压 without requiring a
+     * living caster or spending Qi.  Persistent relic blocks use this to keep
+     * their pressure active while their chunk is loaded.
+     */
+    public static void applyAmbientPressure(ServerLevel level, BlockPos source,
+                                            String sourceLevel) {
+        double radius = radius(sourceLevel);
+        Vec3 center = Vec3.atBottomCenterOf(source);
+        List<LivingEntity> targets = level.getEntitiesOfClass(
+                LivingEntity.class,
+                new AABB(source).inflate(radius),
+                target -> target.isAlive() && contains(center, radius, target.position())
+        );
+        for (LivingEntity target : targets) {
+            applyPressureEffects(sourceLevel, target);
+        }
+    }
 
-            target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, REFRESH_TICKS, strength.slownessAmplifier(), false, false, true));
-            target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, REFRESH_TICKS, strength.weaknessAmplifier(), false, false, true));
+    public static void applyPressureEffects(String sourceLevel, LivingEntity target) {
+        PressureStrength strength = pressureStrength(sourceLevel, targetLevel(target));
 
-            if (strength.suppressesSpells() && target instanceof Player player) {
-                player.addEffect(new MobEffectInstance(ModEffects.DAZE, REFRESH_TICKS, 0, false, false, true));
-            }
+        if (strength == PressureStrength.NONE) {
+            return;
+        }
+
+        target.addEffect(new MobEffectInstance(ModEffects.WEIYA_SUPPRESSED, REFRESH_TICKS,
+                strength.ordinal() - 1, false, false, true));
+
+        target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, REFRESH_TICKS,
+                strength.slownessAmplifier(), false, false, true));
+        target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, REFRESH_TICKS,
+                strength.weaknessAmplifier(), false, false, true));
+
+        if (strength.suppressesSpells()) {
+            target.addEffect(new MobEffectInstance(ModEffects.DAZE, REFRESH_TICKS,
+                    0, false, false, true));
         }
     }
 
     private static String targetLevel(LivingEntity target) {
         if (target instanceof Player player) {
             return ModAttachments.getData(player).cultivationLevel();
+        }
+        if (target instanceof CultivationNpc npc) {
+            return npc.npcRealm();
         }
 
         return CultivationLevels.REALM_MORTAL;
@@ -180,9 +216,28 @@ public final class Weiya {
         return PressureStrength.OVERWHELMING;
     }
 
-    private static int qiCostPerSecond(ModAttachments.CultivationData data) {
-        int maxQi = Math.max(1, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
-        return Math.max(1, (int) Math.ceil(maxQi * 0.10D));
+    public static double radius(String level) {
+        return radiusForStage(CultivationLevels.getStageIndex(level));
+    }
+
+    public static double radiusForStage(int stage) {
+        return stage <= 0 ? 0 : Math.min(64, 12 + (stage - 1) * 2.0D);
+    }
+
+    public static boolean contains(Vec3 center, double radius, Vec3 point) {
+        return radius > 0 && center.distanceToSqr(point) <= radius * radius;
+    }
+
+    /** Rain stops at the top of the pressure dome, without changing world weather. */
+    public static double rainCeiling(Vec3 center, double radius, double x, double z) {
+        double dx = x - center.x, dz = z - center.z;
+        double remaining = radius * radius - dx * dx - dz * dz;
+        return radius <= 0 || remaining < 0 ? Double.NEGATIVE_INFINITY : center.y + Math.sqrt(remaining);
+    }
+
+    public static int qiCostPerSecond(ModAttachments.CultivationData data) {
+        long maxQi = Math.max(1L, (long) CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
+        return (int) Math.min(Integer.MAX_VALUE, Math.max(1L, (long) Math.ceil(maxQi * 0.02D)));
     }
 
     private enum PressureStrength {

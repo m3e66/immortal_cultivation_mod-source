@@ -106,12 +106,16 @@ public class ShihunfanItem extends Item implements GeoItem, SoulStorageWeapon {
         if (!(player instanceof ServerPlayer serverPlayer)) {
             return InteractionResultHolder.sidedSuccess(stack, true);
         }
-        if (player.isShiftKeyDown()) {
-            return deploy(level, serverPlayer, hand, stack);
+        InteractionResultHolder<ItemStack> result = player.isShiftKeyDown()
+                ? deploy(level, serverPlayer, hand, stack)
+                : hundredGhostMarch(serverPlayer, stack)
+                    ? InteractionResultHolder.success(stack)
+                    : InteractionResultHolder.fail(stack);
+        if (result.getResult().consumesAction()) {
+            com.example.immortal_cultivation_mod.network.WeaponUseAnimations.play(serverPlayer,
+                    com.example.immortal_cultivation_mod.network.WeaponUseAnimations.Type.BANNER);
         }
-        return hundredGhostMarch(serverPlayer, stack)
-                ? InteractionResultHolder.success(stack)
-                : InteractionResultHolder.fail(stack);
+        return result;
     }
 
     public static boolean soulWindSlash(ServerPlayer player) {

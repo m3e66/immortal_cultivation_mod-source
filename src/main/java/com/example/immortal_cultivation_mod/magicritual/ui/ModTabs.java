@@ -13,38 +13,48 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ModTabs {
-   public static final DeferredRegister<CreativeModeTab> CREATIVE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, "immortal_cultivation_mod");
-   public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAGIC_RITUAL_TAB = CREATIVE_TABS.register(
-      "magic_ritual_tab",
-      () -> CreativeModeTab.builder()
-            .title(Component.translatable("itemGroup.immortal_cultivation_mod.rituals"))
-            .withTabsBefore(new ResourceKey[]{CreativeModeTabs.COMBAT})
-            .icon(() -> ((Item)ModItems.RITUAL_DAGGER.get()).getDefaultInstance())
-            .displayItems((itemDisplayParameters, output) -> {
-               output.accept((ItemLike)ModItems.RITUAL_DAGGER.get());
-               output.accept((ItemLike)ModItems.SPIRIT_STONE.get());
-               output.accept((ItemLike)ModItems.MEDIUM_SPIRIT_STONE.get());
-               output.accept((ItemLike)ModItems.HIGH_SPIRIT_STONE.get());
-               output.accept((ItemLike)ModItems.INFINITE_SPIRIT_STONE.get());
-               output.accept((ItemLike)ModBlocks.MAGIC_CENTER_BLOCK.get());
-               output.accept((ItemLike)ModBlocks.MAGIC_CIRCLE_BLOCK.get());
-               output.accept((ItemLike)ModBlocks.SPIRIT_ORE.get());
-               output.accept((ItemLike)ModItems.SPIRIT_MAP.get());
-               output.accept((ItemLike)ModItems.ZHENPAN.get());
-               output.accept((ItemLike)ModItems.ZHENWEN_JADE.get());
-               output.accept((ItemLike)ModItems.PATTERNED_CLOTH.get());
-               output.accept((ItemLike)ModItems.SPIRIT_SILKWORM_SILK.get());
-               output.accept((ItemLike)ModItems.SPIRIT_GUIDING_THREAD.get());
-               output.accept((ItemLike)ModItems.SPIRIT_STORAGE_CRYSTAL.get());
-               output.accept((ItemLike)ModItems.FLOWING_SPIRIT_CRYSTAL.get());
-               output.accept((ItemLike)ModItems.LINGMU_FLAGPOLE.get());
-               output.accept((ItemLike)ModItems.BLANK_FORMATION_FLAG.get());
-               output.accept((ItemLike)ModItems.DURATION_FLAG.get());
-               output.accept((ItemLike)ModItems.AMPLIFIER_FLAG.get());
-               output.accept((ItemLike)ModItems.SPIRIT_GATHERING_FLAG.get());
-               output.accept((ItemLike)ModItems.HASTE_FLAG.get());
-               output.accept((ItemLike)ModItems.QI_RETURN_FLAG.get());
-            })
-            .build()
-   );
+   public static final DeferredRegister<CreativeModeTab> CREATIVE_TABS;
+   public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAGIC_RITUAL_TAB;
+
+   static {
+      CREATIVE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, "immortal_cultivation_mod");
+      MAGIC_RITUAL_TAB = CREATIVE_TABS.register("magic_ritual_tab", () -> CreativeModeTab.builder().title(Component.translatable("itemGroup.immortal_cultivation_mod.rituals")).withTabsBefore(new ResourceKey[]{CreativeModeTabs.COMBAT}).icon(() -> ((Item)ModItems.RITUAL_DAGGER.get()).getDefaultInstance()).displayItems((itemDisplayParameters, output) -> {
+            // Insert the component-bearing book directly so the tab and creative search
+            // do not depend on Patchouli's separate creative-tab population callback.
+            var guide = com.example.immortal_cultivation_mod.event.ServerEvents.createMagicRitualGuide();
+            if (!guide.isEmpty()) {
+               output.accept(guide);
+            }
+            output.accept((ItemLike)ModItems.RITUAL_DAGGER.get());
+            output.accept((ItemLike)ModItems.SPIRIT_STONE.get());
+            output.accept((ItemLike)ModItems.MEDIUM_SPIRIT_STONE.get());
+            output.accept((ItemLike)ModItems.HIGH_SPIRIT_STONE.get());
+            output.accept((ItemLike)ModItems.INFINITE_SPIRIT_STONE.get());
+            output.accept((ItemLike)ModBlocks.MAGIC_CENTER_BLOCK.get());
+            output.accept((ItemLike)ModBlocks.MAGIC_CIRCLE_BLOCK.get());
+            output.accept((ItemLike)ModBlocks.SPIRIT_ORE.get());
+            output.accept((ItemLike)ModItems.SPIRIT_MAP.get());
+            output.accept((ItemLike)ModItems.ZHENPAN.get());
+            output.accept((ItemLike)com.example.immortal_cultivation_mod.item.ModItems.ZHENPAN_YUJIAN.get());
+            output.accept((ItemLike)ModItems.ZHENWEN_JADE.get());
+            output.accept((ItemLike)ModItems.PATTERNED_CLOTH.get());
+            output.accept((ItemLike)ModItems.SPIRIT_SILKWORM_SILK.get());
+            output.accept((ItemLike)ModItems.SPIRIT_GUIDING_THREAD.get());
+            output.accept((ItemLike)ModItems.SPIRIT_STORAGE_CRYSTAL.get());
+            output.accept((ItemLike)ModItems.FLOWING_SPIRIT_CRYSTAL.get());
+            output.accept((ItemLike)ModItems.LINGMU_FLAGPOLE.get());
+            output.accept((ItemLike)ModItems.BLANK_FORMATION_FLAG.get());
+            output.accept((ItemLike)ModItems.DURATION_FLAG.get());
+            output.accept((ItemLike)ModItems.AMPLIFIER_FLAG.get());
+            output.accept((ItemLike)ModItems.SPIRIT_GATHERING_FLAG.get());
+            output.accept((ItemLike)ModItems.HASTE_FLAG.get());
+            output.accept((ItemLike)ModItems.QI_RETURN_FLAG.get());
+            output.accept((ItemLike)com.example.immortal_cultivation_mod.item.ModItems.BLANK_FORMATION_FLAG_YUJIAN.get());
+            output.accept((ItemLike)com.example.immortal_cultivation_mod.item.ModItems.DURATION_FLAG_YUJIAN.get());
+            output.accept((ItemLike)com.example.immortal_cultivation_mod.item.ModItems.AMPLIFIER_FLAG_YUJIAN.get());
+            output.accept((ItemLike)com.example.immortal_cultivation_mod.item.ModItems.SPIRIT_GATHERING_FLAG_YUJIAN.get());
+            output.accept((ItemLike)com.example.immortal_cultivation_mod.item.ModItems.HASTE_FLAG_YUJIAN.get());
+            output.accept((ItemLike)com.example.immortal_cultivation_mod.item.ModItems.QI_RETURN_FLAG_YUJIAN.get());
+         }).build());
+   }
 }

@@ -46,6 +46,7 @@ public final class ClientCombatController {
                 && ownsAttackInput(minecraft)
                 && isBlockInputDown(minecraft)) {
             event.setCanceled(true);
+            ThoughtInputGuard.handled(event);
             event.setSwingHand(false);
             updateBlocking(true);
             return;
@@ -68,6 +69,7 @@ public final class ClientCombatController {
             return;
         }
         event.setCanceled(true);
+        ThoughtInputGuard.handled(event);
         event.setSwingHand(false);
         if (!charging) {
             charging = true;

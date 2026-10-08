@@ -10,16 +10,16 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class FogEscapeBlock extends Block implements EntityBlock {
-   private static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 16.0, 16.0);
+   private static final VoxelShape SHAPE = Block.box((double)0.0F, (double)0.0F, (double)0.0F, (double)16.0F, (double)16.0F, (double)16.0F);
 
-   public FogEscapeBlock(Properties properties) {
+   public FogEscapeBlock(BlockBehaviour.Properties properties) {
       super(properties);
    }
 
@@ -40,15 +40,16 @@ public class FogEscapeBlock extends Block implements EntityBlock {
    }
 
    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
-      if (!level.isClientSide && player instanceof ServerPlayer serverPlayer && blockEntity instanceof FogEscapeBlockEntity escapeBlockEntity) {
-         escapeBlockEntity.teleportPlayerBack(serverPlayer);
+      if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
+         if (blockEntity instanceof FogEscapeBlockEntity escapeBlockEntity) {
+            escapeBlockEntity.teleportPlayerBack(serverPlayer);
+         }
       }
 
       super.playerDestroy(level, player, pos, state, blockEntity, tool);
    }
 
-   @Nullable
-   public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+   public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
       return new FogEscapeBlockEntity(pos, state);
    }
 }

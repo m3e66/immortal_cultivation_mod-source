@@ -59,7 +59,7 @@ public final class IdentityItems {
     private IdentityItems() {
     }
 
-    public static final class BiguPillItem extends Item {
+    public static final class BiguPillItem extends com.example.immortal_cultivation_mod.alchemy.LegacyPillItem {
         public BiguPillItem(Properties properties) {
             super(properties);
         }
@@ -69,6 +69,7 @@ public final class IdentityItems {
                                                        InteractionHand hand) {
             ItemStack stack = player.getItemInHand(hand);
             if (!level.isClientSide) {
+                if (player instanceof ServerPlayer sp) com.example.immortal_cultivation_mod.fate.FateCrafting.consumedPill(sp, stack);
                 player.getFoodData().setFoodLevel(20);
                 player.getFoodData().setSaturation(20.0F);
                 consumeOne(player, stack);
@@ -91,7 +92,8 @@ public final class IdentityItems {
             ItemStack stack = player.getItemInHand(hand);
             if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
                 serverPlayer.getPersistentData().putInt(RECOVERY_TICKS, 100);
-                serverPlayer.getPersistentData().putInt(RECOVERY_RATE, qiPerSecond);
+                serverPlayer.getPersistentData().putInt(RECOVERY_RATE, com.example.immortal_cultivation_mod.fate.FateCrafting.pillRate(stack, qiPerSecond));
+                com.example.immortal_cultivation_mod.fate.FateCrafting.consumedPill(serverPlayer, stack);
                 consumeOne(player, stack);
                 serverPlayer.displayClientMessage(Component.translatable(
                         "message." + ImmortalCultivationMod.MODID + ".qi_recovery_started", qiPerSecond), true);

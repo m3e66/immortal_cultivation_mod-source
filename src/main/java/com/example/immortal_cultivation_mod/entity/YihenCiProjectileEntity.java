@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod.entity;
 
 import com.example.immortal_cultivation_mod.event.ServerEvents;
+import com.example.immortal_cultivation_mod.spell.ThoughtDamageHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -51,7 +52,7 @@ public class YihenCiProjectileEntity extends ThrowableItemProjectile {
     protected void onHitEntity(EntityHitResult result) {
         Entity hit = result.getEntity();
         if (hit instanceof Player player) {
-            ServerEvents.adjustThoughts(player, -20);
+            ServerEvents.adjustThoughts(player, -ThoughtDamageHelper.total(getOwner(), 20));
         }
     }
 

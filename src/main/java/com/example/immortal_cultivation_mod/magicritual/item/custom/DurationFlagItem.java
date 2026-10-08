@@ -1,6 +1,5 @@
 package com.example.immortal_cultivation_mod.magicritual.item.custom;
 
-import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import java.util.List;
 import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
@@ -16,60 +15,51 @@ import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 public final class DurationFlagItem extends Item implements GeoItem {
-    public static final int TEMPORARY_DURATION_BONUS_TICKS = 20 * 3;
+   public static final int TEMPORARY_DURATION_BONUS_TICKS = 60;
+   private final String textureName;
+   private final String tooltipName;
+   private final ChatFormatting tooltipColor;
+   private final AnimatableInstanceCache cache;
 
-    private final String textureName;
-    private final String tooltipName;
-    private final ChatFormatting tooltipColor;
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+   public DurationFlagItem(Item.Properties properties) {
+      this(properties, "duration_flag", "duration_flag", ChatFormatting.GOLD);
+   }
 
-    public DurationFlagItem(Properties properties) {
-        this(properties, "duration_flag", "duration_flag", ChatFormatting.GOLD);
-    }
+   public DurationFlagItem(Item.Properties properties, String textureName, String tooltipName, ChatFormatting tooltipColor) {
+      super(properties);
+      this.cache = GeckoLibUtil.createInstanceCache(this);
+      this.textureName = textureName;
+      this.tooltipName = tooltipName;
+      this.tooltipColor = tooltipColor;
+   }
 
-    public DurationFlagItem(Properties properties, String textureName,
-                            String tooltipName, ChatFormatting tooltipColor) {
-        super(properties);
-        this.textureName = textureName;
-        this.tooltipName = tooltipName;
-        this.tooltipColor = tooltipColor;
-    }
+   public String textureName() {
+      return this.textureName;
+   }
 
-    public String textureName() {
-        return textureName;
-    }
+   public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+      tooltip.add(Component.translatable("tooltip.immortal_cultivation_mod." + this.tooltipName).withStyle(this.tooltipColor));
+      super.appendHoverText(stack, context, tooltip, flag);
+   }
 
-    @Override
-    public void appendHoverText(
-            ItemStack stack, TooltipContext context,
-            List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable(
-                "tooltip." + ImmortalCultivationMod.MODID + "." + tooltipName)
-                .withStyle(tooltipColor));
-        super.appendHoverText(stack, context, tooltip, flag);
-    }
+   public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
+      consumer.accept(new GeoRenderProvider() {
+         private DurationFlagItemRenderer renderer;
 
-    @Override
-    public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
-        consumer.accept(new GeoRenderProvider() {
-            private DurationFlagItemRenderer renderer;
-
-            @Override
-            public BlockEntityWithoutLevelRenderer getGeoItemRenderer() {
-                if (renderer == null) {
-                    renderer = new DurationFlagItemRenderer();
-                }
-                return renderer;
+         public BlockEntityWithoutLevelRenderer getGeoItemRenderer() {
+            if (this.renderer == null) {
+               this.renderer = new DurationFlagItemRenderer();
             }
-        });
-    }
 
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-    }
+            return this.renderer;
+         }
+      });
+   }
 
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
-    }
+   public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+   }
+
+   public AnimatableInstanceCache getAnimatableInstanceCache() {
+      return this.cache;
+   }
 }

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " L ",
+    "TJ ",
+    " L "
+  ],
+  "key": {
+    "L": {
+      "item": "immortal_cultivation_mod:lingmu_log"
+    },
+    "T": {
+      "item": "immortal_cultivation_mod:spirit_guiding_thread"
+    },
+    "J": {
+      "item": "immortal_cultivation_mod:zhenwen_jade"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:lingmu_clasp",
+    "count": 1
+  }
+}

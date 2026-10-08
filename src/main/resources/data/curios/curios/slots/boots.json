@@ -1,0 +1,8 @@
+{
+  "size": 1,
+  "order": 65,
+  "icon": "immortal_cultivation_mod:slot/empty_cultivation_slot",
+  "validators": [
+    "curios:tag"
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "type": "minecraft:random_patch",
+  "config": {
+    "tries": 64,
+    "xz_spread": 15,
+    "y_spread": 3,
+    "feature": {
+      "feature": {
+        "type": "minecraft:simple_block",
+        "config": {
+          "to_place": {
+            "type": "minecraft:simple_state_provider",
+            "state": {
+              "Name": "immortal_cultivation_mod:wild_nuomi_plant"
+            }
+          }
+        }
+      },
+      "placement": [
+        {
+          "type": "minecraft:block_predicate_filter",
+          "predicate": {
+            "type": "minecraft:matching_blocks",
+            "blocks": [
+              "minecraft:air",
+              "minecraft:wheat",
+              "minecraft:carrots",
+              "minecraft:potatoes",
+              "minecraft:beetroots"
+            ]
+          }
+        },
+        {
+          "type": "minecraft:block_predicate_filter",
+          "predicate": {
+            "type": "minecraft:matching_blocks",
+            "offset": [0, -1, 0],
+            "blocks": ["minecraft:farmland"]
+          }
+        }
+      ]
+    }
+  }
+}

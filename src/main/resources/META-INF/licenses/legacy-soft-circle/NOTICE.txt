@@ -1,0 +1,6 @@
+legacy_soft_circle.png is an unmodified copy of assets/photon/textures/particle/circle.png
+from Photon 2.1.4 by KilaBash / Low-Drag-MC.
+Source: https://github.com/Low-Drag-MC/Photon
+License: GNU General Public License version 3. See GPL-3.0.txt in this directory.
+This texture is distributed separately under its original license.
+Photon and LowDragLib code are not bundled or required by the native renderer.

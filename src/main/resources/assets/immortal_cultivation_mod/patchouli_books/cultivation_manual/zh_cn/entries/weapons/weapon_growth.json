@@ -1,0 +1,18 @@
+{
+  "name": "禁制与晋阶",
+  "icon": "immortal_cultivation_mod:restriction_table",
+  "category": "immortal_cultivation_mod:weapons",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "篆刻禁制",
+      "text": "将兵器放入禁制台，选择要添加的禁制，再完成灵枢算盘。成功后，本次禁制才会写入兵器。$(br2)物品提示会显示当前品阶与禁制进度。失败不会获得本次选择的禁制，并可能引发反噬。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "七十二重循环",
+      "text": "每一品阶拥有七十二重禁制容量。填满当前循环后，使用禁制台的“蜕变”尝试晋阶。$(br2)兵器蜕变会开始天劫，不会立即无条件晋阶。渡劫成功后，已有禁制融入兵器，当前循环归零，再进入下一品阶。"
+    }
+  ]
+}

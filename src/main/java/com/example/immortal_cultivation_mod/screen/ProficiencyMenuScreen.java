@@ -8,13 +8,12 @@ import com.example.immortal_cultivation_mod.spell.ModSpells;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
 
-public class ProficiencyMenuScreen extends Screen {
+public class ProficiencyMenuScreen extends FittedMenuScreen {
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/proficiency_menu.png");
     private static final int TEXTURE_W = 1547;
@@ -53,11 +52,11 @@ public class ProficiencyMenuScreen extends Screen {
     private Button backButton;
 
     public ProficiencyMenuScreen() {
-        super(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".proficiency_menu"));
+        super(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".proficiency_menu"), WINDOW_W + 16, WINDOW_H + 16);
     }
 
     @Override
-    protected void init() {
+    protected void initMenu() {
         int x = left();
         int y = top();
         backButton = addRenderableWidget(new InvisibleButton(
@@ -71,7 +70,7 @@ public class ProficiencyMenuScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics g, int mx, int my, float pt) {
+    protected void renderMenu(GuiGraphics g, int mx, int my, float pt) {
         int x = left();
         int y = top();
         g.blit(TEXTURE, x, y, WINDOW_W, WINDOW_H,
@@ -89,13 +88,13 @@ public class ProficiencyMenuScreen extends Screen {
             }
         }
 
-        super.render(g, mx, my, pt);
+        super.renderMenu(g, mx, my, pt);
     }
 
     private int elementProficiency(ModAttachments.CultivationData data, String element) {
         int total = 0;
         for (ModSpells.SpellDef spell : ModSpells.all()) {
-            if (element.equals(spell.element())) {
+            if (SpiritRoots.elementMatches(spell.element(), element)) {
                 total += data.spellProficiency(spell.id());
             }
         }

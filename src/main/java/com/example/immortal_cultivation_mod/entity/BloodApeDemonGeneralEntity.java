@@ -176,6 +176,10 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
         if (level().isClientSide || !isAlive()) {
             return;
         }
+        if (BeastDazeControl.blocksMoves(this)) {
+            finishAction();
+            return;
+        }
         heavyPunchCooldown = decrement(heavyPunchCooldown);
         earthStompCooldown = decrement(earthStompCooldown);
         grabCooldown = decrement(grabCooldown);
@@ -269,12 +273,15 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (!level().isClientSide && !yuanyingGuardUsed
+        boolean guardWasActive = hasYuanyingGuard();
+        boolean shouldActivateGuard = !level().isClientSide && !yuanyingGuardUsed
                 && getHealth() - amount <= getMaxHealth() * 0.12F
-                && getHealth() > 1.0F) {
+                && getHealth() > 1.0F;
+        boolean hurt = super.hurt(source, guardWasActive ? amount * 0.55F : amount);
+        if (hurt && shouldActivateGuard && isAlive()) {
             activateYuanyingGuard();
         }
-        return super.hurt(source, hasYuanyingGuard() ? amount * 0.55F : amount);
+        return hurt;
     }
 
     private void tickCurrentAction() {
@@ -366,6 +373,11 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
             target.addEffect(new MobEffectInstance(
                     MobEffects.MOVEMENT_SLOWDOWN, 60, 1, false, true, true), this);
         }
+        BeastMoveBlockBreaker.breakBox(level, this,
+                new AABB(getX() - 6.0D, getY() - 0.75D,
+                        getZ() - 6.0D, getX() + 6.0D,
+                        getY() + 0.8D, getZ() + 6.0D),
+                position().add(0.0D, 0.1D, 0.0D), 32, 6.0F);
         emitShockwave(level, position(), 6.0D, 72, false);
         level.playSound(null, blockPosition(), SoundEvents.RAVAGER_STEP,
                 SoundSource.HOSTILE, 2.2F, 0.5F);
@@ -374,6 +386,12 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
     private void tickGrab(ServerLevel level, int ticks, LivingEntity target) {
         LivingEntity grabbed = resolveLiving(grabbedTargetUuid);
         if (grabbed != null && grabbed.isAlive()) {
+            if (com.example.immortal_cultivation_mod.combat.ThoughtControlGuard.hasProtection(grabbed)) {
+                grabbedTargetUuid = null;
+                grabHoldTicks = 0;
+                finishAction();
+                return;
+            }
             holdGrabbedTarget(grabbed);
             if (--grabHoldTicks <= 0) {
                 throwGrabbedTarget(level, grabbed);
@@ -396,6 +414,11 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
             return;
         }
         target.hurt(damageSources().mobAttack(this), GRAB_DAMAGE);
+        if (com.example.immortal_cultivation_mod.combat.ThoughtControlGuard.resistForDuration(
+                target, "blood_ape_grab", this, GRAB_HOLD_TICKS)) {
+            finishAction();
+            return;
+        }
         grabbedTargetUuid = target.getUUID();
         grabHoldTicks = GRAB_HOLD_TICKS;
         target.addEffect(new MobEffectInstance(
@@ -508,6 +531,9 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
             Vec3 away = target.position().subtract(position());
             target.knockback(2.1D, -away.x, -away.z);
         }
+        BeastMoveBlockBreaker.breakSphere(level, this,
+                position().add(0.0D, 0.35D, 0.0D),
+                4.0D, 2.0D, 48, 8.0F);
         emitShockwave(level, position(), 4.5D, 64, true);
         level.sendParticles(net.minecraft.core.particles.ParticleTypes.EXPLOSION,
                 getX(), getY() + 0.4D, getZ(), 6, 1.2D, 0.35D, 1.2D, 0.05D);
@@ -620,7 +646,7 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
     }
 
     private void startAction(byte action, int duration, LivingEntity target) {
-        if (getActionState() != ACTION_NONE) {
+        if (BeastDazeControl.blocksMoves(this) || getActionState() != ACTION_NONE) {
             return;
         }
         entityData.set(ACTION_STATE, action);
@@ -668,7 +694,7 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
     }
 
     private boolean tryDodge(LivingEntity target) {
-        if (dodgeCooldown > 0 || target == null) {
+        if (BeastDazeControl.blocksMoves(this) || dodgeCooldown > 0 || target == null) {
             return false;
         }
         Vec3 away = position().subtract(target.position()).multiply(1.0D, 0.0D, 1.0D);
@@ -725,7 +751,9 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
 
     @Override
     public boolean doHurtTarget(Entity target) {
-        return getActionState() == ACTION_NONE && super.doHurtTarget(target);
+        return !BeastDazeControl.blocksMoves(this)
+                && getActionState() == ACTION_NONE
+                && super.doHurtTarget(target);
     }
 
     @Override

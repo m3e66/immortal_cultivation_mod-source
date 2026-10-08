@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "immortal_cultivation_mod:plank_walls",
+  "pattern": [
+    "PPP",
+    "PPP"
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:warped_planks"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:warped_plank_wall",
+    "count": 6
+  }
+}

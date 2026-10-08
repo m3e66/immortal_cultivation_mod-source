@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "immortal_cultivation_mod:qingling_grass"
+    },
+    {
+      "item": "immortal_cultivation_mod:qingling_grass"
+    },
+    {
+      "item": "immortal_cultivation_mod:jiuye_xianlan"
+    }
+  ],
+  "result": {
+    "id": "immortal_cultivation_mod:mingmu_formula",
+    "count": 1
+  }
+}

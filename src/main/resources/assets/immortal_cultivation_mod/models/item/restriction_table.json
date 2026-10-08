@@ -1,3 +1,35 @@
 {
-  "parent": "immortal_cultivation_mod:block/restriction_table"
+  "parent": "builtin/entity",
+  "gui_light": "side",
+  "display": {
+    "gui": {
+      "rotation": [30, 225, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.625, 0.625, 0.625]
+    },
+    "ground": {
+      "translation": [0, 2, 0],
+      "scale": [0.48, 0.48, 0.48]
+    },
+    "fixed": {
+      "translation": [0, -1, 0],
+      "scale": [0.72, 0.72, 0.72]
+    },
+    "firstperson_righthand": {
+      "translation": [-2, 0, 2],
+      "scale": [0.3, 0.3, 0.3]
+    },
+    "firstperson_lefthand": {
+      "translation": [-2, 0, 2],
+      "scale": [0.3, 0.3, 0.3]
+    },
+    "thirdperson_righthand": {
+      "translation": [3, 0, -2],
+      "scale": [0.3, 0.3, 0.3]
+    },
+    "thirdperson_lefthand": {
+      "translation": [3, 0, -2],
+      "scale": [0.3, 0.3, 0.3]
+    }
+  }
 }

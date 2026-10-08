@@ -56,12 +56,12 @@
     {
       "type": "patchouli:text",
       "title": "Teleport Center",
-      "text": "XAXAX$(br)DXRXD$(br)XRCRX$(br)DXRXD$(br)XAXAX$(br2)Links two permanent Teleport Centers. This formation has no passive fuel drain and consumes its teleport fuel only when a teleport completes. Its glyph glows only while enabled, fueled, and a living non-spectator player is inside its radius."
+      "text": "XAXAX$(br)DXRXD$(br)XRCRX$(br)DXRXD$(br)XAXAX$(br2)Joins a code-based network of permanent Teleport Centers. This formation has no passive fuel drain and consumes its teleport fuel only when a teleport completes. Its glyph glows only while enabled, fueled, and a living non-spectator player is inside its radius."
     },
     {
       "type": "patchouli:text",
-      "title": "Linking Centers",
-      "text": "Right-click the first Teleport Center with an empty Zhenpan, then right-click the second center with the recorded Zhenpan. The clicked center GUI still opens during both linking interactions. The record stores its dimension, coordinates, owner, and unique center ID. Links begin as two-way. The owner can later use the GUI to select two-way or either endpoint as the source of a one-way link. A Zhenpan can store one Magic Center."
+      "title": "Formation Codes",
+      "text": "Open a permanent Teleport Center with an empty hand and choose Destinations. Every center has its own code and a Copy Code button. Paste that code into another center and press Add to save it as a destination. A center can save up to 32 destinations. Click a destination to select it; its Qi and center-energy cost per entity appears beside it. Press Teleport, or sneak-right-click the center with an empty hand, to travel to the selected destination."
     },
     {
       "type": "patchouli:text",

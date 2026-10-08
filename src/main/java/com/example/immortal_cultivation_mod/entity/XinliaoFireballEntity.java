@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod.entity;
 
 import com.example.immortal_cultivation_mod.effect.ModEffects;
+import com.example.immortal_cultivation_mod.spell.ThoughtDamageHelper;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -160,7 +161,9 @@ public class XinliaoFireballEntity extends ThrowableItemProjectile {
     protected void onHitEntity(EntityHitResult result) {
         LivingEntity target = ModelBonePartEntity.resolveLiving(result.getEntity());
         if (!level().isClientSide && target != null) {
-            target.addEffect(new MobEffectInstance(ModEffects.XINLIAO, EFFECT_TICKS, 0, false, true, true), getOwner());
+            int thoughtDamageBonus = ThoughtDamageHelper.bonus(getOwner());
+            target.addEffect(new MobEffectInstance(
+                    ModEffects.XINLIAO, EFFECT_TICKS, thoughtDamageBonus, false, true, true), getOwner());
             target.igniteForSeconds(30.0F);
         }
     }
@@ -179,6 +182,8 @@ public class XinliaoFireballEntity extends ThrowableItemProjectile {
                 serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE,
                         result.getLocation().x, result.getLocation().y, result.getLocation().z,
                         32, 0.55D, 0.55D, 0.55D, 0.06D);
+                ElementalTechniqueAreaEntity.damageFireSensitiveAreas(
+                        serverLevel, result.getLocation(), 5.0D, 50);
             }
             discard();
         }

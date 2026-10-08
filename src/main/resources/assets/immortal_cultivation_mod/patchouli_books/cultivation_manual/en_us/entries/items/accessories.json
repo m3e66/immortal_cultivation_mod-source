@@ -27,6 +27,11 @@
     {
       "type": "patchouli:text",
       "text": "$(br)Sleeve Launcher uses a Back Accessory slot. In battle mode, keep the main hand empty and hold attack for a heavy attack to fire the topmost Flying Needle in the inventory.$(br2)Flying Needles are forged from 1 Refined Iron Motherstone and 1 Moxuan Iron. Each shot costs 10 durability instead of consuming the needle. Injected qi adds damage and arms an impact explosion."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Protective Accessories and Hair",
+      "text": "Fortune Guarding Coin, Shieldbreaker Ring, Blood Fang Pendant, and Enlightenment Leaf each have designated slots and activation conditions. See $(l:items/protective_accessories)Protective Accessories$(/l).$(br2)Preview and save hair and colors at the $(l:worldly/hair_styling)Hair Styling Table$(/l)."
     }
   ]
 }

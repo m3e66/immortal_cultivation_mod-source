@@ -12,10 +12,10 @@ public class RadiusSelectionScreen extends Screen {
    private static final int BUTTON_W = 56;
    private static final int BUTTON_H = 18;
    private static final int GAP = 2;
-   private static final int[] RADII = {3, 5, 7, 9, 11};
-   private static final int ROWS = (RADII.length + COLUMNS - 1) / COLUMNS;
+   private static final int[] RADII = new int[]{3, 5, 7, 9, 11};
+   private static final int ROWS;
    private static final int WINDOW_W = 316;
-   private static final int WINDOW_H = 64 + ROWS * (BUTTON_H + GAP);
+   private static final int WINDOW_H;
 
    protected RadiusSelectionScreen() {
       super(Component.translatable("gui.immortal_cultivation_mod.select_radius"));
@@ -25,28 +25,24 @@ public class RadiusSelectionScreen extends Screen {
       super.init();
       int centerX = this.width / 2;
       int top = (this.height - WINDOW_H) / 2 + 52;
-      int gridWidth = COLUMNS * BUTTON_W + (COLUMNS - 1) * GAP;
+      int gridWidth = 288;
       int left = centerX - gridWidth / 2;
-      for (int index = 0; index < RADII.length; index++) {
+
+      for(int index = 0; index < RADII.length; ++index) {
          int radius = RADII[index];
          int column = index / ROWS;
          int row = index % ROWS;
-         this.addRenderableWidget(new MagicRitualGuiStyle.RitualButton(
-               left + column * (BUTTON_W + GAP), top + row * (BUTTON_H + GAP),
-               BUTTON_W, BUTTON_H,
-               Component.translatable("gui.immortal_cultivation_mod.center_radius", radius),
-               btn -> this.selectRadius(radius)));
+         this.addRenderableWidget(new MagicRitualGuiStyle.RitualButton(left + column * 58, top + row * 20, 56, 18, Component.translatable("gui.immortal_cultivation_mod.center_radius", new Object[]{radius}), (btn) -> this.selectRadius(radius)));
       }
+
    }
 
-   @Override
    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-      renderBackground(graphics, mouseX, mouseY, partialTick);
-      int x = (width - WINDOW_W) / 2;
-      int y = (height - WINDOW_H) / 2;
-      MagicRitualGuiStyle.drawWindow(graphics, x, y, WINDOW_W, WINDOW_H);
-      graphics.drawString(font, title, width / 2 - font.width(title) / 2,
-            y + 20, MagicRitualGuiStyle.TEXT_COLOR, false);
+      this.renderBackground(graphics, mouseX, mouseY, partialTick);
+      int x = (this.width - 316) / 2;
+      int y = (this.height - WINDOW_H) / 2;
+      MagicRitualGuiStyle.drawWindow(graphics, x, y, 316, WINDOW_H);
+      graphics.drawString(this.font, this.title, this.width / 2 - this.font.width(this.title) / 2, y + 20, -13617617, false);
       super.render(graphics, mouseX, mouseY, partialTick);
    }
 
@@ -55,7 +51,11 @@ public class RadiusSelectionScreen extends Screen {
       this.onClose();
    }
 
-   @Override
    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+   }
+
+   static {
+      ROWS = (RADII.length + 5 - 1) / 5;
+      WINDOW_H = 64 + ROWS * 20;
    }
 }

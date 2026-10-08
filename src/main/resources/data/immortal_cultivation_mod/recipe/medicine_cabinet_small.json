@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PCP",
+    "CBC",
+    "PCP"
+  ],
+  "key": {
+    "P": { "item": "immortal_cultivation_mod:lingmu_log" },
+    "C": { "item": "immortal_cultivation_mod:chitong_sui" },
+    "B": { "item": "minecraft:barrel" }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:medicine_cabinet_small",
+    "count": 1
+  }
+}

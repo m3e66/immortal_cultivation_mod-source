@@ -41,6 +41,14 @@ public final class PlayerShieldManager {
         sync(player);
     }
 
+    public static float totalAmount(ServerPlayer player) {
+        var shields = SHIELDS.get(player.getUUID());
+        if (shields == null) return 0;
+        float total = 0;
+        for (ShieldValue value : shields.values()) total += Math.max(0, value.amount());
+        return total;
+    }
+
     public static void sync(ServerPlayer player) {
         Map<String, ShieldValue> playerShields = SHIELDS.get(player.getUUID());
         float amount = 0.0F;

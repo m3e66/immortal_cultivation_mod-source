@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod.screen;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
+import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.client.NpcClientData;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
 import net.minecraft.client.gui.GuiGraphics;
@@ -140,7 +141,7 @@ abstract class AbstractNpcScreen extends Screen implements NpcDataScreen {
                 detailsWidth, COLOR_INK);
         Component identity = Component.translatable("screen." + ImmortalCultivationMod.MODID + ".npc.identity." + data.identity());
         Component personality = Component.translatable("screen." + ImmortalCultivationMod.MODID + ".npc.personality." + data.personality());
-        drawFittedNoShadow(graphics, Component.literal(data.realm()).append("  ").append(personality),
+        drawFittedNoShadow(graphics, CultivationLevels.displayName(data.realm()).copy().append("  ").append(personality),
                 detailsX, y + 29, detailsWidth, COLOR_GREEN);
         drawFittedNoShadow(graphics, identity, detailsX, y + 42, detailsWidth, COLOR_MUTED);
 

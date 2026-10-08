@@ -1,0 +1,84 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:sword_case",
+          "weight": 15
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:feijian_yujian",
+          "weight": 20
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:dao_yujian",
+          "weight": 18
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:jingtie_spear_yujian",
+          "weight": 17
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:throwing_knife_yujian",
+          "weight": 15
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:flying_needle_yujian",
+          "weight": 15
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "name": "higher_weapon_slips",
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.18
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:black_iron_jian_yujian",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:black_iron_greatsword_yujian",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:moon_crescent_halberd_yujian",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:spirit_silk_whip_yujian",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:soul_hook_yujian",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:wind_feather_fan_yujian",
+          "weight": 4
+        }
+      ]
+    }
+  ],
+  "random_sequence": "immortal_cultivation_mod:chests/small_sect1_special"
+}

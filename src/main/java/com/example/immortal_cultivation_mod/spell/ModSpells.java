@@ -9,6 +9,7 @@ import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,38 @@ public class ModSpells {
     public static final String LIUGUANG_JIANYING = "liuguang_jianying";
     public static final String SIFANG_JIE = "sifang_jie";
     public static final String GUSHI_SHIELD = "gushi_shield";
+    public static final String XUANYAN_HUTI = "xuanyan_huti";
+    public static final String LIUFENG_XIEJIN = "liufeng_xiejin";
+    public static final String XUESHA_HUSHEN = "xuesha_hushen";
+    public static final String JINGLING_FANZHAO = "jingling_fanzhao";
+    public static final String YUANGANG_HUJIE = "yuangang_hujie";
+    public static final String JINMANG_CHUANSHA = "jinmang_chuansha";
+    public static final String JINFENG_ZHI = "jinfeng_zhi";
+    public static final String WANREN_CHUANXIN = "wanren_chuanxin";
+    public static final String JINGJI_TUSHENG = "jingji_tusheng";
+    public static final String WANTENG_JIAOSHA = "wanteng_jiaosha";
+    public static final String YANBAO_DAN = "yanbao_dan";
+    public static final String CHIYAN_LONGJUAN = "chiyan_longjuan";
+    public static final String TIANYUN_FENCHENG = "tianyun_fencheng";
+    public static final String LUOHUA_CHANSHEN = "luohua_chanshen";
+    public static final String BAIHUA_ZANG = "baihua_zang";
+    public static final String POKONG_JIANHEN = "pokong_jianhen";
+    public static final String SANJIAN_ZHUIMING = "sanjian_zhuiming";
+    public static final String DIYAN_QIANG = "diyan_qiang";
+    public static final String SHANBENG_YIN = "shanbeng_yin";
+    public static final String SHUIREN_LIANZHAN = "shuiren_lianzhan";
+    public static final String CANGLANG_CHONG = "canglang_chong";
+    public static final String LEISHAN = "leishan";
+    public static final String WULEI_HONGDING = "wulei_hongding";
+    public static final String BINGZHUI_YU = "bingzhui_yu";
+    public static final String HANYU_FENGDI = "hanyu_fengdi";
+    public static final String YAOGUANG_SHAN = "yaoguang_shan";
+    public static final String TIANGUANG_GUANSHA = "tianguang_guansha";
+    public static final String YINGXI = "yingxi";
+    public static final String TIANFENG_ZHUI = "tianfeng_zhui";
+    public static final String MULING_SHENGXI = "muling_shengxi";
+    public static final String XUE_GUIYUAN_SHU = "xue_guiyuan_shu";
+    public static final String SHENGXI_BAOFA = "shengxi_baofa";
     public static final String KONGSHI_SHU = "kongshi_shu";
     public static final String HANJING_SUOZHUA = "hanjing_suozhua";
     public static final String SHUANGTIAN_QI = "shuangtian_qi";
@@ -61,6 +94,31 @@ public class ModSpells {
     public static final String SHIXU_CHILIU = "shixu_chiliu";
     public static final String LIANSHEN_SHU = "lianshen_shu";
     public static final String SUOKONG_SHU = "suokong_shu";
+    public static final String YANGYAN_FUTI = "yangyan_futi";
+    public static final String DARI_ZHEN = "dari_zhen";
+    public static final String LIEYANG_BU = "lieyang_bu";
+    public static final String RILUN = "rilun";
+    public static final String JIYANG_YIKE = "jiyang_yike";
+    public static final String LEIXIAO_GUANYUN = "leixiao_guanyun";
+    public static final String JIUXIAO_FENGLEI_YU = "jiuxiao_fenglei_yu";
+    public static final String XUANYUE_BI = "xuanyue_bi";
+    public static final String JINYAN_SHENGFENG = "jinyan_shengfeng";
+    public static final String SHANSUO_ZHENYU = "shansuo_zhenyu";
+    public static final String WANFENG_YUEZANG = "wanfeng_yuezang";
+    public static final String DONGLIU_SUO = "dongliu_suo";
+    public static final String CANGYUAN_HONGLIU = "cangyuan_hongliu";
+    public static final String HANYUAN_FENGJIE = "hanyuan_fengjie";
+    public static final String WANMU_SHENG = "wanmu_sheng";
+    public static final String QINGTENG_FU = "qingteng_fu";
+    public static final String YINFU_SHU = "yinfu_shu";
+    public static final String BIHUO_JUE = "bihuo_jue";
+
+    private static final Set<String> NEW_SPELLS_WITHOUT_REALM_REQUIREMENT = Set.of(
+            YANGYAN_FUTI,
+            DARI_ZHEN,
+            LIEYANG_BU,
+            RILUN,
+            JIYANG_YIKE);
 
     private static final Set<String> PREPARED_CAST_SPELLS = Set.of(
             FIREBALL,
@@ -82,6 +140,71 @@ public class ModSpells {
             YUQI_SHU,
             KONGSHI_SHU,
             DUANLIU_KONGDUN,
+            YIHEN_CI,
+            JINHUO_XINLIAO,
+            SUIGUI_XINGYUN,
+            SUOKONG_SHU,
+            DARI_ZHEN,
+            LIEYANG_BU,
+            RILUN,
+            JIYANG_YIKE,
+            QINGTENG_FU);
+
+    /** Offensive and hostile-control spells that are selected first and released with R. */
+    private static final Set<String> ATTACK_SPELLS = Set.of(
+            FIREBALL,
+            LINGBENG,
+            IGNITE_FLARE,
+            ZHENSHAN_PALM,
+            LIGHT_BEAM_ATTACK,
+            LINGZHI_BULLET,
+            JINMANG_CHUANSHA,
+            WIND_BLADE,
+            SMOKE_ART,
+            MICHEN_ZHANG,
+            SLIDING_WATER,
+            ZIBAO,
+            ABSORB_CULTIVATION,
+            TUNTIAN,
+            DINGSHEN,
+            YINLEI_JUE,
+            WULEI_ZHENGFA,
+            LIUGUANG_JIANYING,
+            JINFENG_ZHI,
+            WANREN_CHUANXIN,
+            JINGJI_TUSHENG,
+            WANTENG_JIAOSHA,
+            YANBAO_DAN,
+            CHIYAN_LONGJUAN,
+            TIANYUN_FENCHENG,
+            LUOHUA_CHANSHEN,
+            BAIHUA_ZANG,
+            POKONG_JIANHEN,
+            SANJIAN_ZHUIMING,
+            DIYAN_QIANG,
+            SHANBENG_YIN,
+            SHUIREN_LIANZHAN,
+            CANGLANG_CHONG,
+            LEISHAN,
+            WULEI_HONGDING,
+            BINGZHUI_YU,
+            HANYU_FENGDI,
+            YAOGUANG_SHAN,
+            TIANGUANG_GUANSHA,
+            YINGXI,
+            TIANFENG_ZHUI,
+            DARI_ZHEN,
+            LEIXIAO_GUANYUN,
+            JIUXIAO_FENGLEI_YU,
+            JINYAN_SHENGFENG,
+            SHANSUO_ZHENYU,
+            WANFENG_YUEZANG,
+            DONGLIU_SUO,
+            CANGYUAN_HONGLIU,
+            HANYUAN_FENGJIE,
+            QINGTENG_FU,
+            HANJING_SUOZHUA,
+            SHUANGTIAN_QI,
             YIHEN_CI,
             JINHUO_XINLIAO,
             SUIGUI_XINGYUN,
@@ -111,6 +234,38 @@ public class ModSpells {
             Map.entry(KONGSHI_SHU, 29),
             Map.entry(YUQI_SHU, 34),
             Map.entry(GUSHI_SHIELD, 35),
+            Map.entry(XUANYAN_HUTI, 36),
+            Map.entry(LIUFENG_XIEJIN, 38),
+            Map.entry(XUESHA_HUSHEN, 55),
+            Map.entry(JINGLING_FANZHAO, 68),
+            Map.entry(YUANGANG_HUJIE, 82),
+            Map.entry(JINMANG_CHUANSHA, 54),
+            Map.entry(JINFENG_ZHI, 10),
+            Map.entry(WANREN_CHUANXIN, 48),
+            Map.entry(JINGJI_TUSHENG, 18),
+            Map.entry(WANTENG_JIAOSHA, 44),
+            Map.entry(YANBAO_DAN, 24),
+            Map.entry(CHIYAN_LONGJUAN, 50),
+            Map.entry(TIANYUN_FENCHENG, 72),
+            Map.entry(LUOHUA_CHANSHEN, 30),
+            Map.entry(BAIHUA_ZANG, 58),
+            Map.entry(POKONG_JIANHEN, 20),
+            Map.entry(SANJIAN_ZHUIMING, 42),
+            Map.entry(DIYAN_QIANG, 22),
+            Map.entry(SHANBENG_YIN, 62),
+            Map.entry(SHUIREN_LIANZHAN, 11),
+            Map.entry(CANGLANG_CHONG, 36),
+            Map.entry(LEISHAN, 25),
+            Map.entry(WULEI_HONGDING, 64),
+            Map.entry(BINGZHUI_YU, 30),
+            Map.entry(HANYU_FENGDI, 52),
+            Map.entry(YAOGUANG_SHAN, 20),
+            Map.entry(TIANGUANG_GUANSHA, 66),
+            Map.entry(YINGXI, 28),
+            Map.entry(TIANFENG_ZHUI, 50),
+            Map.entry(MULING_SHENGXI, 34),
+            Map.entry(XUE_GUIYUAN_SHU, 40),
+            Map.entry(SHENGXI_BAOFA, 42),
             Map.entry(WULEI_ZHENGFA, 42),
             Map.entry(XUYING_TA, 43),
             Map.entry(DINGSHEN, 49),
@@ -416,6 +571,60 @@ public class ModSpells {
                 "earth",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_zhenshan_palm.png")
         ));
+        spells.put(XUANYAN_HUTI, new SpellDef(
+                XUANYAN_HUTI,
+                "xuanyan_huti",
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_EARLY,
+                120,
+                SpiritRoots.EARTH,
+                "earth",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_zhenshan_palm.png")
+        ));
+        spells.put(LIUFENG_XIEJIN, new SpellDef(
+                LIUFENG_XIEJIN,
+                "liufeng_xiejin",
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_MID,
+                180,
+                SpiritRoots.WIND,
+                "earth",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_wind_blade.png")
+        ));
+        spells.put(XUESHA_HUSHEN, new SpellDef(
+                XUESHA_HUSHEN,
+                "xuesha_hushen",
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_EARLY,
+                550,
+                "blood",
+                "earth",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_lingbeng.png")
+        ));
+        spells.put(JINGLING_FANZHAO, new SpellDef(
+                JINGLING_FANZHAO,
+                "jingling_fanzhao",
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE,
+                1200,
+                SpiritRoots.LIGHT,
+                "earth",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_beam.png")
+        ));
+        spells.put(YUANGANG_HUJIE, new SpellDef(
+                YUANGANG_HUJIE,
+                "yuangang_hujie",
+                CultivationLevels.REALM_YUANYING + CultivationLevels.STAGE_EARLY,
+                3000,
+                "",
+                "heaven",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_spirit_sight.png")
+        ));
+        spells.put(JINMANG_CHUANSHA, new SpellDef(
+                JINMANG_CHUANSHA,
+                "jinmang_chuansha",
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_EARLY,
+                600,
+                SpiritRoots.METAL,
+                "earth",
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_lingzhi_bullet.png")
+        ));
         spells.put(KONGSHI_SHU, new SpellDef(
                 KONGSHI_SHU,
                 "kongshi_shu",
@@ -551,11 +760,183 @@ public class ModSpells {
                 "heaven",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/mob_effect/unknown.png")
         ));
+        putTechnique(spells, JINFENG_ZHI,
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_MID,
+                30, SpiritRoots.METAL, "human");
+        putTechnique(spells, WANREN_CHUANXIN,
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_MID,
+                1100, SpiritRoots.METAL, "earth");
+        putTechnique(spells, JINGJI_TUSHENG,
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_LATE,
+                80, SpiritRoots.WOOD, "human");
+        putTechnique(spells, WANTENG_JIAOSHA,
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_EARLY,
+                650, SpiritRoots.WOOD, "earth");
+        putTechnique(spells, YANBAO_DAN,
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_EARLY,
+                120, SpiritRoots.FIRE, "earth");
+        putTechnique(spells, CHIYAN_LONGJUAN,
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_MID,
+                1250, SpiritRoots.FIRE, "earth");
+        putTechnique(spells, TIANYUN_FENCHENG,
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE,
+                2800, SpiritRoots.FIRE + "," + SpiritRoots.EARTH, "earth");
+        putTechnique(spells, LUOHUA_CHANSHEN,
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_EARLY,
+                140, SpiritRoots.WOOD + "," + SpiritRoots.WIND, "earth");
+        putTechnique(spells, BAIHUA_ZANG,
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_MID,
+                1200, SpiritRoots.WOOD + "," + SpiritRoots.WIND, "earth");
+        putTechnique(spells, POKONG_JIANHEN,
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_LATE,
+                85, SpiritRoots.METAL + ",sword", "human");
+        putTechnique(spells, SANJIAN_ZHUIMING,
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE,
+                380, SpiritRoots.METAL + ",sword", "earth");
+        putTechnique(spells, DIYAN_QIANG,
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_EARLY,
+                110, SpiritRoots.EARTH, "earth");
+        putTechnique(spells, SHANBENG_YIN,
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE,
+                1850, SpiritRoots.EARTH, "earth");
+        putTechnique(spells, SHUIREN_LIANZHAN,
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_MID,
+                35, SpiritRoots.WATER, "human");
+        putTechnique(spells, CANGLANG_CHONG,
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE,
+                360, SpiritRoots.WATER, "earth");
+        putTechnique(spells, LEISHAN,
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_EARLY,
+                140, SpiritRoots.THUNDER, "earth");
+        putTechnique(spells, WULEI_HONGDING,
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE,
+                1700, SpiritRoots.THUNDER, "earth");
+        putTechnique(spells, BINGZHUI_YU,
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_MID,
+                230, SpiritRoots.ICE, "earth");
+        putTechnique(spells, HANYU_FENGDI,
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_MID,
+                1300, SpiritRoots.ICE, "earth");
+        putTechnique(spells, YAOGUANG_SHAN,
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_LATE,
+                75, SpiritRoots.LIGHT, "human");
+        putTechnique(spells, TIANGUANG_GUANSHA,
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE,
+                1600, SpiritRoots.LIGHT, "earth");
+        putTechnique(spells, YINGXI,
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_EARLY,
+                130, SpiritRoots.DARK, "earth");
+        putTechnique(spells, TIANFENG_ZHUI,
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_MID,
+                1200, SpiritRoots.WIND, "earth");
+        putTechnique(spells, MULING_SHENGXI,
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_MID,
+                240, SpiritRoots.WOOD, "earth");
+        putTechnique(spells, XUE_GUIYUAN_SHU,
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE,
+                320, "blood," + SpiritRoots.WOOD, "earth");
+        putTechnique(spells, SHENGXI_BAOFA,
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE,
+                480, SpiritRoots.WOOD, "earth");
+        putTechnique(spells, YANGYAN_FUTI,
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
+                150, SpiritRoots.FIRE + "," + SpiritRoots.LIGHT, "heaven");
+        putTechnique(spells, DARI_ZHEN,
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
+                450, SpiritRoots.FIRE + "," + SpiritRoots.LIGHT, "heaven");
+        putTechnique(spells, LIEYANG_BU,
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
+                250, SpiritRoots.FIRE + "," + SpiritRoots.LIGHT, "heaven");
+        putTechnique(spells, RILUN,
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
+                800, SpiritRoots.FIRE + "," + SpiritRoots.LIGHT, "heaven");
+        putTechnique(spells, JIYANG_YIKE,
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
+                0, SpiritRoots.FIRE + "," + SpiritRoots.LIGHT, "heaven");
+        putTechnique(spells, LEIXIAO_GUANYUN,
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_EARLY,
+                700, SpiritRoots.WIND + "," + SpiritRoots.THUNDER, "heaven");
+        putTechnique(spells, JIUXIAO_FENGLEI_YU,
+                CultivationLevels.REALM_YUANYING + CultivationLevels.STAGE_EARLY,
+                2800, SpiritRoots.WIND + "," + SpiritRoots.THUNDER, "heaven");
+        putTechnique(spells, XUANYUE_BI,
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_EARLY,
+                200, SpiritRoots.METAL + "," + SpiritRoots.EARTH, "heaven");
+        putTechnique(spells, JINYAN_SHENGFENG,
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE,
+                300, SpiritRoots.METAL + "," + SpiritRoots.EARTH, "heaven");
+        putTechnique(spells, SHANSUO_ZHENYU,
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_EARLY,
+                650, SpiritRoots.EARTH, "heaven");
+        putTechnique(spells, WANFENG_YUEZANG,
+                CultivationLevels.REALM_YUANYING + CultivationLevels.STAGE_EARLY,
+                2400, SpiritRoots.METAL + "," + SpiritRoots.EARTH, "heaven");
+        putTechnique(spells, DONGLIU_SUO,
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE,
+                300, SpiritRoots.WATER + "," + SpiritRoots.ICE, "heaven");
+        putTechnique(spells, CANGYUAN_HONGLIU,
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_EARLY,
+                700, SpiritRoots.WATER + "," + SpiritRoots.ICE, "heaven");
+        putTechnique(spells, HANYUAN_FENGJIE,
+                CultivationLevels.REALM_YUANYING + CultivationLevels.STAGE_EARLY,
+                2500, SpiritRoots.WATER + "," + SpiritRoots.ICE, "heaven");
+        putTechnique(spells, WANMU_SHENG,
+                "", 650, SpiritRoots.WOOD, "earth");
+        putTechnique(spells, QINGTENG_FU,
+                "", 300, SpiritRoots.WOOD, "earth");
+        for (String abilityId : UndeadAbilitySystem.playerAbilityIds()) {
+            putTechnique(spells, abilityId, "", 0, SpiritRoots.DARK, "innate");
+        }
+        putTechnique(spells, "jietian_duoyun_shu",
+                CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE, 1800, "none", "heaven");
+        putTechnique(spells, "bijie_shu",
+                CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE, 500, "none", "earth");
+        putTechnique(spells, "guanyun_shu", "", 100, "none", "earth");
+        putTechnique(spells, YINFU_SHU,
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_MID, 35, "none", "earth");
+        putTechnique(spells, BIHUO_JUE,
+                CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_LATE, 60, "none", "earth");
+        removeRealmRequirements(spells);
         return Map.copyOf(spells);
     }
 
+    private static void removeRealmRequirements(Map<String, SpellDef> spells) {
+        for (String spellId : NEW_SPELLS_WITHOUT_REALM_REQUIREMENT) {
+            SpellDef spell = spells.get(spellId);
+            if (spell == null) {
+                continue;
+            }
+            spells.put(spellId, new SpellDef(
+                    spell.id(),
+                    spell.translationKey(),
+                    "",
+                    spell.qiCost(),
+                    spell.element(),
+                    spell.tier(),
+                    spell.icon()));
+        }
+    }
+
+    private static void putTechnique(
+            Map<String, SpellDef> spells,
+            String id,
+            String requiredLevel,
+            int qiCost,
+            String element,
+            String tier) {
+        spells.put(id, new SpellDef(
+                id,
+                id,
+                requiredLevel,
+                qiCost,
+                element,
+                tier,
+                ResourceLocation.fromNamespaceAndPath(
+                        ImmortalCultivationMod.MODID, "textures/mob_effect/unknown.png")));
+    }
+
     public static List<SpellDef> all() {
-        return SPELLS.values().stream().toList();
+        return List.copyOf(SPELLS.values());
     }
 
     public static SpellDef get(String id) {
@@ -606,6 +987,60 @@ public class ModSpells {
 
     public static int cooldownTicks(String spellId) {
         String normalized = normalizeId(spellId);
+        if ("jietian_duoyun_shu".equals(normalized)) return 6000;
+        if ("bijie_shu".equals(normalized)) return 4800;
+        if ("guanyun_shu".equals(normalized)) return 100;
+        if (YINFU_SHU.equals(normalized)) return 600;
+        if (BIHUO_JUE.equals(normalized)) return 900;
+        int undeadAbilityCooldown = UndeadAbilitySystem.playerAbilityCooldownTicks(normalized);
+        if (undeadAbilityCooldown > 0) {
+            return undeadAbilityCooldown;
+        }
+        int elementalCooldown = switch (normalized) {
+            case JINFENG_ZHI -> 3;
+            case WANREN_CHUANXIN -> 12;
+            case JINGJI_TUSHENG -> 6;
+            case WANTENG_JIAOSHA -> 13;
+            case YANBAO_DAN, DIYAN_QIANG -> 5;
+            case CHIYAN_LONGJUAN -> 15;
+            case TIANYUN_FENCHENG -> 30;
+            case LUOHUA_CHANSHEN -> 8;
+            case BAIHUA_ZANG -> 15;
+            case POKONG_JIANHEN -> 5;
+            case SANJIAN_ZHUIMING -> 10;
+            case SHANBENG_YIN -> 18;
+            case SHUIREN_LIANZHAN -> 4;
+            case CANGLANG_CHONG -> 9;
+            case LEISHAN, YINGXI -> 7;
+            case WULEI_HONGDING -> 17;
+            case BINGZHUI_YU, YAOGUANG_SHAN -> 8;
+            case HANYU_FENGDI -> 16;
+            case TIANGUANG_GUANSHA -> 14;
+            case TIANFENG_ZHUI -> 13;
+            case MULING_SHENGXI -> 12;
+            case XUE_GUIYUAN_SHU -> 14;
+            case SHENGXI_BAOFA -> 18;
+            case YANGYAN_FUTI -> 8;
+            case DARI_ZHEN -> 12;
+            case LIEYANG_BU -> 7;
+            case RILUN -> 15;
+            case JIYANG_YIKE -> 30;
+            case LEIXIAO_GUANYUN -> 13;
+            case JIUXIAO_FENGLEI_YU -> 25;
+            case XUANYUE_BI -> 7;
+            case JINYAN_SHENGFENG -> 8;
+            case SHANSUO_ZHENYU -> 14;
+            case WANFENG_YUEZANG -> 24;
+            case DONGLIU_SUO -> 9;
+            case CANGYUAN_HONGLIU -> 14;
+            case HANYUAN_FENGJIE -> 24;
+            case WANMU_SHENG -> 18;
+            case QINGTENG_FU -> 9;
+            default -> 0;
+        };
+        if (elementalCooldown > 0) {
+            return elementalCooldown * 20;
+        }
         if (JINHUO_XINLIAO.equals(normalized)) {
             return 20 * 60;
         }
@@ -624,6 +1059,24 @@ public class ModSpells {
         if (REGENERATION.equals(normalized)) {
             return 20;
         }
+        if (XUANYAN_HUTI.equals(normalized)) {
+            return 20 * 8;
+        }
+        if (LIUFENG_XIEJIN.equals(normalized)) {
+            return 20 * 10;
+        }
+        if (XUESHA_HUSHEN.equals(normalized)) {
+            return 20 * 14;
+        }
+        if (JINGLING_FANZHAO.equals(normalized)) {
+            return 20 * 16;
+        }
+        if (YUANGANG_HUJIE.equals(normalized)) {
+            return 20 * 20;
+        }
+        if (JINMANG_CHUANSHA.equals(normalized)) {
+            return 20 * 8;
+        }
         if (HUTI_QI.equals(normalized)
                 || DIELANG_SHIELD.equals(normalized)
                 || SIFANG_JIE.equals(normalized)
@@ -635,7 +1088,15 @@ public class ModSpells {
 
     /** Spells whose existing client flow prepares and charges before release. */
     public static boolean requiresPreparation(String spellId) {
-        return PREPARED_CAST_SPELLS.contains(normalizeId(spellId));
+        String normalized = normalizeId(spellId);
+        return UndeadAbilitySystem.requiresPlayerPreparation(normalized)
+                || PREPARED_CAST_SPELLS.contains(normalized)
+                || ATTACK_SPELLS.contains(normalized);
+    }
+
+    public static boolean isAttackSpell(String spellId) {
+        String normalized = normalizeId(spellId);
+        return ATTACK_SPELLS.contains(normalized);
     }
 
     public static String cooldownText(String spellId) {
@@ -659,6 +1120,18 @@ public class ModSpells {
     public static String normalizeId(String id) {
         if (id == null) {
             return "";
+        }
+        if ("YinfuShu".equalsIgnoreCase(id)
+                || "yinfu_shu".equalsIgnoreCase(id)
+                || "yinfu shu".equalsIgnoreCase(id)
+                || "引福术".equals(id)) {
+            return YINFU_SHU;
+        }
+        if ("BihuoJue".equalsIgnoreCase(id)
+                || "bihuo_jue".equalsIgnoreCase(id)
+                || "bihuo jue".equalsIgnoreCase(id)
+                || "避祸诀".equals(id)) {
+            return BIHUO_JUE;
         }
         if ("Lingbeng".equalsIgnoreCase(id) || "lingbeng".equalsIgnoreCase(id) || "\u7075\u5d29".equals(id)) {
             return LINGBENG;
@@ -753,6 +1226,73 @@ public class ModSpells {
         if ("GushiShield".equalsIgnoreCase(id) || "gushi_shield".equalsIgnoreCase(id) || "gushi shield".equalsIgnoreCase(id) || "\u56fa\u77f3\u76fe".equals(id)) {
             return GUSHI_SHIELD;
         }
+        if ("XuanyanHuti".equalsIgnoreCase(id) || "xuanyan_huti".equalsIgnoreCase(id) || "xuanyan huti".equalsIgnoreCase(id) || "\u7384\u5ca9\u62a4\u4f53".equals(id)) {
+            return XUANYAN_HUTI;
+        }
+        if ("LiufengXiejin".equalsIgnoreCase(id) || "liufeng_xiejin".equalsIgnoreCase(id) || "liufeng xiejin".equalsIgnoreCase(id) || "\u6d41\u98ce\u5378\u52b2".equals(id)) {
+            return LIUFENG_XIEJIN;
+        }
+        if ("XueshaHushen".equalsIgnoreCase(id) || "xuesha_hushen".equalsIgnoreCase(id) || "xuesha hushen".equalsIgnoreCase(id) || "\u8840\u715e\u62a4\u8eab".equals(id)) {
+            return XUESHA_HUSHEN;
+        }
+        if ("JinglingFanzhao".equalsIgnoreCase(id) || "jingling_fanzhao".equalsIgnoreCase(id) || "jingling fanzhao".equalsIgnoreCase(id) || "\u955c\u7075\u8fd4\u7167".equals(id)) {
+            return JINGLING_FANZHAO;
+        }
+        if ("YuangangHujie".equalsIgnoreCase(id) || "yuangang_hujie".equalsIgnoreCase(id) || "yuangang hujie".equalsIgnoreCase(id) || "\u5143\u7f61\u62a4\u754c".equals(id)) {
+            return YUANGANG_HUJIE;
+        }
+        if ("JinmangChuansha".equalsIgnoreCase(id) || "jinmang_chuansha".equalsIgnoreCase(id) || "jinmang chuansha".equalsIgnoreCase(id) || "\u91d1\u8292\u7a7f\u6740".equals(id)) {
+            return JINMANG_CHUANSHA;
+        }
+        String compact = id.trim().toLowerCase(java.util.Locale.ROOT).replace(' ', '_');
+        String elemental = switch (compact) {
+            case "jinfeng_zhi", "\u91d1\u950b\u6307" -> JINFENG_ZHI;
+            case "wanren_chuanxin", "\u4e07\u5203\u7a7f\u5fc3" -> WANREN_CHUANXIN;
+            case "jingji_tusheng", "\u8346\u68d8\u7a81\u751f" -> JINGJI_TUSHENG;
+            case "wanteng_jiaosha", "\u4e07\u85e4\u7ede\u6740" -> WANTENG_JIAOSHA;
+            case "yanbao_dan", "\u708e\u7206\u5f39" -> YANBAO_DAN;
+            case "chiyan_longjuan", "\u8d64\u708e\u9f99\u5377" -> CHIYAN_LONGJUAN;
+            case "tianyun_fencheng", "\u5929\u9668\u711a\u57ce" -> TIANYUN_FENCHENG;
+            case "yangyan_futi", "\u9633\u708e\u9644\u4f53" -> YANGYAN_FUTI;
+            case "dari_zhen", "riyun", "\u5927\u65e5\u9707", "\u65e5\u9668" -> DARI_ZHEN;
+            case "lieyang_bu", "\u70c8\u9633\u6b65" -> LIEYANG_BU;
+            case "rilun", "\u65e5\u8f6e" -> RILUN;
+            case "jiyang_yike", "\u6781\u9633\u4e00\u523b" -> JIYANG_YIKE;
+            case "leixiao_guanyun", "\u96f7\u5578\u8d2f\u4e91" -> LEIXIAO_GUANYUN;
+            case "jiuxiao_fenglei_yu", "\u4e5d\u9704\u98ce\u96f7\u57df" -> JIUXIAO_FENGLEI_YU;
+            case "xuanyue_bi", "\u7384\u5cb3\u58c1" -> XUANYUE_BI;
+            case "jinyan_shengfeng", "\u91d1\u5ca9\u751f\u950b" -> JINYAN_SHENGFENG;
+            case "shansuo_zhenyu", "\u5c71\u9501\u9547\u57df" -> SHANSUO_ZHENYU;
+            case "wanfeng_yuezang", "\u4e07\u950b\u5cb3\u846c" -> WANFENG_YUEZANG;
+            case "dongliu_suo", "\u51bb\u6d41\u9501" -> DONGLIU_SUO;
+            case "cangyuan_hongliu", "\u6ca7\u6e0a\u6d2a\u6d41" -> CANGYUAN_HONGLIU;
+            case "hanyuan_fengjie", "\u5bd2\u6e0a\u5c01\u754c" -> HANYUAN_FENGJIE;
+            case "wanmu_sheng", "\u4e07\u6728\u751f" -> WANMU_SHENG;
+            case "qingteng_fu", "\u9752\u85e4\u7f1a" -> QINGTENG_FU;
+            case "luohua_chanshen", "\u843d\u82b1\u7f20\u8eab" -> LUOHUA_CHANSHEN;
+            case "baihua_zang", "\u767e\u82b1\u846c" -> BAIHUA_ZANG;
+            case "pokong_jianhen", "\u7834\u7a7a\u5251\u75d5" -> POKONG_JIANHEN;
+            case "sanjian_zhuiming", "\u4e09\u5251\u8ffd\u547d" -> SANJIAN_ZHUIMING;
+            case "diyan_qiang", "\u5730\u5ca9\u67aa" -> DIYAN_QIANG;
+            case "shanbeng_yin", "\u5c71\u5d29\u5370" -> SHANBENG_YIN;
+            case "shuiren_lianzhan", "\u6c34\u5203\u8fde\u65a9" -> SHUIREN_LIANZHAN;
+            case "canglang_chong", "\u6ca7\u6d6a\u51b2" -> CANGLANG_CHONG;
+            case "leishan", "\u96f7\u95ea" -> LEISHAN;
+            case "wulei_hongding", "\u4e94\u96f7\u8f70\u9876" -> WULEI_HONGDING;
+            case "bingzhui_yu", "\u51b0\u9525\u96e8" -> BINGZHUI_YU;
+            case "hanyu_fengdi", "\u5bd2\u72f1\u5c01\u5730" -> HANYU_FENGDI;
+            case "yaoguang_shan", "\u66dc\u5149\u95ea" -> YAOGUANG_SHAN;
+            case "tianguang_guansha", "\u5929\u5149\u8d2f\u6740" -> TIANGUANG_GUANSHA;
+            case "yingxi", "\u5f71\u88ad" -> YINGXI;
+            case "tianfeng_zhui", "\u5929\u98ce\u5760" -> TIANFENG_ZHUI;
+            case "muling_shengxi", "mulingshengxi", "\u6728\u7075\u751f\u606f" -> MULING_SHENGXI;
+            case "xue_guiyuan_shu", "xueguiyuanshu", "\u8840\u5f52\u5143\u672f" -> XUE_GUIYUAN_SHU;
+            case "shengxi_baofa", "shengxibaofa", "\u751f\u606f\u7206\u53d1" -> SHENGXI_BAOFA;
+            default -> "";
+        };
+        if (!elemental.isEmpty()) {
+            return elemental;
+        }
         if ("KongshiShu".equalsIgnoreCase(id) || "kongshi_shu".equalsIgnoreCase(id) || "kongshi shu".equalsIgnoreCase(id) || "\u63a7\u5c38\u672f".equals(id)) {
             return KONGSHI_SHU;
         }
@@ -822,6 +1362,9 @@ public class ModSpells {
         if (YUQI_SHU.equals(spell.id())) {
             return CultivationLevels.getStageIndex(currentLevel) >= CultivationLevels.getStageIndex(spell.requiredLevel());
         }
+        if (spell.requiredLevel().isBlank()) {
+            return true;
+        }
         return CultivationLevels.getStageIndex(currentLevel) >= CultivationLevels.getStageIndex(spell.requiredLevel());
     }
 
@@ -859,6 +1402,25 @@ public class ModSpells {
         if (FENGYA.equals(normalized)) {
             return CultivationMethods.isPokongJue(data.activeCultivationMethod());
         }
+        if (SolarTechniques.isTechnique(normalized)) {
+            return CultivationMethods.isDariBatiJue(data.activeCultivationMethod());
+        }
+        if (GangtingTechniques.isTechnique(normalized)) {
+            return CultivationMethods.isGangtingXiaokongLu(data.activeCultivationMethod())
+                    && meetsRequirement(data.cultivationLevel(), get(normalized));
+        }
+        if (XuanyueTechniques.isTechnique(normalized)) {
+            return CultivationMethods.isXuanyueSuifengJue(data.activeCultivationMethod())
+                    && meetsRequirement(data.cultivationLevel(), get(normalized));
+        }
+        if (HanlanTechniques.isTechnique(normalized)) {
+            return CultivationMethods.isHanlanNingyuanJing(data.activeCultivationMethod())
+                    && meetsRequirement(data.cultivationLevel(), get(normalized));
+        }
+        if (ChangqingTechniques.isTechnique(normalized)) {
+            return CultivationMethods.isChangqingJue(data.activeCultivationMethod())
+                    && meetsRequirement(data.cultivationLevel(), get(normalized));
+        }
         return isHantiBingqinSpellUnlocked(normalized, data);
     }
 
@@ -885,9 +1447,10 @@ public class ModSpells {
         return -1;
     }
 
-    public static boolean isComboEligible(String spellId) {
+    public static boolean isRandomRewardEligible(String spellId) {
         String normalized = normalizeId(spellId);
-        return !WEIYA.equals(normalized)
+        return !UndeadAbilitySystem.isPlayerAbility(normalized)
+                && !WEIYA.equals(normalized)
                 && !ZIBAO.equals(normalized)
                 && !DONGTIAN_JIELING.equals(normalized)
                 && !ABSORB_CULTIVATION.equals(normalized)
@@ -899,10 +1462,15 @@ public class ModSpells {
                 && !SUOKONG_SHU.equals(normalized)
                 && !HANJING_SUOZHUA.equals(normalized)
                 && !SHUANGTIAN_QI.equals(normalized)
-                && !SUISHUANG_LINGXIAO.equals(normalized);
+                && !SUISHUANG_LINGXIAO.equals(normalized)
+                && !SolarTechniques.isTechnique(normalized)
+                && !GangtingTechniques.isTechnique(normalized)
+                && !XuanyueTechniques.isTechnique(normalized)
+                && !HanlanTechniques.isTechnique(normalized)
+                && !ChangqingTechniques.isTechnique(normalized);
     }
 
-    public static boolean isComboTimedToggle(String spellId) {
+    public static boolean isTimedToggle(String spellId) {
         String normalized = normalizeId(spellId);
         return EARTH_ESCAPE.equals(normalized)
                 || QI_GATHERING.equals(normalized)
@@ -910,22 +1478,23 @@ public class ModSpells {
                 || WIND_STEP.equals(normalized)
                 || YUFENG_JUE.equals(normalized)
                 || XUYING_TA.equals(normalized)
-                || SHIXU_CHILIU.equals(normalized);
-    }
-
-    public static boolean isTimedToggle(String spellId) {
-        String normalized = normalizeId(spellId);
-        return isComboTimedToggle(normalized)
+                || SHIXU_CHILIU.equals(normalized)
                 || WEIYA.equals(normalized)
                 || FENGYA.equals(normalized)
-                || SUISHUANG_LINGXIAO.equals(normalized)
-                || XUYING_TA.equals(normalized);
+                || SUISHUANG_LINGXIAO.equals(normalized);
     }
 
     public static List<String> innateSpellIds() {
-        return List.of(WEIYA, ZIBAO, DONGTIAN_JIELING, ABSORB_CULTIVATION, TUNTIAN, FENGYA,
+        ArrayList<String> ids = new ArrayList<>(List.of(
+                WEIYA, ZIBAO, DONGTIAN_JIELING, ABSORB_CULTIVATION, TUNTIAN, FENGYA,
                 HANJING_SUOZHUA, SHUANGTIAN_QI, SUISHUANG_LINGXIAO, YUQI_SHU, CUIGU_LIANSHEN,
-                SUOKONG_SHU);
+                SUOKONG_SHU, YANGYAN_FUTI, DARI_ZHEN, LIEYANG_BU, RILUN, JIYANG_YIKE,
+                LEIXIAO_GUANYUN, JIUXIAO_FENGLEI_YU,
+                XUANYUE_BI, JINYAN_SHENGFENG, SHANSUO_ZHENYU, WANFENG_YUEZANG,
+                DONGLIU_SUO, CANGYUAN_HONGLIU, HANYUAN_FENGJIE,
+                WANMU_SHENG, QINGTENG_FU));
+        ids.addAll(UndeadAbilitySystem.playerAbilityIds());
+        return List.copyOf(ids);
     }
 
     private static boolean isJindanOrHigher(String currentLevel) {

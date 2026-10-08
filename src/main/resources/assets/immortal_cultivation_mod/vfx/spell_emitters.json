@@ -1,0 +1,1231 @@
+{
+  "fireball": [
+    {
+      "kind": "particle_emitter",
+      "position": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "rotation": [
+        -0.7071068286895752,
+        0.0,
+        0.0,
+        0.7071068286895752
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "builtinCircle": true,
+      "duration": 1,
+      "local": false,
+      "looping": true,
+      "rate": 5.0,
+      "distanceInterval": 1.0,
+      "exactEmission": false,
+      "speed": [
+        10.0,
+        10.0
+      ],
+      "lifetime": [
+        10.0,
+        10.0
+      ],
+      "size": [
+        0.30000001192092896,
+        0.30000001192092896,
+        0.30000001192092896
+      ],
+      "color": [
+        -65536,
+        -3072
+      ],
+      "maxParticles": 5000,
+      "shape": "cone",
+      "radiusThickness": 1.0,
+      "arc": 360.0,
+      "angle": 10.0,
+      "radius": 0.10000000149011612,
+      "shapeScale": [
+        1,
+        1,
+        1
+      ],
+      "shapeRotation": [
+        0,
+        0,
+        0
+      ],
+      "shapePosition": [
+        0,
+        0,
+        0
+      ],
+      "physics": {
+        "gravity": 1.0,
+        "friction": 1,
+        "collision": true,
+        "bounce": 1.0,
+        "chance": 0.699999988079071,
+        "spread": 0.10000000149011612,
+        "collidedFriction": 0.699999988079071,
+        "remove": false
+      }
+    }
+  ],
+  "flying_sword": [
+    {
+      "kind": "particle_emitter",
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "builtinCircle": false,
+      "duration": 100,
+      "local": true,
+      "looping": true,
+      "rate": 100.0,
+      "distanceInterval": 0,
+      "exactEmission": true,
+      "speed": [
+        0.0,
+        0.0
+      ],
+      "lifetime": [
+        100,
+        100
+      ],
+      "size": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "color": [
+        -3217416,
+        -3217416
+      ],
+      "maxParticles": 1,
+      "shape": "sphere",
+      "radiusThickness": 1.0,
+      "arc": 360.0,
+      "radius": 0.5,
+      "shapeScale": [
+        0.10000000149011612,
+        0.10000000149011612,
+        0.10000000149011612
+      ],
+      "shapeRotation": [
+        0,
+        0,
+        0
+      ],
+      "shapePosition": [
+        0,
+        0,
+        0
+      ],
+      "trail": {
+        "lifetime": 0.30000001192092896,
+        "width": 3.0,
+        "sizeAffectsWidth": true,
+        "inheritColor": true,
+        "dieWithParticle": false,
+        "minDistance": 0.05000000074505806,
+        "color": {
+          "data": {
+            "gradientColor": {
+              "a": [
+                0.0,
+                1.0,
+                0.017241379246115685,
+                1.0
+              ],
+              "rgb": [
+                0.0,
+                0.26274511218070984,
+                0.6705882549285889,
+                0.9411764740943909,
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "type": "gradient"
+        },
+        "lifetimeColor": {
+          "data": {
+            "gradientColor": {
+              "a": [
+                0.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "rgb": [
+                0.0,
+                0.26274511218070984,
+                0.6705882549285889,
+                0.9411764740943909,
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "type": "gradient"
+        }
+      }
+    }
+  ],
+  "ball": [
+    {
+      "kind": "particle_emitter",
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.7071068286895752,
+        0.7071068286895752
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "builtinCircle": false,
+      "duration": 100,
+      "local": true,
+      "looping": true,
+      "rate": 0.5,
+      "distanceInterval": 0,
+      "exactEmission": true,
+      "speed": [
+        1,
+        1
+      ],
+      "lifetime": [
+        100,
+        100
+      ],
+      "size": [
+        0.10000000149011612,
+        0.10000000149011612,
+        0.10000000149011612
+      ],
+      "color": [
+        -65589,
+        -65589
+      ],
+      "maxParticles": 50,
+      "shape": "sphere",
+      "radiusThickness": 1.0,
+      "arc": 360.0,
+      "radius": 0.5,
+      "shapeScale": [
+        1,
+        1,
+        1
+      ],
+      "shapeRotation": [
+        0,
+        0,
+        0
+      ],
+      "shapePosition": [
+        0,
+        0,
+        0
+      ],
+      "physics": {
+        "gravity": 0,
+        "friction": 1,
+        "collision": true,
+        "bounce": 1,
+        "chance": 1,
+        "spread": 0,
+        "collidedFriction": 0.699999988079071,
+        "remove": false
+      }
+    },
+    {
+      "kind": "beam_emitter",
+      "position": [
+        0.0,
+        0.0,
+        1.5
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "builtinCircle": false,
+      "duration": 100,
+      "end": [
+        0.0,
+        0.0,
+        -3.0
+      ],
+      "width": 1.5,
+      "color": [
+        -1,
+        -1
+      ]
+    }
+  ],
+  "beam": [
+    {
+      "kind": "beam_emitter",
+      "position": [
+        0.0,
+        -10.0,
+        0.0
+      ],
+      "rotation": [
+        0.7071067690849304,
+        0.0,
+        0.0,
+        0.7071067690849304
+      ],
+      "scale": [
+        10.0,
+        10.0,
+        10.0
+      ],
+      "builtinCircle": false,
+      "duration": 100,
+      "end": [
+        0.0,
+        0.0,
+        -3.0
+      ],
+      "width": 0.2,
+      "color": [
+        -1,
+        -1
+      ]
+    }
+  ],
+  "lingbeng": [
+    {
+      "kind": "particle_emitter",
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "builtinCircle": false,
+      "duration": 1,
+      "local": true,
+      "looping": true,
+      "rate": 25.0,
+      "distanceInterval": 0.0,
+      "exactEmission": true,
+      "speed": [
+        10.0,
+        20.0
+      ],
+      "lifetime": [
+        5.0,
+        8.0
+      ],
+      "size": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "color": [
+        -7127297,
+        -12963329
+      ],
+      "maxParticles": 50,
+      "shape": "cone",
+      "radiusThickness": 1.0,
+      "arc": 360.0,
+      "angle": 25.0,
+      "radius": 0.5,
+      "shapeScale": [
+        1,
+        1,
+        1
+      ],
+      "shapeRotation": [
+        0,
+        0,
+        0
+      ],
+      "shapePosition": [
+        0,
+        0,
+        0
+      ],
+      "trail": {
+        "lifetime": 1.0,
+        "width": 0.5,
+        "sizeAffectsWidth": true,
+        "inheritColor": true,
+        "dieWithParticle": false,
+        "minDistance": 0.05000000074505806,
+        "color": {
+          "data": {
+            "gradientColor": {
+              "a": [
+                0.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "rgb": [
+                0.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "type": "gradient"
+        },
+        "lifetimeColor": {
+          "data": {
+            "gradientColor": {
+              "a": [
+                0.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "rgb": [
+                0.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "type": "gradient"
+        }
+      }
+    }
+  ],
+  "meditating": [
+    {
+      "kind": "particle_emitter",
+      "position": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "builtinCircle": false,
+      "duration": 10,
+      "local": true,
+      "looping": true,
+      "rate": 0.5,
+      "distanceInterval": 0,
+      "exactEmission": true,
+      "speed": [
+        0.008,
+        0.018
+      ],
+      "lifetime": [
+        50.0,
+        50.0
+      ],
+      "size": [
+        0.035,
+        0.035,
+        0.035
+      ],
+      "color": [
+        -7680513,
+        -7680513
+      ],
+      "maxParticles": 96,
+      "shape": "cone",
+      "radiusThickness": 1.0,
+      "arc": 360.0,
+      "angle": 25.0,
+      "radius": 0.85,
+      "shapeScale": [
+        1,
+        1,
+        1
+      ],
+      "shapeRotation": [
+        0,
+        0,
+        0
+      ],
+      "shapePosition": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "puddle": [
+    {
+      "kind": "particle_emitter",
+      "position": [
+        0.0,
+        -0.5,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        2.0,
+        2.0,
+        2.0
+      ],
+      "builtinCircle": true,
+      "duration": 100,
+      "local": true,
+      "looping": true,
+      "rate": 80.0,
+      "distanceInterval": 0,
+      "exactEmission": true,
+      "speed": [
+        0.30000001192092896,
+        0.30000001192092896
+      ],
+      "lifetime": [
+        10.0,
+        10.0
+      ],
+      "size": [
+        0.07999999821186066,
+        0.07999999821186066,
+        0.07999999821186066
+      ],
+      "color": [
+        -11238913,
+        -5840897
+      ],
+      "maxParticles": 2000,
+      "shape": "cylinder",
+      "radiusThickness": 1.0,
+      "arc": 360.0,
+      "radius": 0.5,
+      "shapeScale": [
+        1,
+        0.0,
+        1
+      ],
+      "shapeRotation": [
+        0,
+        0,
+        0
+      ],
+      "shapePosition": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "rage3": [
+    {
+      "kind": "particle_emitter",
+      "position": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "builtinCircle": false,
+      "duration": 100,
+      "local": true,
+      "looping": true,
+      "rate": 10.0,
+      "distanceInterval": 0,
+      "exactEmission": true,
+      "speed": [
+        10.0,
+        10.0
+      ],
+      "lifetime": [
+        30.0,
+        30.0
+      ],
+      "size": [
+        0.009999999776482582,
+        0.009999999776482582,
+        0.009999999776482582
+      ],
+      "color": [
+        -2686976,
+        -2686976
+      ],
+      "maxParticles": 1000,
+      "shape": "circle",
+      "radiusThickness": 1.0,
+      "arc": 360.0,
+      "radius": 0.5,
+      "shapeScale": [
+        3.0,
+        3.0,
+        3.0
+      ],
+      "shapeRotation": [
+        0,
+        0,
+        0
+      ],
+      "shapePosition": [
+        0,
+        0,
+        0
+      ],
+      "trail": {
+        "lifetime": 0.5,
+        "width": 10.0,
+        "sizeAffectsWidth": true,
+        "inheritColor": true,
+        "dieWithParticle": false,
+        "minDistance": 0.05000000074505806,
+        "color": {
+          "data": {
+            "a": -6641921,
+            "b": -9403649
+          },
+          "type": "random_color"
+        },
+        "lifetimeColor": {
+          "data": {
+            "gradientColor": {
+              "a": [
+                0.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "rgb": [
+                0.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "type": "gradient"
+        }
+      }
+    }
+  ],
+  "water1": [
+    {
+      "kind": "particle_emitter",
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        3.0,
+        3.0,
+        3.0
+      ],
+      "builtinCircle": true,
+      "duration": 1,
+      "local": true,
+      "looping": true,
+      "rate": 10.0,
+      "distanceInterval": 0,
+      "exactEmission": true,
+      "speed": [
+        0.0010000000474974513,
+        0.0010000000474974513
+      ],
+      "lifetime": [
+        1000.0,
+        1000.0
+      ],
+      "size": [
+        0.029999999329447746,
+        0.029999999329447746,
+        0.029999999329447746
+      ],
+      "color": [
+        -12348929,
+        -10563841
+      ],
+      "maxParticles": 500,
+      "shape": "sphere",
+      "radiusThickness": 1.0,
+      "arc": 360.0,
+      "radius": 0.5,
+      "shapeScale": [
+        1,
+        1,
+        1
+      ],
+      "shapeRotation": [
+        0,
+        0,
+        0
+      ],
+      "shapePosition": [
+        0,
+        0,
+        0
+      ],
+      "trail": {
+        "lifetime": 0.009999999776482582,
+        "width": 1.0,
+        "sizeAffectsWidth": true,
+        "inheritColor": true,
+        "dieWithParticle": false,
+        "minDistance": 0.05000000074505806,
+        "color": {
+          "data": {
+            "gradientColor": {
+              "a": [
+                0.005747126415371895,
+                1.0,
+                0.028735632076859474,
+                1.0
+              ],
+              "rgb": [
+                0.0,
+                0.26274511218070984,
+                0.6705882549285889,
+                0.9411764740943909,
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "type": "gradient"
+        },
+        "lifetimeColor": {
+          "data": {
+            "gradientColor": {
+              "a": [
+                0.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "rgb": [
+                0.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "type": "gradient"
+        }
+      }
+    }
+  ],
+  "water2": [
+    {
+      "kind": "particle_emitter",
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        3.5,
+        3.5,
+        3.5
+      ],
+      "builtinCircle": true,
+      "duration": 1,
+      "local": true,
+      "looping": true,
+      "rate": 10.0,
+      "distanceInterval": 0,
+      "exactEmission": true,
+      "speed": [
+        0.0010000000474974513,
+        0.0010000000474974513
+      ],
+      "lifetime": [
+        1000.0,
+        1000.0
+      ],
+      "size": [
+        0.029999999329447746,
+        0.029999999329447746,
+        0.029999999329447746
+      ],
+      "color": [
+        -12348929,
+        -10563841
+      ],
+      "maxParticles": 500,
+      "shape": "sphere",
+      "radiusThickness": 1.0,
+      "arc": 360.0,
+      "radius": 0.5,
+      "shapeScale": [
+        1,
+        1,
+        1
+      ],
+      "shapeRotation": [
+        0,
+        0,
+        0
+      ],
+      "shapePosition": [
+        0,
+        0,
+        0
+      ],
+      "trail": {
+        "lifetime": 0.009999999776482582,
+        "width": 1.0,
+        "sizeAffectsWidth": true,
+        "inheritColor": true,
+        "dieWithParticle": false,
+        "minDistance": 0.05000000074505806,
+        "color": {
+          "data": {
+            "gradientColor": {
+              "a": [
+                0.005747126415371895,
+                1.0,
+                0.028735632076859474,
+                1.0
+              ],
+              "rgb": [
+                0.0,
+                0.26274511218070984,
+                0.6705882549285889,
+                0.9411764740943909,
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "type": "gradient"
+        },
+        "lifetimeColor": {
+          "data": {
+            "gradientColor": {
+              "a": [
+                0.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "rgb": [
+                0.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "type": "gradient"
+        }
+      }
+    }
+  ],
+  "water3": [
+    {
+      "kind": "particle_emitter",
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        4.0,
+        4.0,
+        4.0
+      ],
+      "builtinCircle": true,
+      "duration": 1,
+      "local": true,
+      "looping": true,
+      "rate": 10.0,
+      "distanceInterval": 0,
+      "exactEmission": true,
+      "speed": [
+        0.0010000000474974513,
+        0.0010000000474974513
+      ],
+      "lifetime": [
+        1000.0,
+        1000.0
+      ],
+      "size": [
+        0.029999999329447746,
+        0.029999999329447746,
+        0.029999999329447746
+      ],
+      "color": [
+        -12348929,
+        -10563841
+      ],
+      "maxParticles": 500,
+      "shape": "sphere",
+      "radiusThickness": 1.0,
+      "arc": 360.0,
+      "radius": 0.5,
+      "shapeScale": [
+        1,
+        1,
+        1
+      ],
+      "shapeRotation": [
+        0,
+        0,
+        0
+      ],
+      "shapePosition": [
+        0,
+        0,
+        0
+      ],
+      "trail": {
+        "lifetime": 0.009999999776482582,
+        "width": 1.0,
+        "sizeAffectsWidth": true,
+        "inheritColor": true,
+        "dieWithParticle": false,
+        "minDistance": 0.05000000074505806,
+        "color": {
+          "data": {
+            "gradientColor": {
+              "a": [
+                0.005747126415371895,
+                1.0,
+                0.028735632076859474,
+                1.0
+              ],
+              "rgb": [
+                0.0,
+                0.26274511218070984,
+                0.6705882549285889,
+                0.9411764740943909,
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "type": "gradient"
+        },
+        "lifetimeColor": {
+          "data": {
+            "gradientColor": {
+              "a": [
+                0.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "rgb": [
+                0.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "type": "gradient"
+        }
+      }
+    }
+  ],
+  "ice1": [
+    {
+      "kind": "particle_emitter",
+      "position": [
+        0.0,
+        -0.30000001192092896,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        5.0,
+        5.0,
+        5.0
+      ],
+      "builtinCircle": true,
+      "duration": 100,
+      "local": true,
+      "looping": true,
+      "rate": 10.0,
+      "distanceInterval": 0.0,
+      "exactEmission": true,
+      "speed": [
+        0.009999999776482582,
+        0.009999999776482582
+      ],
+      "lifetime": [
+        100.0,
+        100.0
+      ],
+      "size": [
+        0.07999999821186066,
+        0.07999999821186066,
+        0.07999999821186066
+      ],
+      "color": [
+        -11238913,
+        -5840897
+      ],
+      "maxParticles": 1000,
+      "shape": "cylinder",
+      "radiusThickness": 1.0,
+      "arc": 360.0,
+      "radius": 0.5,
+      "shapeScale": [
+        1,
+        0.0,
+        1
+      ],
+      "shapeRotation": [
+        0,
+        0,
+        0
+      ],
+      "shapePosition": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "ice2": [
+    {
+      "kind": "particle_emitter",
+      "position": [
+        0.0,
+        -0.30000001192092896,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        5.0,
+        5.0,
+        5.0
+      ],
+      "builtinCircle": true,
+      "duration": 100,
+      "local": true,
+      "looping": true,
+      "rate": 10.0,
+      "distanceInterval": 0.0,
+      "exactEmission": true,
+      "speed": [
+        0.009999999776482582,
+        0.009999999776482582
+      ],
+      "lifetime": [
+        100.0,
+        100.0
+      ],
+      "size": [
+        0.07999999821186066,
+        0.07999999821186066,
+        0.07999999821186066
+      ],
+      "color": [
+        -11238913,
+        -5840897
+      ],
+      "maxParticles": 1000,
+      "shape": "sphere",
+      "radiusThickness": 1.0,
+      "arc": 360.0,
+      "radius": 0.5,
+      "shapeScale": [
+        0.20000000298023224,
+        0.20000000298023224,
+        0.20000000298023224
+      ],
+      "shapeRotation": [
+        0,
+        0,
+        0
+      ],
+      "shapePosition": [
+        0,
+        0,
+        0
+      ],
+      "trail": {
+        "lifetime": 0.10000000149011612,
+        "width": 0.5,
+        "sizeAffectsWidth": true,
+        "inheritColor": true,
+        "dieWithParticle": false,
+        "minDistance": 0.05000000074505806,
+        "color": {
+          "data": {
+            "gradientColor": {
+              "a": [
+                0.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "rgb": [
+                0.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "type": "gradient"
+        },
+        "lifetimeColor": {
+          "data": {
+            "gradientColor": {
+              "a": [
+                0.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "rgb": [
+                0.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "type": "gradient"
+        }
+      }
+    }
+  ]
+}

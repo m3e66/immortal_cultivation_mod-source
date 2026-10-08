@@ -26,6 +26,9 @@ public final class EscapedYuanyingCoreEntity extends PathfinderMob {
     public static final float CORE_HEALTH = 18_000.0F * 0.20F;
 
     private int revivalTicks = ESCAPE_TICKS;
+    private java.util.UUID originalDragon;
+
+    public java.util.UUID originalDragon() { return originalDragon; }
     private double revivalX;
     private double revivalY;
     private double revivalZ;
@@ -44,6 +47,7 @@ public final class EscapedYuanyingCoreEntity extends PathfinderMob {
         this(ModEntities.ESCAPED_YUANYING_CORE.get(), level);
         setPos(dragon.getX(), dragon.getY() + dragon.getBbHeight() * 0.7D, dragon.getZ());
         setHealth(CORE_HEALTH);
+        originalDragon = dragon.getUUID();
         revivalX = dragon.getX();
         revivalY = dragon.getY();
         revivalZ = dragon.getZ();
@@ -180,6 +184,7 @@ public final class EscapedYuanyingCoreEntity extends PathfinderMob {
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putInt("RevivalTicks", revivalTicks);
+        if (originalDragon != null) tag.putUUID("OriginalDragon", originalDragon);
         tag.putDouble("RevivalX", revivalX);
         tag.putDouble("RevivalY", revivalY);
         tag.putDouble("RevivalZ", revivalZ);
@@ -190,6 +195,7 @@ public final class EscapedYuanyingCoreEntity extends PathfinderMob {
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         revivalTicks = Math.max(1, tag.getInt("RevivalTicks"));
+        originalDragon = tag.hasUUID("OriginalDragon") ? tag.getUUID("OriginalDragon") : null;
         revivalX = tag.getDouble("RevivalX");
         revivalY = tag.getDouble("RevivalY");
         revivalZ = tag.getDouble("RevivalZ");

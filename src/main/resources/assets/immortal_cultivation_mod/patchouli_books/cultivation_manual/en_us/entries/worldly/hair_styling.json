@@ -1,0 +1,18 @@
+{
+  "name": "Hair Styling Table",
+  "icon": "immortal_cultivation_mod:hair_styling_table",
+  "category": "immortal_cultivation_mod:worldly",
+  "sortnum": 11,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Preview and Adjust",
+      "text": "Interact with the Hair Styling Table, choose a hairstyle, and preview your character. Adjust color and helmet display behavior, or load a skin reference for the preview.$(br2)A reference skin assists matching and previewing; editing a draft does not immediately replace your equipped appearance."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Apply Your Appearance",
+      "text": "Confirm and save to apply the hairstyle and color to your hair slot. Save frequently used colors for later.$(br2)With Chinese selected, the styling table buttons, color choices, hints, and skin-loading status appear in Chinese."
+    }
+  ]
+}

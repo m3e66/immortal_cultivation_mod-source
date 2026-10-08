@@ -1,1 +1,6 @@
-{"parent":"immortal_cultivation_mod:block/jiuye_xianlan"}
+{
+  "parent": "immortal_cultivation_mod:item/herb_display",
+  "textures": {
+    "layer0": "immortal_cultivation_mod:item/jiuye_xianlan"
+  }
+}

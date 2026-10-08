@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "immortal_cultivation_mod:block/hair_styling_table"
+    },
+    "facing=east": {
+      "model": "immortal_cultivation_mod:block/hair_styling_table",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "immortal_cultivation_mod:block/hair_styling_table",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "immortal_cultivation_mod:block/hair_styling_table",
+      "y": 270
+    }
+  }
+}

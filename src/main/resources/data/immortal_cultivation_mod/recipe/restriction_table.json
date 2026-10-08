@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "JZJ",
+    "XGX",
+    "MMM"
+  ],
+  "key": {
+    "J": {
+      "item": "immortal_cultivation_mod:jingtie_motherstone"
+    },
+    "Z": {
+      "item": "immortal_cultivation_mod:zhenwen_jade"
+    },
+    "X": {
+      "item": "immortal_cultivation_mod:xuanduan_iron_shard"
+    },
+    "G": {
+      "item": "immortal_cultivation_mod:spirit_guiding_gear"
+    },
+    "M": {
+      "item": "immortal_cultivation_mod:moxuan_iron"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:restriction_table",
+    "count": 1
+  }
+}

@@ -39,7 +39,7 @@ displayName="${mod_name}" #mandatory
 #logoFile="examplemod.png" #optional
 
 # A text field displayed in the mod UI
-#credits="" #optional
+credits="Environmental particle textures: shuimo0413 — Iron-Elden-Ring-Particle-library (MIT). See META-INF/THIRD-PARTY-CREDITS.txt inside this JAR."
 
 # The authors of the mod, displayed in the mod UI (optional)
 #authors=""
@@ -89,14 +89,6 @@ config="${mod_id}.mixins.json"
     side="BOTH"
 
 [[dependencies.${mod_id}]]
-    modId="photon"
-    type="optional"
-    reason="Uses Photon effects for spell visuals when Photon is present."
-    versionRange="[2.1.4,)"
-    ordering="AFTER"
-    side="BOTH"
-
-[[dependencies.${mod_id}]]
     modId="geckolib"
     type="required"
     reason="Uses GeckoLib custom models for cultivation ore and rock blocks."
@@ -128,6 +120,13 @@ config="${mod_id}.mixins.json"
     ordering="AFTER"
     side="BOTH"
 
+[[dependencies.${mod_id}]]
+    modId="jei"
+    type="optional"
+    reason="Displays Ding forging recipes and their required materials."
+    versionRange="[19,20)"
+    ordering="AFTER"
+    side="CLIENT"
 [[dependencies.${mod_id}]]
     modId="ultramarine"
     type="required"

@@ -1,9 +1,12 @@
 package com.example.immortal_cultivation_mod.screen;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
+import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.client.ClientData;
-import com.example.immortal_cultivation_mod.client.ClientSpellCombos;
+import com.example.immortal_cultivation_mod.client.DaoGuidanceClient;
+import com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent;
+import com.example.immortal_cultivation_mod.network.DaoGuidancePayloads;
 import com.example.immortal_cultivation_mod.effect.ModEffects;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
@@ -25,8 +28,6 @@ import java.util.Set;
 public class SpellSelectionScreen extends Screen {
     private static final ResourceLocation BACKGROUND =
             ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_selection.png");
-    private static final ResourceLocation COMBO_ICON =
-            ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/mob_effect/spell_icon_combo.png");
     private static final ResourceLocation SPELL_ROW_BACKGROUND =
             ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_background.png");
     private static final int TEXTURE_W = 1567;
@@ -164,13 +165,30 @@ public class SpellSelectionScreen extends Screen {
 
     private static List<SelectionEntry> getKnownEntries() {
         ArrayList<SelectionEntry> entries = new ArrayList<>();
-        for (ModSpells.SpellDef spell : ClientSpellCombos.knownSpells(ClientData.cultivationData)) {
+        for (ModSpells.SpellDef spell : knownSpells()) {
             entries.add(SelectionEntry.spell(spell));
         }
-        for (ClientSpellCombos.SpellCombo combo : ClientSpellCombos.combos()) {
-            entries.add(SelectionEntry.combo(combo));
-        }
         return entries;
+    }
+
+    private static List<ModSpells.SpellDef> knownSpells() {
+        var data = ClientData.cultivationData;
+        if (data == null) {
+            return List.of();
+        }
+        ArrayList<String> spellIds = new ArrayList<>(
+                data.knownSpells() == null ? List.of() : data.knownSpells());
+        for (String spellId : ModSpells.innateSpellIds()) {
+            if (ClientData.isInnateSpellKnown(spellId)) {
+                spellIds.add(spellId);
+            }
+        }
+        return spellIds.stream()
+                .map(ModSpells::normalizeId)
+                .map(ModSpells::get)
+                .filter(spell -> spell != null)
+                .distinct()
+                .toList();
     }
 
     private void populateList() {
@@ -202,6 +220,11 @@ public class SpellSelectionScreen extends Screen {
 
     private void toggleEntry(SelectionEntry entry) {
         ClientData.toggleSpellVisibleInWheel(entry.id());
+        if (ClientData.isSpellVisibleInWheel(entry.id())) {
+            PacketDistributor.sendToServer(
+                    new DaoGuidancePayloads.ServerboundDaoGuidanceActionPayload(
+                            DaoGuidanceContent.EQUIP_SPELL));
+        }
         populateList();
         updateMoveButtons();
     }
@@ -286,6 +309,20 @@ public class SpellSelectionScreen extends Screen {
         renderActiveToggleSpells(guiGraphics, x + sx(250), y + sy(110), sx(1120));
         renderSpellDetails(guiGraphics, x + sx(978), y + sy(230), sx(390));
         renderLearnedMethods(guiGraphics, mouseX, mouseY);
+
+        if (toggleButton != null
+                && DaoGuidanceClient.isCurrentAction(
+                        DaoGuidanceContent.EQUIP_SPELL)) {
+            int pulse = 145 + (int) (Math.sin(System.currentTimeMillis() / 180.0D) * 65.0D);
+            int color = (Math.max(70, Math.min(230, pulse)) << 24) | 0xF0C66B;
+            guiGraphics.renderOutline(toggleButton.getX() - 3,
+                    toggleButton.getY() - 3,
+                    toggleButton.getWidth() + 6,
+                    toggleButton.getHeight() + 6, color);
+            guiGraphics.drawCenteredString(font, Component.literal("↓"),
+                    toggleButton.getX() + toggleButton.getWidth() / 2,
+                    toggleButton.getY() - 13, color);
+        }
 
         if (allEntries.isEmpty()) {
             Component none = Component.translatable("screen." + ImmortalCultivationMod.MODID + ".no_spells");
@@ -766,8 +803,7 @@ public class SpellSelectionScreen extends Screen {
 
             selectEntry(entry);
             long now = System.currentTimeMillis();
-            if (!entry.id().startsWith(ClientSpellCombos.CAST_PREFIX)
-                    && entry.id().equals(lastSpellClickId)
+            if (entry.id().equals(lastSpellClickId)
                     && now - lastSpellClickMillis <= 350L
                     && minecraft != null) {
                 minecraft.setScreen(TechniqueDescriptionScreen.spell(SpellSelectionScreen.this, entry.id()));
@@ -782,10 +818,10 @@ public class SpellSelectionScreen extends Screen {
                                   ResourceLocation icon, String requirementText, String costText, String proficiencyText,
                                   String cooldownText) {
         static SelectionEntry spell(ModSpells.SpellDef spell) {
-            String requirementText = spell.requiredLevel();
+            String requirementText = CultivationLevels.displayName(spell.requiredLevel()).getString();
             String costText;
             if (ModSpells.WEIYA.equals(spell.id())) {
-                costText = "1% qi per second";
+                costText = Component.translatable("spell.immortal_cultivation_mod.weiya.qi_cost").getString();
             } else if (ModSpells.ZIBAO.equals(spell.id())) {
                 costText = "all age";
             } else if (ModSpells.LIANSHEN_SHU.equals(spell.id())) {
@@ -797,7 +833,10 @@ public class SpellSelectionScreen extends Screen {
             }
             String proficiencyText = ModSpells.spellProficiencyLevel(ClientData.cultivationData, spell.id()).getString();
             String cooldownText = ModSpells.cooldownText(spell.id());
-            String requirement = requirementText + " / " + costText + " / " + proficiencyText;
+            String requirement = java.util.stream.Stream.of(
+                            requirementText, costText, proficiencyText)
+                    .filter(text -> text != null && !text.isBlank())
+                    .collect(java.util.stream.Collectors.joining(" / "));
             return new SelectionEntry(
                     spell.id(),
                     spell.name(),
@@ -809,30 +848,6 @@ public class SpellSelectionScreen extends Screen {
                     costText,
                     proficiencyText,
                     cooldownText);
-        }
-
-        static SelectionEntry combo(ClientSpellCombos.SpellCombo combo) {
-            String elements = ClientSpellCombos.topElements(combo);
-            String order = combo.spellIds().stream()
-                    .map(ModSpells::get)
-                    .filter(spell -> spell != null)
-                    .map(spell -> spell.name().getString())
-                    .reduce((a, b) -> a + " -> " + b)
-                    .orElse(elements);
-            Component description = Component.empty().append(ClientSpellCombos.castModeDescription(combo))
-                    .append("\n")
-                    .append(Component.literal(order));
-            return new SelectionEntry(
-                    combo.castId(),
-                    Component.literal(combo.name()),
-                    Component.translatable("screen." + ImmortalCultivationMod.MODID + ".combo_detail", elements, combo.spellIds().size()).getString(),
-                    description,
-                    0xFF5D4633,
-                    COMBO_ICON,
-                    Component.translatable("screen." + ImmortalCultivationMod.MODID + ".combo").getString(),
-                    "-",
-                    "-",
-                    "-");
         }
 
     }

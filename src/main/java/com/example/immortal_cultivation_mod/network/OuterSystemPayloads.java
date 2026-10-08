@@ -116,7 +116,7 @@ public final class OuterSystemPayloads {
         }
     }
 
-    public record ServerboundShopBuy(String itemId)
+    public record ServerboundShopBuy(String itemId, boolean buyStack)
             implements CustomPacketPayload {
         public static final Type<ServerboundShopBuy> TYPE =
                 OuterSystemPayloads.type("outer_system_shop_buy");
@@ -124,6 +124,8 @@ public final class OuterSystemPayloads {
                 STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.STRING_UTF8,
                 ServerboundShopBuy::itemId,
+                ByteBufCodecs.BOOL,
+                ServerboundShopBuy::buyStack,
                 ServerboundShopBuy::new);
 
         @Override
@@ -320,7 +322,7 @@ public final class OuterSystemPayloads {
             context.enqueueWork(() -> {
                 if (context.player() instanceof ServerPlayer player) {
                     OuterSystemManager.buyShopItem(
-                            player, payload.itemId());
+                            player, payload.itemId(), payload.buyStack());
                 }
             });
         }

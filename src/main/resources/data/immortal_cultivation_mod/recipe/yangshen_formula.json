@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "immortal_cultivation_mod:shihun_grass"
+    },
+    {
+      "item": "immortal_cultivation_mod:jiuye_xianlan"
+    },
+    {
+      "item": "immortal_cultivation_mod:xuanbing_lotus"
+    }
+  ],
+  "result": {
+    "id": "immortal_cultivation_mod:yangshen_formula",
+    "count": 1
+  }
+}

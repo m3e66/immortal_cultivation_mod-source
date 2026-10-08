@@ -45,6 +45,12 @@ public class ModAttachments {
             return;
         }
         player.setData(CULTIVATION_DATA, data);
+        if (player instanceof ServerPlayer serverPlayer && !previous.cultivationLevel().equals(data.cultivationLevel())
+                && CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi()
+                        > CultivationLevels.getLevelDef(previous.cultivationLevel()).maxQi()) {
+            com.example.immortal_cultivation_mod.fate.LuckSystem.rewardOnce(
+                    serverPlayer, "realm_" + data.cultivationLevel(), 3);
+        }
         if (player instanceof ServerPlayer serverPlayer
                 && !previous.bodyType().equals(data.bodyType())) {
             OuterSystemManager.onBodyTypeChanged(serverPlayer);
@@ -83,6 +89,9 @@ public class ModAttachments {
             boolean yuqiControlAllMode,
             float talent
     ) {
+        public CultivationData {
+            luck = com.example.immortal_cultivation_mod.fate.LuckRules.clamp(luck);
+        }
         public static final Codec<CultivationData> CODEC = RecordCodecBuilder.create(instance ->
                 instance.group(
                         Codec.INT.fieldOf("qi").forGetter(CultivationData::qi),
@@ -214,7 +223,17 @@ public class ModAttachments {
         }
 
         public int maxThoughts() {
-            return MAX_THOUGHTS + Math.max(0, methodProficiencies.getOrDefault(LIANSHEN_THOUGHT_BONUS_KEY, 0));
+            return MAX_THOUGHTS
+                    + thoughtSkillBonus()
+                    + Math.max(0, methodProficiencies.getOrDefault(LIANSHEN_THOUGHT_BONUS_KEY, 0));
+        }
+
+        /**
+         * The old energy skill stored 40 points per investment. Preserve that save data while
+         * converting each existing and future investment into 10 maximum Thoughts.
+         */
+        public int thoughtSkillBonus() {
+            return Math.max(0, maxEnergyBonus) / 40 * 10;
         }
 
         public boolean hasLianshenThoughtBonus() {

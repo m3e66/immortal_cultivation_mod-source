@@ -23,11 +23,23 @@ public final class ClientItemEvents {
                 com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENPAN.get())) {
             return;
         }
-        if (ClientData.debugEyeEnabled()) {
+        boolean higherWeapon = event.getItemStack().getItem() instanceof com.example.immortal_cultivation_mod.item.HigherWeaponItem;
+        boolean weapon = WeaponRestrictionSystem.isWeapon(event.getItemStack());
+        // Keep the name first, then the same rank/restriction header for every weapon.
+        if (weapon) {
+            event.getToolTip().addAll(Math.min(1, event.getToolTip().size()),
+                    WeaponRestrictionSystem.tooltips(event.getItemStack()));
+        }
+        if (!higherWeapon && ClientData.debugEyeEnabled()) {
             event.getToolTip().add(CultivationItemRarity.tooltip(event.getItemStack()));
         }
-        if (QiInfusedWeapon.getQi(event.getItemStack()) > 0.0D) {
-            event.getToolTip().add(QiInfusedWeapon.tooltip(event.getItemStack()));
+        // Old and new weapons share this exact Qi tooltip path and visibility rule.
+        QiInfusedWeapon.appendStoredQiTooltips(event.getItemStack(), event.getToolTip());
+        if (higherWeapon) {
+            if (event.getItemStack().is(com.example.immortal_cultivation_mod.item.ModItems.SEVEN_STAR_SWORD.get())) {
+                event.getToolTip().add(com.example.immortal_cultivation_mod.item.SevenStarPattern.tooltip(event.getItemStack()));
+            }
+            return;
         }
         if (ForgingSystem.isPurityMaterial(event.getItemStack())) {
             event.getToolTip().add(ForgingSystem.purityTooltip(event.getItemStack()));
@@ -54,6 +66,6 @@ public final class ClientItemEvents {
         if (!sharpened.getString().isEmpty()) {
             event.getToolTip().add(sharpened);
         }
-        event.getToolTip().addAll(WeaponRestrictionSystem.tooltips(event.getItemStack()));
+        if (!weapon) event.getToolTip().addAll(WeaponRestrictionSystem.tooltips(event.getItemStack()));
     }
 }

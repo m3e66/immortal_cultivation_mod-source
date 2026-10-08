@@ -7,7 +7,9 @@ import com.example.immortal_cultivation_mod.item.ModItems;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
 import com.example.immortal_cultivation_mod.network.CombatPayloads;
 import com.example.immortal_cultivation_mod.network.RestrictionPayloads;
+import com.example.immortal_cultivation_mod.network.DisguiseMaskPayloads;
 import com.example.immortal_cultivation_mod.screen.DebugStatEditorScreen;
+import com.example.immortal_cultivation_mod.screen.DisguiseMaskSkinScreen;
 import com.example.immortal_cultivation_mod.screen.JindanBreakthroughScreen;
 import com.example.immortal_cultivation_mod.screen.LearningMatchScreen;
 import com.example.immortal_cultivation_mod.screen.LingqiTrajectoryScreen;
@@ -26,9 +28,23 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class ClientPayloadHandlers {
+    public static void handleXuanjinView(com.example.immortal_cultivation_mod.network.XuanjinPayloads.View payload,
+                                        net.neoforged.neoforge.network.handling.IPayloadContext context) {
+        context.enqueueWork(()->com.example.immortal_cultivation_mod.screen.XuanjinScreen.accept(payload));
+    }
+
+
+    public static void handleOpenDisguiseMaskPicker(
+            DisguiseMaskPayloads.ClientboundOpenSkinPicker payload, IPayloadContext context) {
+        context.enqueueWork(() -> Minecraft.getInstance().setScreen(
+                new DisguiseMaskSkinScreen(payload.mainHand(), payload.selectedSkin())));
+    }
+
     public static void openScrollLearning(String spellId) {
         Minecraft.getInstance().setScreen(new ScrollLearningScreen(spellId));
     }
@@ -40,7 +56,8 @@ public class ClientPayloadHandlers {
     public static void handleOpenDebugStatEditor(
             ModPayloads.ClientboundOpenDebugStatEditorPayload payload, IPayloadContext ctx) {
         ctx.enqueueWork(() -> Minecraft.getInstance().setScreen(
-                new DebugStatEditorScreen(payload.targetId(), payload.targetName())));
+                new DebugStatEditorScreen(
+                        payload.targetId(), payload.targetName(), payload.systemType(), payload.page())));
     }
 
     public static void openSpiritRootSelectionOrMessage(Player player, Component alreadyCultivatingMessage) {
@@ -88,9 +105,11 @@ public class ClientPayloadHandlers {
                     payload.talent()
             );
             ClientData.cultivationData = data;
+            ThoughtInputGuard.onThoughtSync();
             ClientData.playerIdentity = payload.playerIdentity();
             ClientData.jindanQuality = payload.jindanQuality();
             if (!previewingOtherPlayer) {
+                ClientData.setLivingCorpse(payload.livingCorpse());
                 ClientData.setYuqiControlAllMode(payload.yuqiControlAllMode());
                 ClientData.reconcileWheelSelection(payload.knownSpells());
                 if (player != null) {
@@ -105,7 +124,11 @@ public class ClientPayloadHandlers {
     }
 
     public static void handleCastAnimation(ModPayloads.ClientboundCastAnimationPayload payload, IPayloadContext ctx) {
-        ctx.enqueueWork(() -> ClientData.beginCasting(payload.playerId()));
+        ctx.enqueueWork(() -> {
+            ClientData.beginCasting(payload.playerId());
+            SwordComboAnimations.playSpellCast(
+                    payload.playerId(), payload.spellId());
+        });
     }
 
     public static void handleShieldData(ModPayloads.ClientboundShieldDataPayload payload, IPayloadContext ctx) {
@@ -229,7 +252,22 @@ public class ClientPayloadHandlers {
 
     public static void handleJindanFlightControl(
             ModPayloads.ClientboundJindanFlightControlPayload payload, IPayloadContext ctx) {
-        ctx.enqueueWork(() -> ClientData.setJindanFlightControlActive(payload.active()));
+        ctx.enqueueWork(() -> {
+            ClientData.setJindanFlightControlActive(payload.active());
+            JindanFlightEffects.setControlActive(payload.active());
+        });
+    }
+
+    public static void handleJindanFlightSpeed(
+            ModPayloads.ClientboundJindanFlightSpeedPayload payload, IPayloadContext ctx) {
+        ctx.enqueueWork(() -> JindanFlightEffects.updateSpeed(
+                payload.selectedSpeed(), payload.changedLayers()));
+    }
+
+    public static void handleJindanFlightDive(
+            ModPayloads.ClientboundJindanFlightDivePayload payload, IPayloadContext ctx) {
+        ctx.enqueueWork(() -> JindanFlightEffects.triggerDive(
+                payload.impact(), payload.intensity()));
     }
 
     public static void handleDebugHintCount(ModPayloads.ClientboundDebugHintCountPayload payload, IPayloadContext ctx) {

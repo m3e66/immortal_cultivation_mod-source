@@ -3,85 +3,162 @@ package com.example.immortal_cultivation_mod.screen;
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.client.ClientData;
+import com.example.immortal_cultivation_mod.config.ModClientConfig;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import com.example.immortal_cultivation_mod.ring.RingAiConfig;
+import net.minecraft.client.gui.components.AbstractWidget;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-public class CultivationSettingsScreen extends Screen {
+public class CultivationSettingsScreen extends FittedMenuScreen {
     private static final String TRANSLATION_PREFIX =
             "screen." + ImmortalCultivationMod.MODID + ".settings.";
     private static final int PANEL_WIDTH = 430;
     private static final int PANEL_HEIGHT = 385;
-    private static final int BUTTON_HEIGHT = 20;
-    private static final int ROW_HEIGHT = 42;
+    private static final int BUTTON_HEIGHT = 22;
+    private static final int MIN_BUTTON_HEIGHT = 18;
+    private static final int ROW_HEIGHT = 26;
+    private static final int ROW_GAP = 2;
+    // Vertical edges of the inner frame in cultivation_background.png.
+    private static final int CONTENT_TOP_TEXTURE_Y = 198;
+    private static final int CONTENT_BOTTOM_TEXTURE_Y = 949;
+    private int scroll;
+    private final Map<AbstractWidget, Integer> rowWidgets = new LinkedHashMap<>();
+    private Component status = Component.empty();
     private CultivationGuiButton autoChannelButton;
     private CultivationGuiButton outwardQiButton;
-    private CultivationGuiButton outwardQiBlockBreakingButton;
+    private CultivationGuiButton outwardQiAutoFitButton;
+    private CultivationGuiButton outwardQiSizeScrollButton;
     private CultivationGuiButton creativeFlightButton;
     private CultivationGuiButton combatStateButton;
     private CultivationGuiButton chinesePoemButton;
     private CultivationGuiButton formationPlatePaymentButton;
+    private CultivationGuiButton qiUseParticlesButton;
+    private CultivationGuiButton spiritualSenseQiCurrentsButton;
+    private CultivationGuiButton droughtDomainButton;
 
     public CultivationSettingsScreen() {
-        super(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".settings"));
+        super(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".settings"), PANEL_WIDTH + 20, PANEL_HEIGHT + 20);
     }
 
     @Override
-    protected void init() {
+    protected void initMenu() {
+        rowWidgets.clear();
         boolean showCreativeFlight = showCreativeFlightOption();
         int left = panelX();
         int top = panelY();
-        int buttonX = left + Math.max(34, panelWidth() / 8);
+        int buttonX = left + 50;
         int buttonWidth = panelWidth() - (buttonX - left) * 2;
+        int rowButtonHeight = buttonHeight(showCreativeFlight);
 
+        addRenderableWidget(new CultivationGuiButton(
+                buttonX, buttonY(0, showCreativeFlight), buttonWidth, rowButtonHeight,
+                Component.translatable(TRANSLATION_PREFIX + "block_breaking"),
+                () -> minecraft.setScreen(new BlockBreakingSettingsScreen(this))))
+                .setTooltip(net.minecraft.client.gui.components.Tooltip.create(
+                        Component.translatable(TRANSLATION_PREFIX + "block_breaking.description")));
         autoChannelButton = addRenderableWidget(new CultivationGuiButton(
-                buttonX, buttonY(0, showCreativeFlight), buttonWidth, BUTTON_HEIGHT,
+                buttonX, buttonY(1, showCreativeFlight), buttonWidth, rowButtonHeight,
                 autoChannelLabel(), () -> {
                     ClientData.setAutoChannelWeaponQi(!ClientData.autoChannelWeaponQi());
                     autoChannelButton.setMessage(autoChannelLabel());
                 }));
         outwardQiButton = addRenderableWidget(new CultivationGuiButton(
-                buttonX, buttonY(1, showCreativeFlight), buttonWidth, BUTTON_HEIGHT,
+                buttonX, buttonY(2, showCreativeFlight), buttonWidth, rowButtonHeight,
                 outwardQiLabel(), () -> {
                     ClientData.setOutwardQiRelease(!ClientData.outwardQiRelease());
                     outwardQiButton.setMessage(outwardQiLabel());
                 }));
-        outwardQiBlockBreakingButton = addRenderableWidget(new CultivationGuiButton(
-                buttonX, buttonY(2, showCreativeFlight), buttonWidth, BUTTON_HEIGHT,
-                outwardQiBlockBreakingLabel(), () -> {
-                    ClientData.setOutwardQiBlockBreaking(!ClientData.outwardQiBlockBreaking());
-                    outwardQiBlockBreakingButton.setMessage(outwardQiBlockBreakingLabel());
+        outwardQiAutoFitButton = addRenderableWidget(new CultivationGuiButton(
+                buttonX, buttonY(3, showCreativeFlight), buttonWidth, rowButtonHeight,
+                outwardQiAutoFitLabel(), () -> {
+                    ClientData.setOutwardQiAutoFit(!ClientData.outwardQiAutoFit());
+                    outwardQiAutoFitButton.setMessage(outwardQiAutoFitLabel());
                 }));
+        outwardQiAutoFitButton.setTooltip(net.minecraft.client.gui.components.Tooltip.create(
+                Component.translatable(TRANSLATION_PREFIX + "outward_qi_auto_fit.description")));
+        outwardQiSizeScrollButton = addRenderableWidget(new CultivationGuiButton(
+                buttonX, buttonY(4, showCreativeFlight), buttonWidth, rowButtonHeight,
+                outwardQiSizeScrollLabel(), () -> {
+                    ModClientConfig.setExternalQiSizeMouseWheel(!ModClientConfig.enableExternalQiSizeMouseWheel());
+                    outwardQiSizeScrollButton.setMessage(outwardQiSizeScrollLabel());
+                }));
+        outwardQiSizeScrollButton.setTooltip(net.minecraft.client.gui.components.Tooltip.create(
+                Component.translatable(TRANSLATION_PREFIX + "outward_qi_size_scroll.description")));
         combatStateButton = addRenderableWidget(new CultivationGuiButton(
-                buttonX, buttonY(3, showCreativeFlight), buttonWidth, BUTTON_HEIGHT,
+                buttonX, buttonY(5, showCreativeFlight), buttonWidth, rowButtonHeight,
                 combatStateLabel(), () -> {
                     ClientData.setCombatStateEnabled(!ClientData.combatStateEnabled());
                     combatStateButton.setMessage(combatStateLabel());
                 }));
         chinesePoemButton = addRenderableWidget(new CultivationGuiButton(
-                buttonX, buttonY(4, showCreativeFlight), buttonWidth, BUTTON_HEIGHT,
+                buttonX, buttonY(6, showCreativeFlight), buttonWidth, rowButtonHeight,
                 chinesePoemLabel(), () -> {
                     ClientData.setChinesePoemDescriptions(!ClientData.chinesePoemDescriptions());
                     chinesePoemButton.setMessage(chinesePoemLabel());
                 }));
         formationPlatePaymentButton = addRenderableWidget(new CultivationGuiButton(
-                buttonX, buttonY(5, showCreativeFlight), buttonWidth, BUTTON_HEIGHT,
+                buttonX, buttonY(7, showCreativeFlight), buttonWidth, rowButtonHeight,
                 formationPlatePaymentLabel(), () -> {
                     ClientData.setFormationPlateQiFirst(!ClientData.formationPlateQiFirst());
                     formationPlatePaymentButton.setMessage(formationPlatePaymentLabel());
                 }));
+        qiUseParticlesButton = addRenderableWidget(new CultivationGuiButton(
+                buttonX, buttonY(8, showCreativeFlight), buttonWidth, rowButtonHeight,
+                qiUseParticlesLabel(), () -> {
+                    ClientData.setShowQiUseParticles(!ClientData.showQiUseParticles());
+                    qiUseParticlesButton.setMessage(qiUseParticlesLabel());
+                }));
+        spiritualSenseQiCurrentsButton = addRenderableWidget(
+                new CultivationGuiButton(
+                        buttonX, buttonY(9, showCreativeFlight),
+                        buttonWidth, rowButtonHeight,
+                        spiritualSenseQiCurrentsLabel(), () -> {
+                            ClientData.setShowSpiritualSenseQiCurrents(
+                                    !ClientData.showSpiritualSenseQiCurrents());
+                            spiritualSenseQiCurrentsButton.setMessage(
+                                    spiritualSenseQiCurrentsLabel());
+                        }));
+        droughtDomainButton = addRenderableWidget(new CultivationGuiButton(
+                buttonX, buttonY(10, showCreativeFlight), buttonWidth, rowButtonHeight,
+                droughtDomainLabel(), () -> {
+                    ClientData.setDroughtZombieDomainEnabled(
+                            !ClientData.droughtZombieDomainEnabled());
+                    droughtDomainButton.setMessage(droughtDomainLabel());
+                }));
         creativeFlightButton = null;
         if (showCreativeFlight) {
             creativeFlightButton = addRenderableWidget(new CultivationGuiButton(
-                    buttonX, buttonY(6, true), buttonWidth, BUTTON_HEIGHT,
+                    buttonX, buttonY(11, true), buttonWidth, rowButtonHeight,
                     creativeFlightLabel(), () -> {
                         ClientData.setJindanCreativeFlight(!ClientData.jindanCreativeFlight());
                         creativeFlightButton.setMessage(creativeFlightLabel());
                     }));
         }
+        int next = showCreativeFlight ? 12 : 11;
+        var aiButton = addRenderableWidget(new CultivationGuiButton(buttonX, buttonY(next, showCreativeFlight),
+                buttonWidth, rowButtonHeight, aiLabel(), () -> {
+                    if (!RingAiSettingsScreen.hostMayConfigure()) return;
+                    var old = RingAiConfig.get();
+                    try {
+                        RingAiConfig.save(new RingAiConfig.Settings(!old.enabled(), old.endpoint(), old.model(), old.apiKey(), old.protocol()));
+                        rebuildWidgets();
+                    } catch (Exception ignored) { status = Component.translatable("ring.ai.config_error"); }
+                }));
+        aiButton.active = RingAiSettingsScreen.hostMayConfigure();
+        var apiButton = addRenderableWidget(new CultivationGuiButton(buttonX, buttonY(next + 1, showCreativeFlight),
+                buttonWidth, rowButtonHeight, Component.translatable("ring.ai.settings"),
+                () -> minecraft.setScreen(new RingAiSettingsScreen(this))));
+        apiButton.active = RingAiSettingsScreen.hostMayConfigure();
+        for (var child : children()) if (child instanceof AbstractWidget widget) {
+            if (widget instanceof CultivationGuiButton button) button.setTextScale(1.0F);
+            rowWidgets.put(widget, widget.getY() + scroll);
+        }
         addRenderableWidget(new CultivationGuiButton(
-                left + panelWidth() / 2 - 50, top + panelHeight() - 31, 100, BUTTON_HEIGHT,
-                Component.translatable(TRANSLATION_PREFIX + "done"), this::onClose));
+                left + panelWidth() / 2 - 55, top + panelHeight() - 29, 110, BUTTON_HEIGHT,
+                Component.translatable(TRANSLATION_PREFIX + "done"), this::onClose).setTextScale(1.0F));
+        updateScroll();
     }
 
     private Component autoChannelLabel() {
@@ -105,11 +182,14 @@ public class CultivationSettingsScreen extends Screen {
                         + (ClientData.outwardQiRelease() ? "on" : "off")));
     }
 
-    private Component outwardQiBlockBreakingLabel() {
-        return Component.translatable(
-                TRANSLATION_PREFIX + "outward_qi_block_breaking",
-                Component.translatable(TRANSLATION_PREFIX
-                        + (ClientData.outwardQiBlockBreaking() ? "on" : "off")));
+    private Component outwardQiAutoFitLabel() {
+        return Component.translatable(TRANSLATION_PREFIX + "outward_qi_auto_fit",
+                Component.translatable(TRANSLATION_PREFIX + (ClientData.outwardQiAutoFit() ? "on" : "off")));
+    }
+
+    private Component outwardQiSizeScrollLabel() {
+        return Component.translatable(TRANSLATION_PREFIX + "outward_qi_size_scroll",
+                Component.translatable(TRANSLATION_PREFIX + (ModClientConfig.enableExternalQiSizeMouseWheel() ? "on" : "off")));
     }
 
     private Component combatStateLabel() {
@@ -135,12 +215,34 @@ public class CultivationSettingsScreen extends Screen {
                         : "payment_spirit_stone_qi")));
     }
 
+    private Component qiUseParticlesLabel() {
+        return Component.translatable(
+                TRANSLATION_PREFIX + "qi_use_particles",
+                Component.translatable(TRANSLATION_PREFIX
+                        + (ClientData.showQiUseParticles() ? "on" : "off")));
+    }
+
+    private Component spiritualSenseQiCurrentsLabel() {
+        return Component.translatable(
+                TRANSLATION_PREFIX + "spiritual_sense_qi_currents",
+                Component.translatable(TRANSLATION_PREFIX
+                        + (ClientData.showSpiritualSenseQiCurrents()
+                                ? "on" : "off")));
+    }
+
+    private Component droughtDomainLabel() {
+        return Component.translatable(
+                TRANSLATION_PREFIX + "drought_zombie_domain",
+                Component.translatable(TRANSLATION_PREFIX
+                        + (ClientData.droughtZombieDomainEnabled() ? "on" : "off")));
+    }
+
     private boolean showCreativeFlightOption() {
         return CultivationLevels.getRealmIndex(ClientData.cultivationData.cultivationLevel()) >= 3;
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderMenu(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         boolean showCreativeFlight = showCreativeFlightOption();
         int left = panelX();
         int top = panelY();
@@ -150,16 +252,19 @@ public class CultivationSettingsScreen extends Screen {
         drawCenteredFitted(graphics, title, left + panelWidth() / 2, top + 20,
                 panelWidth() - 150, 0xFF38352E);
 
-        drawSettingRow(graphics, 0, showCreativeFlight);
-        drawSettingRow(graphics, 1, showCreativeFlight);
-        drawSettingRow(graphics, 2, showCreativeFlight);
-        drawSettingRow(graphics, 3, showCreativeFlight);
-        drawSettingRow(graphics, 4, showCreativeFlight);
-        drawSettingRow(graphics, 5, showCreativeFlight);
-        if (showCreativeFlight) {
-            drawSettingRow(graphics, 6, true);
+        graphics.enableScissor(left + 20, contentTop(), left + panelWidth() - 20, contentBottom());
+        for (int i = 0; i < rowCount(showCreativeFlight); i++) drawSettingRow(graphics, i, showCreativeFlight);
+        graphics.disableScissor();
+        int viewport = contentHeight();
+        int full = contentExtent(showCreativeFlight);
+        if (full > viewport) {
+            int barHeight = Math.max(18, viewport * viewport / full);
+            int barY = contentTop() + scroll * (viewport - barHeight) / (full - viewport);
+            graphics.fill(left + panelWidth() - 22, barY, left + panelWidth() - 18, barY + barHeight, 0xAA897451);
         }
-        super.render(graphics, mouseX, mouseY, partialTick);
+        if (!status.getString().isEmpty()) drawCenteredFitted(graphics, status, left + panelWidth() / 2,
+                contentBottom() + 3, panelWidth() - 45, 0xCC552222);
+        super.renderMenu(graphics, mouseX, mouseY, partialTick);
     }
 
     private void drawSettingRow(GuiGraphics graphics, int index, boolean showCreativeFlight) {
@@ -192,34 +297,81 @@ public class CultivationSettingsScreen extends Screen {
 
     private int buttonY(int index, boolean showCreativeFlight) {
         return rowTop(index, showCreativeFlight)
-                + (rowVisualHeight(showCreativeFlight) - BUTTON_HEIGHT) / 2;
+                + (rowVisualHeight(showCreativeFlight) - buttonHeight(showCreativeFlight)) / 2;
     }
 
     private int rowTop(int index, boolean showCreativeFlight) {
-        int contentTop = panelY() + 44;
-        int availableHeight = contentHeight();
-        int rowCount = rowCount(showCreativeFlight);
-        int rowPitch = rowPitch(showCreativeFlight);
-        int firstRow = contentTop + Math.max(0, (availableHeight - rowPitch * rowCount) / 2);
-        return firstRow + index * rowPitch;
+        int span = contentExtent(showCreativeFlight) - rowVisualHeight(showCreativeFlight);
+        return contentTop() + (int) Math.round(index * span / (double) (rowCount(showCreativeFlight) - 1)) - scroll;
+    }
+
+    private int buttonHeight(boolean showCreativeFlight) {
+        int count = rowCount(showCreativeFlight);
+        return Math.min(BUTTON_HEIGHT, Math.max(MIN_BUTTON_HEIGHT,
+                (contentHeight() - ROW_GAP * (count - 1)) / count));
     }
 
     private int rowVisualHeight(boolean showCreativeFlight) {
-        return Math.min(ROW_HEIGHT, rowPitch(showCreativeFlight));
+        return Math.min(ROW_HEIGHT, buttonHeight(showCreativeFlight) + ROW_GAP);
+    }
+
+    private int contentExtent(boolean showCreativeFlight) {
+        return Math.max(contentHeight(), rowCount(showCreativeFlight) * rowVisualHeight(showCreativeFlight));
     }
 
     private int rowPitch(boolean showCreativeFlight) {
-        return Math.min(57, contentHeight() / rowCount(showCreativeFlight));
+        return Math.max(1, (contentExtent(showCreativeFlight) - rowVisualHeight(showCreativeFlight))
+                / (rowCount(showCreativeFlight) - 1));
     }
 
     private int rowCount(boolean showCreativeFlight) {
-        return showCreativeFlight ? 7 : 6;
+        return showCreativeFlight ? 14 : 13;
     }
 
     private int contentHeight() {
-        int contentTop = panelY() + 44;
-        int contentBottom = panelY() + panelHeight() - 39;
-        return Math.max(1, contentBottom - contentTop);
+        return Math.max(1, contentBottom() - contentTop());
+    }
+
+    private int contentTop() {
+        return panelY() + Math.round(panelHeight() * CONTENT_TOP_TEXTURE_Y
+                / (float) CultivationGuiTextures.LANDSCAPE_HEIGHT);
+    }
+
+    private int contentBottom() {
+        return panelY() + Math.round(panelHeight() * CONTENT_BOTTOM_TEXTURE_Y
+                / (float) CultivationGuiTextures.LANDSCAPE_HEIGHT);
+    }
+
+    private Component aiLabel() {
+        if (!RingAiSettingsScreen.hostMayConfigure()) return Component.translatable("ring.ai.host_only");
+        return Component.translatable("ring.ai.toggle", Component.translatable(RingAiConfig.get().enabled() ? "options.on" : "options.off"));
+    }
+
+    private void updateScroll() {
+        boolean showCreativeFlight = showCreativeFlightOption();
+        scroll = net.minecraft.util.Mth.clamp(scroll, 0, Math.max(0,
+                contentExtent(showCreativeFlight) - contentHeight()));
+        int top = contentTop(), bottom = contentBottom();
+        rowWidgets.forEach((widget, baseY) -> {
+            widget.setY(baseY - scroll);
+            widget.visible = widget.getY() >= top && widget.getY() + widget.getHeight() <= bottom;
+            if (!widget.visible && getFocused() == widget) setFocused(null);
+        });
+    }
+
+    @Override public boolean mouseScrolled(double x, double y, double dx, double dy) {
+        scroll -= (int)(dy * rowPitch(showCreativeFlightOption()));
+        updateScroll();
+        return true;
+    }
+
+    @Override public boolean keyPressed(int key, int scan, int modifiers) {
+        if (key == 266 || key == 267 || key == 268 || key == 269) {
+            scroll = key == 268 ? 0 : key == 269 ? Integer.MAX_VALUE
+                    : scroll + (key == 266 ? -1 : 1) * contentHeight();
+            updateScroll(); return true;
+        }
+        return super.keyPressed(key, scan, modifiers);
     }
 
     private int panelWidth() {

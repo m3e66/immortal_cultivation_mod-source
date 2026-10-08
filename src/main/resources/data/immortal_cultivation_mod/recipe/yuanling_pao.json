@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "WBW",
+    "WSW",
+    "BWB"
+  ],
+  "key": {
+    "W": {
+      "item": "immortal_cultivation_mod:white_wool_strip"
+    },
+    "B": {
+      "item": "immortal_cultivation_mod:black_wool_strip"
+    },
+    "S": {
+      "item": "minecraft:string"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:yuanling_pao",
+    "count": 1
+  }
+}

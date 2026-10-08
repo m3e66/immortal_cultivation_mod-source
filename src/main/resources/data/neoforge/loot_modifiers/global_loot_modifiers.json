@@ -1,6 +1,9 @@
 {
   "replace": false,
   "entries": [
-    "immortal_cultivation_mod:dungeon_spell_scrolls"
+    "immortal_cultivation_mod:dungeon_spell_scrolls",
+    "immortal_cultivation_mod:weapon_care_low_ruins",
+    "immortal_cultivation_mod:weapon_care_high_ruins",
+    "immortal_cultivation_mod:weapon_care_bosses"
   ]
 }

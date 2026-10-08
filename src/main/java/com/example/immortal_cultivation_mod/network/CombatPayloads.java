@@ -3,6 +3,7 @@ package com.example.immortal_cultivation_mod.network;
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.client.ClientPayloadHandlers;
 import com.example.immortal_cultivation_mod.combat.CombatStateManager;
+import com.example.immortal_cultivation_mod.config.BlockBreakingSettings;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -155,7 +156,7 @@ public final class CombatPayloads {
         }
     }
 
-    public record ServerboundSetOutwardQiPayload(boolean enabled, boolean blockBreaking)
+    public record ServerboundSetOutwardQiPayload(boolean enabled, boolean blockBreaking, boolean autoFit)
             implements CustomPacketPayload {
         public static final Type<ServerboundSetOutwardQiPayload> TYPE = new Type<>(
                 ResourceLocation.fromNamespaceAndPath(
@@ -165,14 +166,34 @@ public final class CombatPayloads {
                         (buf, data) -> {
                             buf.writeBoolean(data.enabled());
                             buf.writeBoolean(data.blockBreaking());
+                            buf.writeBoolean(data.autoFit());
                         },
                         buf -> new ServerboundSetOutwardQiPayload(
-                                buf.readBoolean(), buf.readBoolean()));
+                                buf.readBoolean(), buf.readBoolean(), buf.readBoolean()));
 
         @Override
         public Type<? extends CustomPacketPayload> type() {
             return TYPE;
         }
+    }
+
+    public record ServerboundSetBlockBreakingPayload(int disabledMask) implements CustomPacketPayload {
+        public static final Type<ServerboundSetBlockBreakingPayload> TYPE = new Type<>(
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "set_block_breaking"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundSetBlockBreakingPayload> STREAM_CODEC =
+                StreamCodec.composite(ByteBufCodecs.VAR_INT,
+                        ServerboundSetBlockBreakingPayload::disabledMask,
+                        ServerboundSetBlockBreakingPayload::new);
+
+        @Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
+    public record ServerboundQiSizePayload(int steps) implements CustomPacketPayload {
+        public static final Type<ServerboundQiSizePayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(
+                ImmortalCultivationMod.MODID, "external_qi_size"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundQiSizePayload> STREAM_CODEC =
+                StreamCodec.composite(ByteBufCodecs.VAR_INT, ServerboundQiSizePayload::steps, ServerboundQiSizePayload::new);
+        @Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
 
     public record ServerboundWeaponQiSlashPayload() implements CustomPacketPayload {
@@ -195,7 +216,12 @@ public final class CombatPayloads {
 
         @SubscribeEvent
         public static void register(RegisterPayloadHandlersEvent event) {
-            var registrar = event.registrar("1");
+            var registrar = event.registrar("2");
+            registrar.playToServer(ServerboundQiSizePayload.TYPE, ServerboundQiSizePayload.STREAM_CODEC,
+                    (payload, context) -> context.enqueueWork(() -> {
+                        if (context.player() instanceof ServerPlayer player)
+                            com.example.immortal_cultivation_mod.combat.ExternalQiSize.adjust(player, payload.steps());
+                    }));
             registrar.playToClient(
                     ClientboundCombatStatePayload.TYPE,
                     ClientboundCombatStatePayload.STREAM_CODEC,
@@ -220,6 +246,10 @@ public final class CombatPayloads {
                     ServerboundToggleManualCombatPayload.TYPE,
                     ServerboundToggleManualCombatPayload.STREAM_CODEC,
                     Handler::handleToggleManualCombatServer);
+            registrar.playToServer(
+                    ServerboundSetBlockBreakingPayload.TYPE,
+                    ServerboundSetBlockBreakingPayload.STREAM_CODEC,
+                    Handler::handleBlockBreakingServer);
             registrar.playToServer(
                     ServerboundSetOutwardQiPayload.TYPE,
                     ServerboundSetOutwardQiPayload.STREAM_CODEC,
@@ -290,6 +320,16 @@ public final class CombatPayloads {
             });
         }
 
+        private static void handleBlockBreakingServer(
+                ServerboundSetBlockBreakingPayload payload, IPayloadContext context) {
+            context.enqueueWork(() -> {
+                if (context.player() instanceof ServerPlayer player) {
+                    int disabledMask = payload.disabledMask() & BlockBreakingSettings.validMask();
+                    BlockBreakingSettings.setDisabledMask(player, disabledMask);
+                }
+            });
+        }
+
         private static void handleOutwardQiEnabledServer(
                 ServerboundSetOutwardQiPayload payload, IPayloadContext context) {
             context.enqueueWork(() -> {
@@ -298,6 +338,8 @@ public final class CombatPayloads {
                             .setOutwardQiRelease(player, payload.enabled());
                     com.example.immortal_cultivation_mod.item.QiInfusedWeapon
                             .setOutwardQiBlockBreaking(player, payload.blockBreaking());
+                    com.example.immortal_cultivation_mod.item.QiInfusedWeapon
+                            .setOutwardQiAutoFit(player, payload.autoFit());
                 }
             });
         }

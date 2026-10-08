@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "frequency": 0.001,
+    "frequency_reduction_method": "default",
+    "salt": 17092026,
+    "separation": 0,
+    "spacing": 1
+  },
+  "structures": [
+    {
+      "structure": "immortal_cultivation_mod:abandoned_spirit_mine",
+      "weight": 1
+    }
+  ]
+}

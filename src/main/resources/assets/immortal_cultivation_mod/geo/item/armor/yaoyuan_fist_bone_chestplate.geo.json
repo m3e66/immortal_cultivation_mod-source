@@ -30,7 +30,21 @@
             22,
             0
           ],
-          "parent": "bipedLeftArm",
+          "parent": "bipedLeftArm"
+        },
+        {
+          "name": "leftFistBone",
+          "pivot": [
+            6,
+            13,
+            0
+          ],
+          "rotation": [
+            0,
+            -90,
+            0
+          ],
+          "parent": "armorLeftArm",
           "cubes": [
             {
               "origin": [
@@ -1899,7 +1913,21 @@
             22,
             0
           ],
-          "parent": "bipedRightArm",
+          "parent": "bipedRightArm"
+        },
+        {
+          "name": "rightFistBone",
+          "pivot": [
+            -6,
+            13,
+            0
+          ],
+          "rotation": [
+            0,
+            90,
+            0
+          ],
+          "parent": "armorRightArm",
           "cubes": [
             {
               "origin": [

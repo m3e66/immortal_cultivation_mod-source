@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "immortal_cultivation_mod:shihun_grass"
+    },
+    {
+      "item": "immortal_cultivation_mod:shihun_grass"
+    },
+    {
+      "item": "immortal_cultivation_mod:qingling_grass"
+    }
+  ],
+  "result": {
+    "id": "immortal_cultivation_mod:bixie_formula",
+    "count": 1
+  }
+}

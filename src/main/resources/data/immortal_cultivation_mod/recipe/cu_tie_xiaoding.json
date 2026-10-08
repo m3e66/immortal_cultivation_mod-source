@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "J J",
+    "JSJ",
+    "JJJ"
+  ],
+  "key": {
+    "J": {
+      "item": "immortal_cultivation_mod:jingtie_motherstone"
+    },
+    "S": {
+      "item": "immortal_cultivation_mod:medium_spirit_stone"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:cu_tie_xiaoding",
+    "count": 1
+  }
+}

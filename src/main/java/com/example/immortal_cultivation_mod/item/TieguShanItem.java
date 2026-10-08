@@ -78,6 +78,9 @@ public class TieguShanItem extends SwordItem implements GeoItem {
         boolean open = !isOpen(stack);
         if (!level.isClientSide) {
             setOpen(stack, open);
+            if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)
+                com.example.immortal_cultivation_mod.network.WeaponUseAnimations.play(serverPlayer,
+                        com.example.immortal_cultivation_mod.network.WeaponUseAnimations.Type.FAN);
             if (level instanceof ServerLevel serverLevel) {
                 triggerAnim(player, GeoItem.getOrAssignId(stack, serverLevel),
                         "form", open ? "open" : "close");

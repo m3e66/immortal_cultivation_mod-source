@@ -2,7 +2,10 @@ package com.example.immortal_cultivation_mod.client;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
+import com.example.immortal_cultivation_mod.attribute.ModAttributes;
+import com.example.immortal_cultivation_mod.config.BlockBreakingSettings;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
+import com.example.immortal_cultivation_mod.spell.UndeadAbilitySystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import java.io.IOException;
@@ -36,11 +39,16 @@ public class ClientData {
     private static boolean autoChannelWeaponQi = false;
     private static boolean outwardQiRelease = false;
     private static boolean outwardQiBlockBreaking = true;
+    private static int blockBreakingDisabledMask;
+    private static boolean outwardQiAutoFit = true;
     private static boolean jindanCreativeFlight = false;
     private static boolean jindanFlightControlActive = false;
     private static boolean combatStateEnabled = true;
     private static boolean chinesePoemDescriptions = false;
     private static boolean formationPlateQiFirst = false;
+    private static boolean showQiUseParticles = true;
+    private static boolean showSpiritualSenseQiCurrents = true;
+    private static boolean droughtZombieDomainEnabled = true;
     private static boolean clientTogglesLoaded = false;
     private static String preparedSpellId = "";
     private static String preparedSpellStorageKey = "";
@@ -58,6 +66,25 @@ public class ClientData {
     private static float heavyAttackChargeProgress = 0.0F;
     private static String outerSystemType = "";
     private static boolean outerSystemEquipped = false;
+    private static boolean livingCorpse = false;
+
+    public static boolean livingCorpse() {
+        return livingCorpse;
+    }
+
+    public static void setLivingCorpse(boolean value) {
+        livingCorpse = value;
+    }
+
+    public static boolean isInnateSpellKnown(String spellId) {
+        if (ModSpells.isInnateKnown(spellId, cultivationData)) {
+            return true;
+        }
+        var player = Minecraft.getInstance().player;
+        long grudge = player == null ? 0L : Math.max(0L,
+                Math.round(player.getAttributeValue(ModAttributes.GRUDGE)));
+        return UndeadAbilitySystem.canPlayerUseAbility(livingCorpse, grudge, spellId);
+    }
 
     public static void updateOuterSystem(String type, boolean equipped) {
         outerSystemType = type == null ? "" : type;
@@ -99,6 +126,7 @@ public class ClientData {
 
     public static void setDebugEyeEnabled(boolean enabled) {
         debugEyeEnabled = enabled;
+        if (!enabled) DebugEyeClient.clear();
     }
 
     public static void updateMeditationState(UUID playerId, boolean meditating) {
@@ -162,7 +190,7 @@ public class ClientData {
     }
 
     public static boolean postureBroken() {
-        return postureBroken;
+        return postureBroken && cultivationData.thoughts() <= 0;
     }
 
     public static void updateHeavyAttackCharge(int ticks, int maximumTicks) {
@@ -212,27 +240,12 @@ public class ClientData {
         if (spellId.isEmpty()) {
             return Component.empty();
         }
-        if (spellId.startsWith(ClientSpellCombos.CAST_PREFIX)) {
-            ClientSpellCombos.SpellCombo combo = ClientSpellCombos.get(spellId.substring(ClientSpellCombos.CAST_PREFIX.length()));
-            return combo == null ? Component.empty() : Component.literal(combo.name());
-        }
         ModSpells.SpellDef spell = ModSpells.get(spellId);
         return spell == null ? Component.empty() : spell.name();
     }
 
     public static int preparedSpellCooldownTicks() {
         String spellId = preparedSpellId();
-        if (spellId.startsWith(ClientSpellCombos.CAST_PREFIX)) {
-            ClientSpellCombos.SpellCombo combo =
-                    ClientSpellCombos.get(spellId.substring(ClientSpellCombos.CAST_PREFIX.length()));
-            if (combo == null) {
-                return 0;
-            }
-            return combo.spellIds().stream()
-                    .mapToInt(ClientData::spellCooldownTicks)
-                    .max()
-                    .orElse(0);
-        }
         return spellCooldownTicks(spellId);
     }
 
@@ -326,13 +339,42 @@ public class ClientData {
     }
 
     public static boolean outwardQiBlockBreaking() {
-        ensureClientTogglesLoaded();
-        return outwardQiBlockBreaking;
+        return blockBreaking(BlockBreakingSettings.Category.EXTERNAL_QI);
     }
 
     public static void setOutwardQiBlockBreaking(boolean enabled) {
+        setBlockBreaking(BlockBreakingSettings.Category.EXTERNAL_QI, enabled);
+    }
+
+    /** Stored category choice; the master switch does not erase individual choices. */
+    public static boolean blockBreaking(BlockBreakingSettings.Category category) {
         ensureClientTogglesLoaded();
-        outwardQiBlockBreaking = enabled;
+        return (blockBreakingDisabledMask & category.bit()) == 0;
+    }
+
+    public static void setBlockBreaking(BlockBreakingSettings.Category category, boolean enabled) {
+        ensureClientTogglesLoaded();
+        if (enabled) blockBreakingDisabledMask &= ~category.bit();
+        else blockBreakingDisabledMask |= category.bit();
+        blockBreakingDisabledMask &= BlockBreakingSettings.validMask();
+        outwardQiBlockBreaking = (blockBreakingDisabledMask
+                & BlockBreakingSettings.Category.EXTERNAL_QI.bit()) == 0;
+        saveClientToggles();
+    }
+
+    public static int blockBreakingDisabledMask() {
+        ensureClientTogglesLoaded();
+        return blockBreakingDisabledMask;
+    }
+
+    public static boolean outwardQiAutoFit() {
+        ensureClientTogglesLoaded();
+        return outwardQiAutoFit;
+    }
+
+    public static void setOutwardQiAutoFit(boolean enabled) {
+        ensureClientTogglesLoaded();
+        outwardQiAutoFit = enabled;
         saveClientToggles();
     }
 
@@ -385,6 +427,39 @@ public class ClientData {
     public static void setFormationPlateQiFirst(boolean qiFirst) {
         ensureClientTogglesLoaded();
         formationPlateQiFirst = qiFirst;
+        saveClientToggles();
+    }
+
+    public static boolean showQiUseParticles() {
+        ensureClientTogglesLoaded();
+        return showQiUseParticles;
+    }
+
+    public static void setShowQiUseParticles(boolean enabled) {
+        ensureClientTogglesLoaded();
+        showQiUseParticles = enabled;
+        saveClientToggles();
+    }
+
+    public static boolean showSpiritualSenseQiCurrents() {
+        ensureClientTogglesLoaded();
+        return showSpiritualSenseQiCurrents;
+    }
+
+    public static void setShowSpiritualSenseQiCurrents(boolean enabled) {
+        ensureClientTogglesLoaded();
+        showSpiritualSenseQiCurrents = enabled;
+        saveClientToggles();
+    }
+
+    public static boolean droughtZombieDomainEnabled() {
+        ensureClientTogglesLoaded();
+        return droughtZombieDomainEnabled;
+    }
+
+    public static void setDroughtZombieDomainEnabled(boolean enabled) {
+        ensureClientTogglesLoaded();
+        droughtZombieDomainEnabled = enabled;
         saveClientToggles();
     }
 
@@ -479,11 +554,12 @@ public class ClientData {
                 known.add(ModSpells.normalizeId(spell));
             }
             for (String spellId : ModSpells.innateSpellIds()) {
-                if (ModSpells.isInnateKnown(spellId, cultivationData)) {
+                if (isInnateSpellKnown(spellId)) {
                     known.add(spellId);
                 }
             }
-            SELECTED_WHEEL_SPELLS.removeIf(spell -> !known.contains(spell) && !isValidComboWheelId(spell));
+            SELECTED_WHEEL_SPELLS.removeIf(spell -> !known.contains(spell)
+                    && !UndeadAbilitySystem.isPlayerAbility(spell));
             if (!wheelSelectionFileExists && SELECTED_WHEEL_SPELLS.isEmpty()) {
                 for (String spell : knownSpells) {
                     if (SELECTED_WHEEL_SPELLS.size() >= MAX_WHEEL_SPELLS) {
@@ -608,8 +684,20 @@ public class ClientData {
                 autoChannelWeaponQi = Boolean.parseBoolean(properties.getProperty("autoChannelWeaponQi", "false"));
                 outwardQiRelease = Boolean.parseBoolean(
                         properties.getProperty("outwardQiRelease", "false"));
+                outwardQiAutoFit = Boolean.parseBoolean(properties.getProperty("outwardQiAutoFit", "true"));
                 outwardQiBlockBreaking = Boolean.parseBoolean(
                         properties.getProperty("outwardQiBlockBreaking", "true"));
+                blockBreakingDisabledMask = outwardQiBlockBreaking ? 0
+                        : BlockBreakingSettings.Category.EXTERNAL_QI.bit();
+                try {
+                    blockBreakingDisabledMask = Integer.parseInt(properties.getProperty(
+                            "blockBreakingDisabledMask", Integer.toString(blockBreakingDisabledMask)))
+                            & BlockBreakingSettings.validMask();
+                } catch (NumberFormatException ignored) {
+                    // Preserve the older External Qi preference if the new value is invalid.
+                }
+                outwardQiBlockBreaking = (blockBreakingDisabledMask
+                        & BlockBreakingSettings.Category.EXTERNAL_QI.bit()) == 0;
                 jindanCreativeFlight = Boolean.parseBoolean(
                         properties.getProperty("jindanCreativeFlight", "false"));
                 combatStateEnabled = Boolean.parseBoolean(
@@ -618,6 +706,13 @@ public class ClientData {
                         properties.getProperty("chinesePoemDescriptions", "false"));
                 formationPlateQiFirst = Boolean.parseBoolean(
                         properties.getProperty("formationPlateQiFirst", "false"));
+                showQiUseParticles = Boolean.parseBoolean(
+                        properties.getProperty("showQiUseParticles", "true"));
+                showSpiritualSenseQiCurrents = Boolean.parseBoolean(
+                        properties.getProperty(
+                                "showSpiritualSenseQiCurrents", "true"));
+                droughtZombieDomainEnabled = Boolean.parseBoolean(
+                        properties.getProperty("droughtZombieDomainEnabled", "true"));
                 legacyPreparedSpellId = properties.getProperty("preparedSpellId", "");
             } catch (IOException ignored) {
             }
@@ -631,12 +726,19 @@ public class ClientData {
         properties.setProperty("yuqiControlAllMode", Boolean.toString(yuqiControlAllMode));
         properties.setProperty("yinYangCompassQiMode", Boolean.toString(yinYangCompassQiMode));
         properties.setProperty("autoChannelWeaponQi", Boolean.toString(autoChannelWeaponQi));
+        properties.setProperty("outwardQiAutoFit", Boolean.toString(outwardQiAutoFit));
         properties.setProperty("outwardQiRelease", Boolean.toString(outwardQiRelease));
         properties.setProperty("outwardQiBlockBreaking", Boolean.toString(outwardQiBlockBreaking));
+        properties.setProperty("blockBreakingDisabledMask", Integer.toString(blockBreakingDisabledMask));
         properties.setProperty("jindanCreativeFlight", Boolean.toString(jindanCreativeFlight));
         properties.setProperty("combatStateEnabled", Boolean.toString(combatStateEnabled));
         properties.setProperty("chinesePoemDescriptions", Boolean.toString(chinesePoemDescriptions));
         properties.setProperty("formationPlateQiFirst", Boolean.toString(formationPlateQiFirst));
+        properties.setProperty("showQiUseParticles", Boolean.toString(showQiUseParticles));
+        properties.setProperty("showSpiritualSenseQiCurrents",
+                Boolean.toString(showSpiritualSenseQiCurrents));
+        properties.setProperty("droughtZombieDomainEnabled",
+                Boolean.toString(droughtZombieDomainEnabled));
         try {
             Files.createDirectories(path.getParent());
             try (var writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
@@ -653,19 +755,10 @@ public class ClientData {
     }
 
     private static String normalizeWheelId(String id) {
-        if (id != null && id.startsWith(ClientSpellCombos.CAST_PREFIX)) {
-            return id.trim();
-        }
         return ModSpells.normalizeId(id);
     }
 
     private static boolean isValidWheelId(String id) {
-        return ModSpells.get(id) != null || isValidComboWheelId(id);
-    }
-
-    private static boolean isValidComboWheelId(String id) {
-        return id != null
-                && id.startsWith(ClientSpellCombos.CAST_PREFIX)
-                && ClientSpellCombos.get(id.substring(ClientSpellCombos.CAST_PREFIX.length())) != null;
+        return ModSpells.get(id) != null;
     }
 }

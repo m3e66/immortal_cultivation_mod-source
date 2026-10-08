@@ -1,11 +1,12 @@
 package com.example.immortal_cultivation_mod.spell;
 
 import com.example.immortal_cultivation_mod.effect.ModEffects;
-import com.example.immortal_cultivation_mod.effect.PhotonEffects;
+import com.example.immortal_cultivation_mod.effect.NativeSpellEffects;
 import com.example.immortal_cultivation_mod.entity.CultivationNpc;
 import com.example.immortal_cultivation_mod.entity.DingshenProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.FireballProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.IgniteFlareProjectileEntity;
+import com.example.immortal_cultivation_mod.entity.JinmangChuanshaProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.LightningProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.LingzhiBulletProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.NpcProfile;
@@ -57,7 +58,6 @@ public final class CultivatorSpellExecution {
         if (!launch(caster, target, projectile, 1.5F, 1.0F, projectileHook)) {
             return false;
         }
-        PhotonEffects.fireballProjectile(projectile);
         caster.level().playSound(
                 null,
                 caster.getX(),
@@ -96,6 +96,36 @@ public final class CultivatorSpellExecution {
         LingzhiBulletProjectileEntity projectile = new LingzhiBulletProjectileEntity(caster.level(), caster);
         projectile.getPersistentData().putFloat("ChargeScale", areaScale(chargeScale));
         return launch(caster, target, projectile, 2.1F, 0.0F, projectileHook);
+    }
+
+    public static boolean jinmangChuansha(LivingEntity caster, LivingEntity target) {
+        return jinmangChuansha(caster, target, NO_PROJECTILE_HOOK);
+    }
+
+    public static boolean jinmangChuansha(
+            LivingEntity caster,
+            LivingEntity target,
+            Consumer<Entity> projectileHook) {
+        JinmangChuanshaProjectileEntity projectile =
+                new JinmangChuanshaProjectileEntity(caster.level(), caster);
+        boolean launched = launch(caster, target, projectile, 4.5F, 0.0F, projectileHook);
+        if (launched && caster.level() instanceof ServerLevel level) {
+            Vec3 start = caster.getEyePosition();
+            Vec3 desiredEnd = target == null
+                    ? start.add(caster.getLookAngle().scale(24.0D))
+                    : predictedPosition(caster, target, 0.35D);
+            Vec3 offset = desiredEnd.subtract(start);
+            double length = Math.min(24.0D, offset.length());
+            Vec3 direction = offset.lengthSqr() < 1.0E-6D
+                    ? caster.getLookAngle() : offset.normalize();
+            for (double distance = 0.6D; distance <= length; distance += 0.75D) {
+                Vec3 point = start.add(direction.scale(distance));
+                level.sendParticles(ParticleTypes.ELECTRIC_SPARK,
+                        point.x, point.y, point.z, 1,
+                        0.005D, 0.005D, 0.005D, 0.0D);
+            }
+        }
+        return launched;
     }
 
     public static boolean windBlade(LivingEntity caster, LivingEntity target, float chargeScale) {
@@ -224,10 +254,8 @@ public final class CultivatorSpellExecution {
     }
 
     public static boolean suiguiXingyun(LivingEntity caster, LivingEntity target, float chargeScale) {
-        Vec3 aim = target == null
-                ? caster.getEyePosition().add(caster.getLookAngle().scale(48.0D))
-                : predictedPosition(caster, target, 0.35D);
-        return SuiguiXingyun.castAt(caster, aim, areaScale(chargeScale));
+        return SuiguiXingyun.cast(
+                caster, target, areaScale(chargeScale), NO_PROJECTILE_HOOK);
     }
 
     public static boolean lightBeamVolley(LivingEntity caster, LivingEntity target) {
@@ -304,15 +332,12 @@ public final class CultivatorSpellExecution {
         }
         float radius = 2.0F + Math.min(9, lingbeng.getAmplifier());
         caster.removeEffect(ModEffects.LINGBENG);
-        if (caster instanceof ServerPlayer player) {
-            PhotonEffects.lingbengStop(player);
-        }
-        PhotonEffects.lingbengExplosion(serverLevel, impact.x, impact.y, impact.z);
+        NativeSpellEffects.lingbengExplosion(serverLevel, impact, radius);
         if (caster instanceof CultivationNpc) {
-            serverLevel.explode(caster, null, npcEnemyOnlyExplosion(caster), impact,
+            com.example.immortal_cultivation_mod.spell.SpellDestruction.explode(serverLevel,caster, null, npcEnemyOnlyExplosion(caster), impact,
                     radius, false, Level.ExplosionInteraction.BLOCK);
         } else {
-            caster.level().explode(
+            com.example.immortal_cultivation_mod.spell.SpellDestruction.explode(caster.level(),
                     caster,
                     impact.x,
                     impact.y,

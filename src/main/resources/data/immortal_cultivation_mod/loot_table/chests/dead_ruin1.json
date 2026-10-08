@@ -1,0 +1,240 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:high_spirit_stone",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 4,
+                "max": 8
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:medium_spirit_stone",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 16,
+                "max": 32
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:bigu_pill",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": 8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:high_qi_recovery_pill",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:blood_demon_jindan_method"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:wulei_zhengfa_scroll",
+          "weight": 18
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:liuguang_jianying_scroll",
+          "weight": 18
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:sifang_jie_scroll",
+          "weight": 16
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:jinhuo_xinliao_scroll",
+          "weight": 14
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:suigui_xingyun_scroll",
+          "weight": 13
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:shixu_chiliu_scroll",
+          "weight": 13
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:sword_case",
+          "weight": 8
+        }
+      ]
+    },
+    {
+      "rolls": 3,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:jingtie_motherstone",
+          "weight": 34,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 2,
+                "max": 4
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:yunwen_silver_crystal",
+          "weight": 25,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:hanpo_jade",
+          "weight": 25,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:star_dust_stone",
+          "weight": 20,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:breakthrough_pill",
+          "weight": 20
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:jindan_yaodan",
+          "weight": 16
+        }
+      ]
+    },
+    {
+      "name": "higher_weapon_slips",
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.12
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:soul_hook_yujian",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:wind_feather_fan_yujian",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:thunderwood_sword_yujian",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:flame_pattern_dao_yujian",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:earthbreaker_hammer_yujian",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:seven_star_sword_yujian",
+          "weight": 1
+        }
+      ]
+    }
+  ],
+  "random_sequence": "immortal_cultivation_mod:chests/dead_ruin1"
+}

@@ -2,6 +2,7 @@ package com.example.immortal_cultivation_mod.client;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
+import com.example.immortal_cultivation_mod.attribute.ModAttributes;
 import com.example.immortal_cultivation_mod.block.ModBlockEntities;
 import com.example.immortal_cultivation_mod.client.hud.QiBarOverlay;
 import com.example.immortal_cultivation_mod.client.hud.JindanTribulationOverlay;
@@ -29,12 +30,12 @@ import com.example.immortal_cultivation_mod.network.ModPayloads;
 import com.example.immortal_cultivation_mod.network.CombatPayloads;
 import com.example.immortal_cultivation_mod.particle.ModParticles;
 import com.example.immortal_cultivation_mod.screen.StatMenuScreen;
+import com.example.immortal_cultivation_mod.screen.DaoGuidanceScreen;
 import com.example.immortal_cultivation_mod.screen.CultivationSettingsScreen;
-import com.example.immortal_cultivation_mod.screen.SpellComboMenuScreen;
+import com.example.immortal_cultivation_mod.screen.BlockBreakingSettingsScreen;
 import com.example.immortal_cultivation_mod.screen.SpellSelectionScreen;
 import com.example.immortal_cultivation_mod.screen.SpellWheelScreen;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
-import com.example.immortal_cultivation_mod.spell.ShixuChiliu;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -92,12 +93,14 @@ public class ModClientEvents {
     private static final int SWORD_CASE_CHARGE_TICKS = 40;
     private static final int JINDAN_SCROLL_STEPS_PER_PACKET = 8;
     private static final int MAX_JINDAN_SCROLL_STEPS_PER_EVENT = 64;
-    private static Boolean lastFrostFlightFirstPerson = null;
     private static UUID autoChannelSyncedPlayer = null;
     private static Boolean autoChannelSyncedValue = null;
     private static UUID outwardQiSyncedPlayer = null;
     private static Boolean outwardQiSyncedValue = null;
     private static Boolean outwardQiBlockBreakingSyncedValue = null;
+    private static Boolean outwardQiAutoFitSyncedValue = null;
+    private static UUID blockBreakingSyncedPlayer = null;
+    private static Integer blockBreakingSyncedMask = null;
     private static UUID jindanFlightSyncedPlayer = null;
     private static Boolean jindanFlightSyncedValue = null;
     private static double jindanFlightScrollAccumulator = 0.0D;
@@ -105,38 +108,64 @@ public class ModClientEvents {
     private static Boolean combatSettingSyncedValue = null;
     private static UUID formationPlatePaymentSyncedPlayer = null;
     private static Boolean formationPlatePaymentSyncedValue = null;
+    private static UUID qiUseParticlesSyncedPlayer = null;
+    private static Boolean qiUseParticlesSyncedValue = null;
+    private static UUID droughtDomainSyncedPlayer = null;
+    private static Boolean droughtDomainSyncedValue = null;
     private static final DustParticleOptions GONG_LASER =
             new DustParticleOptions(new Vector3f(1.0F, 0.0F, 0.0F), 0.8F);
-    private static final DustParticleOptions SHIXU_DOMAIN_DUST =
-            new DustParticleOptions(new Vector3f(0.08F, 1.0F, 0.22F), 1.25F);
-    private static final int SHIXU_SPHERE_POINTS = 480;
-    private static final int SHIXU_PARTICLE_INTERVAL = 5;
-    private static final double GOLDEN_ANGLE = Math.PI * (3.0D - Math.sqrt(5.0D));
 
     public static void register() {
+        com.example.immortal_cultivation_mod.combat.ThoughtControlGuard.clientHasThoughts = player ->
+                player == net.minecraft.client.Minecraft.getInstance().player && ClientData.cultivationData.thoughts() > 0;
         SwordComboAnimations.register();
         ClientCombatController.register();
+        TemporalSlowflowClient.register();
+        SpiritualSenseClient.register();
+        BlackFlameClient.register();
+        ScaledDingInteractionClient.register();
+        OverworldCosmicSkyRenderer.register();
+        JindanFlightEffects.register();
         NeoForge.EVENT_BUS.addListener(ModClientEvents::onClientTickPre);
         NeoForge.EVENT_BUS.addListener(ModClientEvents::onClientTick);
         NeoForge.EVENT_BUS.addListener(ModClientEvents::onMouseScrolling);
         NeoForge.EVENT_BUS.addListener(ModClientEvents::onRenderBlockScreenEffect);
         NeoForge.EVENT_BUS.addListener(ModClientEvents::onRenderNameTag);
         NeoForge.EVENT_BUS.addListener(InventorySystemTab::onScreenInit);
+        NeoForge.EVENT_BUS.addListener(InventorySystemTab::onScreenRender);
+        NeoForge.EVENT_BUS.addListener(CreativeSubtabs::onScreenInit);
+        NeoForge.EVENT_BUS.addListener(CreativeSubtabs::onScreenRenderPre);
         NeoForge.EVENT_BUS.addListener(ClientScreenFade::onOpening);
         NeoForge.EVENT_BUS.addListener(ClientScreenFade::onRenderPost);
     }
 
+    private static double externalQiScroll;
     private static void onMouseScrolling(InputEvent.MouseScrollingEvent event) {
         Minecraft mc = Minecraft.getInstance();
         double scrollDelta = event.getScrollDeltaY();
+        if (ModClientConfig.enableExternalQiSizeMouseWheel()
+                && mc.screen == null && mc.player != null && mc.getConnection() != null
+                && !mc.player.isSpectator() && !mc.player.isShiftKeyDown()
+                && com.example.immortal_cultivation_mod.item.QiInfusedWeapon.isWeapon(mc.player.getMainHandItem())
+                && Double.isFinite(scrollDelta) && scrollDelta != 0) {
+            event.setCanceled(true);
+            externalQiScroll += scrollDelta;
+            int steps = Math.clamp((int) externalQiScroll, -4, 4);
+            if (steps != 0) {
+                externalQiScroll -= steps;
+                PacketDistributor.sendToServer(new com.example.immortal_cultivation_mod.network.CombatPayloads.ServerboundQiSizePayload(steps));
+            }
+            return;
+        }
+        externalQiScroll = 0;
+        boolean undeadFlight = mc.player != null
+                && ClientData.livingCorpse()
+                && Math.round(mc.player.getAttributeValue(ModAttributes.GRUDGE)) >= 12_500L;
         if (mc.player == null
                 || mc.getConnection() == null
                 || scrollDelta == 0.0D
-                || !ModClientConfig.enableJindanFlightMouseWheel()
-                || !ClientData.jindanCreativeFlight()
-                || !ClientData.jindanFlightControlActive()
-                || CultivationLevels.getRealmIndex(
-                        ClientData.cultivationData.cultivationLevel()) < 3
+                || (!undeadFlight && !ModClientConfig.enableJindanFlightMouseWheel())
+                || (!ClientData.jindanFlightControlActive() && !undeadFlight)
                 || !mc.player.getAbilities().flying
                 || mc.player.isCreative()
                 || mc.player.isSpectator()
@@ -177,17 +206,20 @@ public class ModClientEvents {
 
     private static void onRenderBlockScreenEffect(RenderBlockScreenEffectEvent event) {
         if (event.getOverlayType() != RenderBlockScreenEffectEvent.OverlayType.FIRE
-                || !event.getPlayer().hasEffect(ModEffects.QI_FIRE_BURN)) {
+                || (!event.getPlayer().hasEffect(ModEffects.QI_FIRE_BURN)
+                && com.example.immortal_cultivation_mod.flame.SpiritFlameBurnEffect.kind(event.getPlayer()) == null)) {
             return;
         }
         event.setCanceled(true);
-        renderBlueFireOverlay(event.getPoseStack());
+        renderCultivationFireOverlay(event.getPoseStack(), event.getPlayer());
     }
 
-    private static void renderBlueFireOverlay(PoseStack poseStack) {
+    private static void renderCultivationFireOverlay(PoseStack poseStack, net.minecraft.world.entity.player.Player player) {
         Minecraft mc = Minecraft.getInstance();
         TextureAtlasSprite sprite = ModelBakery.FIRE_1.sprite();
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        int tint = com.example.immortal_cultivation_mod.client.flame.BurningFlameVisuals.color(player);
+        float red = (tint >> 16 & 255) / 255F, green = (tint >> 8 & 255) / 255F, blue = (tint & 255) / 255F;
+        RenderSystem.setShader(com.example.immortal_cultivation_mod.client.flame.BurningFlameVisuals::shader);
         RenderSystem.setShaderTexture(0, sprite.atlasLocation());
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
@@ -205,10 +237,10 @@ public class ModClientEvents {
             poseStack.translate(side == 0 ? -0.24F : 0.24F, -0.30F, -0.50F);
             poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(side == 0 ? 10.0F : -10.0F));
             Matrix4f sideMatrix = poseStack.last().pose();
-            buffer.addVertex(sideMatrix, -0.65F, -0.50F, -0.50F).setUv(maxU, maxV).setColor(0.04F, 0.28F, 1.0F, alpha);
-            buffer.addVertex(sideMatrix, 0.65F, -0.50F, -0.50F).setUv(minU, maxV).setColor(0.04F, 0.28F, 1.0F, alpha);
-            buffer.addVertex(sideMatrix, 0.65F, 0.75F, -0.50F).setUv(minU, minV).setColor(0.04F, 0.28F, 1.0F, alpha);
-            buffer.addVertex(sideMatrix, -0.65F, 0.75F, -0.50F).setUv(maxU, minV).setColor(0.04F, 0.28F, 1.0F, alpha);
+            buffer.addVertex(sideMatrix, -0.65F, -0.50F, -0.50F).setUv(maxU, maxV).setColor(red, green, blue, alpha);
+            buffer.addVertex(sideMatrix, 0.65F, -0.50F, -0.50F).setUv(minU, maxV).setColor(red, green, blue, alpha);
+            buffer.addVertex(sideMatrix, 0.65F, 0.75F, -0.50F).setUv(minU, minV).setColor(red, green, blue, alpha);
+            buffer.addVertex(sideMatrix, -0.65F, 0.75F, -0.50F).setUv(maxU, minV).setColor(red, green, blue, alpha);
             poseStack.popPose();
         }
 
@@ -230,6 +262,7 @@ public class ModClientEvents {
     public static void onClientTick(ClientTickEvent.Post event) {
 
         Minecraft mc = Minecraft.getInstance();
+        SwordComboAnimations.tickBindingPoses();
         if (mc.player == null) {
             JindanTribulationOverlay.clear();
             ClientData.updateCombatState(false, 0.0F, 0.0F, 0, false);
@@ -239,6 +272,9 @@ public class ModClientEvents {
             outwardQiSyncedPlayer = null;
             outwardQiSyncedValue = null;
             outwardQiBlockBreakingSyncedValue = null;
+            outwardQiAutoFitSyncedValue = null;
+            blockBreakingSyncedPlayer = null;
+            blockBreakingSyncedMask = null;
             jindanFlightSyncedPlayer = null;
             jindanFlightSyncedValue = null;
             jindanFlightScrollAccumulator = 0.0D;
@@ -247,6 +283,10 @@ public class ModClientEvents {
             combatSettingSyncedValue = null;
             formationPlatePaymentSyncedPlayer = null;
             formationPlatePaymentSyncedValue = null;
+            qiUseParticlesSyncedPlayer = null;
+            qiUseParticlesSyncedValue = null;
+            droughtDomainSyncedPlayer = null;
+            droughtDomainSyncedValue = null;
             preparedChargeTicks = 0;
             wasPreparedCastKeyDown = false;
             preparedStateSent = false;
@@ -255,22 +295,27 @@ public class ModClientEvents {
             return;
         }
         ClientData.tickClientAnimations();
-        SwordComboAnimations.tickBindingPoses();
         ClientCombatController.tick(mc);
         JindanTribulationOverlay.tick();
+        DaoGuidanceClient.tick();
         syncAutoChannelSetting(mc);
+        syncBlockBreakingSetting(mc);
         syncOutwardQiSetting(mc);
         syncJindanFlightSetting(mc);
         syncCombatSetting(mc);
         syncFormationPlatePaymentSetting(mc);
-        renderShixuDomainParticles(mc);
+        syncQiUseParticlesSetting(mc);
+        syncDroughtDomainSetting(mc);
 
         var key = ModKeyMappings.OPEN_SPELL_WHEEL.get();
         boolean isHeld = InputConstants.isKeyDown(mc.getWindow().getWindow(), key.getKey().getValue());
 
-        boolean typing = mc.screen instanceof ChatScreen;
+        boolean typing = mc.screen instanceof ChatScreen
+                || mc.screen instanceof com.example.immortal_cultivation_mod.hair.client.HairScreen hairScreen && hairScreen.isEditingText();
 
         if (typing) {
+            if(mc.screen instanceof com.example.immortal_cultivation_mod.hair.client.HairScreen)
+                net.minecraft.client.KeyMapping.releaseAll();
             wasSpellKeyDown = false;
             wasAttackKeyDown = false;
             wasUseKeyDown = false;
@@ -316,23 +361,13 @@ public class ModClientEvents {
                 if (mc.screen instanceof SpellWheelScreen sws) {
                     String spell = sws.getSelectedSpell();
                     if (spell != null && mc.getConnection() != null) {
-                        if (spell.startsWith(ClientSpellCombos.CAST_PREFIX)) {
-                            var combo = ClientSpellCombos.get(spell.substring(ClientSpellCombos.CAST_PREFIX.length()));
-                            if (combo != null) {
-                                if (isRSelectableCombo(combo)) {
-                                    ClientData.setPreparedSpellId(spell);
-                                } else {
-                                    cancelPreparedCharge();
-                                    PacketDistributor.sendToServer(new ModPayloads.ServerboundCastComboPayload(
-                                            combo.spellIds(), combo.castMode() == ClientSpellCombos.CastMode.SEQUENTIAL, 1.0F));
-                                }
-                            }
-                        } else if (isRCastSpell(spell)) {
+                        if (isRCastSpell(spell)) {
                             ClientData.setPreparedSpellId(spell);
                         } else {
                             cancelPreparedCharge();
                             PacketDistributor.sendToServer(
-                                    new ModPayloads.ServerboundCastSpellPayload(spell, 1.0F)
+                                    new ModPayloads.ServerboundCastSpellPayload(
+                                            spell, 1.0F, mc.options.keyShift.isDown())
                             );
                         }
                     }
@@ -356,8 +391,18 @@ public class ModClientEvents {
             }
         }
 
+        while (ModKeyMappings.OPEN_DAO_GUIDANCE.get().consumeClick()) {
+            if (mc.screen instanceof DaoGuidanceScreen) {
+                mc.screen.onClose();
+            } else if (mc.screen == null || mc.screen instanceof StatMenuScreen) {
+                mc.setScreen(new DaoGuidanceScreen(mc.screen));
+            }
+        }
+
         while (ModKeyMappings.OPEN_SETTINGS.get().consumeClick()) {
-            if (mc.screen instanceof CultivationSettingsScreen) {
+            if (mc.screen instanceof BlockBreakingSettingsScreen) {
+                mc.screen.onClose();
+            } else if (mc.screen instanceof CultivationSettingsScreen) {
                 mc.setScreen(null);
             } else if (mc.screen == null) {
                 mc.setScreen(new CultivationSettingsScreen());
@@ -369,14 +414,6 @@ public class ModClientEvents {
                 mc.setScreen(null);
             } else {
                 mc.setScreen(new SpellSelectionScreen());
-            }
-        }
-
-        while (ModKeyMappings.OPEN_COMBO_MENU.get().consumeClick()) {
-            if (mc.screen instanceof SpellComboMenuScreen) {
-                mc.setScreen(null);
-            } else if (mc.screen == null) {
-                mc.setScreen(new SpellComboMenuScreen());
             }
         }
 
@@ -404,13 +441,14 @@ public class ModClientEvents {
         tickReleaseWeaponKey(mc);
 
         while (ModKeyMappings.DEBUG_EYE.get().consumeClick()) {
-            PacketDistributor.sendToServer(new ModPayloads.ServerboundToggleDebugEyePayload());
+            if (net.minecraft.client.gui.screens.Screen.hasShiftDown() && ClientData.debugEyeEnabled()) {
+                mc.setScreen(new com.example.immortal_cultivation_mod.screen.DebugEyeScreen());
+            } else PacketDistributor.sendToServer(new ModPayloads.ServerboundToggleDebugEyePayload());
         }
 
         tickPreparedSpellCharge(mc);
 
         ClientTargetLock.tickCamera(mc);
-        syncFrostFlightCameraMode(mc);
         spawnGongLaser(mc);
 
         if (mc.player.onGround() || !mc.player.hasEffect(ModEffects.WIND_STEP)) {
@@ -452,37 +490,6 @@ public class ModClientEvents {
         wasUseKeyDown = useDown;
     }
 
-    private static void renderShixuDomainParticles(Minecraft mc) {
-        if (mc.level == null || mc.player == null
-                || mc.level.getGameTime() % SHIXU_PARTICLE_INTERVAL != 0L) {
-            return;
-        }
-
-        double radius = ShixuChiliu.DOMAIN_RADIUS;
-        double visibleDistance = radius + 48.0D;
-        double phase = mc.level.getGameTime() * 0.075D;
-        for (var caster : mc.level.players()) {
-            if (!caster.hasEffect(ModEffects.SHIXU_CHILIU)
-                    || caster.distanceToSqr(mc.player) > visibleDistance * visibleDistance) {
-                continue;
-            }
-            double centerX = caster.getX();
-            double centerY = caster.getY() + 1.0D;
-            double centerZ = caster.getZ();
-            for (int point = 0; point < SHIXU_SPHERE_POINTS; point++) {
-                double normalizedY = 1.0D - 2.0D * (point + 0.5D) / SHIXU_SPHERE_POINTS;
-                double horizontal = Math.sqrt(Math.max(0.0D,
-                        1.0D - normalizedY * normalizedY));
-                double angle = point * GOLDEN_ANGLE + phase;
-                double x = centerX + Math.cos(angle) * horizontal * radius;
-                double y = centerY + normalizedY * radius;
-                double z = centerZ + Math.sin(angle) * horizontal * radius;
-                mc.level.addParticle(SHIXU_DOMAIN_DUST, x, y, z,
-                        0.0D, 0.0D, 0.0D);
-            }
-        }
-    }
-
     private static void syncAutoChannelSetting(Minecraft mc) {
         if (mc.player == null || mc.getConnection() == null) {
             return;
@@ -498,23 +505,39 @@ public class ModClientEvents {
         }
     }
 
+    private static void syncBlockBreakingSetting(Minecraft mc) {
+        if (mc.player == null || mc.getConnection() == null) return;
+        int disabledMask = ClientData.blockBreakingDisabledMask();
+        UUID playerId = mc.player.getUUID();
+        if (!playerId.equals(blockBreakingSyncedPlayer)
+                || blockBreakingSyncedMask == null || blockBreakingSyncedMask != disabledMask) {
+            PacketDistributor.sendToServer(
+                    new CombatPayloads.ServerboundSetBlockBreakingPayload(disabledMask));
+            blockBreakingSyncedPlayer = playerId;
+            blockBreakingSyncedMask = disabledMask;
+        }
+    }
+
     private static void syncOutwardQiSetting(Minecraft mc) {
         if (mc.player == null || mc.getConnection() == null) {
             return;
         }
         boolean enabled = ClientData.outwardQiRelease();
         boolean blockBreaking = ClientData.outwardQiBlockBreaking();
+        boolean autoFit = ClientData.outwardQiAutoFit();
         UUID playerId = mc.player.getUUID();
         if (!playerId.equals(outwardQiSyncedPlayer)
                 || outwardQiSyncedValue == null
                 || outwardQiSyncedValue != enabled
                 || outwardQiBlockBreakingSyncedValue == null
-                || outwardQiBlockBreakingSyncedValue != blockBreaking) {
+                || outwardQiBlockBreakingSyncedValue != blockBreaking
+                || outwardQiAutoFitSyncedValue == null || outwardQiAutoFitSyncedValue != autoFit) {
             PacketDistributor.sendToServer(
-                    new CombatPayloads.ServerboundSetOutwardQiPayload(enabled, blockBreaking));
+                    new CombatPayloads.ServerboundSetOutwardQiPayload(enabled, blockBreaking, autoFit));
             outwardQiSyncedPlayer = playerId;
             outwardQiSyncedValue = enabled;
             outwardQiBlockBreakingSyncedValue = blockBreaking;
+            outwardQiAutoFitSyncedValue = autoFit;
         }
     }
 
@@ -563,6 +586,38 @@ public class ModClientEvents {
                     new ModPayloads.ServerboundSetFormationPlatePaymentOrderPayload(qiFirst));
             formationPlatePaymentSyncedPlayer = playerId;
             formationPlatePaymentSyncedValue = qiFirst;
+        }
+    }
+
+    private static void syncQiUseParticlesSetting(Minecraft mc) {
+        if (mc.player == null || mc.getConnection() == null) {
+            return;
+        }
+        boolean enabled = ClientData.showQiUseParticles();
+        UUID playerId = mc.player.getUUID();
+        if (!playerId.equals(qiUseParticlesSyncedPlayer)
+                || qiUseParticlesSyncedValue == null
+                || qiUseParticlesSyncedValue != enabled) {
+            PacketDistributor.sendToServer(
+                    new ModPayloads.ServerboundSetQiUseParticlesPayload(enabled));
+            qiUseParticlesSyncedPlayer = playerId;
+            qiUseParticlesSyncedValue = enabled;
+        }
+    }
+
+    private static void syncDroughtDomainSetting(Minecraft mc) {
+        if (mc.player == null || mc.getConnection() == null) {
+            return;
+        }
+        boolean enabled = ClientData.droughtZombieDomainEnabled();
+        UUID playerId = mc.player.getUUID();
+        if (!playerId.equals(droughtDomainSyncedPlayer)
+                || droughtDomainSyncedValue == null
+                || droughtDomainSyncedValue != enabled) {
+            PacketDistributor.sendToServer(
+                    new ModPayloads.ServerboundSetDroughtDomainPayload(enabled));
+            droughtDomainSyncedPlayer = playerId;
+            droughtDomainSyncedValue = enabled;
         }
     }
 
@@ -618,6 +673,10 @@ public class ModClientEvents {
                 && mc.getConnection() != null
                 && !preparedSpell.isEmpty()
                 && !ClientData.postureBroken();
+        int requiredChargeTicks = mc.player != null
+                && mc.player.hasEffect(ModEffects.SPIRIT_SEAL)
+                ? (int) Math.ceil(PREPARED_CHARGE_TICKS / 0.75D)
+                : PREPARED_CHARGE_TICKS;
         if (preparedCastInterrupted) {
             resetPreparedCharge(false);
             wasPreparedCastKeyDown = preparedCastDown;
@@ -628,35 +687,31 @@ public class ModClientEvents {
         }
         if (preparedCastDown && canUse) {
             if (!wasPreparedCastKeyDown) {
-                List<String> spellIds = preparedSpellIds(preparedSpell);
-                if (!spellIds.isEmpty()) {
+                String spellId = preparedSpell == null
+                        ? "" : ModSpells.normalizeId(preparedSpell);
+                if (ModSpells.get(spellId) != null) {
                     PacketDistributor.sendToServer(
                             new ModPayloads.ServerboundSpellPreparationPayload(
-                                    spellIds, true, preparedSpellSequential(preparedSpell)));
+                                    spellId, true));
                     preparedStateSent = true;
                 }
             }
-            int nextTicks = wasPreparedCastKeyDown ? Math.min(PREPARED_CHARGE_TICKS, preparedChargeTicks + 1) : 0;
-            float nextScale = 1.0F + nextTicks / (float) PREPARED_CHARGE_TICKS;
+            int nextTicks = wasPreparedCastKeyDown
+                    ? Math.min(requiredChargeTicks, preparedChargeTicks + 1) : 0;
+            float nextScale = 1.0F + nextTicks / (float) requiredChargeTicks;
             if (canAffordPreparedCharge(preparedSpell, nextScale)) {
                 preparedChargeTicks = nextTicks;
             }
-            ClientData.updatePreparedCharge(1.0F + preparedChargeTicks / (float) PREPARED_CHARGE_TICKS, true);
+            ClientData.updatePreparedCharge(
+                    1.0F + preparedChargeTicks / (float) requiredChargeTicks, true);
         } else if (!preparedCastDown && wasPreparedCastKeyDown) {
             float chargeScale = ClientData.preparedChargeScale();
             boolean castSent = false;
             if (canUse && canAffordPreparedCharge(preparedSpell, chargeScale)) {
-                if (preparedSpell.startsWith(ClientSpellCombos.CAST_PREFIX)) {
-                    ClientSpellCombos.SpellCombo combo = ClientSpellCombos.get(preparedSpell.substring(ClientSpellCombos.CAST_PREFIX.length()));
-                    if (combo != null) {
-                        PacketDistributor.sendToServer(new ModPayloads.ServerboundCastComboPayload(
-                                combo.spellIds(), combo.castMode() == ClientSpellCombos.CastMode.SEQUENTIAL, chargeScale));
-                        castSent = true;
-                    }
-                } else {
-                    PacketDistributor.sendToServer(new ModPayloads.ServerboundCastSpellPayload(preparedSpell, chargeScale));
-                    castSent = true;
-                }
+                PacketDistributor.sendToServer(
+                        new ModPayloads.ServerboundCastSpellPayload(
+                                preparedSpell, chargeScale, mc.options.keyShift.isDown()));
+                castSent = true;
             }
             if (castSent) {
                 preparedStateSent = false;
@@ -679,7 +734,7 @@ public class ModClientEvents {
     private static void resetPreparedCharge(boolean notifyServer) {
         if (notifyServer && preparedStateSent) {
             PacketDistributor.sendToServer(
-                    new ModPayloads.ServerboundSpellPreparationPayload(List.of(), false, false));
+                    new ModPayloads.ServerboundSpellPreparationPayload("", false));
         }
         preparedStateSent = false;
         preparedChargeTicks = 0;
@@ -693,8 +748,13 @@ public class ModClientEvents {
     }
 
     private static boolean canAffordPreparedCharge(String spellId, float chargeScale) {
-        int baseCost = basePreparedSpellCost(spellId);
-        if (baseCost <= 0) {
+        int required = preparedSpellCost(spellId, chargeScale);
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.player != null
+                && minecraft.player.hasEffect(ModEffects.SPIRIT_SEAL)) {
+            required = (int) Math.ceil(required * 1.30D);
+        }
+        if (required <= 0) {
             return true;
         }
         var data = ClientData.cultivationData;
@@ -703,21 +763,29 @@ public class ModClientEvents {
                 data.activeCultivationMethod())) {
             available += data.blood();
         }
-        return available >= chargedCost(baseCost, chargeScale);
+        return available >= required;
+    }
+
+    private static int preparedSpellCost(String spellId, float chargeScale) {
+        String normalized = ModSpells.normalizeId(spellId);
+        int cost = chargedCost(basePreparedSpellCost(normalized), chargeScale);
+        var data = ClientData.cultivationData;
+        ModSpells.SpellDef spell = ModSpells.get(normalized);
+        if (cost > 0 && spell != null
+                && com.example.immortal_cultivation_mod.attachment.CultivationMethods
+                .isChangqingJue(data.activeCultivationMethod())
+                && com.example.immortal_cultivation_mod.attachment.SpiritRoots
+                .elementMatches(spell.element(),
+                        com.example.immortal_cultivation_mod.attachment.SpiritRoots.WOOD)) {
+            float reserve = com.example.immortal_cultivation_mod.attachment.CultivationMethods
+                    .changqingLifeForce(data);
+            float multiplier = reserve >= 80.0F ? 0.85F : reserve >= 60.0F ? 0.90F : 1.0F;
+            cost = Math.max(1, (int)Math.ceil(cost * multiplier));
+        }
+        return cost;
     }
 
     private static int basePreparedSpellCost(String spellId) {
-        if (spellId != null && spellId.startsWith(ClientSpellCombos.CAST_PREFIX)) {
-            ClientSpellCombos.SpellCombo combo = ClientSpellCombos.get(spellId.substring(ClientSpellCombos.CAST_PREFIX.length()));
-            if (combo == null) {
-                return 0;
-            }
-            int total = 0;
-            for (String comboSpell : combo.spellIds()) {
-                total += basePreparedSpellCost(comboSpell);
-            }
-            return total;
-        }
         String normalized = ModSpells.normalizeId(spellId);
         if (ModSpells.HANJING_SUOZHUA.equals(normalized)) {
             return Math.max(1, clientMaxQi() * 3 / 100);
@@ -739,43 +807,12 @@ public class ModClientEvents {
     }
 
     private static int chargedCost(int baseCost, float chargeScale) {
-        float clamped = Math.max(1.0F, Math.min(2.0F, chargeScale));
-        return Math.max(1, Math.round(baseCost * (1.0F + 4.0F * (clamped - 1.0F))));
+        return com.example.immortal_cultivation_mod.spell.SpellCharge
+                .qiCost(baseCost, chargeScale);
     }
 
     private static boolean isRCastSpell(String spellId) {
         return ModSpells.requiresPreparation(spellId);
-    }
-
-    private static boolean isRSelectableCombo(ClientSpellCombos.SpellCombo combo) {
-        for (String spellId : combo.spellIds()) {
-            if (isRCastSpell(spellId)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static List<String> preparedSpellIds(String preparedSpell) {
-        if (preparedSpell == null || preparedSpell.isEmpty()) {
-            return List.of();
-        }
-        if (preparedSpell.startsWith(ClientSpellCombos.CAST_PREFIX)) {
-            ClientSpellCombos.SpellCombo combo = ClientSpellCombos.get(
-                    preparedSpell.substring(ClientSpellCombos.CAST_PREFIX.length()));
-            return combo == null ? List.of() : combo.spellIds();
-        }
-        String normalized = ModSpells.normalizeId(preparedSpell);
-        return ModSpells.get(normalized) == null ? List.of() : List.of(normalized);
-    }
-
-    private static boolean preparedSpellSequential(String preparedSpell) {
-        if (preparedSpell == null || !preparedSpell.startsWith(ClientSpellCombos.CAST_PREFIX)) {
-            return false;
-        }
-        ClientSpellCombos.SpellCombo combo = ClientSpellCombos.get(
-                preparedSpell.substring(ClientSpellCombos.CAST_PREFIX.length()));
-        return combo != null && combo.castMode() == ClientSpellCombos.CastMode.SEQUENTIAL;
     }
 
     private static void applyEarthEscapeMovement(Minecraft mc) {
@@ -835,24 +872,6 @@ public class ModClientEvents {
         Vec3 current = mc.player.getDeltaMovement();
         Vec3 target = new Vec3(dx, dy, dz);
         mc.player.setDeltaMovement(current.lerp(target, 0.48D));
-    }
-
-    private static void syncFrostFlightCameraMode(Minecraft mc) {
-        if (mc.player == null || mc.getConnection() == null) {
-            lastFrostFlightFirstPerson = null;
-            return;
-        }
-        if (!mc.player.hasEffect(ModEffects.FROST_FLIGHT)) {
-            if (lastFrostFlightFirstPerson != null) {
-                lastFrostFlightFirstPerson = null;
-            }
-            return;
-        }
-        boolean firstPerson = mc.options.getCameraType().isFirstPerson();
-        if (lastFrostFlightFirstPerson == null || lastFrostFlightFirstPerson.booleanValue() != firstPerson) {
-            lastFrostFlightFirstPerson = firstPerson;
-            PacketDistributor.sendToServer(new ModPayloads.ServerboundFrostFlightCameraPayload(firstPerson));
-        }
     }
 
     private static void spawnGongLaser(Minecraft mc) {

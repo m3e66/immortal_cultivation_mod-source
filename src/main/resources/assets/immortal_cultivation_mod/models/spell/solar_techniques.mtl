@@ -1,0 +1,20 @@
+newmtl solar_core
+Ka 1.000 0.965 0.620
+Kd 1.000 0.760 0.080
+Ks 1.000 1.000 0.820
+Ns 128
+map_Kd minecraft:block/white_concrete
+
+newmtl solar_ring
+Ka 1.000 0.720 0.045
+Kd 1.000 0.430 0.015
+Ks 1.000 0.920 0.360
+Ns 112
+map_Kd minecraft:block/white_concrete
+
+newmtl solar_flame
+Ka 1.000 0.390 0.010
+Kd 1.000 0.150 0.005
+Ks 1.000 0.720 0.100
+Ns 80
+map_Kd minecraft:block/white_concrete

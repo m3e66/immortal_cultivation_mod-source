@@ -1,6 +1,5 @@
 package com.example.immortal_cultivation_mod.magicritual.center;
 
-import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.magicritual.center.behavior.BlankCenterBehavior;
 import com.example.immortal_cultivation_mod.magicritual.center.behavior.DecayCenterBehavior;
 import com.example.immortal_cultivation_mod.magicritual.center.behavior.DetectionCenterBehavior;
@@ -11,8 +10,8 @@ import com.example.immortal_cultivation_mod.magicritual.center.behavior.Inverted
 import com.example.immortal_cultivation_mod.magicritual.center.behavior.ReforgeBladeCenterBehavior;
 import com.example.immortal_cultivation_mod.magicritual.center.behavior.SanctuaryCenterBehavior;
 import com.example.immortal_cultivation_mod.magicritual.center.behavior.ScorchingCenterBehavior;
-import com.example.immortal_cultivation_mod.magicritual.center.behavior.ThunderCenterBehavior;
 import com.example.immortal_cultivation_mod.magicritual.center.behavior.TeleportCenterBehavior;
+import com.example.immortal_cultivation_mod.magicritual.center.behavior.ThunderCenterBehavior;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -32,8 +31,35 @@ public final class MagicCenterTypeRegistry {
    public static final ResourceLocation DETECTION = id("detection");
    public static final ResourceLocation REFORGE_BLADE = id("reforge_blade");
    public static final ResourceLocation TELEPORT = id("teleport");
+   private static final Map<ResourceLocation, MagicCenterType> TYPES = new LinkedHashMap();
 
-   private static final Map<ResourceLocation, MagicCenterType> TYPES = new LinkedHashMap<>();
+   private MagicCenterTypeRegistry() {
+   }
+
+   private static void register(ResourceLocation id, String visualPattern, MagicCenterBehavior behavior) {
+      String path = id.getPath();
+      TYPES.put(id, new MagicCenterType(id, "center_type.immortal_cultivation_mod." + path, "center_type.immortal_cultivation_mod." + path + ".description", visualPattern, behavior));
+   }
+
+   public static Optional<MagicCenterType> get(ResourceLocation id) {
+      return Optional.ofNullable((MagicCenterType)TYPES.get(id));
+   }
+
+   public static MagicCenterType getOrBlank(ResourceLocation id) {
+      return (MagicCenterType)TYPES.getOrDefault(id, (MagicCenterType)TYPES.get(BLANK));
+   }
+
+   public static boolean contains(ResourceLocation id) {
+      return TYPES.containsKey(id);
+   }
+
+   public static Collection<MagicCenterType> values() {
+      return TYPES.values();
+   }
+
+   private static ResourceLocation id(String path) {
+      return ResourceLocation.fromNamespaceAndPath("immortal_cultivation_mod", path);
+   }
 
    static {
       register(BLANK, "normal", new BlankCenterBehavior());
@@ -48,38 +74,5 @@ public final class MagicCenterTypeRegistry {
       register(DETECTION, "normal", new DetectionCenterBehavior());
       register(REFORGE_BLADE, "normal", new ReforgeBladeCenterBehavior());
       register(TELEPORT, "normal", new TeleportCenterBehavior());
-   }
-
-   private MagicCenterTypeRegistry() {
-   }
-
-   private static void register(ResourceLocation id, String visualPattern, MagicCenterBehavior behavior) {
-      String path = id.getPath();
-      TYPES.put(id, new MagicCenterType(
-            id,
-            "center_type." + ImmortalCultivationMod.MODID + "." + path,
-            "center_type." + ImmortalCultivationMod.MODID + "." + path + ".description",
-            visualPattern,
-            behavior));
-   }
-
-   public static Optional<MagicCenterType> get(ResourceLocation id) {
-      return Optional.ofNullable(TYPES.get(id));
-   }
-
-   public static MagicCenterType getOrBlank(ResourceLocation id) {
-      return TYPES.getOrDefault(id, TYPES.get(BLANK));
-   }
-
-   public static boolean contains(ResourceLocation id) {
-      return TYPES.containsKey(id);
-   }
-
-   public static Collection<MagicCenterType> values() {
-      return TYPES.values();
-   }
-
-   private static ResourceLocation id(String path) {
-      return ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, path);
    }
 }

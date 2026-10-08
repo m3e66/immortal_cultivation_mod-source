@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod.screen;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
+import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.client.ClientData;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
@@ -24,7 +25,7 @@ public class TechniqueDescriptionScreen extends Screen {
     private static final int CONTENT_Y_OFFSET = 18;
     private static final ResourceLocation POEM_FONT =
             ResourceLocation.fromNamespaceAndPath(
-                    ImmortalCultivationMod.MODID, "aidian_full_numbers");
+                    ImmortalCultivationMod.MODID, "zhimangxing_original");
     private static final String SCREEN_PREFIX =
             "screen." + ImmortalCultivationMod.MODID + ".description.";
 
@@ -179,23 +180,33 @@ public class TechniqueDescriptionScreen extends Screen {
         int textBottom = top + panelHeight - sy(92);
         List<String> poemLines = poemLines(resolveDescription().getString());
         List<Metadata> metadata = metadata();
-        List<String> metadataLines = new ArrayList<>();
+        List<PoemMetadataColumn> metadataColumns = new ArrayList<>();
         for (Metadata value : metadata) {
-            metadataLines.add(sanitizePoemText(
-                    value.label().getString() + "：" + poemMetadataValue(value)));
+            String label = sanitizePoemText(value.label().getString()).strip();
+            String metadataValue = sanitizePoemText(poemMetadataValue(value)).strip();
+            if ("method_proficiency_label".equals(value.key())) {
+                metadataColumns.add(new PoemMetadataColumn(label, value.color()));
+                metadataColumns.add(new PoemMetadataColumn(metadataValue, value.color()));
+            } else {
+                metadataColumns.add(new PoemMetadataColumn(
+                        sanitizePoemText(label + "：" + metadataValue).strip(),
+                        value.color()));
+            }
         }
         int longestColumn = 1;
         for (String line : poemLines) {
             longestColumn = Math.max(
                     longestColumn, line.codePointCount(0, line.length()));
         }
-        for (String line : metadataLines) {
+        for (PoemMetadataColumn column : metadataColumns) {
+            String line = column.text();
             longestColumn = Math.max(
                     longestColumn, line.codePointCount(0, line.length()));
         }
         int availableHeight = Math.max(1, textBottom - textTop);
-        int characterStep = Math.max(
-                1, Math.min(sy(40), availableHeight / longestColumn));
+        int poemGlyphSize = Math.max(1, (int) Math.ceil(font.lineHeight * 1.5F));
+        int characterStep = Math.max(poemGlyphSize + Math.max(1, sy(2)),
+                availableHeight / longestColumn);
 
         for (int i = 0; i < poemLines.size(); i++) {
             drawVerticalColumn(graphics, poemLines.get(i), columnX, textTop, characterStep,
@@ -207,15 +218,15 @@ public class TechniqueDescriptionScreen extends Screen {
         }
 
         columnX -= sx(12);
-        for (int i = 0; i < metadata.size(); i++) {
+        for (PoemMetadataColumn column : metadataColumns) {
             drawVerticalColumn(
                     graphics,
-                    metadataLines.get(i),
+                    column.text(),
                     columnX,
                     textTop,
                     characterStep,
                     longestColumn,
-                    metadata.get(i).color());
+                    column.color());
             columnX -= columnStep;
         }
     }
@@ -223,9 +234,14 @@ public class TechniqueDescriptionScreen extends Screen {
     private static List<String> poemLines(String text) {
         List<String> lines = new ArrayList<>();
         for (String rawLine : text.split("\\R")) {
-            String line = sanitizePoemText(rawLine).strip();
-            if (!line.isEmpty()) {
-                lines.add(line);
+            String sanitizedLine = sanitizePoemText(rawLine).strip();
+            if (sanitizedLine.isEmpty()) {
+                continue;
+            }
+            for (String line : sanitizedLine.split("\\s+")) {
+                if (!line.isEmpty()) {
+                    lines.add(line);
+                }
             }
         }
         return lines;
@@ -249,10 +265,15 @@ public class TechniqueDescriptionScreen extends Screen {
             value = value.replaceFirst("(?i)(\\d+(?:\\.\\d+)?)s$", "$1");
         }
         if ("method_proficiency_label".equals(metadata.key())) {
+            int colonIndex = Math.max(value.lastIndexOf('：'), value.lastIndexOf(':'));
+            if (colonIndex >= 0 && colonIndex + 1 < value.length()) {
+                value = value.substring(colonIndex + 1);
+            }
             value = value.replace("（", "")
                     .replace("）", "")
                     .replace("(", "")
-                    .replace(")", "");
+                    .replace(")", "")
+                    .strip();
         }
         return value;
     }
@@ -266,13 +287,14 @@ public class TechniqueDescriptionScreen extends Screen {
             int maxCharacters,
             int color) {
         int[] codePoints = text.codePoints().limit(maxCharacters).toArray();
+        float targetSize = Math.max(1.0F, font.lineHeight * 1.5F);
+        int referenceWidth = Math.max(
+                1, font.width(withPoemFont(Component.literal("修"))));
+        float glyphScale = targetSize / (float) referenceWidth;
         for (int i = 0; i < codePoints.length; i++) {
             Component glyph = withPoemFont(Component.literal(
                     new String(Character.toChars(codePoints[i]))));
             int glyphWidth = Math.max(1, font.width(glyph));
-            int targetSize = Math.max(
-                    1, characterStep - Math.max(1, sy(3)));
-            float glyphScale = targetSize / (float) glyphWidth;
             graphics.pose().pushPose();
             graphics.pose().translate(
                     centerX,
@@ -321,7 +343,12 @@ public class TechniqueDescriptionScreen extends Screen {
             if (spell == null) {
                 return result;
             }
-            result.add(metadata("requirement_label", literalOrNone(spell.requiredLevel()), 0xFF725D23));
+            if (!spell.requiredLevel().isBlank()) {
+                result.add(metadata(
+                        "requirement_label",
+                        CultivationLevels.displayName(spell.requiredLevel()),
+                        0xFF725D23));
+            }
             result.add(metadata("element_label", TechniqueDescriptions.element(spell.element()), 0xFF326A55));
             result.add(metadata("method_tier_label",
                     Component.translatable("method_tier." + ImmortalCultivationMod.MODID + "." + spell.tier()),
@@ -400,7 +427,7 @@ public class TechniqueDescriptionScreen extends Screen {
 
     private static String spellCost(ModSpells.SpellDef spell) {
         if (ModSpells.WEIYA.equals(spell.id())) {
-            return "1% qi / sec";
+            return Component.translatable("spell.immortal_cultivation_mod.weiya.qi_cost").getString();
         }
         if (ModSpells.ZIBAO.equals(spell.id())) {
             return "all age";
@@ -483,5 +510,8 @@ public class TechniqueDescriptionScreen extends Screen {
     }
 
     private record Metadata(String key, Component label, Component value, int color) {
+    }
+
+    private record PoemMetadataColumn(String text, int color) {
     }
 }

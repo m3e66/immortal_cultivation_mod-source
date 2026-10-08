@@ -1,5 +1,7 @@
 package com.example.immortal_cultivation_mod.entity;
 
+import com.example.immortal_cultivation_mod.config.BlockBreakingSettings;
+
 import com.example.immortal_cultivation_mod.item.ForgingSystem;
 import com.example.immortal_cultivation_mod.item.ModItems;
 import com.example.immortal_cultivation_mod.item.QiInfusedWeapon;
@@ -185,8 +187,9 @@ public class ThrowingKnifeEntity extends ThrowableItemProjectile {
             return;
         }
 
-        float baseDamage = (float) Math.max(
-                4.0D, QiInfusedWeapon.baseAttackDamage(storedKnifeStack));
+        float baseDamage = (float) QiInfusedWeapon.baseAttackDamage(storedKnifeStack);
+        // Legacy/spawned projectiles can lack a saved weapon; real weapons retain their exact damage.
+        if (baseDamage <= 0.0F) baseDamage = 4.0F;
         float injectedQiDamage =
                 QiInfusedWeapon.injectedQiDamage(storedKnifeStack);
         float damage = baseDamage + injectedQiDamage;
@@ -230,7 +233,9 @@ public class ThrowingKnifeEntity extends ThrowableItemProjectile {
                 && (!(owner instanceof ServerPlayer player)
                 || player.mayUseItemAt(
                         blockPos, result.getDirection(), storedKnifeStack));
-        if (!canBreak || !level().destroyBlock(blockPos, false, owner)) {
+        if (!canBreak || !BlockBreakingSettings.withSource(
+                BlockBreakingSettings.Category.WEAPONS, owner,
+                () -> com.example.immortal_cultivation_mod.spell.SpellDestruction.breakNow(level(), blockPos, false, owner))) {
             stickAt(result.getLocation(), getDeltaMovement());
             return;
         }
@@ -266,14 +271,16 @@ public class ThrowingKnifeEntity extends ThrowableItemProjectile {
                 0.0D,
                 0.0D);
         Entity source = getOwner() == null ? this : getOwner();
-        serverLevel.explode(
+        BlockBreakingSettings.runWithSource(
+                BlockBreakingSettings.Category.WEAPONS, source,
+                () -> com.example.immortal_cultivation_mod.spell.SpellDestruction.explode(serverLevel,
                 source,
                 location.x,
                 location.y,
                 location.z,
                 radius,
                 false,
-                Level.ExplosionInteraction.BLOCK);
+                Level.ExplosionInteraction.BLOCK));
     }
 
     private void stickAt(Vec3 location, Vec3 movement) {

@@ -1,0 +1,129 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.shanbeng_seal",
+        "texture_width": 16,
+        "texture_height": 16,
+        "visible_bounds_width": 9.0,
+        "visible_bounds_height": 8.0,
+        "visible_bounds_offset": [0, 3.0, 0]
+      },
+      "bones": [
+        {"name": "root", "pivot": [0, 0, 0]},
+        {
+          "name": "seal_base",
+          "parent": "root",
+          "pivot": [0, 0, 0],
+          "cubes": [
+            {"origin": [-40, 0, -40], "size": [80, 6, 80], "uv": [0, 0]}
+          ]
+        },
+        {
+          "name": "seal_cross",
+          "parent": "root",
+          "pivot": [0, 6, 0],
+          "rotation": [0, 45, 0],
+          "cubes": [
+            {"origin": [-31, 6, -31], "size": [62, 7, 62], "uv": [0, 0]}
+          ]
+        },
+        {
+          "name": "lower_mass",
+          "parent": "root",
+          "pivot": [0, 13, 0],
+          "rotation": [0, 12, 0],
+          "cubes": [
+            {"origin": [-24, 13, -24], "size": [48, 13, 48], "uv": [0, 0]}
+          ]
+        },
+        {
+          "name": "middle_mass",
+          "parent": "root",
+          "pivot": [0, 26, 0],
+          "rotation": [0, -10, 0],
+          "cubes": [
+            {"origin": [-18, 26, -18], "size": [36, 14, 36], "uv": [0, 0]}
+          ]
+        },
+        {
+          "name": "upper_mass",
+          "parent": "root",
+          "pivot": [0, 40, 0],
+          "rotation": [0, 18, 0],
+          "cubes": [
+            {"origin": [-11, 40, -11], "size": [22, 14, 22], "uv": [0, 0]}
+          ]
+        },
+        {
+          "name": "peak",
+          "parent": "root",
+          "pivot": [0, 54, 0],
+          "rotation": [0, -12, 0],
+          "cubes": [
+            {"origin": [-6, 54, -6], "size": [12, 13, 12], "uv": [0, 0]}
+          ]
+        },
+        {
+          "name": "west_boulder",
+          "parent": "root",
+          "pivot": [-29, 15, 0],
+          "rotation": [8, 18, -17],
+          "cubes": [
+            {"origin": [-39, 8, -9], "size": [19, 21, 18], "uv": [0, 0]}
+          ]
+        },
+        {
+          "name": "east_boulder",
+          "parent": "root",
+          "pivot": [29, 14, 1],
+          "rotation": [-7, -24, 19],
+          "cubes": [
+            {"origin": [20, 7, -8], "size": [19, 20, 18], "uv": [0, 0]}
+          ]
+        },
+        {
+          "name": "north_boulder",
+          "parent": "root",
+          "pivot": [1, 14, -29],
+          "rotation": [-18, 8, 6],
+          "cubes": [
+            {"origin": [-8, 7, -39], "size": [18, 20, 19], "uv": [0, 0]}
+          ]
+        },
+        {
+          "name": "south_boulder",
+          "parent": "root",
+          "pivot": [-1, 15, 29],
+          "rotation": [20, -14, -8],
+          "cubes": [
+            {"origin": [-10, 8, 20], "size": [18, 21, 19], "uv": [0, 0]}
+          ]
+        },
+        {
+          "name": "orbit_lower",
+          "parent": "root",
+          "pivot": [0, 28, 0],
+          "cubes": [
+            {"origin": [31, 24, -5], "size": [10, 10, 10], "uv": [0, 0]},
+            {"origin": [-41, 23, -5], "size": [9, 9, 9], "uv": [0, 0]},
+            {"origin": [-5, 25, 31], "size": [8, 8, 8], "uv": [0, 0]},
+            {"origin": [-4, 22, -41], "size": [9, 11, 9], "uv": [0, 0]}
+          ]
+        },
+        {
+          "name": "orbit_upper",
+          "parent": "root",
+          "pivot": [0, 44, 0],
+          "cubes": [
+            {"origin": [23, 42, -4], "size": [7, 7, 7], "uv": [0, 0]},
+            {"origin": [-30, 39, -3], "size": [7, 9, 7], "uv": [0, 0]},
+            {"origin": [-3, 41, 24], "size": [6, 6, 6], "uv": [0, 0]},
+            {"origin": [-4, 40, -30], "size": [8, 8, 8], "uv": [0, 0]}
+          ]
+        }
+      ]
+    }
+  ]
+}

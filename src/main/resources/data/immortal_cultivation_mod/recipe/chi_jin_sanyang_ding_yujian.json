@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "minecraft:gold_ingot"
+    },
+    {
+      "item": "immortal_cultivation_mod:chitong_sui"
+    }
+  ],
+  "result": {
+    "id": "immortal_cultivation_mod:chi_jin_sanyang_ding_yujian",
+    "count": 1
+  }
+}

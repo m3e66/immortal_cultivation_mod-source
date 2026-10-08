@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "immortal_cultivation_mod:chi_lin"
+    },
+    {
+      "item": "immortal_cultivation_mod:huo_xi_blood"
+    }
+  ],
+  "result": {
+    "id": "immortal_cultivation_mod:crimson_flame_seed_yujian",
+    "count": 1
+  }
+}

@@ -10,19 +10,19 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
-import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class MagicCircleBlock extends CarpetBlock implements EntityBlock {
-   private static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 1.0, 16.0);
+   private static final VoxelShape SHAPE = Block.box((double)0.0F, (double)0.0F, (double)0.0F, (double)16.0F, (double)1.0F, (double)16.0F);
    public static final EnumProperty<CircleType> CIRCLE_TYPE = EnumProperty.create("circle_type", CircleType.class);
 
-   public MagicCircleBlock(Properties properties) {
+   public MagicCircleBlock(BlockBehaviour.Properties properties) {
       super(properties);
       this.registerDefaultState((BlockState)((BlockState)this.stateDefinition.any()).setValue(CIRCLE_TYPE, CircleType.ATTACK));
    }
@@ -35,7 +35,7 @@ public class MagicCircleBlock extends CarpetBlock implements EntityBlock {
       return false;
    }
 
-   protected void createBlockStateDefinition(Builder builder) {
+   protected void createBlockStateDefinition(StateDefinition.Builder builder) {
       builder.add(new Property[]{CIRCLE_TYPE});
    }
 
@@ -43,16 +43,12 @@ public class MagicCircleBlock extends CarpetBlock implements EntityBlock {
       return new MagicCircleBlockEntity(pos, state);
    }
 
-   @Override
-   protected void onPlace(BlockState state, Level level, BlockPos pos,
-                          BlockState oldState, boolean movedByPiston) {
+   protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
       super.onPlace(state, level, pos, oldState, movedByPiston);
       MagicCenterBlockEntity.invalidateNearbyBlankCenters(level, pos);
    }
 
-   @Override
-   protected void onRemove(BlockState state, Level level, BlockPos pos,
-                           BlockState newState, boolean movedByPiston) {
+   protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
       super.onRemove(state, level, pos, newState, movedByPiston);
       MagicCenterBlockEntity.invalidateNearbyBlankCenters(level, pos);
    }
@@ -66,6 +62,7 @@ public class MagicCircleBlock extends CarpetBlock implements EntityBlock {
          if (be instanceof MagicCircleBlockEntity circle) {
             circle.clientTick(lvl, pos, st);
          }
+
       } : null;
    }
 }

@@ -3,6 +3,7 @@ package com.example.immortal_cultivation_mod.effect;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.server.level.ServerLevel;
 
 public class ShiduEffect extends MobEffect {
     public ShiduEffect() {
@@ -11,13 +12,15 @@ public class ShiduEffect extends MobEffect {
 
     @Override
     public boolean applyEffectTick(LivingEntity entity, int amplifier) {
-        entity.hurt(entity.damageSources().magic(), 5.0F * (amplifier + 1));
+        entity.hurt(entity.damageSources().magic(), 4.0F * (amplifier + 1));
+        if (entity.level() instanceof ServerLevel level) {
+            UndeadEffectParticles.corpsePoison(level, entity);
+        }
         return true;
     }
 
     @Override
     public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
-        int interval = Math.max(5, 25 >> amplifier);
-        return duration % interval == 0;
+        return duration % 20 == 0;
     }
 }

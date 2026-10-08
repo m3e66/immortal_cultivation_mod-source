@@ -9,69 +9,73 @@ import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.core.particles.SimpleParticleType;
 
 public class MethodQiParticle extends TextureSheetParticle {
-    private final SpriteSet sprites;
-    private final float initialSize;
+   private final SpriteSet sprites;
+   private final float initialSize;
 
-    protected MethodQiParticle(ClientLevel level, double x, double y, double z,
-                               double xSpeed, double ySpeed, double zSpeed,
-                               SpriteSet sprites, int color) {
-        super(level, x, y, z, xSpeed, ySpeed, zSpeed);
-        this.sprites = sprites;
-        this.lifetime = 14 + random.nextInt(9);
-        this.gravity = -0.018F;
-        this.hasPhysics = false;
-        this.initialSize = 0.10F + random.nextFloat() * 0.09F;
-        this.quadSize = initialSize;
-        this.alpha = 0.92F;
-        this.rCol = ((color >> 16) & 255) / 255.0F;
-        this.gCol = ((color >> 8) & 255) / 255.0F;
-        this.bCol = (color & 255) / 255.0F;
-        this.xd = xSpeed + (random.nextDouble() - 0.5D) * 0.025D;
-        this.yd = Math.abs(ySpeed) * 0.35D + 0.025D + random.nextDouble() * 0.025D;
-        this.zd = zSpeed + (random.nextDouble() - 0.5D) * 0.025D;
-        setSpriteFromAge(sprites);
-    }
+   @Override
+   public void render(com.mojang.blaze3d.vertex.VertexConsumer vertices,
+                      net.minecraft.client.Camera camera, float partialTick) {
+      float size = this.quadSize;
+      float opacity = this.alpha;
+      // Keep each particle's original sprite, path and lifetime; add only a faint outer glow.
+      this.quadSize = size * 2.4F;
+      this.alpha = opacity * 0.12F;
+      super.render(vertices, camera, partialTick);
+      this.quadSize = size;
+      this.alpha = opacity;
+      super.render(vertices, camera, partialTick);
+   }
 
-    @Override
-    public void tick() {
-        super.tick();
-        if (removed) {
-            return;
-        }
-        setSpriteFromAge(sprites);
-        float life = (float) age / lifetime;
-        alpha = 0.92F * (1.0F - life);
-        quadSize = initialSize * (0.85F + life * 0.45F);
-        xd *= 0.96D;
-        yd *= 0.985D;
-        zd *= 0.96D;
-    }
+   protected MethodQiParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites, int color) {
+      super(level, x, y, z, xSpeed, ySpeed, zSpeed);
+      this.sprites = sprites;
+      this.lifetime = 14 + this.random.nextInt(9);
+      this.gravity = -0.018F;
+      this.hasPhysics = false;
+      this.initialSize = 0.1F + this.random.nextFloat() * 0.09F;
+      this.quadSize = this.initialSize;
+      this.alpha = 0.92F;
+      this.rCol = (float)(color >> 16 & 255) / 255.0F;
+      this.gCol = (float)(color >> 8 & 255) / 255.0F;
+      this.bCol = (float)(color & 255) / 255.0F;
+      this.xd = xSpeed + (this.random.nextDouble() - (double)0.5F) * 0.025;
+      this.yd = Math.abs(ySpeed) * 0.35 + 0.025 + this.random.nextDouble() * 0.025;
+      this.zd = zSpeed + (this.random.nextDouble() - (double)0.5F) * 0.025;
+      this.setSpriteFromAge(sprites);
+   }
 
-    @Override
-    protected int getLightColor(float partialTick) {
-        return 0xF000F0;
-    }
+   public void tick() {
+      super.tick();
+      if (!this.removed) {
+         this.setSpriteFromAge(this.sprites);
+         float life = (float)this.age / (float)this.lifetime;
+         this.alpha = 0.92F * (1.0F - life);
+         this.quadSize = this.initialSize * (0.85F + life * 0.45F);
+         this.xd *= 0.96;
+         this.yd *= 0.985;
+         this.zd *= 0.96;
+      }
+   }
 
-    @Override
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
-    }
+   protected int getLightColor(float partialTick) {
+      return 15728880;
+   }
 
-    public static class Provider implements ParticleProvider<SimpleParticleType> {
-        private final SpriteSet sprites;
-        private final int color;
+   public ParticleRenderType getRenderType() {
+      return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+   }
 
-        public Provider(SpriteSet sprites, int color) {
-            this.sprites = sprites;
-            this.color = color;
-        }
+   public static class Provider implements ParticleProvider<SimpleParticleType> {
+      private final SpriteSet sprites;
+      private final int color;
 
-        @Override
-        public Particle createParticle(SimpleParticleType type, ClientLevel level,
-                                       double x, double y, double z,
-                                       double xSpeed, double ySpeed, double zSpeed) {
-            return new MethodQiParticle(
-                    level, x, y, z, xSpeed, ySpeed, zSpeed, sprites, color);
-        }
-    }
+      public Provider(SpriteSet sprites, int color) {
+         this.sprites = sprites;
+         this.color = color;
+      }
+
+      public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+         return new MethodQiParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, this.sprites, this.color);
+      }
+   }
 }

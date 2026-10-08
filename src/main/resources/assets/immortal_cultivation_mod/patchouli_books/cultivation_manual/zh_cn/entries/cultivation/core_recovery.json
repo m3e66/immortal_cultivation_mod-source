@@ -1,0 +1,18 @@
+{
+  "name": "金丹失败与恢复",
+  "icon": "immortal_cultivation_mod:breakthrough_pill",
+  "category": "immortal_cultivation_mod:cultivation",
+  "sortnum": 7,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "裂丹与半步金丹",
+      "text": "金丹雷劫中死亡，会留下裂开的金丹，并进入半步金丹。打开修炼状态查看境界与裂丹状态。$(br2)这是失败后的恢复路线，无须为了学习而故意死亡。普通突破失败与金丹雷劫死亡不是同一种后果。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "再次冲击金丹",
+      "text": "半步金丹重新冲击金丹，需要筑基后期两倍的修炼进度。恢复灵气，并满足界面列出的功法与其他突破条件。$(br2)重新启动金丹挑战与雷劫，成功渡过后才能完成金丹晋升。此前失败不会自动算作成功。"
+    }
+  ]
+}

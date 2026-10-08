@@ -35,7 +35,7 @@ public final class LightBeamAttack {
         }
 
         var data = ModAttachments.getData(player);
-        if (!ServerEvents.spendQiOrBlood(player, data, CAST_COST)) {
+        if (!ServerEvents.spendSpellQiOrBlood(player, data, CAST_COST)) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return false;
         }
@@ -64,7 +64,7 @@ public final class LightBeamAttack {
         Vec3 direction = player.getLookAngle().normalize();
         for (int i = 0; i < shotsToTry; i++) {
             var data = ModAttachments.getData(player);
-            if (!ServerEvents.spendQiOrBlood(player, data, SHOOT_COST)) {
+            if (!ServerEvents.spendSpellQiOrBlood(player, data, SHOOT_COST)) {
                 player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
                 break;
             }

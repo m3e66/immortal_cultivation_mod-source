@@ -26,7 +26,7 @@ public final class SifangJie {
 
     public static boolean cast(ServerPlayer player) {
         var data = ModAttachments.getData(player);
-        if (!ServerEvents.spendQiOrBlood(player, data, COST)) {
+        if (!ServerEvents.spendSpellQiOrBlood(player, data, COST)) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return false;
         }
@@ -56,14 +56,16 @@ public final class SifangJie {
     }
 
     public static void clear(ServerPlayer player) {
+        com.example.immortal_cultivation_mod.network.SpellRibbonPayload.send(player.serverLevel(),"sifang_jie",player.position(),net.minecraft.world.phys.Vec3.ZERO,player.getId(),0,1);
         BARRIERS.remove(player.getUUID());
     }
 
     private static void emitBarrier(ServerLevel level, ServerPlayer player) {
+        com.example.immortal_cultivation_mod.network.SpellRibbonPayload.send(level,"sifang_jie",player.position(),new net.minecraft.world.phys.Vec3(0,0,1),player.getId(),14,1);
         level.sendParticles(ParticleTypes.END_ROD, player.getX(), player.getY() + 1.1D, player.getZ(),
-                42, RADIUS * 0.45D, 0.8D, RADIUS * 0.45D, 0.015D);
+                6, RADIUS * 0.45D, 0.8D, RADIUS * 0.45D, 0.015D);
         level.sendParticles(ParticleTypes.ENCHANT, player.getX(), player.getY() + 1.0D, player.getZ(),
-                36, RADIUS * 0.4D, 0.7D, RADIUS * 0.4D, 0.02D);
+                5, RADIUS * 0.4D, 0.7D, RADIUS * 0.4D, 0.02D);
     }
 
     private static void cleanseProtected(ServerLevel level, ServerPlayer player) {

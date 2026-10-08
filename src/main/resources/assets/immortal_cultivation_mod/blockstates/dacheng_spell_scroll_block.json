@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "immortal_cultivation_mod:block/dacheng_spell_scroll_block" },
+    "facing=east": { "model": "immortal_cultivation_mod:block/dacheng_spell_scroll_block" },
+    "facing=south": { "model": "immortal_cultivation_mod:block/dacheng_spell_scroll_block" },
+    "facing=west": { "model": "immortal_cultivation_mod:block/dacheng_spell_scroll_block" }
+  }
+}

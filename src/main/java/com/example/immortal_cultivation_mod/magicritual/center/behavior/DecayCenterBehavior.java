@@ -11,37 +11,34 @@ import net.minecraft.world.entity.LivingEntity;
 import org.joml.Vector3f;
 
 public final class DecayCenterBehavior implements MagicCenterBehavior {
-   private static final DustParticleOptions BLOOD_MIST =
-         new DustParticleOptions(new Vector3f(0.42F, 0.02F, 0.04F), 1.15F);
+   private static final DustParticleOptions BLOOD_MIST = new DustParticleOptions(new Vector3f(0.42F, 0.02F, 0.04F), 1.15F);
 
-   @Override
    public void serverTick(CenterContext context) {
-      if (!context.center().shouldTriggerEvery(context.level().getGameTime(), 20)) {
-         return;
-      }
-      int attackCount = context.center().getAttackCount();
-      for (LivingEntity entity : CenterBehaviorUtil.livingEntities(context)) {
-         if (!CenterBehaviorUtil.hostile(context, entity)) {
-            continue;
+      if (context.center().shouldTriggerEvery(context.level().getGameTime(), 20)) {
+         int attackCount = context.center().getAttackCount();
+
+         for(LivingEntity entity : CenterBehaviorUtil.livingEntities(context)) {
+            if (CenterBehaviorUtil.hostile(context, entity)) {
+               boolean resistant = CenterEffectSupport.hasBloodOrCorpseAffinity(entity);
+               int duration = resistant ? 30 : 50;
+               entity.addEffect(new MobEffectInstance(MobEffects.WITHER, duration, attackCount - 1, true, false, true));
+               entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, duration, 0, true, false, true));
+               context.level().sendParticles(BLOOD_MIST, entity.getX(), entity.getY() + (double)entity.getBbHeight() * (double)0.5F, entity.getZ(), Math.min(96, (resistant ? 3 : 8) * attackCount), 0.35, 0.45, 0.35, 0.015);
+            }
          }
-         boolean resistant = CenterEffectSupport.hasBloodOrCorpseAffinity(entity);
-         int duration = resistant ? 30 : 50;
-         entity.addEffect(new MobEffectInstance(MobEffects.WITHER, duration,
-               attackCount - 1, true, false, true));
-         entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, duration,
-               0, true, false, true));
-         context.level().sendParticles(BLOOD_MIST, entity.getX(),
-               entity.getY() + entity.getBbHeight() * 0.5D, entity.getZ(),
-               Math.min(96, (resistant ? 3 : 8) * attackCount),
-               0.35D, 0.45D, 0.35D, 0.015D);
+
       }
    }
 
-   @Override
    public int getFuelCostPerMinute(CenterContext context) {
       return CenterFuelController.baseRadiusCost(context.center().getRadius()) * 3;
    }
 
-   @Override public boolean supportsHostileMobSetting() { return true; }
-   @Override public boolean supportsPassiveMobSetting() { return true; }
+   public boolean supportsHostileMobSetting() {
+      return true;
+   }
+
+   public boolean supportsPassiveMobSetting() {
+      return true;
+   }
 }

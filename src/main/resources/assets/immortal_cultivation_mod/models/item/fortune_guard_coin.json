@@ -1,0 +1,25 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "immortal_cultivation_mod:item/fortune_guard_coin"
+  },
+  "display": {
+    "gui": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0.1129032,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9032258,
+        0.9032258,
+        0.9032258
+      ]
+    }
+  }
+}

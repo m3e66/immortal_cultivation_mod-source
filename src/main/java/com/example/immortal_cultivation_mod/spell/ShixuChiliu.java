@@ -63,7 +63,7 @@ public final class ShixuChiliu {
         if (!meetsRequirement(data.cultivationLevel())) {
             return false;
         }
-        if (!ServerEvents.spendQiOrBlood(player, data, QI_PER_SECOND)) {
+        if (!ServerEvents.spendSpellQiOrBlood(player, data, QI_PER_SECOND)) {
             player.sendSystemMessage(Component.translatable(
                     "message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return false;
@@ -99,7 +99,7 @@ public final class ShixuChiliu {
         if (timedUntil != null || player.tickCount % 20 != 0) {
             return;
         }
-        if (!ServerEvents.spendQiOrBlood(player, data, QI_PER_SECOND)) {
+        if (!ServerEvents.spendSustainedQiOrBlood(player, data, QI_PER_SECOND)) {
             stop(player);
             player.sendSystemMessage(Component.translatable(
                     "message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));

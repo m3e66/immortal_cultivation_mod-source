@@ -1,0 +1,16 @@
+{
+  "structures": [
+    {
+      "structure": "immortal_cultivation_mod:small_shrine",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "frequency": 0.5,
+    "frequency_reduction_method": "default",
+    "spacing": 32,
+    "separation": 16,
+    "salt": 206825163
+  }
+}

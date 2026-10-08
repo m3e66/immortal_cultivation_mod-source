@@ -1,5 +1,7 @@
 package com.example.immortal_cultivation_mod.entity;
 
+import com.example.immortal_cultivation_mod.config.BlockBreakingSettings;
+
 import com.example.immortal_cultivation_mod.item.ModItems;
 import com.example.immortal_cultivation_mod.magicritual.center.CenterEffectSupport;
 import com.example.immortal_cultivation_mod.magicritual.center.behavior.ForcefieldCenterBehavior;
@@ -101,7 +103,9 @@ public final class CrimsonDragonScaleProjectileEntity extends ThrowableItemProje
                     && CenterEffectSupport.isForcefieldRouteBlocked(
                             living, living.getBoundingBox().getCenter(),
                             net.minecraft.world.phys.Vec3.atCenterOf(firePos));
-            if (!blocked && level().getBlockState(firePos).isAir()) {
+            if (!blocked && level().getBlockState(firePos).isAir()
+                    && BlockBreakingSettings.enabled(owner == null ? this : owner,
+                    BlockBreakingSettings.Category.COMPANIONS)) {
                 level().setBlockAndUpdate(firePos, Blocks.FIRE.defaultBlockState());
             }
         }
@@ -115,6 +119,8 @@ public final class CrimsonDragonScaleProjectileEntity extends ThrowableItemProje
 
     private void finishImpact(HitResult result) {
         if (level() instanceof ServerLevel serverLevel) {
+            if (getOwner() instanceof CrimsonSkyFlameFloodDragonEntity dragon)
+                BeastMoveBlockBreaker.breakSphere(serverLevel, dragon, result.getLocation(), 1.3, 1.1, 16, 12);
             serverLevel.sendParticles(ModParticles.DRAGON_EMBER.get(),
                     result.getLocation().x, result.getLocation().y, result.getLocation().z,
                     18, 0.34D, 0.34D, 0.34D, 0.09D);

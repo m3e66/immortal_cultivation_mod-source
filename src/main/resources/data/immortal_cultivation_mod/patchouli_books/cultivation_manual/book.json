@@ -1,7 +1,7 @@
 {
   "name": "immortal_cultivation_mod.book.name",
   "landing_text": "immortal_cultivation_mod.book.landing",
-  "version": 1,
+  "version": 4,
   "creative_tab": "immortal_cultivation_mod:immortal_tab",
   "use_resource_pack": true,
   "model": "immortal_cultivation_mod:cultivation_manual",

@@ -2,13 +2,12 @@ package com.example.immortal_cultivation_mod.entity;
 
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
-import com.example.immortal_cultivation_mod.effect.PhotonEffects;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -38,7 +37,6 @@ public class LightBeamProjectileEntity extends ThrowableItemProjectile {
             SynchedEntityData.defineId(LightBeamProjectileEntity.class, EntityDataSerializers.INT);
 
     private UUID casterId;
-    private int photonEffectAttempts;
     private int flightTicks;
     private int blocksBroken;
     private Vec3 firedDirection = Vec3.ZERO;
@@ -61,7 +59,9 @@ public class LightBeamProjectileEntity extends ThrowableItemProjectile {
 
     @Override
     protected Item getDefaultItem() {
-        return Items.AIR;
+        // ThrowableItemProjectile serializes this stack; AIR cannot be encoded.
+        // The client uses the procedural sphere rather than an item renderer.
+        return Items.GLOWSTONE_DUST;
     }
 
     public boolean isWaiting() {
@@ -78,7 +78,6 @@ public class LightBeamProjectileEntity extends ThrowableItemProjectile {
         shoot(firedDirection.x, firedDirection.y, firedDirection.z, 2.4F, 0.0F);
         flightTicks = 0;
         blocksBroken = 0;
-        photonEffectAttempts = 0;
         noPhysics = false;
         setNoGravity(true);
     }
@@ -115,9 +114,6 @@ public class LightBeamProjectileEntity extends ThrowableItemProjectile {
 
         if (level().isClientSide) {
             addLightParticles();
-        } else if (photonEffectAttempts < 20) {
-            photonEffectAttempts++;
-            PhotonEffects.lightBeamProjectile(this);
         }
 
         if (!isWaiting()) {
@@ -244,10 +240,10 @@ public class LightBeamProjectileEntity extends ThrowableItemProjectile {
 
     private void addLightParticles() {
         Vec3 movement = getDeltaMovement();
-        int count = isWaiting() ? 2 : 8;
+        int count = isWaiting() ? 2 : 4;
         for (int i = 0; i < count; i++) {
             double spread = isWaiting() ? 0.06D : 0.12D;
-            double back = isWaiting() ? 0.0D : i * 0.18D;
+            double back = isWaiting() ? 0.0D : i * 0.06D;
             level().addParticle(ParticleTypes.ELECTRIC_SPARK,
                     getX() - movement.x * back + (random.nextDouble() - 0.5D) * spread,
                     getY() - movement.y * back + (random.nextDouble() - 0.5D) * spread,
@@ -267,7 +263,7 @@ public class LightBeamProjectileEntity extends ThrowableItemProjectile {
             }
             BlockState state = level().getBlockState(pos);
             if (!state.isAir() && state.getDestroySpeed(level(), pos) >= 0.0F) {
-                level().destroyBlock(pos, true, getOwner());
+                com.example.immortal_cultivation_mod.spell.SpellDestruction.breakBlock(level(),pos, true, getOwner());
                 broken++;
             }
         }

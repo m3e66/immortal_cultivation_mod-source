@@ -1,0 +1,45 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "immortal_cultivation_mod:item/song_wusha_hat"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "minecraft:damage": 0.25
+      },
+      "model": "immortal_cultivation_mod:item/song_wusha_hat_worn"
+    },
+    {
+      "predicate": {
+        "minecraft:damage": 0.5
+      },
+      "model": "immortal_cultivation_mod:item/song_wusha_hat_damaged"
+    },
+    {
+      "predicate": {
+        "minecraft:damage": 0.75
+      },
+      "model": "immortal_cultivation_mod:item/song_wusha_hat_tattered"
+    }
+  ],
+  "display": {
+    "gui": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ]
+    }
+  }
+}

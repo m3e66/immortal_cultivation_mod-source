@@ -1,10 +1,11 @@
 package com.example.immortal_cultivation_mod.mixin;
 
 import com.example.immortal_cultivation_mod.client.ClientData;
-import com.example.immortal_cultivation_mod.spell.JindanCreativeFlight;
+import com.example.immortal_cultivation_mod.client.JindanFlightEffects;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,24 +27,57 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
         super(root);
     }
 
+    @Inject(method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At("HEAD"))
+    private void immortalCultivation$resetCustomPose(
+            LivingEntity entity, float limbSwing, float limbSwingAmount,
+            float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {
+        // Player renderers reuse their model. Clear our previous custom pose before
+        // vanilla computes this player's stance, including the crouching hip offsets.
+        if (immortalCultivation$poseApplied) {
+            com.example.immortal_cultivation_mod.client.model.MeditationPose.reset(
+                    (PlayerModel<?>)(Object)this);
+            immortalCultivation$poseApplied = false;
+        }
+    }
+
     @Inject(method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At("TAIL"))
     private void immortalCultivation$meditatingPose(LivingEntity entity, float limbSwing, float limbSwingAmount,
             float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {
         if (!(entity instanceof Player player)) {
-            if (immortalCultivation$poseApplied) {
-                resetDefaultPlayerPose();
-                immortalCultivation$poseApplied = false;
-            }
             return;
         }
 
-        if (JindanCreativeFlight.shouldUseElytraPose(player)) {
+        if (com.example.immortal_cultivation_mod.client.flame.ChargedFlameRenderer.charging(player)) {
+            boolean right = (player.getUsedItemHand() == net.minecraft.world.InteractionHand.MAIN_HAND)
+                    == (player.getMainArm() == net.minecraft.world.entity.HumanoidArm.RIGHT);
+            ModelPart arm = right ? rightArm : leftArm;
+            ModelPart other = right ? leftArm : rightArm;
+            arm.xRot = -Mth.HALF_PI + head.xRot * .75F;
+            arm.yRot = head.yRot + (right ? -.08F : .08F);
+            arm.zRot = right ? .06F : -.06F;
+            other.xRot = -.22F; other.yRot = 0; other.zRot = right ? -.12F : .12F;
+            rightSleeve.copyFrom(rightArm); leftSleeve.copyFrom(leftArm);
+            return;
+        }
+
+        // Player Animator applies its pose before this tail injection. Yield for ordinary
+        // swings and single-weapon guards too, not only skills and crossed guards.
+        if (com.example.immortal_cultivation_mod.client.SwordComboAnimations.isPlaying(player)) {
+            return;
+        }
+
+        boolean forgingVisual=com.example.immortal_cultivation_mod.client.ForgingVisualState.isForging(player);
+        boolean meditationVisual=ClientData.isPlayerMeditating(player.getUUID()) || forgingVisual;
+        float flightPoseProgress = JindanFlightEffects.fastFlightPoseProgress(
+                player,
+                Mth.clamp(ageInTicks - player.tickCount, 0.0F, 1.0F));
+        if (flightPoseProgress > 0.001F && !forgingVisual) {
             immortalCultivation$poseApplied = true;
-            applyJindanFastFlightPose(netHeadYaw);
+            applyJindanReferenceFlightPose(flightPoseProgress);
             return;
         }
 
-        if (ClientData.isPlayerCasting(player.getUUID()) && !ClientData.isPlayerMeditating(player.getUUID())) {
+        if (ClientData.isPlayerCasting(player.getUUID()) && !meditationVisual) {
             rightArm.xRot = -2.15F;
             rightArm.yRot = -0.22F;
             rightArm.zRot = 0.18F;
@@ -51,60 +85,41 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
             return;
         }
 
-        if (!ClientData.isPlayerMeditating(player.getUUID())) {
-            if (immortalCultivation$poseApplied) {
-                resetDefaultPlayerPose();
-                immortalCultivation$poseApplied = false;
-            }
+        if (!meditationVisual) {
             return;
         }
 
         immortalCultivation$poseApplied = true;
+        com.example.immortal_cultivation_mod.client.model.MeditationPose.apply(
+                (PlayerModel<?>)(Object)this,netHeadYaw*((float)Math.PI/180F));
+    }
+
+    private void applyJindanReferenceFlightPose(float progress) {
         crouching = false;
-        float yaw = netHeadYaw * ((float) Math.PI / 180.0F);
 
-        body.x = 0.0F;
-        body.y = 8.5F;
-        body.z = 0.8F;
-        body.xRot = 0.0F;
-        body.yRot = 0.0F;
-        body.zRot = 0.0F;
+        blendPart(body, progress,
+                0.0F, 0.0F, 0.0F,
+                0.0F, 0.0F, 0.0F);
 
-        head.x = 0.0F;
-        head.y = 8.5F;
-        head.z = -0.4F;
-        head.xRot = -0.16F;
-        head.yRot = yaw;
-        head.zRot = 0.0F;
+        // Match the supplied model.geo.json reference: the body stays straight,
+        // while the head pitches back 62.5 degrees to face the travel direction.
+        blendPart(head, progress,
+                0.0F, 0.0F, 0.0F,
+                (float)Math.toRadians(-62.5D), 0.0F, 0.0F);
         hat.copyFrom(head);
 
-        rightArm.x = -4.8F;
-        rightArm.y = 10.5F;
-        rightArm.z = -0.7F;
-        rightArm.xRot = -0.28F;
-        rightArm.yRot = -0.18F;
-        rightArm.zRot = -0.82F;
-
-        leftArm.x = 4.8F;
-        leftArm.y = 10.5F;
-        leftArm.z = -0.7F;
-        leftArm.xRot = -0.28F;
-        leftArm.yRot = 0.18F;
-        leftArm.zRot = 0.82F;
-
-        rightLeg.x = -5.45F;
-        rightLeg.y = 21.3F;
-        rightLeg.z = 2.45F;
-        rightLeg.xRot = -2.0F;
-        rightLeg.yRot = 0.0F;
-        rightLeg.zRot = 1.42F;
-
-        leftLeg.x = 5.45F;
-        leftLeg.y = 21.3F;
-        leftLeg.z = 2.45F;
-        leftLeg.xRot = -2.0F;
-        leftLeg.yRot = 0.0F;
-        leftLeg.zRot = -1.42F;
+        blendPart(rightArm, progress,
+                -5.0F, 2.0F, 0.0F,
+                0.0F, 0.0F, 0.0F);
+        blendPart(leftArm, progress,
+                5.0F, 2.0F, 0.0F,
+                0.0F, 0.0F, 0.0F);
+        blendPart(rightLeg, progress,
+                -1.9F, 12.0F, 0.0F,
+                0.0F, 0.0F, 0.0F);
+        blendPart(leftLeg, progress,
+                1.9F, 12.0F, 0.0F,
+                0.0F, 0.0F, 0.0F);
 
         jacket.copyFrom(body);
         rightSleeve.copyFrom(rightArm);
@@ -113,87 +128,21 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
         leftPants.copyFrom(leftLeg);
     }
 
-    private void applyJindanFastFlightPose(float netHeadYaw) {
-        crouching = false;
-        float yaw = netHeadYaw * ((float) Math.PI / 180.0F);
-
-        body.x = 0.0F;
-        body.y = 0.0F;
-        body.z = 0.0F;
-        body.xRot = 0.0F;
-        body.yRot = 0.0F;
-        body.zRot = 0.0F;
-
-        head.x = 0.0F;
-        head.y = 0.0F;
-        head.z = 0.0F;
-        head.xRot = -((float) Math.PI / 4.0F);
-        head.yRot = yaw;
-        head.zRot = 0.0F;
-        hat.copyFrom(head);
-
-        rightArm.x = -5.0F;
-        rightArm.y = 2.0F;
-        rightArm.z = 0.0F;
-        rightArm.xRot = -0.35F;
-        rightArm.yRot = 0.0F;
-        rightArm.zRot = 0.10F;
-
-        leftArm.x = 5.0F;
-        leftArm.y = 2.0F;
-        leftArm.z = 0.0F;
-        leftArm.xRot = -0.35F;
-        leftArm.yRot = 0.0F;
-        leftArm.zRot = -0.10F;
-
-        rightLeg.x = -1.9F;
-        rightLeg.y = 12.0F;
-        rightLeg.z = 0.0F;
-        rightLeg.xRot = 0.10F;
-        rightLeg.yRot = 0.0F;
-        rightLeg.zRot = 0.02F;
-
-        leftLeg.x = 1.9F;
-        leftLeg.y = 12.0F;
-        leftLeg.z = 0.0F;
-        leftLeg.xRot = -0.10F;
-        leftLeg.yRot = 0.0F;
-        leftLeg.zRot = -0.02F;
-
-        jacket.copyFrom(body);
-        rightSleeve.copyFrom(rightArm);
-        leftSleeve.copyFrom(leftArm);
-        rightPants.copyFrom(rightLeg);
-        leftPants.copyFrom(leftLeg);
+    private static void blendPart(
+            ModelPart part,
+            float progress,
+            float targetX,
+            float targetY,
+            float targetZ,
+            float targetXRot,
+            float targetYRot,
+            float targetZRot) {
+        part.x = Mth.lerp(progress, part.x, targetX);
+        part.y = Mth.lerp(progress, part.y, targetY);
+        part.z = Mth.lerp(progress, part.z, targetZ);
+        part.xRot = Mth.lerp(progress, part.xRot, targetXRot);
+        part.yRot = Mth.lerp(progress, part.yRot, targetYRot);
+        part.zRot = Mth.lerp(progress, part.zRot, targetZRot);
     }
 
-    private void resetDefaultPlayerPose() {
-        head.x = 0.0F;
-        head.y = 0.0F;
-        head.z = 0.0F;
-        hat.copyFrom(head);
-
-        body.x = 0.0F;
-        body.y = 0.0F;
-        body.z = 0.0F;
-        jacket.copyFrom(body);
-
-        rightArm.x = -5.0F;
-        rightArm.y = 2.0F;
-        rightArm.z = 0.0F;
-        leftArm.x = 5.0F;
-        leftArm.y = 2.0F;
-        leftArm.z = 0.0F;
-        rightSleeve.copyFrom(rightArm);
-        leftSleeve.copyFrom(leftArm);
-
-        rightLeg.x = -1.9F;
-        rightLeg.y = 12.0F;
-        rightLeg.z = 0.0F;
-        leftLeg.x = 1.9F;
-        leftLeg.y = 12.0F;
-        leftLeg.z = 0.0F;
-        rightPants.copyFrom(rightLeg);
-        leftPants.copyFrom(leftLeg);
-    }
 }

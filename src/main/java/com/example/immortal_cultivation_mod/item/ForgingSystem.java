@@ -2,6 +2,7 @@ package com.example.immortal_cultivation_mod.item;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.block.ModBlocks;
+import com.example.immortal_cultivation_mod.flame.FlameKind;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -10,6 +11,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -28,8 +30,13 @@ import java.util.Map;
 
 public final class ForgingSystem {
     public static final String TAG_PURITY = ImmortalCultivationMod.MODID + ".purity";
+    public static final String TAG_PENDING_PURITY_LUCK = ImmortalCultivationMod.MODID + ".pending_purity_luck";
     public static final String TAG_FORGING = ImmortalCultivationMod.MODID + ".forging";
-    public static final int MAX_TEMP = 10000;
+    public static final int MAX_TEMP = 12000;
+    /** Maximum physical ingredient stacks accepted by the Golden Core ding. */
+    public static final int MAX_RECIPE_MATERIAL_SLOTS = 20;
+    /** Every forging recipe consumes one complete stack of finite spirit stones. */
+    public static final int RECIPE_SPIRIT_STONE_COUNT = 64;
 
     private static final List<MaterialDef> MATERIALS = List.of(
             new MaterialDef("jingtie_motherstone", ModBlocks.JINGTIE_MOTHERSTONE.get().asItem(), "Metal", "durability_percent"),
@@ -60,20 +67,64 @@ public final class ForgingSystem {
         if (stack.isEmpty()) {
             return false;
         }
-        return isForgeMaterial(stack)
+        return com.example.immortal_cultivation_mod.alchemy.AlchemyMenu.plantId(stack)!=null
+                || isForgeMaterial(stack)
+                || stack.getItem() instanceof TalismanMaterialItem
                 || stack.is(ModItems.CHI_LIN.get())
                 || stack.is(ModItems.HUO_XI_BLOOD.get())
+                || stack.is(ModItems.LIANQI_YAODAN.get())
+                || stack.is(ModItems.ZHUJI_YAODAN.get())
                 || stack.is(ModItems.JINDAN_YAODAN.get())
                 || stack.is(ModItems.CHIYAN_BONE.get())
                 || stack.is(ModItems.YUANYING_YAODAN.get())
+                || stack.is(ModItems.HUASHEN_YAODAN.get())
+                || stack.is(ModItems.LIANXU_YAODAN.get())
+                || stack.is(ModItems.HETI_YAODAN.get())
+                || stack.is(ModItems.DACHENG_YAODAN.get())
+                || stack.is(ModItems.DUJIE_YAODAN.get())
                 || stack.is(ModItems.YANJIAO_HORN.get())
                 || stack.is(ModItems.YAOYUAN_BONE.get())
                 || stack.is(ModItems.XUESHA_HIDE.get())
+                || stack.is(ModItems.PHANTOM_VEIL_FUR.get())
+                || stack.is(ModItems.KONGMING_STONE.get())
+                || stack.is(ModItems.ROCK_BADGER_HIDE.get())
+                || stack.is(ModItems.THUNDER_PATTERNED_ROCK_PLATE.get())
+                || stack.is(ModItems.THUNDER_HORN.get())
+                || stack.is(ModItems.FROSTSPINE_HIDE.get())
+                || stack.is(ModItems.SPIRIT_DEVOURING_RAT_HIDE.get())
+                || stack.is(ModItems.SPIRIT_SCENT_WHISKER.get())
+                || stack.is(ModItems.IRON_SCALE_PLATE.get())
+                || stack.is(ModItems.CRIMSON_VENOM_SAC.get())
+                || stack.is(ModItems.SCORPION_TAIL_STINGER.get())
+                || stack.is(ModItems.WIND_FEATHER.get())
+                || stack.is(ModItems.SPIRIT_DEER_ANTLER.get())
+                || stack.is(ModItems.INK_ARMOR_PLATE.get())
+                || stack.is(ModItems.MINERAL_MARROW.get())
+                || stack.is(ModItems.PROFOUND_IRON_ARMOR_CORE.get())
+                || stack.is(ModItems.EMBER_FEATHER.get())
+                || stack.is(ModItems.FIRE_OWL_CLAW.get())
+                || stack.is(ModItems.FLAME_RADIANCE_BONE.get())
+                || stack.is(ModItems.LIANQI_BEAST_MEAT.get())
+                || stack.is(ModItems.ZHUJI_BEAST_MEAT.get())
+                || stack.is(ModItems.JINDAN_BEAST_MEAT.get())
+                || stack.is(ModItems.YUANYING_BEAST_MEAT.get())
+                || stack.is(ModItems.HUASHEN_BEAST_MEAT.get())
+                || stack.is(ModItems.LIANXU_BEAST_MEAT.get())
+                || stack.is(ModItems.HETI_BEAST_MEAT.get())
+                || stack.is(ModItems.DACHENG_BEAST_MEAT.get())
+                || stack.is(ModItems.DUJIE_BEAST_MEAT.get())
+                || stack.is(ModItems.COLD_MARROW.get())
+                || stack.is(ModItems.XUANDUAN_IRON_SHARD.get())
+                || stack.is(ModItems.SPIRIT_GUIDING_GEAR.get())
+                || stack.is(ModItems.DAMAGED_FORGING_FURNACE_CORE.get())
+                || stack.is(ModItems.LINGMU_CLASP.get())
                 || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get())
                 || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_SILKWORM_SILK.get())
                 || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get())
                 || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_STORAGE_CRYSTAL.get())
                 || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.FLOWING_SPIRIT_CRYSTAL.get())
+                || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.LINGMU_FLAGPOLE.get())
+                || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.PATTERNED_CLOTH.get())
                 || fixedPurity(stack) > 0;
     }
 
@@ -137,7 +188,8 @@ public final class ForgingSystem {
         CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
         if (!tag.contains(TAG_PURITY)) {
             int purity = 1 + Math.floorMod(seed * 31 + stack.getCount() * 17, 100);
-            tag.putInt(TAG_PURITY, purity);
+            tag.putInt(TAG_PURITY, Math.clamp(purity + tag.getInt(TAG_PENDING_PURITY_LUCK), 1, 100));
+            tag.remove(TAG_PENDING_PURITY_LUCK);
             stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
         }
     }
@@ -178,6 +230,25 @@ public final class ForgingSystem {
     }
 
     public static ForgingRecipe recipe(ItemStack yujian) {
+        if(yujian.getItem() instanceof com.example.immortal_cultivation_mod.alchemy.AlchemyFormulaItem formula)
+            return recipeById("alchemy/"+formula.formula);
+        String slipId=BuiltInRegistries.ITEM.getKey(yujian.getItem()).getPath();
+        if(slipId.endsWith("_formula") && com.example.immortal_cultivation_mod.alchemy.AlchemyForgeRecipes.LEGACY_REQUIRED.containsKey(slipId.substring(0,slipId.length()-8)))
+            return recipeById("legacy_alchemy/"+slipId.substring(0,slipId.length()-8));
+        if(slipId.equals("jade_pill_bottle_yujian"))return recipeById("jade_pill_bottle");
+        if(slipId.equals("chi_jin_sanyang_ding_yujian"))return recipeById("chi_jin_sanyang_ding");
+        if(slipId.equals("crimson_flame_seed_yujian"))return recipeById("crimson_flame_seed");
+        if(slipId.equals("dragon_flame_seed_yujian"))return recipeById("dragon_flame_seed");
+        if(slipId.endsWith("_yujian")) {
+            var higher=HigherWeaponRecipes.recipe(slipId.substring(0,slipId.length()-7));
+            if(higher!=null)return higher;
+        }
+        if (yujian.is(ModItems.FORTUNE_MIRROR_YUJIAN.get())) return recipeById("fortune_mirror");
+        if (yujian.is(ModItems.PRECISE_FORTUNE_MIRROR_YUJIAN.get())) return recipeById("precise_fortune_mirror");
+        if (yujian.is(ModItems.FORTUNE_GUARD_COIN_YUJIAN.get())) return recipeById("fortune_guard_coin");
+        if (yujian.is(ModItems.FORTUNE_LAMP_YUJIAN.get())) return recipeById("fortune_lamp");
+        if (yujian.is(ModItems.TRIBULATION_DOLL_YUJIAN.get())) return recipeById("tribulation_doll");
+        if (yujian.is(ModItems.PURIFIED_TRIBULATION_DOLL_YUJIAN.get())) return recipeById("purified_tribulation_doll");
         if (yujian.is(ModItems.FEIJIAN_YUJIAN.get())) {
             return recipeById("flying_sword");
         }
@@ -195,6 +266,18 @@ public final class ForgingSystem {
         }
         if (yujian.is(ModItems.FLYING_NEEDLE_YUJIAN.get())) {
             return recipeById("flying_needle");
+        }
+        if (yujian.is(ModItems.TIEGU_SHAN_YUJIAN.get())) {
+            return recipeById("tiegu_shan");
+        }
+        if (yujian.is(ModItems.FUCHEN_YUJIAN.get())) {
+            return recipeById("fuchen");
+        }
+        if (yujian.is(ModItems.WHIP_YUJIAN.get())) {
+            return recipeById("whip");
+        }
+        if (yujian.is(ModItems.SHIHUNFAN_YUJIAN.get())) {
+            return recipeById("shihunfan");
         }
         if (yujian.is(ModItems.ZHENPAN_YUJIAN.get())) {
             return recipeById("zhenpan");
@@ -217,10 +300,121 @@ public final class ForgingSystem {
         if (yujian.is(ModItems.QI_RETURN_FLAG_YUJIAN.get())) {
             return recipeById("qi_return_flag");
         }
+        if (yujian.is(ModItems.QI_POUCH_YUJIAN.get())) {
+            return recipeById("qi_pouch");
+        }
+        if (yujian.is(ModItems.SWORD_CASE_YUJIAN.get())) {
+            return recipeById("sword_case");
+        }
+        if (yujian.is(ModItems.BLOOD_FANG_PENDANT_YUJIAN.get())) {
+            return recipeById("blood_fang_pendant");
+        }
+        if (yujian.is(ModItems.WATER_AVOIDING_PEARL_YUJIAN.get())) {
+            return recipeById("water_avoiding_pearl");
+        }
+        if (yujian.is(ModItems.JADE_PENDANT_YUJIAN.get())) {
+            return recipeById("jade_pendant");
+        }
+        if (yujian.is(ModItems.SHIELD_BREAKER_RING_YUJIAN.get())) {
+            return recipeById("shield_breaker_ring");
+        }
+        if (yujian.is(ModItems.DISGUISE_MASK_YUJIAN.get())) {
+            return recipeById("disguise_mask");
+        }
+        if (yujian.is(ModItems.BLACK_TORTOISE_HEARTGUARD_MIRROR_YUJIAN.get())) {
+            return recipeById("black_tortoise_heartguard_mirror");
+        }
+        if (yujian.is(ModItems.ZHENHUN_BELL_YUJIAN.get())) {
+            return recipeById("zhenhun_bell");
+        }
+        if (yujian.is(ModItems.YINHUN_GONG_YUJIAN.get())) {
+            return recipeById("yinhun_gong");
+        }
+        if (yujian.is(ModItems.FOG_REVEALING_MIRROR_YUJIAN.get())) {
+            return recipeById("fog_revealing_mirror");
+        }
+        if (yujian.is(ModItems.YINYANG_COMPASS_YUJIAN.get())) {
+            return recipeById("yinyang_compass");
+        }
+        if (yujian.is(ModItems.YUANHUN_BOTTLE_YUJIAN.get())) {
+            return recipeById("yuanhun_bottle");
+        }
         return null;
     }
 
     public static ForgingRecipe recipeById(String id) {
+        if ("chi_jin_sanyang_ding".equals(id)) return new ForgingRecipe(id,
+                ModBlocks.CHI_JIN_SANYANG_DING.get(), 6500,
+                Map.of(ModBlocks.QINGTONG_YINHUO_DING.get().asItem(), 1,
+                        ModBlocks.CHITONG_SUI.get().asItem(), 4,
+                        ModBlocks.LIUJIN_SAND.get().asItem(), 4,
+                        ModItems.JINDAN_YAODAN.get(), 3,
+                        ModBlocks.JINGTIE_MOTHERSTONE.get().asItem(), 2),
+                true, RECIPE_SPIRIT_STONE_COUNT, "zhen_fire");
+        if ("crimson_flame_seed".equals(id)) return new ForgingRecipe(id, ModItems.CRIMSON_FLAME_SEED.get(), 2000,
+                Map.of(ModItems.CHI_LIN.get(), 1, ModItems.HUO_XI_BLOOD.get(), 1), true, 8, "");
+        if ("dragon_flame_seed".equals(id)) return new ForgingRecipe(id, ModItems.DRAGON_FLAME_SEED.get(), 8500,
+                Map.of(ModItems.YUANYING_YAODAN.get(), 1, ModItems.YANJIAO_HORN.get(), 1), true, 64, "");
+        if(WeaponShardSystem.REFORGE.equals(id))return new ForgingRecipe(id,ModItems.WEAPON_SHARD.get(),3500,Map.of(),true,128,"");
+        var alchemy=com.example.immortal_cultivation_mod.alchemy.AlchemyForgeRecipes.recipe(id);
+        if(alchemy!=null)return alchemy;
+        var higher=HigherWeaponRecipes.recipe(id);
+        if(higher!=null)return higher;
+        if ("fortune_mirror".equals(id)) {
+            return new ForgingRecipe(id, ModItems.FORTUNE_MIRROR.get(), 4800,
+                    Map.of(ModBlocks.YUNWEN_SILVER_CRYSTAL.get().asItem(), 3,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_STORAGE_CRYSTAL.get(), 2,
+                            ModItems.KONGMING_STONE.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), 3,
+                            ModItems.JINDAN_YAODAN.get(), 2), true, RECIPE_SPIRIT_STONE_COUNT, "ling_fire");
+        }
+        if ("precise_fortune_mirror".equals(id)) {
+            return new ForgingRecipe(id, ModItems.PRECISE_FORTUNE_MIRROR.get(), 6400,
+                    Map.of(ModItems.FORTUNE_MIRROR.get(), 1,
+                            ModBlocks.STAR_DUST_STONE.get().asItem(), 2,
+                            ModBlocks.YUNWEN_SILVER_CRYSTAL.get().asItem(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_STORAGE_CRYSTAL.get(), 2,
+                            ModItems.KONGMING_STONE.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), 2,
+                            ModItems.YUANYING_YAODAN.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 1), true, RECIPE_SPIRIT_STONE_COUNT, "ling_fire");
+        }
+        if ("fortune_guard_coin".equals(id)) {
+            return new ForgingRecipe(id, ModItems.FORTUNE_GUARD_COIN.get(), 5200,
+                    Map.of(Items.COPPER_INGOT, 64,
+                            ModBlocks.LIUJIN_SAND.get().asItem(), 3,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 3,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), 2,
+                            ModBlocks.QIANNIAN_LINGMU_HEART.get().asItem(), 3,
+                            ModItems.JINDAN_YAODAN.get(), 2), true, RECIPE_SPIRIT_STONE_COUNT, "ling_fire");
+        }
+        if ("fortune_lamp".equals(id)) {
+            return new ForgingRecipe(id, ModBlocks.FORTUNE_LAMP_ITEM.get(), 6000,
+                    Map.of(ModBlocks.QIANNIAN_LINGMU_HEART.get().asItem(), 2,
+                            ModBlocks.YUNWEN_SILVER_CRYSTAL.get().asItem(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_STORAGE_CRYSTAL.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.FLOWING_SPIRIT_CRYSTAL.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), 3,
+                            ModItems.YUANYING_YAODAN.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 1), true, RECIPE_SPIRIT_STONE_COUNT, "ling_fire");
+        }
+        if ("tribulation_doll".equals(id) || "purified_tribulation_doll".equals(id)) {
+            boolean purified = "purified_tribulation_doll".equals(id);
+            // Pictured recipe: beast essence is 128 Blood (two stacks).
+            // Twelve purity materials + two Blood stacks + spirit stones = 15 slots.
+            return new ForgingRecipe(id,
+                    purified ? ModItems.PURIFIED_TRIBULATION_DOLL.get() : ModItems.TRIBULATION_DOLL.get(),
+                    purified ? 5200 : 4200,
+                    Map.of(ModBlocks.QIANNIAN_LINGMU_HEART.get().asItem(), 1,
+                            ModItems.KONGMING_STONE.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_STORAGE_CRYSTAL.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), purified ? 1 : 4,
+                            ModItems.BLOOD.get(), 128,
+                            ModItems.JINDAN_YAODAN.get(), purified ? 4 : 1),
+                    true, RECIPE_SPIRIT_STONE_COUNT, "ling_fire");
+        }
         if ("flying_sword".equals(id)) {
             return new ForgingRecipe(
                     "flying_sword",
@@ -281,17 +475,69 @@ public final class ForgingSystem {
                             ModBlocks.MOXUAN_IRON.get().asItem(), 1
                     ));
         }
+        if ("tiegu_shan".equals(id)) {
+            return new ForgingRecipe(
+                    "tiegu_shan",
+                    ModItems.WEAPON_MOLD.get(),
+                    3500,
+                    Map.of(
+                            ModBlocks.JINGTIE_MOTHERSTONE.get().asItem(), 2,
+                            ModBlocks.MOXUAN_IRON.get().asItem(), 2
+                    ));
+        }
+        if ("fuchen".equals(id)) {
+            return new ForgingRecipe(
+                    "fuchen",
+                    ModItems.WEAPON_MOLD.get(),
+                    2200,
+                    Map.of(
+                            ModBlocks.QIANNIAN_LINGMU_HEART.get().asItem(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), 3
+                    ));
+        }
+        if ("whip".equals(id)) {
+            return new ForgingRecipe(
+                    "whip",
+                    ModItems.WEAPON_MOLD.get(),
+                    2400,
+                    Map.of(
+                            ModBlocks.ZIYUN_VINE.get().asItem(), 3,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), 2,
+                            ModBlocks.JINGTIE_MOTHERSTONE.get().asItem(), 1
+                    ));
+        }
+        if ("shihunfan".equals(id)) {
+            return new ForgingRecipe(
+                    "shihunfan",
+                    ModItems.SHIHUNFAN.get(),
+                    3200,
+                    Map.of(
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.PATTERNED_CLOTH.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.LINGMU_FLAGPOLE.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), 2,
+                            ModBlocks.SHIHUN_GRASS.get().asItem(), 1,
+                            ModItems.BLOOD_CRYSTAL.get(), 1,
+                            ModBlocks.HANPO_JADE.get().asItem(), 1,
+                            ModItems.YUANYING_YAODAN.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.HIGH_SPIRIT_STONE.get(), 1
+                    ),
+                    true,
+                    0,
+                    "ling_fire");
+        }
         if ("zhenpan".equals(id)) {
             return new ForgingRecipe(
                     "zhenpan",
                     com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENPAN.get(),
                     1800,
                     Map.of(
-                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 4,
-                            ModBlocks.JINGTIE_MOTHERSTONE.get().asItem(), 1
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 3,
+                            ModBlocks.JINGTIE_MOTHERSTONE.get().asItem(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_STORAGE_CRYSTAL.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.MEDIUM_SPIRIT_STONE.get(), 1
                     ),
                     true,
-                    128);
+                    0);
         }
         if ("blank_formation_flag".equals(id)) {
             return new ForgingRecipe(
@@ -374,28 +620,342 @@ public final class ForgingSystem {
                     true,
                     0);
         }
+        if ("qi_pouch".equals(id)) {
+            return new ForgingRecipe(
+                    "qi_pouch",
+                    ModItems.QI_POUCH.get(),
+                    1800,
+                    Map.of(
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.PATTERNED_CLOTH.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 1,
+                            ModItems.KONGMING_STONE.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_STORAGE_CRYSTAL.get(), 1,
+                            ModItems.LINGMU_CLASP.get(), 1
+                    ),
+                    true,
+                    0);
+        }
+        if ("zhenhun_bell".equals(id)) {
+            return new ForgingRecipe(
+                    "zhenhun_bell",
+                    ModItems.ZHENHUN_BELL.get(),
+                    2400,
+                    Map.of(
+                            ModBlocks.JINGTIE_MOTHERSTONE.get().asItem(), 1,
+                            ModBlocks.YUNWEN_SILVER_CRYSTAL.get().asItem(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 1,
+                            ModItems.BLOOD_CRYSTAL.get(), 4
+                    ),
+                    true,
+                    1,
+                    "ling_fire");
+        }
+        if ("yinhun_gong".equals(id)) {
+            return new ForgingRecipe(
+                    "yinhun_gong",
+                    ModItems.YINHUN_GONG.get(),
+                    3200,
+                    Map.of(
+                            ModBlocks.MOXUAN_IRON.get().asItem(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), 1,
+                            ModItems.BLOOD_CRYSTAL.get(), 2
+                    ),
+                    true,
+                    0,
+                    "ling_fire");
+        }
+        if ("fog_revealing_mirror".equals(id)) {
+            return new ForgingRecipe(
+                    "fog_revealing_mirror",
+                    ModItems.FOG_REVEALING_MIRROR.get(),
+                    2200,
+                    Map.of(
+                            ModBlocks.YUNWEN_SILVER_CRYSTAL.get().asItem(), 2,
+                            ModBlocks.HANPO_JADE.get().asItem(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_STORAGE_CRYSTAL.get(), 1
+                    ),
+                    true,
+                    0,
+                    "ling_fire");
+        }
+        if ("yinyang_compass".equals(id)) {
+            return new ForgingRecipe(
+                    "yinyang_compass",
+                    ModItems.YINYANG_COMPASS.get(),
+                    2800,
+                    Map.of(
+                            ModBlocks.MOXUAN_IRON.get().asItem(), 1,
+                            ModBlocks.HANPO_JADE.get().asItem(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_STORAGE_CRYSTAL.get(), 1
+                    ),
+                    true,
+                    0,
+                    "ling_fire");
+        }
+        if ("yuanhun_bottle".equals(id)) {
+            return new ForgingRecipe(
+                    "yuanhun_bottle",
+                    ModItems.YUANHUN_BOTTLE.get(),
+                    1800,
+                    Map.of(
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_STORAGE_CRYSTAL.get(), 1,
+                            ModBlocks.HANPO_JADE.get().asItem(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), 1,
+                            ModItems.BLOOD_CRYSTAL.get(), 2
+                    ),
+                    true,
+                    0,
+                    "ling_fire");
+        }
+        if ("blood_fang_pendant".equals(id)) {
+            return new ForgingRecipe(
+                    "blood_fang_pendant",
+                    ModItems.BLOOD_FANG_PENDANT.get(),
+                    2600,
+                    Map.of(
+                            ModItems.BLOOD_CRYSTAL.get(), 2,
+                            ModItems.XUESHA_HIDE.get(), 1,
+                            ModItems.RED_STRING.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), 1,
+                            ModItems.YANJIAO_HORN.get(), 1,
+                            ModItems.HUO_XI_BLOOD.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.MEDIUM_SPIRIT_STONE.get(), 1
+                    ),
+                    true,
+                    0,
+                    "ling_fire");
+        }
+        if ("water_avoiding_pearl".equals(id)) {
+            return new ForgingRecipe(
+                    "water_avoiding_pearl",
+                    ModItems.WATER_AVOIDING_PEARL.get(),
+                    2000,
+                    Map.of(
+                            ModBlocks.BISUI_STONE.get().asItem(), 2,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.FLOWING_SPIRIT_CRYSTAL.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), 1
+                    ),
+                    true,
+                    4,
+                    "ling_fire");
+        }
+        if ("jade_pendant".equals(id)) {
+            return new ForgingRecipe(
+                    "jade_pendant",
+                    ModItems.JADE_PENDANT.get(),
+                    3600,
+                    Map.of(
+                            ModBlocks.HANPO_JADE.get().asItem(), 1,
+                            ModItems.KONGMING_STONE.get(), 1,
+                            ModBlocks.QIANNIAN_LINGMU_HEART.get().asItem(), 1,
+                            ModBlocks.JIUYE_XIANLAN.get().asItem(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.FLOWING_SPIRIT_CRYSTAL.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), 1,
+                            ModBlocks.YUNWEN_SILVER_CRYSTAL.get().asItem(), 1,
+                            ModItems.JINDAN_YAODAN.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.HIGH_SPIRIT_STONE.get(), 1
+                    ),
+                    true,
+                    0,
+                    "ling_fire");
+        }
+        if ("shield_breaker_ring".equals(id)) {
+            return new ForgingRecipe(
+                    "shield_breaker_ring",
+                    ModItems.SHIELD_BREAKER_RING.get(),
+                    3000,
+                    Map.of(
+                            ModBlocks.MOXUAN_IRON.get().asItem(), 2,
+                            ModBlocks.YUNWEN_SILVER_CRYSTAL.get().asItem(), 1,
+                            ModBlocks.JINGTIE_MOTHERSTONE.get().asItem(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 1,
+                            ModItems.IRON_SCALE_PLATE.get(), 1,
+                            ModItems.JINDAN_YAODAN.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.MEDIUM_SPIRIT_STONE.get(), 1
+                    ),
+                    true,
+                    0,
+                    "ling_fire");
+        }
+        if ("disguise_mask".equals(id)) {
+            return new ForgingRecipe(
+                    "disguise_mask",
+                    ModItems.DISGUISE_MASK.get(),
+                    3200,
+                    Map.of(
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.PATTERNED_CLOTH.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 1,
+                            ModItems.KONGMING_STONE.get(), 1,
+                            ModItems.PHANTOM_VEIL_FUR.get(), 1,
+                            ModItems.RED_STRING.get(), 1,
+                            ModItems.BLACK_WOOL_STRIP.get(), 1,
+                            ModBlocks.HANPO_JADE.get().asItem(), 1,
+                            ModItems.YUANYING_YAODAN.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.HIGH_SPIRIT_STONE.get(), 1
+                    ),
+                    true,
+                    0,
+                    "ling_fire");
+        }
+        if ("black_tortoise_heartguard_mirror".equals(id)) {
+            return new ForgingRecipe(
+                    "black_tortoise_heartguard_mirror",
+                    ModItems.BLACK_TORTOISE_HEARTGUARD_MIRROR.get(),
+                    2800,
+                    Map.of(
+                            ModItems.INK_ARMOR_PLATE.get(), 2,
+                            ModItems.PROFOUND_IRON_ARMOR_CORE.get(), 1,
+                            ModBlocks.MOXUAN_IRON.get().asItem(), 1,
+                            ModBlocks.HANPO_JADE.get().asItem(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.FLOWING_SPIRIT_CRYSTAL.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), 1,
+                            ModItems.ZHUJI_YAODAN.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.MEDIUM_SPIRIT_STONE.get(), 1
+                    ),
+                    true,
+                    0,
+                    "ling_fire");
+        }
+        if ("sword_case".equals(id)) {
+            return new ForgingRecipe(
+                    "sword_case",
+                    ModItems.SWORD_CASE.get(),
+                    3600,
+                    Map.of(
+                            ModBlocks.JINGTIE_MOTHERSTONE.get().asItem(), 1,
+                            ModBlocks.QIANNIAN_LINGMU_HEART.get().asItem(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GUIDING_THREAD.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENWEN_JADE.get(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.FLOWING_SPIRIT_CRYSTAL.get(), 1,
+                            ModItems.KONGMING_STONE.get(), 1,
+                            ModItems.LINGMU_CLASP.get(), 1,
+                            ModBlocks.MOXUAN_IRON.get().asItem(), 1,
+                            ModBlocks.YUNWEN_SILVER_CRYSTAL.get().asItem(), 1,
+                            com.example.immortal_cultivation_mod.magicritual.item.ModItems.HIGH_SPIRIT_STONE.get(), 1
+                    ),
+                    true,
+                    0,
+                    "ling_fire");
+        }
         return null;
+    }
+
+    public static ItemLike resultItem(ForgingRecipe recipe) {
+        if (recipe == null) {
+            return Items.AIR;
+        }
+        if(HigherWeaponSpec.find(recipe.id())!=null || ("baota".equals(recipe.id()) || "jin_hulu".equals(recipe.id())))return HigherWeaponRecipes.item(recipe.id());
+        if (recipe.directOutput()) {
+            return recipe.moldItem();
+        }
+        return switch (recipe.id()) {
+            case "flying_sword" -> ModItems.FLYING_SWORD.get();
+            case "dao" -> ModItems.DAO.get();
+            case "jingtie_spear" -> ModItems.JINGTIE_SPEAR.get();
+            case "heavy_iron_bracer" -> ModItems.HEAVY_IRON_BRACER.get();
+            case "throwing_knife" -> ModItems.THROWING_KNIFE.get();
+            case "flying_needle" -> ModItems.FLYING_NEEDLE.get();
+            case "tiegu_shan" -> ModItems.TIEGU_SHAN.get();
+            case "fuchen" -> ModItems.FUCHEN.get();
+            case "whip" -> ModItems.WHIP.get();
+            default -> Items.AIR;
+        };
+    }
+
+    /** Native weapon rank is fixed by its item type, not by later restriction breakthroughs. */
+    private static int originalWeaponTemperature(String id, int fallback) {
+        HigherWeaponSpec spec = HigherWeaponSpec.find(id);
+        int realm = spec != null ? spec.realm : ("baota".equals(id) || "jin_hulu".equals(id) ? 2 : 0);
+        return realm == 0 ? fallback : Math.clamp(4500 + (realm - 2) * 2000, 0, MAX_TEMP);
+    }
+
+    /** Reforging shares the original weapon's temperature even after its restriction tier changes. */
+    public static int targetTemperature(ForgingRecipe recipe, List<ItemStack> materials) {
+        if (recipe == null) return 0;
+        if (WeaponShardSystem.REFORGE.equals(recipe.id())) {
+            for (ItemStack material : materials) {
+                if (!WeaponShardSystem.populated(material)) continue;
+                // The serialized weapon is the source of truth; the shard's item label is display data.
+                ResourceLocation original = ResourceLocation.tryParse(
+                        WeaponShardSystem.data(material).getCompound("weapon").getString("id"));
+                if (original != null && ImmortalCultivationMod.MODID.equals(original.getNamespace())) {
+                    ForgingRecipe originalRecipe = recipeById(original.getPath());
+                    if (originalRecipe != null && !WeaponShardSystem.REFORGE.equals(originalRecipe.id())) {
+                        return originalRecipe.averageTemp();
+                    }
+                }
+                break;
+            }
+        }
+        return recipe.averageTemp();
+    }
+
+    public static boolean canUseFire(ForgingRecipe recipe, String fireType) {
+        return canUseFire(recipe, fireType, List.of());
+    }
+
+    /** Every fire must reach the original weapon's heat, including shard reforging. */
+    public static boolean canUseFire(ForgingRecipe recipe, String fireType, List<ItemStack> materials) {
+        if (recipe == null) return false;
+        String fire = normalizedFire(fireType);
+        if (FlameKind.temperatureCeiling(fire) < targetTemperature(recipe, materials)) return false;
+        FlameKind kind = FlameKind.fromId(fire);
+        if (requiresHeavenlyFire(recipe, materials) && kind != FlameKind.HEAVENLY) return false;
+        if (kind.special()) {
+            return recipe.requiredFireType().isBlank() || "ling_fire".equals(recipe.requiredFireType())
+                    || "zhen_fire".equals(recipe.requiredFireType()) || recipe.requiredFireType().equals(fire);
+        }
+        if (recipe.requiredFireType().isBlank()) return true;
+        return recipe.requiredFireType().equals(fire)
+                || ("ling_fire".equals(recipe.requiredFireType()) && "zhen_fire".equals(fire));
+    }
+
+    /** Native Hua Shen heat and higher require heavenly fire, including complete shard reforges. */
+    public static boolean requiresHeavenlyFire(ForgingRecipe recipe, List<ItemStack> materials) {
+        return recipe != null && targetTemperature(recipe, materials) >= 10500;
+    }
+
+    public static int qualityCeiling(String fireType) {
+        return FlameKind.fromId(fireType) == FlameKind.HEAVENLY ? 125 : 100;
     }
 
     public static boolean hasRequiredMaterials(ForgingRecipe recipe, List<ItemStack> inputs) {
         if (recipe == null) {
             return false;
         }
+        if(WeaponShardSystem.REFORGE.equals(recipe.id()))return WeaponShardSystem.canReforge(inputs);
+        if(!WeaponShardSystem.validAdditives(inputs))return false;
+        if(com.example.immortal_cultivation_mod.alchemy.AlchemyForgeRecipes.isPill(recipe.id()) && !com.example.immortal_cultivation_mod.alchemy.AlchemyChemistry.matches(
+                com.example.immortal_cultivation_mod.alchemy.AlchemyChemistry.formula(recipe.id().substring(8)),com.example.immortal_cultivation_mod.alchemy.AlchemyForgeRecipes.herbs(inputs)))return false;
         Map<Item, Integer> counts = new LinkedHashMap<>();
-        int spiritStones = 0;
         for (ItemStack stack : inputs) {
             if (stack.isEmpty()) {
                 continue;
             }
-            counts.merge(stack.getItem(), stack.getCount(), Integer::sum);
-            if (isRecipeSpiritStone(stack)) {
-                spiritStones += stack.getCount();
-            }
+            int available = canStackInForgingRecipe(stack) ? stack.getCount() : 1;
+            counts.merge(stack.getItem(), available, Integer::sum);
         }
         for (var required : recipe.required().entrySet()) {
             if (counts.getOrDefault(required.getKey(), 0) < required.getValue()) {
                 return false;
             }
+        }
+        int spiritStones = 0;
+        for (Map.Entry<Item, Integer> available : counts.entrySet()) {
+            ItemStack sample = new ItemStack(available.getKey());
+            if (!isRecipeSpiritStone(sample)) {
+                continue;
+            }
+            int reservedForExactIngredient =
+                    recipe.required().getOrDefault(available.getKey(), 0);
+            spiritStones += Math.max(0, available.getValue() - reservedForExactIngredient);
         }
         return spiritStones >= recipe.spiritStoneCount();
     }
@@ -404,11 +964,15 @@ public final class ForgingSystem {
         if (stack.isEmpty()) {
             return false;
         }
-        if (recipe == null || !recipe.directOutput()) {
-            return isForgeMaterial(stack);
+        if (recipe == null) {
+            return isForgeMaterial(stack)||WeaponShardSystem.populated(stack)||isRecipeSpiritStone(stack);
         }
-        return recipe.required().containsKey(stack.getItem())
-                || recipe.spiritStoneCount() > 0 && isRecipeSpiritStone(stack);
+        if(WeaponShardSystem.REFORGE.equals(recipe.id()))return WeaponShardSystem.populated(stack)||isRecipeSpiritStone(stack);
+        if(WeaponShardSystem.populated(stack))return true;
+        return com.example.immortal_cultivation_mod.alchemy.AlchemyForgeRecipes.isPill(recipe.id()) && com.example.immortal_cultivation_mod.alchemy.AlchemyMenu.plantId(stack)!=null
+                || recipe.required().containsKey(stack.getItem())
+                || recipe.spiritStoneCount() > 0 && isRecipeSpiritStone(stack)
+                || !recipe.directOutput() && isForgeMaterial(stack);
     }
 
     public static boolean isRecipeSpiritStone(ItemStack stack) {
@@ -416,6 +980,22 @@ public final class ForgingSystem {
                 .isSpiritStone(stack.getItem())
                 && !stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems
                 .INFINITE_SPIRIT_STONE.get());
+    }
+
+    /**
+     * Ingredients without an individual purity value may supply several recipe
+     * units from one physical ding slot. Spirit stones are deliberately included:
+     * each tier has one fixed purity, so stacking identical stones loses no data.
+     */
+    public static boolean canStackInForgingRecipe(ItemStack stack) {
+        if (stack.isEmpty() || stack.getMaxStackSize() <= 1) {
+            return false;
+        }
+        if (isRecipeSpiritStone(stack)) {
+            return true;
+        }
+        return !isPurityMaterial(stack)
+                && !forgingData(stack).contains("average_purity");
     }
 
     public static int meltTicks(List<ItemStack> inputs) {
@@ -439,29 +1019,49 @@ public final class ForgingSystem {
         return Math.max(20, (101 - purity(stack)) * 20);
     }
 
+    /**
+     * The weighted average material purity is also the forge success percentage.
+     * A 100-purity batch is guaranteed; a 1-purity batch has a 1% chance.
+     */
+    public static double forgingSuccessChancePercent(List<ItemStack> materials) {
+        return Math.max(1.0D, Math.min(100.0D, puritySummary(materials).average()));
+    }
+
     public static ItemStack createMold(ForgingRecipe recipe, List<ItemStack> materials, double averageTemp, String fireType) {
-        ItemStack mold = new ItemStack(recipe.moldItem());
-        int quality = quality(recipe.averageTemp(), averageTemp, materials);
+        return createMold(recipe, materials, averageTemp, fireType, targetTemperature(recipe, materials));
+    }
+
+    /** A running batch keeps the target it saved, including when recipe defaults change after an update. */
+    public static ItemStack createMold(ForgingRecipe recipe, List<ItemStack> materials, double averageTemp,
+                                      String fireType, int targetTemperature) {
+        return createMold(recipe, materials, averageTemp, fireType, targetTemperature, RandomSource.create());
+    }
+
+    public static ItemStack createMold(ForgingRecipe recipe, List<ItemStack> materials, double averageTemp,
+                                      String fireType, int targetTemperature, RandomSource random) {
+        ItemStack mold = com.example.immortal_cultivation_mod.alchemy.AlchemyForgeRecipes.isPill(recipe.id()) ? com.example.immortal_cultivation_mod.alchemy.AlchemyForgeRecipes.output(recipe.id(),materials) : new ItemStack(recipe.moldItem());
+        int quality = quality(targetTemperature, averageTemp, materials);
+        FlameKind flame = FlameKind.fromId(fireType);
+        if (flame == FlameKind.EARTH) quality = Math.min(100, quality + 5);
+        boolean pill = com.example.immortal_cultivation_mod.alchemy.AlchemyForgeRecipes.isPill(recipe.id());
+        if (flame == FlameKind.HEAVENLY && !pill) quality = Math.min(qualityCeiling(fireType), quality + 25);
         CompoundTag data = new CompoundTag();
         data.putInt("schema_version", 2);
         data.putString("recipe", recipe.id());
-        data.putInt("target_temp", recipe.averageTemp());
+        data.putInt("target_temp", targetTemperature);
         data.putDouble("average_temp", averageTemp);
         data.putInt("quality", quality);
         data.putString("quality_name", qualityName(quality));
         data.putString("fire", fireType == null || fireType.isBlank() ? "normal_fire" : fireType);
+        if (quality > 100) data.putInt("flame_heavenly_quality_percent", quality - 100);
         CompoundTag materialCounts = new CompoundTag();
         Map<Item, Integer> ingredientCounts = new LinkedHashMap<>();
-        double purityTotal = 0.0D;
-        int purityWeight = 0;
+        PuritySummary purity = puritySummary(materials);
         for (ItemStack stack : materials) {
             if (stack.isEmpty()) {
                 continue;
             }
             ingredientCounts.merge(stack.getItem(), stack.getCount(), Integer::sum);
-            PurityContribution contribution = effectivePurity(stack);
-            purityTotal += contribution.purity() * contribution.weight();
-            purityWeight += contribution.weight();
 
             MaterialDef material = material(stack);
             if (recipe.directOutput() || material == null) {
@@ -472,12 +1072,118 @@ public final class ForgingSystem {
         }
         data.put("materials", materialCounts);
         data.put("ingredients", ingredientList(ingredientCounts));
-        data.putInt("purity_weight", purityWeight);
-        data.putDouble("average_purity", purityWeight <= 0 ? 1.0D : purityTotal / purityWeight);
+        data.putInt("purity_weight", (int)Math.min(Integer.MAX_VALUE, purity.weight()));
+        data.putDouble("average_purity", purity.average());
+        applyFlameBonuses(data, recipe, flame, random);
         CompoundTag tag = mold.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
         tag.put(TAG_FORGING, data);
         mold.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+        if ("disguise_mask".equals(recipe.id())) {
+            DisguiseMaskItem.setDisguiseRealm(
+                    mold, weakestPhantomVeilFurRealm(materials));
+        }
+        WeaponShardSystem.inherit(mold,materials);
         return mold;
+    }
+
+    private static void applyFlameBonuses(CompoundTag data, ForgingRecipe recipe, FlameKind flame, RandomSource random) {
+        if (com.example.immortal_cultivation_mod.alchemy.AlchemyForgeRecipes.isPill(recipe.id())) return;
+        switch (flame) {
+            case CRIMSON -> {
+                addStat(data, "flame_durability_percent", 5);
+                addStat(data, "fire_storage", 1);
+                addStat(data, "qi_damage_percent", 5);
+            }
+            case EARTH -> addStat(data, "quality_bonus_percent", 1);
+            case WOOD -> {
+                if (woodFlameCompatible(recipe)) data.putInt("material_loss_reduction_percent", 25);
+            }
+            case SOLAR -> {
+                if (solarFlameCompatible(recipe)) {
+                    addStat(data, "armor_pen_percent", 5);
+                    addStat(data, "flame_sharpness_percent", 5);
+                }
+            }
+            case NETHER -> {
+                addStat(data, "flame_spirit_damage_percent", 5);
+                addStat(data, "flame_soul_damage", 2);
+            }
+            case THUNDER -> {
+                addStat(data, "tribulation_resistance_percent", 15);
+                if (random.nextFloat() < .25F) addStat(data, "flame_lightning_damage_percent", 5);
+            }
+            case DRAGON -> {
+                addStat(data, "qi_damage_percent", 20);
+                addStat(data, "flame_fire_affinity_percent", 35);
+                addStat(data, "fire_storage", 3);
+                addStat(data, "flame_qi_burn_chance_percent", 25);
+            }
+            default -> {}
+        }
+    }
+
+    private static void addStat(CompoundTag data, String key, int amount) {
+        data.putInt(key, data.getInt(key) + amount);
+    }
+
+    /** Structural recipe material determines affinity; precious fittings do not turn a wooden weapon into metal. */
+    public static boolean solarFlameCompatible(ForgingRecipe recipe) {
+        if (recipe == null || !WeaponRestrictionSystem.isWeapon(new ItemStack(resultItem(recipe)))) return false;
+        HigherWeaponSpec spec = HigherWeaponSpec.find(recipe.id());
+        if (spec == HigherWeaponSpec.THUNDERWOOD_SWORD || spec == HigherWeaponSpec.SPIRIT_SILK_WHIP
+                || spec == HigherWeaponSpec.WIND_FEATHER_FAN) return false;
+        if (recipe.id().contains("wood") || recipe.id().contains("bamboo")) return false;
+        long metal = 0, organic = 0;
+        for (var entry : recipe.required().entrySet()) {
+            String material = BuiltInRegistries.ITEM.getKey(entry.getKey()).getPath();
+            int units = entry.getValue();
+            if (material.equals("jingtie_motherstone") || material.equals("moxuan_iron")
+                    || material.equals("chitong_sui") || material.endsWith("_ingot")
+                    || material.endsWith("_nugget") || material.equals("iron_block")
+                    || material.equals("gold_block") || material.equals("copper_block")) metal += units;
+            if (material.contains("wood") || material.contains("lingmu") || material.contains("bamboo")
+                    || material.contains("vine") || material.contains("silk") || material.contains("cloth")
+                    || material.contains("feather") || material.contains("thread")) organic += units;
+        }
+        return metal > 0 && metal > organic;
+    }
+
+    /** Wood flames protect organic batches and bows, fans and staffs from material loss. */
+    public static boolean woodFlameCompatible(ForgingRecipe recipe) {
+        if (recipe == null || com.example.immortal_cultivation_mod.alchemy.AlchemyForgeRecipes.isPill(recipe.id())) return false;
+        String id = recipe.id();
+        if (id.contains("wood") || id.contains("bow") || id.contains("fan") || id.contains("shan")
+                || id.contains("staff") || id.equals("fuchen")) return true;
+        return recipe.required().keySet().stream().anyMatch(item -> {
+            String path = BuiltInRegistries.ITEM.getKey(item).getPath();
+            return path.contains("wood") || path.contains("lingmu") || path.contains("bamboo");
+        });
+    }
+
+    /** Returned units are real ingredients already consumed by a failed eligible batch. */
+    public static int woodFlameSalvageCount(ForgingRecipe recipe, String fireType, ItemStack consumed) {
+        if (FlameKind.fromId(fireType) != FlameKind.WOOD || !woodFlameCompatible(recipe)
+                || consumed.isEmpty() || isRecipeSpiritStone(consumed) || WeaponShardSystem.populated(consumed)) return 0;
+        return (consumed.getCount() + 3) / 4;
+    }
+
+    private static String weakestPhantomVeilFurRealm(
+            List<ItemStack> materials) {
+        String weakestRealm = PhantomVeilFurItem.DEFAULT_REALM;
+        int weakestIndex = Integer.MAX_VALUE;
+        boolean foundFur = false;
+        for (ItemStack stack : materials) {
+            if (!stack.is(ModItems.PHANTOM_VEIL_FUR.get())) {
+                continue;
+            }
+            int realmIndex = PhantomVeilFurItem.realmIndex(stack);
+            if (!foundFur || realmIndex < weakestIndex) {
+                weakestRealm = PhantomVeilFurItem.realm(stack);
+                weakestIndex = realmIndex;
+                foundFur = true;
+            }
+        }
+        return weakestRealm;
     }
 
     public static ItemStack temper(ItemStack mold) {
@@ -492,21 +1198,28 @@ public final class ForgingSystem {
                 && !"jingtie_spear".equals(recipe)
                 && !"heavy_iron_bracer".equals(recipe)
                 && !"throwing_knife".equals(recipe)
-                && !"flying_needle".equals(recipe)) {
+                && !"flying_needle".equals(recipe)
+                && !"tiegu_shan".equals(recipe)
+                && !"fuchen".equals(recipe)
+                && !"whip".equals(recipe) && !"baota".equals(recipe) && !"jin_hulu".equals(recipe) && HigherWeaponSpec.find(recipe)==null) {
             return ItemStack.EMPTY;
         }
         forging.putString("tempering", "cool_water");
         tag.put(TAG_FORGING, forging);
-        ItemStack weapon = new ItemStack(switch (recipe) {
+        ItemStack weapon = new ItemStack(HigherWeaponSpec.find(recipe)!=null || ("baota".equals(recipe) || "jin_hulu".equals(recipe))?HigherWeaponRecipes.item(recipe):switch (recipe) {
             case "dao" -> ModItems.DAO.get();
             case "jingtie_spear" -> ModItems.JINGTIE_SPEAR.get();
             case "heavy_iron_bracer" -> ModItems.HEAVY_IRON_BRACER.get();
             case "throwing_knife" -> ModItems.THROWING_KNIFE.get();
             case "flying_needle" -> ModItems.FLYING_NEEDLE.get();
+            case "tiegu_shan" -> ModItems.TIEGU_SHAN.get();
+            case "fuchen" -> ModItems.FUCHEN.get();
+            case "whip" -> ModItems.WHIP.get();
             default -> ModItems.FLYING_SWORD.get();
         });
         weapon.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
         applyForgedDurability(weapon);
+        WeaponRestrictionSystem.finalizeInheritedLayers(weapon);
         return weapon;
     }
 
@@ -537,15 +1250,26 @@ public final class ForgingSystem {
     }
 
     public static boolean isForgedWeapon(ItemStack stack) {
-        return (stack.is(ModItems.FLYING_SWORD.get()) || stack.is(ModItems.DAO.get())
+        return (stack.getItem() instanceof HigherWeaponItem || stack.is(ModItems.FLYING_SWORD.get()) || stack.is(ModItems.DAO.get())
                 || stack.is(ModItems.JINGTIE_SPEAR.get())
                 || stack.is(ModItems.THROWING_KNIFE.get())
                 || stack.is(ModItems.FLYING_NEEDLE.get())
+                || stack.is(ModItems.TIEGU_SHAN.get())
+                || stack.is(ModItems.FUCHEN.get())
+                || stack.is(ModItems.WHIP.get())
                 || stack.is(ModItems.HEAVY_IRON_BRACER.get())) && hasForgingData(stack);
     }
 
     public static boolean isForgedRitualArtifact(ItemStack stack) {
         return (stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENPAN.get())
+                || stack.is(ModItems.QI_POUCH.get())
+                || stack.is(ModItems.SHIHUNFAN.get())
+                || stack.is(ModItems.BLOOD_FANG_PENDANT.get())
+                || stack.is(ModItems.WATER_AVOIDING_PEARL.get())
+                || stack.is(ModItems.JADE_PENDANT.get())
+                || stack.is(ModItems.SHIELD_BREAKER_RING.get())
+                || stack.is(ModItems.DISGUISE_MASK.get())
+                || stack.is(ModItems.BLACK_TORTOISE_HEARTGUARD_MIRROR.get())
                 || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.BLANK_FORMATION_FLAG.get())
                 || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.DURATION_FLAG.get())
                 || stack.is(com.example.immortal_cultivation_mod.magicritual.item.ModItems.AMPLIFIER_FLAG.get())
@@ -609,7 +1333,8 @@ public final class ForgingSystem {
         }
         String fire = normalizedFire(forging.getString("fire"));
         tooltips.add(Component.translatable("tooltip." + ImmortalCultivationMod.MODID + ".forged.fire",
-                Component.translatable("tooltip." + ImmortalCultivationMod.MODID + ".forged.fire." + fire))
+                FlameKind.fromId(fire).special() ? FlameKind.fromId(fire).displayName()
+                        : Component.translatable("tooltip." + ImmortalCultivationMod.MODID + ".forged.fire." + fire))
                 .withStyle(ChatFormatting.RED));
         String tempering = normalizedTempering(forging.getString("tempering"));
         tooltips.add(Component.translatable("tooltip." + ImmortalCultivationMod.MODID + ".forged.tempering",
@@ -630,6 +1355,16 @@ public final class ForgingSystem {
         addForgedBuff(tooltips, forging, "dragon_pressure", 1);
         addForgedBuff(tooltips, forging, "star_essence", 1);
         addForgedBuff(tooltips, forging, "fire_storage", 1);
+        addForgedBuff(tooltips, forging, "flame_durability_percent", 1);
+        addForgedBuff(tooltips, forging, "material_loss_reduction_percent", 1);
+        addForgedBuff(tooltips, forging, "flame_sharpness_percent", 1);
+        addForgedBuff(tooltips, forging, "flame_spirit_damage_percent", 1);
+        addForgedBuff(tooltips, forging, "flame_soul_damage", 1);
+        addForgedBuff(tooltips, forging, "tribulation_resistance_percent", 1);
+        addForgedBuff(tooltips, forging, "flame_lightning_damage_percent", 1);
+        addForgedBuff(tooltips, forging, "flame_qi_burn_chance_percent", 1);
+        addForgedBuff(tooltips, forging, "flame_fire_affinity_percent", 1);
+        addForgedBuff(tooltips, forging, "flame_heavenly_quality_percent", 1);
         return tooltips;
     }
 
@@ -650,11 +1385,21 @@ public final class ForgingSystem {
         if (starEssence > 0) {
             damage *= 1.0F + starEssence * 0.02F;
         }
+        int flameDamage = forgedStat(stack, "flame_sharpness_percent")
+                + forgedStat(stack, "flame_spirit_damage_percent") + forgedStat(stack, "flame_lightning_damage_percent")
+                + forgedStat(stack, "flame_heavenly_quality_percent");
+        if (flameDamage > 0) damage *= 1.0F + flameDamage / 100.0F;
+        // Dragon-forged weapons draw power from an existing flame; ignition itself cannot
+        // grant the first strike this bonus, and fire-immune creatures never supply it.
+        int fireAffinity = forgedStat(stack, "flame_fire_affinity_percent");
+        if (fireAffinity > 0 && target.isOnFire() && !target.fireImmune()) {
+            damage *= 1.0F + fireAffinity / 100.0F;
+        }
         return damage;
     }
 
     public static float adjustInjectedQiDamage(ItemStack stack, float damage) {
-        int qiDamage = forgedStat(stack, "qi_damage_percent");
+        int qiDamage = forgedStat(stack, "qi_damage_percent") + forgedStat(stack, "flame_heavenly_quality_percent");
         return qiDamage <= 0 ? damage : damage * (1.0F + qiDamage / 100.0F);
     }
 
@@ -683,6 +1428,26 @@ public final class ForgingSystem {
         if (fireStorage > 0) {
             target.igniteForSeconds(Math.max(1, fireStorage));
         }
+        int soulDamage = forgedStat(stack, "flame_soul_damage");
+        if (soulDamage > 0 && !target.level().isClientSide) {
+            if (target instanceof Player player) {
+                com.example.immortal_cultivation_mod.event.ServerEvents.adjustThoughts(player, -soulDamage);
+            } else if (target instanceof net.minecraft.world.entity.PathfinderMob mob
+                    && target instanceof com.example.immortal_cultivation_mod.entity.CultivationNpc npc) {
+                com.example.immortal_cultivation_mod.entity.NpcProfile.adjustThoughts(mob, npc.npcArchetype(), -soulDamage);
+            }
+        }
+    }
+
+    /** Called after positive accepted damage; protected, blocked and canceled attacks never burn Qi. */
+    public static void applyAcceptedWeaponHitEffects(ItemStack stack, LivingEntity target) {
+        if (target.level().isClientSide || !target.isAlive() || !WeaponRestrictionSystem.isWeapon(stack)) return;
+        int chance = Math.clamp(forgedStat(stack, "flame_qi_burn_chance_percent"), 0, 100);
+        if (chance > 0 && target.getRandom().nextInt(100) < chance) {
+            target.addEffect(new MobEffectInstance(
+                    com.example.immortal_cultivation_mod.effect.ModEffects.QI_FIRE_BURN,
+                    100, 1, false, false, true));
+        }
     }
 
     public static void tickForgedInventory(Player player) {
@@ -708,7 +1473,8 @@ public final class ForgingSystem {
     }
 
     public static void applyForgedDurability(ItemStack stack) {
-        int durabilityPercent = forgedStat(stack, "durability_percent");
+        int durabilityPercent = forgedStat(stack, "durability_percent") + forgedStat(stack, "flame_durability_percent")
+                + forgedStat(stack, "flame_heavenly_quality_percent");
         if (durabilityPercent <= 0 || !stack.isDamageableItem()) {
             return;
         }
@@ -773,11 +1539,28 @@ public final class ForgingSystem {
         return new PurityContribution(0.0D, 0);
     }
 
+    private static PuritySummary puritySummary(List<ItemStack> materials) {
+        double total = 0.0D;
+        long weight = 0L;
+        for (ItemStack stack : materials) {
+            if (stack.isEmpty()) {
+                continue;
+            }
+            PurityContribution contribution = effectivePurity(stack);
+            total += contribution.purity() * contribution.weight();
+            weight += contribution.weight();
+        }
+        return new PuritySummary(total, weight);
+    }
+
     private static String normalizedFire(String fire) {
+        if ("zhen_fire".equals(fire)) {
+            return "zhen_fire";
+        }
         if ("ling_fire".equals(fire)) {
             return "ling_fire";
         }
-        return "normal_fire";
+        return FlameKind.fromId(fire).id();
     }
 
     private static String normalizedTempering(String tempering) {
@@ -837,6 +1620,7 @@ public final class ForgingSystem {
 
     public static String qualityName(int quality) {
         return switch (qualityKey(quality)) {
+            case "heavenly" -> "Heavenly";
             case "flawless" -> "Flawless";
             case "perfect" -> "Perfect";
             case "excellent" -> "Excellent";
@@ -851,6 +1635,7 @@ public final class ForgingSystem {
     }
 
     private static String qualityKey(int quality) {
+        if (quality > 100) return "heavenly";
         if (quality >= 100) return "flawless";
         if (quality >= 95) return "perfect";
         if (quality >= 85) return "excellent";
@@ -863,18 +1648,83 @@ public final class ForgingSystem {
         return String.format(Locale.ROOT, "%.1f", value);
     }
 
+    private static int physicalRecipeSlots(ItemStack sample, int count) {
+        if (count <= 0) {
+            return 0;
+        }
+        if (!canStackInForgingRecipe(sample)) {
+            return count;
+        }
+        return (count + sample.getMaxStackSize() - 1) / sample.getMaxStackSize();
+    }
+
+    private static int spiritStoneRecipeSlots(int count) {
+        return physicalRecipeSlots(new ItemStack(
+                com.example.immortal_cultivation_mod.magicritual.item.ModItems
+                        .SPIRIT_STONE.get()), count);
+    }
+
     public record MaterialDef(String id, Item item, String displayTrait, String statKey) {
     }
 
     private record PurityContribution(double purity, int weight) {
     }
 
+    private record PuritySummary(double total, long weight) {
+        private double average() {
+            return weight <= 0L ? 1.0D : total / weight;
+        }
+    }
+
     public record ForgingRecipe(String id, ItemLike moldItem, int averageTemp,
                                 Map<Item, Integer> required, boolean directOutput,
-                                int spiritStoneCount) {
+                                int spiritStoneCount, String requiredFireType) {
+        public ForgingRecipe {
+            averageTemp = originalWeaponTemperature(id, averageTemp);
+            // Heat capacity is checked by canUseFire; only explicit recipes require a fire type.
+            Map<Item, Integer> materialRequirements = new LinkedHashMap<>();
+            for (Map.Entry<Item, Integer> ingredient : required.entrySet()) {
+                if (!isRecipeSpiritStone(new ItemStack(ingredient.getKey()))) {
+                    materialRequirements.put(ingredient.getKey(), ingredient.getValue());
+                }
+            }
+            required = Map.copyOf(materialRequirements);
+            spiritStoneCount = WeaponShardSystem.REFORGE.equals(id) ? 128
+                    : "crimson_flame_seed".equals(id) ? 8 : RECIPE_SPIRIT_STONE_COUNT;
+            int slots = spiritStoneRecipeSlots(spiritStoneCount);
+            for (Map.Entry<Item, Integer> ingredient : required.entrySet()) {
+                int count = ingredient.getValue();
+                if (count <= 0) {
+                    throw new IllegalArgumentException("Non-positive ingredient count for " + id);
+                }
+                slots += physicalRecipeSlots(
+                        new ItemStack(ingredient.getKey()), count);
+            }
+            if (slots > MAX_RECIPE_MATERIAL_SLOTS) {
+                throw new IllegalArgumentException(
+                        "Forging recipe " + id + " needs " + slots
+                                + " material slots; maximum is " + MAX_RECIPE_MATERIAL_SLOTS);
+            }
+        }
+
+        public int ingredientSlotCount() {
+            int slots = spiritStoneRecipeSlots(spiritStoneCount);
+            for (Map.Entry<Item, Integer> ingredient : required.entrySet()) {
+                slots += physicalRecipeSlots(
+                        new ItemStack(ingredient.getKey()), ingredient.getValue());
+            }
+            return slots;
+        }
+
+        public ForgingRecipe(String id, ItemLike moldItem, int averageTemp,
+                             Map<Item, Integer> required, boolean directOutput,
+                             int spiritStoneCount) {
+            this(id, moldItem, averageTemp, required, directOutput, spiritStoneCount, "");
+        }
+
         public ForgingRecipe(String id, ItemLike moldItem, int averageTemp,
                              Map<Item, Integer> required) {
-            this(id, moldItem, averageTemp, required, false, 0);
+            this(id, moldItem, averageTemp, required, false, 0, "");
         }
     }
 }

@@ -18,6 +18,9 @@ public final class TechniqueIcons {
 
     private static final Map<ResourceLocation, IconSize> ICON_SIZES = new HashMap<>();
     private static final Map<String, String> SPELL_EFFECT_ICONS = Map.ofEntries(
+            Map.entry("jietian_duoyun_shu", "spirit_seal"),
+            Map.entry("bijie_shu", "stabilized"),
+            Map.entry("guanyun_shu", "spirit_sight"),
             Map.entry(ModSpells.DINGSHEN, "dishen"),
             Map.entry(ModSpells.SUISHUANG_LINGXIAO, "frost_flight"),
             Map.entry(ModSpells.HANJING_SUOZHUA, "frozen_qi"),
@@ -29,6 +32,8 @@ public final class TechniqueIcons {
     }
 
     public static ResourceLocation spell(ModSpells.SpellDef spell) {
+        ResourceLocation dedicated = texture("textures/spell/" + spell.id() + ".png");
+        if (Minecraft.getInstance().getResourceManager().getResource(dedicated).isPresent()) return dedicated;
         String iconName = SPELL_EFFECT_ICONS.getOrDefault(spell.id(), spell.id());
         ResourceLocation icon = texture("textures/mob_effect/" + iconName + ".png");
         return Minecraft.getInstance().getResourceManager().getResource(icon).isPresent()

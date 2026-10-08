@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PIP",
+    "WCW",
+    "WWW"
+  ],
+  "key": {
+    "P": { "item": "immortal_cultivation_mod:ordinary_yellow_talisman_paper" },
+    "I": { "item": "immortal_cultivation_mod:mundane_cinnabar_ink" },
+    "W": { "item": "immortal_cultivation_mod:lingmu_log" },
+    "C": { "item": "immortal_cultivation_mod:lingmu_clasp" }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:talisman_drawing_table",
+    "count": 1
+  }
+}

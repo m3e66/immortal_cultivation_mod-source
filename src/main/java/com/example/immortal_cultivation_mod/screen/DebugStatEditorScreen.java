@@ -6,7 +6,10 @@ import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.attachment.BodyTypes;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import com.example.immortal_cultivation_mod.client.ClientData;
+import com.example.immortal_cultivation_mod.item.TalismanRecipes;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
+import com.example.immortal_cultivation_mod.spell.ModSpells;
+import com.example.immortal_cultivation_mod.system.OuterSystemType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -20,27 +23,51 @@ import java.util.Set;
 import java.util.UUID;
 
 public class DebugStatEditorScreen extends Screen {
-    private static final int WINDOW_W = 320;
-    private static final int WINDOW_H = 320;
+    static final int WINDOW_W = 320;
+    static final int WINDOW_H = 320;
+    static final String[] TAB_KEYS = {"stats", "roots", "methods", "jindan", "proficiency", "system", "talisman_mastery", "weapon"};
     private static final int VISIBLE_METHOD_ROWS = 11;
+    private static final int VISIBLE_TALISMAN_ROWS = 11;
     private static final String METHOD_PROFICIENCY_PREFIX = "method_proficiency:";
+    private static final String CRAFT_PROFICIENCY_PREFIX = "craft_proficiency:";
+    private static final String TALISMAN_MASTERY_PREFIX = "talisman_mastery:";
+    private static final List<String> CRAFT_PROFICIENCIES = List.of(
+            "forging",
+            "alchemy",
+            "talisman",
+            "beast_taming",
+            "puppet",
+            "corpse_control",
+            "gu",
+            "formation",
+            "divination",
+            "ghost_control");
     private static final List<String> JINDAN_QUALITIES = List.of(
             "liedan", "xiapin", "zhongpin", "shangpin", "jipin", "yuanman", "jiuzhuan");
 
     private final List<ElementToggle> elementToggles = new ArrayList<>();
     private final List<GradeToggle> gradeToggles = new ArrayList<>();
     private final List<QualityToggle> qualityToggles = new ArrayList<>();
+    private final List<SystemToggle> systemToggles = new ArrayList<>();
     private final UUID targetId;
     private final String targetName;
+    private String selectedSystemId;
 
     private int page = 0;
     private int methodScroll = 0;
+    private int talismanScroll = 0;
     private boolean closeSyncSent;
 
-    public DebugStatEditorScreen(UUID targetId, String targetName) {
+    public DebugStatEditorScreen(UUID targetId, String targetName, String systemType) {
+        this(targetId, targetName, systemType, 0);
+    }
+
+    public DebugStatEditorScreen(UUID targetId, String targetName, String systemType, int initialPage) {
         super(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".debug_stat_editor"));
+        this.page = Math.clamp(initialPage, 0, 6);
         this.targetId = targetId;
         this.targetName = targetName;
+        this.selectedSystemId = OuterSystemType.byId(systemType).id();
     }
 
     public UUID targetId() {
@@ -52,15 +79,13 @@ public class DebugStatEditorScreen extends Screen {
         elementToggles.clear();
         gradeToggles.clear();
         qualityToggles.clear();
+        systemToggles.clear();
         clearWidgets();
 
         int x = (width - WINDOW_W) / 2;
         int y = (height - WINDOW_H) / 2;
 
-        addPageButton(0, x + 12, y + 30, "stats");
-        addPageButton(1, x + 87, y + 30, "roots");
-        addPageButton(2, x + 162, y + 30, "methods");
-        addPageButton(3, x + 237, y + 30, "jindan");
+        for (int i = 0; i < TAB_KEYS.length; i++) addPageButton(i, x + 10 + i * 37, y + 30, TAB_KEYS[i]);
         addHintControls(x + 264, y + 5);
         adjustStat("restriction_hints", 0);
 
@@ -81,6 +106,18 @@ public class DebugStatEditorScreen extends Screen {
             addJindanQualityButtons(x + 12, y + 92);
             return;
         }
+        if (page == 4) {
+            addCraftProficiencyButtons(x + 12, y + 62);
+            return;
+        }
+        if (page == 5) {
+            addSystemButtons(x + 12, y + 92);
+            return;
+        }
+        if (page == 6) {
+            addTalismanMasteryButtons(x + 12, y + 62);
+            return;
+        }
 
         addAdjustRow("cultivation_level", x + 12, y + 58, 1);
         addAdjustRow("age", x + 12, y + 76, 10);
@@ -92,7 +129,7 @@ public class DebugStatEditorScreen extends Screen {
         addAdjustRow("skill_points", x + 12, y + 184, 10);
         addAdjustRow("max_hp", x + 12, y + 202, 20);
         addAdjustRow("max_qi", x + 12, y + 220, 100);
-        addAdjustRow("max_energy", x + 12, y + 238, 100);
+        addAdjustRow("max_energy", x + 12, y + 238, 40);
         addAdjustRow("physical", x + 12, y + 256, 5);
         addAdjustRow("magic", x + 12, y + 274, 5);
         addAdjustRow("mental", x + 12, y + 292, 5);
@@ -101,7 +138,11 @@ public class DebugStatEditorScreen extends Screen {
     private void addPageButton(int targetPage, int x, int y, String key) {
         Component label = Component.literal(page == targetPage ? "[X] " : "")
                 .append(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".debug_tab_" + key));
-        addRenderableWidget(new DebugButton(x, y, 70, 18, label, b -> {
+        addRenderableWidget(new DebugButton(x, y, 36, 18, label, b -> {
+            if (targetPage == 7) {
+                PacketDistributor.sendToServer(new com.example.immortal_cultivation_mod.network.DebugWeaponEditorPayloads.Open());
+                return;
+            }
             page = targetPage;
             init();
         }));
@@ -151,6 +192,76 @@ public class DebugStatEditorScreen extends Screen {
             qualityToggles.add(new QualityToggle(quality, button));
             addRenderableWidget(button);
         }
+    }
+
+    private void addCraftProficiencyButtons(int x, int y) {
+        for (int i = 0; i < CRAFT_PROFICIENCIES.size(); i++) {
+            String stat = CRAFT_PROFICIENCY_PREFIX + CRAFT_PROFICIENCIES.get(i);
+            int rowY = y + i * 22;
+            addRenderableWidget(new DebugButton(x + 174, rowY, 32, 18, Component.literal("-100"), b ->
+                    adjustStat(stat, -100)));
+            addRenderableWidget(new DebugButton(x + 210, rowY, 22, 18, Component.literal("-1"), b ->
+                    adjustStat(stat, -1)));
+            addRenderableWidget(new DebugButton(x + 236, rowY, 22, 18, Component.literal("+1"), b ->
+                    adjustStat(stat, 1)));
+            addRenderableWidget(new DebugButton(x + 262, rowY, 36, 18, Component.literal("+100"), b ->
+                    adjustStat(stat, 100)));
+        }
+    }
+
+    private void addTalismanMasteryButtons(int x, int y) {
+        List<TalismanRecipes.Def> recipes = TalismanRecipes.all();
+        talismanScroll = Math.max(0, Math.min(
+                talismanScroll, Math.max(0, recipes.size() - VISIBLE_TALISMAN_ROWS)));
+        int visible = Math.min(VISIBLE_TALISMAN_ROWS, recipes.size() - talismanScroll);
+        for (int i = 0; i < visible; i++) {
+            TalismanRecipes.Def recipe = recipes.get(talismanScroll + i);
+            String stat = TALISMAN_MASTERY_PREFIX + recipe.id();
+            int rowY = y + i * 22;
+            addRenderableWidget(new DebugButton(x + 174, rowY, 32, 18,
+                    Component.literal("-1"), b -> adjustStat(stat, -1)));
+            addRenderableWidget(new DebugButton(x + 210, rowY, 32, 18,
+                    Component.literal("+1"), b -> adjustStat(stat, 1)));
+            addRenderableWidget(new DebugButton(x + 246, rowY, 52, 18,
+                    Component.translatable(
+                            "screen." + ImmortalCultivationMod.MODID + ".debug_master"),
+                    b -> masterTalisman(recipe)));
+        }
+    }
+
+    private void masterTalisman(TalismanRecipes.Def recipe) {
+        var data = ClientData.cultivationData;
+        if (data == null) {
+            return;
+        }
+        int remaining = TalismanRecipes.masterySuccesses(recipe)
+                - TalismanRecipes.successCount(data, recipe.id());
+        if (remaining > 0) {
+            adjustStat(TALISMAN_MASTERY_PREFIX + recipe.id(), remaining);
+        }
+    }
+
+    private void addSystemButtons(int x, int y) {
+        OuterSystemType[] types = OuterSystemType.values();
+        for (int i = 0; i < types.length; i++) {
+            OuterSystemType type = types[i];
+            int bx = i == types.length - 1 ? x : x + (i % 2) * 148;
+            int by = y + (i / 2) * 34;
+            int buttonWidth = i == types.length - 1 ? 296 : 140;
+            Button button = new DebugButton(
+                    bx, by, buttonWidth, 24,
+                    Component.translatable(type.translationKey()),
+                    b -> setSystem(type));
+            systemToggles.add(new SystemToggle(type, button));
+            addRenderableWidget(button);
+        }
+    }
+
+    private void setSystem(OuterSystemType type) {
+        selectedSystemId = type.id();
+        updateSystemButtons();
+        PacketDistributor.sendToServer(new ModPayloads.ServerboundDebugSetOuterSystemPayload(
+                targetId, type.id()));
     }
 
     private List<CultivationMethods.MethodDef> learnedMethods() {
@@ -254,10 +365,25 @@ public class DebugStatEditorScreen extends Screen {
                     Component.translatable("screen." + ImmortalCultivationMod.MODID + ".debug_jindan_quality", current),
                     x + 12, y + 66, 0xFFD76A, true);
             updateQualityButtons();
+        } else if (page == 4) {
+            drawCraftProficiencies(g, mc, data, x + 12, y + 66);
+        } else if (page == 5) {
+            Component selected = Component.translatable(
+                    OuterSystemType.byId(selectedSystemId).translationKey());
+            g.drawString(mc.font, Component.translatable(
+                            "screen." + ImmortalCultivationMod.MODID + ".debug_system_selected",
+                            selected),
+                    x + 12, y + 66, 0xFFE1A8, true);
+            g.drawString(mc.font, Component.translatable(
+                            "screen." + ImmortalCultivationMod.MODID + ".debug_system_note"),
+                    x + 12, y + 78, 0xAAAAAA, false);
+            updateSystemButtons();
+        } else if (page == 6) {
+            drawTalismanMasteries(g, mc, data, x + 12, y + 66);
         } else {
             var levelDef = CultivationLevels.getLevelDef(data.cultivationLevel());
 
-            drawValue(g, mc, x + 12, y + 62, "cultivation_level", data.cultivationLevel(), 0xFFFFFF);
+            drawValue(g, mc, x + 12, y + 62, "cultivation_level", CultivationLevels.displayName(data.cultivationLevel()), 0xFFFFFF);
             drawValue(g, mc, x + 12, y + 80, "age", Integer.toString(Math.max(1, levelDef.maxAge() - data.agePenalty())), 0xAAAAAA);
             drawValue(g, mc, x + 12, y + 98, "moral", Integer.toString(data.moral()), 0xDDFFAA);
             drawValue(g, mc, x + 12, y + 116, "luck", Integer.toString(data.luck()), 0xFFFFAA);
@@ -268,7 +394,7 @@ public class DebugStatEditorScreen extends Screen {
             drawValue(g, mc, x + 12, y + 188, "skill_points_debug", Integer.toString(data.skillPoints()), 0x55FFFF);
             drawValue(g, mc, x + 12, y + 206, "max_hp", Integer.toString(levelDef.maxHp() + data.maxHpBonus()), 0xFFFFFF);
             drawValue(g, mc, x + 12, y + 224, "max_qi", Integer.toString(levelDef.maxQi() + data.maxQiBonus()), 0x55FFFF);
-            drawValue(g, mc, x + 12, y + 242, "max_energy", Integer.toString(data.maxEnergyBonus()), 0xFFFF55);
+            drawValue(g, mc, x + 12, y + 242, "max_energy", Integer.toString(data.thoughtSkillBonus()), 0xFFFF55);
             drawValue(g, mc, x + 12, y + 260, "physical", Integer.toString(data.physicalAttack()), 0xFFAA66);
             drawValue(g, mc, x + 12, y + 278, "magic", Integer.toString(data.magicAttack()), 0xAA88FF);
             drawValue(g, mc, x + 12, y + 296, "mental", Integer.toString(data.mentalAttack()), 0x88FFAA);
@@ -296,7 +422,13 @@ public class DebugStatEditorScreen extends Screen {
     }
 
     private void drawValue(GuiGraphics g, Minecraft mc, int x, int y, String key, String value, int color) {
-        Component label = Component.translatable("screen." + ImmortalCultivationMod.MODID + "." + key).append(": ").append(value);
+        drawValue(g, mc, x, y, key, Component.literal(value), color);
+    }
+
+    private void drawValue(GuiGraphics g, Minecraft mc, int x, int y, String key, Component value, int color) {
+        Component label = Component.translatable("screen." + ImmortalCultivationMod.MODID + "." + key)
+                .append(": ")
+                .append(value);
         g.drawString(mc.font, label, x, y, color, true);
     }
 
@@ -322,6 +454,78 @@ public class DebugStatEditorScreen extends Screen {
         }
     }
 
+    private void drawCraftProficiencies(GuiGraphics g, Minecraft mc,
+                                         com.example.immortal_cultivation_mod.attachment.ModAttachments.CultivationData data,
+                                         int x, int y) {
+        for (int i = 0; i < CRAFT_PROFICIENCIES.size(); i++) {
+            String id = CRAFT_PROFICIENCIES.get(i);
+            int value = craftProficiency(data, id);
+            Component label = Component.translatable(
+                            "screen." + ImmortalCultivationMod.MODID + ".debug_proficiency_" + id)
+                    .append(": ")
+                    .append(Integer.toString(value))
+                    .append(" / ")
+                    .append(proficiencyTier(value));
+            drawFittedLabel(g, mc, label, x, y + i * 22, 168, 0xFFE1A8);
+        }
+    }
+
+    private void drawTalismanMasteries(GuiGraphics g, Minecraft mc,
+                                        com.example.immortal_cultivation_mod.attachment.ModAttachments.CultivationData data,
+                                        int x, int y) {
+        List<TalismanRecipes.Def> recipes = TalismanRecipes.all();
+        talismanScroll = Math.max(0, Math.min(
+                talismanScroll, Math.max(0, recipes.size() - VISIBLE_TALISMAN_ROWS)));
+        int visible = Math.min(VISIBLE_TALISMAN_ROWS, recipes.size() - talismanScroll);
+        for (int i = 0; i < visible; i++) {
+            TalismanRecipes.Def recipe = recipes.get(talismanScroll + i);
+            int successes = TalismanRecipes.successCount(data, recipe.id());
+            int required = TalismanRecipes.masterySuccesses(recipe);
+            Component label = recipe.result().getHoverName().copy()
+                    .append(": ")
+                    .append(Integer.toString(successes))
+                    .append(" / ")
+                    .append(Integer.toString(required));
+            drawFittedLabel(g, mc, label, x, y + i * 22, 168,
+                    successes >= required ? 0xFF88CC : 0xFFE1A8);
+        }
+    }
+
+    private void drawFittedLabel(GuiGraphics g, Minecraft mc, Component label,
+                                 int x, int y, int maxWidth, int color) {
+        int textWidth = Math.max(1, mc.font.width(label));
+        float scale = Math.min(1.0F, maxWidth / (float) textWidth);
+        g.pose().pushPose();
+        g.pose().translate(x, y + (8.0F - 8.0F * scale) / 2.0F, 0.0F);
+        g.pose().scale(scale, scale, 1.0F);
+        g.drawString(mc.font, label, 0, 0, color, true);
+        g.pose().popPose();
+    }
+
+    private int craftProficiency(
+            com.example.immortal_cultivation_mod.attachment.ModAttachments.CultivationData data,
+            String id) {
+        return "corpse_control".equals(id)
+                ? data.spellProficiency(ModSpells.KONGSHI_SHU)
+                : data.methodProficiency("craft_" + id);
+    }
+
+    private Component proficiencyTier(int value) {
+        String key;
+        if (value >= 10_000) {
+            key = "spell_proficiency_peak";
+        } else if (value >= 1_000) {
+            key = "spell_proficiency_perfected";
+        } else if (value >= 500) {
+            key = "spell_proficiency_great";
+        } else if (value >= 100) {
+            key = "spell_proficiency_minor";
+        } else {
+            key = "spell_proficiency_beginner";
+        }
+        return Component.translatable("screen." + ImmortalCultivationMod.MODID + "." + key);
+    }
+
     private void updateQualityButtons() {
         for (QualityToggle toggle : qualityToggles) {
             boolean selected = toggle.quality().equals(ClientData.jindanQuality);
@@ -331,8 +535,27 @@ public class DebugStatEditorScreen extends Screen {
         }
     }
 
+    private void updateSystemButtons() {
+        for (SystemToggle toggle : systemToggles) {
+            boolean selected = toggle.type().id().equals(selectedSystemId);
+            toggle.button().setMessage(Component.literal(selected ? "[X] " : "[ ] ")
+                    .append(Component.translatable(toggle.type().translationKey())));
+        }
+    }
+
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (page == 6) {
+            int max = Math.max(0, TalismanRecipes.all().size() - VISIBLE_TALISMAN_ROWS);
+            int next = Math.max(0,
+                    Math.min(max, talismanScroll - (int) Math.signum(scrollY)));
+            if (next != talismanScroll) {
+                talismanScroll = next;
+                init();
+                return true;
+            }
+            return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        }
         if (page != 2) {
             return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
         }
@@ -373,7 +596,10 @@ public class DebugStatEditorScreen extends Screen {
     private record QualityToggle(String quality, Button button) {
     }
 
-    private static class DebugButton extends Button {
+    private record SystemToggle(OuterSystemType type, Button button) {
+    }
+
+    static class DebugButton extends Button {
         DebugButton(int x, int y, int width, int height, Component message, OnPress onPress) {
             super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
         }
@@ -396,11 +622,16 @@ public class DebugStatEditorScreen extends Screen {
 
             var font = Minecraft.getInstance().font;
             Component message = getMessage();
+            int textWidth = Math.max(1, font.width(message));
+            float scale = Math.min(1.0F, Math.max(0.1F, (width - 6) / (float) textWidth));
+            float tx = x + (width - textWidth * scale) / 2.0F;
+            float ty = y + (height - 8.0F * scale) / 2.0F;
 
-            int tx = x + (width - font.width(message)) / 2;
-            int ty = y + (height - 8) / 2;
-
-            g.drawString(font, message, tx, ty, text, false);
+            g.pose().pushPose();
+            g.pose().translate(tx, ty, 0.0F);
+            g.pose().scale(scale, scale, 1.0F);
+            g.drawString(font, message, 0, 0, text, false);
+            g.pose().popPose();
         }
     }
 }

@@ -183,6 +183,7 @@ public class MysteriousRingItem extends Item implements ICurioItem {
         tooltip.add(Component.translatable(
                 "tooltip." + ImmortalCultivationMod.MODID + ".mysterious_ring.energy",
                 getEnergy(state), MAX_ENERGY).withStyle(ChatFormatting.YELLOW));
+        tooltip.add(Component.translatable("ring.ai.hint").withStyle(ChatFormatting.AQUA));
     }
 
     public static void tick(ServerPlayer player) {
@@ -201,6 +202,11 @@ public class MysteriousRingItem extends Item implements ICurioItem {
         CompoundTag before = state.copy();
         long now = player.level().getGameTime();
         initialize(player, state, now);
+        if (state.getBoolean(AWAKE)) {
+            boolean missingProfile = !state.hasUUID("ElderId");
+            ensureElder(player, state);
+            if (missingProfile) saveState(ring, state);
+        }
         handleEquipTransition(player, ring, state, equippedNow, wasEquipped, now);
 
         if (!state.getBoolean(AWAKE)) {
@@ -226,6 +232,7 @@ public class MysteriousRingItem extends Item implements ICurioItem {
 
     public static boolean tryEmergencyTeleport(ServerPlayer player, DamageSource source,
                                                float incomingDamage) {
+        if (com.example.immortal_cultivation_mod.pagoda.PagodaSystem.adminKill(player,source)) return false;
         if (incomingDamage <= 0.0F || NpcProfile.sparPartner(player) != null) {
             return false;
         }
@@ -237,6 +244,9 @@ public class MysteriousRingItem extends Item implements ICurioItem {
 
         ItemStack ring = findEquippedAwake(player);
         if (ring.isEmpty()) {
+            return false;
+        }
+        if (elderProfiles(player).rescueRefused(elderId(player, ring), player.getUUID(), player.server.overworld().getGameTime())) {
             return false;
         }
         CompoundTag state = readState(ring);
@@ -606,6 +616,8 @@ public class MysteriousRingItem extends Item implements ICurioItem {
 
         if (progress >= AWAKENING_QI) {
             state.putBoolean(AWAKE, true);
+            ensureElder(player, state);
+            saveState(findOwned(player), state);
             state.putInt(ENERGY, 1);
             state.putBoolean(PENDING_ENERGY_ONE, true);
             sendSystem(player, "awakening_complete");
@@ -922,12 +934,13 @@ public class MysteriousRingItem extends Item implements ICurioItem {
         ModAttachments.CultivationData data = ModAttachments.getData(player);
         List<ModSpells.SpellDef> eligible = ModSpells.all().stream()
                 .filter(spell -> newLevel.equals(spell.requiredLevel()))
-                .filter(spell -> ModSpells.isComboEligible(spell.id()))
+                .filter(spell -> ModSpells.isRandomRewardEligible(spell.id()))
                 .filter(spell -> !data.knownSpells().contains(spell.id()))
+                .filter(spell -> elderProfiles(player).knows(elderId(player, findOwned(player)), spell.id()))
                 .toList();
         String spellId = eligible.isEmpty()
                 ? ""
-                : eligible.get(player.getRandom().nextInt(eligible.size())).id();
+                : eligible.get(elderChoice(player, eligible.size())).id();
         boolean noEligibleSpell = eligible.isEmpty();
         MaterialReward material = noEligibleSpell
                 ? replacementMaterialReward(player, newLevel)
@@ -952,15 +965,16 @@ public class MysteriousRingItem extends Item implements ICurioItem {
         int count;
         if (realm <= 1) {
             itemId = ImmortalCultivationMod.MODID + ":spirit_stone";
-            count = player.getRandom().nextInt(8, 17);
+            count = elderRange(player, 8, 17);
         } else if (realm <= 3) {
             itemId = ImmortalCultivationMod.MODID + ":medium_spirit_stone";
-            count = player.getRandom().nextInt(major ? 6 : 3, major ? 13 : 8);
+            count = elderRange(player, major ? 6 : 3, major ? 13 : 8);
         } else {
             itemId = ImmortalCultivationMod.MODID + ":high_spirit_stone";
-            count = player.getRandom().nextInt(major ? 3 : 1, major ? 7 : 4);
+            count = elderRange(player, major ? 3 : 1, major ? 7 : 4);
         }
-        return new MaterialReward(itemId, count);
+        return new MaterialReward(itemId, elderProfiles(player).reserveGift(
+                elderId(player, findOwned(player)), itemId, count));
     }
 
     private static MaterialReward replacementMaterialReward(ServerPlayer player,
@@ -969,11 +983,11 @@ public class MysteriousRingItem extends Item implements ICurioItem {
         if (realm <= 1) {
             return new MaterialReward(
                     ImmortalCultivationMod.MODID + ":medium_spirit_stone",
-                    player.getRandom().nextInt(4, 9));
+                    reserveReplacement(player, "medium_spirit_stone", 4, 9));
         }
         return new MaterialReward(
                 ImmortalCultivationMod.MODID + ":high_spirit_stone",
-                player.getRandom().nextInt(realm <= 3 ? 2 : 5,
+                reserveReplacement(player, "high_spirit_stone", realm <= 3 ? 2 : 5,
                         realm <= 3 ? 6 : 11));
     }
 
@@ -1012,6 +1026,8 @@ public class MysteriousRingItem extends Item implements ICurioItem {
                 ? ItemStack.EMPTY : new ItemStack(material, count);
         if (!materialStack.isEmpty()) {
             player.getInventory().add(materialStack);
+            elderProfiles(player).delivered(elderId(player, findOwned(player)), materialId,
+                    count - materialStack.getCount());
             if (!materialStack.isEmpty()) {
                 reward.putInt("Count", materialStack.getCount());
                 rewards.set(0, reward);
@@ -1041,10 +1057,11 @@ public class MysteriousRingItem extends Item implements ICurioItem {
                 ModAttachments.setData(player, data.withKnownSpells(List.copyOf(known)));
                 ServerEvents.syncPlayerData(player);
                 gaveSpell = true;
+                elderProfiles(player).taught(elderId(player, findOwned(player)), spellId);
             }
         }
 
-        if (gaveSpell && material != Items.AIR) {
+        if (gaveSpell && material != Items.AIR && count > 0) {
             speakElder(player, "reward.both", spell.name(), material.getDescription());
         } else if (gaveSpell) {
             speakRandomWithArg(player, state, "reward.spell", 5, spell.name());
@@ -1052,7 +1069,7 @@ public class MysteriousRingItem extends Item implements ICurioItem {
             speakElder(player, "reward.already_known");
         } else if (reward.getBoolean("NoEligibleSpell")) {
             speakElder(player, "reward.no_spells");
-        } else if (material != Items.AIR) {
+        } else if (material != Items.AIR && count > 0) {
             speakRandomWithArg(player, state, "reward.material", 4,
                     material.getDescription());
         } else {
@@ -1115,7 +1132,7 @@ public class MysteriousRingItem extends Item implements ICurioItem {
             mask = 0;
         }
         int remaining = fullMask & ~mask;
-        int pick = player.getRandom().nextInt(Integer.bitCount(remaining));
+        int pick = elderChoice(player, Integer.bitCount(remaining));
         int selected = 0;
         for (int index = 0; index < count; index++) {
             if ((remaining & (1 << index)) == 0) {
@@ -1133,11 +1150,14 @@ public class MysteriousRingItem extends Item implements ICurioItem {
 
     private static void speakElder(ServerPlayer player, String suffix,
                                    Object... args) {
+        ItemStack ring = findOwned(player);
+        String name = ring.isEmpty() || !readState(ring).getBoolean(AWAKE) ? "戒老"
+                : elderProfiles(player).profile(elderId(player, ring)).getString("Name");
         PacketDistributor.sendToPlayer(player, new ModPayloads.ClientboundRingDialoguePayload(
-                Component.translatable(
+                Component.literal("【" + name + "】").append(Component.translatable(
                         "dialogue." + ImmortalCultivationMod.MODID
                                 + ".mysterious_ring." + suffix,
-                        args).withStyle(ChatFormatting.GOLD),
+                        args)).withStyle(ChatFormatting.GOLD),
                 true,
                 ELDER_MESSAGE_DURATION_TICKS));
     }
@@ -1239,10 +1259,43 @@ public class MysteriousRingItem extends Item implements ICurioItem {
         return value >= 100 ? 1 : 0;
     }
 
-    private static ItemStack findEquippedAwake(ServerPlayer player) {
+    public static ItemStack findEquippedAwake(ServerPlayer player) {
         ItemStack stack = findEquipped(player);
         return !stack.isEmpty() && readState(stack).getBoolean(AWAKE)
                 ? stack : ItemStack.EMPTY;
+    }
+
+    public static ItemStack findTalkRing(ServerPlayer player) {
+        // Holding a ring chooses that elder; otherwise use the worn ring.
+        for (var hand : net.minecraft.world.InteractionHand.values()) {
+            ItemStack held = player.getItemInHand(hand);
+            if (held.is(ModItems.MYSTERIOUS_RING.get()) && readState(held).getBoolean(AWAKE)) return held;
+        }
+        return findEquippedAwake(player);
+    }
+
+    public static ItemStack findConversationRing(ServerPlayer player, java.util.UUID elder) {
+        ItemStack active = findTalkRing(player);
+        if (!active.isEmpty() && (elder == null || elder.equals(elderId(player, active)))) return active;
+        ItemStack worn = findEquippedAwake(player);
+        if (!worn.isEmpty() && (elder == null || elder.equals(elderId(player, worn)))) return worn;
+        for (ItemStack stack : player.getInventory().items) {
+            if (stack.is(ModItems.MYSTERIOUS_RING.get()) && readState(stack).getBoolean(AWAKE)
+                    && (elder == null || elder.equals(elderId(player, stack)))) return stack;
+        }
+        for (ItemStack stack : player.getInventory().offhand) {
+            if (stack.is(ModItems.MYSTERIOUS_RING.get()) && readState(stack).getBoolean(AWAKE)
+                    && (elder == null || elder.equals(elderId(player, stack)))) return stack;
+        }
+        return ItemStack.EMPTY;
+    }
+
+    public static String elderLiveRingFacts(ServerPlayer player, ItemStack ring) {
+        CompoundTag state = readState(ring);
+        return "Stored ring energy=" + getEnergy(state) + "/" + MAX_ENERGY
+                + "; emergency teleport cooldown remaining ticks="
+                + Math.max(0, state.getLong(TELEPORT_COOLDOWN) - player.level().getGameTime())
+                + "; emergency rescues=" + state.getInt(TELEPORT_COUNT) + ".";
     }
 
     private static ItemStack findEquipped(ServerPlayer player) {
@@ -1271,6 +1324,39 @@ public class MysteriousRingItem extends Item implements ICurioItem {
         return Mth.clamp(state.getInt(ENERGY), 1, MAX_ENERGY);
     }
 
+    private static java.util.UUID ensureElder(ServerPlayer player, CompoundTag state) {
+        if (!state.hasUUID("ElderId")) state.putUUID("ElderId", java.util.UUID.randomUUID());
+        java.util.UUID id = state.getUUID("ElderId");
+        elderProfiles(player).profile(id);
+        return id;
+    }
+
+    public static java.util.UUID elderId(ServerPlayer player, ItemStack ring) {
+        CompoundTag state = readState(ring);
+        if (ring.isEmpty() || !state.getBoolean(AWAKE)) throw new IllegalArgumentException("Ring must be awake");
+        boolean needsId = !state.hasUUID("ElderId");
+        java.util.UUID id = ensureElder(player, state);
+        if (needsId) saveState(ring, state);
+        return id;
+    }
+
+    private static com.example.immortal_cultivation_mod.ring.RingElderProfiles elderProfiles(ServerPlayer player) {
+        return com.example.immortal_cultivation_mod.ring.RingElderProfiles.get(player.server);
+    }
+
+    private static int elderChoice(ServerPlayer player, int bound) {
+        return elderProfiles(player).choose(elderId(player, findOwned(player)), bound);
+    }
+
+    private static int elderRange(ServerPlayer player, int min, int max) {
+        return min + elderChoice(player, max - min);
+    }
+
+    private static int reserveReplacement(ServerPlayer player, String item, int min, int max) {
+        return elderProfiles(player).reserveGift(elderId(player, findOwned(player)),
+                ImmortalCultivationMod.MODID + ":" + item, elderRange(player, min, max));
+    }
+
     private static void setEnergy(CompoundTag state, int energy) {
         state.putInt(ENERGY, Mth.clamp(energy, 1, MAX_ENERGY));
     }
@@ -1293,6 +1379,9 @@ public class MysteriousRingItem extends Item implements ICurioItem {
     private static void saveState(ItemStack stack, CompoundTag state) {
         CompoundTag custom = stack.getOrDefault(
                 DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+        CompoundTag previous = custom.getCompound(STATE_TAG);
+        if (!state.hasUUID("ElderId") && previous.hasUUID("ElderId"))
+            state.putUUID("ElderId", previous.getUUID("ElderId"));
         custom.put(STATE_TAG, state.copy());
         stack.set(DataComponents.CUSTOM_DATA, CustomData.of(custom));
     }

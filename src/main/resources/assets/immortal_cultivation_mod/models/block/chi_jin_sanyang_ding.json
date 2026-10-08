@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "immortal_cultivation_mod:block/chi_jin_sanyang_ding"
+  }
+}

@@ -1,8 +1,11 @@
 package com.example.immortal_cultivation_mod.mixin;
 
 import com.example.immortal_cultivation_mod.effect.ModEffects;
+import com.example.immortal_cultivation_mod.client.BlackFlameClient;
+import com.example.immortal_cultivation_mod.client.JindanFlightEffects;
+import com.example.immortal_cultivation_mod.client.ClientData;
+import com.example.immortal_cultivation_mod.client.SpiritualSenseClient;
 import com.example.immortal_cultivation_mod.item.DisguiseMaskItem;
-import com.example.immortal_cultivation_mod.spell.JindanCreativeFlight;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -14,6 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -21,6 +25,50 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerRenderer.class)
 public abstract class PlayerRendererMixin {
+    @Unique private double immortalCultivation$lastFlightYawCorrection;
+    @Unique private float immortalCultivation$lastFlightMovementPitch;
+
+    @Inject(
+            method = "setupRotations(Lnet/minecraft/client/player/AbstractClientPlayer;Lcom/mojang/blaze3d/vertex/PoseStack;FFFF)V",
+            at = @At("HEAD"))
+    private void immortalCultivation$blackFlameCollapse(
+            AbstractClientPlayer player,
+            PoseStack poseStack,
+            float ageInTicks,
+            float rotationYaw,
+            float partialTick,
+            float scale,
+            CallbackInfo ci) {
+        BlackFlameClient.DeathAppearance appearance =
+                BlackFlameClient.deathAppearance(player, partialTick);
+        if (appearance != null && appearance.scale() < 0.999F) {
+            poseStack.scale(appearance.scale(), appearance.scale(), appearance.scale());
+        }
+    }
+
+    @Inject(
+            method = "setupRotations(Lnet/minecraft/client/player/AbstractClientPlayer;Lcom/mojang/blaze3d/vertex/PoseStack;FFFF)V",
+            at = @At("HEAD"))
+    private void immortalCultivation$solarBodyScale(
+            AbstractClientPlayer player,
+            PoseStack poseStack,
+            float ageInTicks,
+            float rotationYaw,
+            float partialTick,
+            float scale,
+            CallbackInfo ci) {
+        var solarBody = player.getEffect(ModEffects.SOLAR_BODY);
+        if (solarBody == null) {
+            return;
+        }
+        float bodyScale = switch (solarBody.getAmplifier()) {
+            case 1 -> 1.15F;
+            case 2 -> 1.25F;
+            default -> 1.12F;
+        };
+        poseStack.scale(bodyScale, bodyScale, bodyScale);
+    }
+
     @Inject(
             method = "getTextureLocation(Lnet/minecraft/client/player/AbstractClientPlayer;)Lnet/minecraft/resources/ResourceLocation;",
             at = @At("HEAD"),
@@ -32,7 +80,7 @@ public abstract class PlayerRendererMixin {
                 DisguiseMaskItem.getEquippedMask(player);
 
         if (mask.isEmpty()
-                || immortalCultivation$canReveal(player)) {
+                || immortalCultivation$canReveal(player, mask)) {
             return;
         }
 
@@ -56,8 +104,9 @@ public abstract class PlayerRendererMixin {
             int packedLight,
             float partialTick,
             CallbackInfo ci) {
-        if (DisguiseMaskItem.isWearing(player)
-                && !immortalCultivation$canReveal(player)) {
+        ItemStack mask = DisguiseMaskItem.getEquippedMask(player);
+        if (!mask.isEmpty()
+                && !immortalCultivation$canReveal(player, mask)) {
             ci.cancel();
         }
     }
@@ -73,17 +122,13 @@ public abstract class PlayerRendererMixin {
             float partialTick,
             float scale,
             CallbackInfo ci) {
-        if (!JindanCreativeFlight
-                .shouldUseElytraPose(player)) {
+        float flightPoseProgress = com.example.immortal_cultivation_mod.client.SwordComboAnimations.isPlaying(player)
+                ? 0.0F : JindanFlightEffects.fastFlightPoseProgress(player, partialTick);
+        if (flightPoseProgress <= 0.001F) {
+            immortalCultivation$lastFlightYawCorrection = 0.0D;
+            immortalCultivation$lastFlightMovementPitch = 0.0F;
             return;
         }
-
-        poseStack.mulPose(
-                Axis.XP.rotationDegrees(
-                        -90.0F - player.getXRot()));
-
-        Vec3 look =
-                player.getViewVector(partialTick);
 
         Vec3 movement =
                 player.getDeltaMovement();
@@ -91,46 +136,51 @@ public abstract class PlayerRendererMixin {
         double movementHorizontal =
                 movement.horizontalDistanceSqr();
 
-        double lookHorizontal =
-                look.horizontalDistanceSqr();
-
-        if (movementHorizontal <= 0.0D
-                || lookHorizontal <= 0.0D) {
-            return;
+        // First turn the rendered body toward its actual horizontal movement,
+        // instead of the camera direction or the player's last walking yaw.
+        if (movementHorizontal > 1.0E-7D) {
+            double yawRadians = Math.toRadians(rotationYaw);
+            double renderedForwardX = -Math.sin(yawRadians);
+            double renderedForwardZ = Math.cos(yawRadians);
+            double horizontalLength = Math.sqrt(movementHorizontal);
+            double dot = (movement.x * renderedForwardX
+                    + movement.z * renderedForwardZ) / horizontalLength;
+            double cross = movement.x * renderedForwardZ
+                    - movement.z * renderedForwardX;
+            immortalCultivation$lastFlightYawCorrection = Math.signum(cross) * Math.acos(
+                    Math.max(-1.0D, Math.min(1.0D, dot)));
         }
+        poseStack.mulPose(Axis.YP.rotation(
+                (float)immortalCultivation$lastFlightYawCorrection
+                        * flightPoseProgress));
 
-        double dot =
-                (movement.x * look.x
-                        + movement.z * look.z)
-                        / Math.sqrt(
-                        movementHorizontal
-                                * lookHorizontal);
-
-        double cross =
-                movement.x * look.z
-                        - movement.z * look.x;
-
-        double angle =
-                Math.signum(cross)
-                        * Math.acos(
-                        Math.max(
-                                -1.0D,
-                                Math.min(1.0D, dot)));
-
-        poseStack.mulPose(
-                Axis.YP.rotation((float)angle));
+        // Match the supplied model's 82.5-degree root tilt, then carry that
+        // complete straight-body pose through the velocity pitch.
+        if (movement.lengthSqr() > 1.0E-7D) {
+            double horizontalSpeed = Math.sqrt(movementHorizontal);
+            immortalCultivation$lastFlightMovementPitch = (float)Math.toDegrees(
+                    Math.atan2(-movement.y, horizontalSpeed));
+        }
+        poseStack.mulPose(Axis.XP.rotationDegrees(
+                (-82.5F - immortalCultivation$lastFlightMovementPitch)
+                        * flightPoseProgress));
     }
 
     private static boolean
     immortalCultivation$canReveal(
-            AbstractClientPlayer target) {
-        var viewer =
-                Minecraft.getInstance().player;
+            AbstractClientPlayer target, ItemStack mask) {
+        var viewer = Minecraft.getInstance().player;
+        if (viewer == null) {
+            return false;
+        }
 
-        return viewer != null
-                && viewer.hasEffect(
-                ModEffects.SPIRIT_SIGHT)
-                && viewer.distanceToSqr(target)
-                <= 64.0D;
+        boolean spiritSight = viewer.hasEffect(ModEffects.SPIRIT_SIGHT)
+                && viewer.distanceToSqr(target) <= 64.0D;
+        boolean strongerQiSense = SpiritualSenseClient.isActive()
+                && SpiritualSenseClient.isSensingEntity(target.getId())
+                && DisguiseMaskItem.canQiSenseReveal(
+                        ClientData.cultivationData.cultivationLevel(),
+                        mask);
+        return spiritSight || strongerQiSense;
     }
 }

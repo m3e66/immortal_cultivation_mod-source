@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:entity",
+  "pools": [
+    { "rolls": 1, "entries": [{ "type": "minecraft:item", "name": "immortal_cultivation_mod:wind_feather", "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 2, "max": 5 } }] }] },
+    { "rolls": 1, "entries": [{ "type": "minecraft:item", "name": "immortal_cultivation_mod:spirit_deer_antler", "conditions": [{ "condition": "minecraft:random_chance", "chance": 0.65 }] }] },
+    { "rolls": 1, "entries": [{ "type": "minecraft:item", "name": "immortal_cultivation_mod:zhuji_beast_meat", "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 2, "max": 4 } }] }] },
+    { "rolls": 1, "entries": [{ "type": "minecraft:item", "name": "immortal_cultivation_mod:zhuji_yaodan", "conditions": [{ "condition": "minecraft:random_chance", "chance": 0.30 }] }] }
+  ]
+}

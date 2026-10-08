@@ -1,0 +1,16 @@
+package com.example.immortal_cultivation_mod.hair;
+
+import java.util.Locale;
+
+public enum HairStyle {
+    MALE_SHORT_LAYERED, MALE_LONG_CULTIVATION, MALE_HIGH_PONYTAIL, MALE_MESSY_MEDIUM,
+    MALE_SLICKED_BACK, MALE_HALF_UP_LONG, MALE_WARRIOR_PONYTAIL, MALE_LOOSE_SHOULDER_LENGTH,
+    MALE_TOPKNOT, MALE_LONG_SECT_DISCIPLE,
+    FEMALE_LONG_STRAIGHT, FEMALE_HIGH_PONYTAIL, FEMALE_TWIN_PONYTAIL,
+    FEMALE_HALF_UP_CULTIVATION, FEMALE_LONG_SIDE_BANGS, FEMALE_BRAIDED_LONG,
+    FEMALE_DOUBLE_BUN, FEMALE_LOW_PONYTAIL, FEMALE_FLOWING_SHOULDER_LENGTH,
+    FEMALE_IMMORTAL_CULTIVATOR;
+
+    public String id() { return name().toLowerCase(Locale.ROOT) + "_hair"; }
+    public String translation() { return "item.immortal_cultivation_mod." + id(); }
+}

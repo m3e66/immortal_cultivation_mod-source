@@ -107,6 +107,11 @@ public class CrimsonFlameFireballEntity extends ThrowableItemProjectile {
             target.knockback(0.9D * distanceScale, -away.x, -away.z);
         }
 
+        if (owner instanceof CrimsonScaleFlameLizardEntity lizard) {
+            BeastMoveBlockBreaker.breakSphere(serverLevel, lizard, center,
+                    2.4D, 1.8D, 24, 6.0F);
+        }
+
         serverLevel.sendParticles(ParticleTypes.EXPLOSION_EMITTER,
                 center.x, center.y, center.z, 1, 0.0D, 0.0D, 0.0D, 0.0D);
         serverLevel.sendParticles(ParticleTypes.FLAME,

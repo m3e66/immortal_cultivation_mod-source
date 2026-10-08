@@ -1,0 +1,7 @@
+{
+  "type": "immortal_cultivation_mod:bridge",
+  "biomes": "#immortal_cultivation_mod:has_structure/bridge1",
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "spawn_overrides": {}
+}

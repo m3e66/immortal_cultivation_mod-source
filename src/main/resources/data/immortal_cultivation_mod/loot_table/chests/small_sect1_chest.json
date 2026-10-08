@@ -1,0 +1,137 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 12.0,
+                "min": 6.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "minecraft:paper"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 5.0,
+                "min": 2.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "immortal_cultivation_mod:medium_spirit_stone"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 14.0,
+                "min": 10.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "immortal_cultivation_mod:spirit_stone"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "chance": 0.25,
+          "condition": "minecraft:random_chance"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:feijian_yujian"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:dao_yujian"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:jingtie_spear_yujian"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:heavy_iron_bracer_yujian"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:throwing_knife_yujian"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:flying_needle_yujian"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:zhenpan_yujian"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:blank_formation_flag_yujian"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:qi_pouch_yujian"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:zhenhun_bell_yujian"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:yinhun_gong_yujian"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:fog_revealing_mirror_yujian"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:yinyang_compass_yujian"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "immortal_cultivation_mod:yuanhun_bottle_yujian"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "immortal_cultivation_mod:chests/small_sect1_chest"
+}

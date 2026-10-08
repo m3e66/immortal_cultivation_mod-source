@@ -1,0 +1,26 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "immortal_cultivation_mod:item/embroidered_forehead_band"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "minecraft:damage": 0.25
+      },
+      "model": "immortal_cultivation_mod:item/embroidered_forehead_band_worn"
+    },
+    {
+      "predicate": {
+        "minecraft:damage": 0.5
+      },
+      "model": "immortal_cultivation_mod:item/embroidered_forehead_band_damaged"
+    },
+    {
+      "predicate": {
+        "minecraft:damage": 0.75
+      },
+      "model": "immortal_cultivation_mod:item/embroidered_forehead_band_tattered"
+    }
+  ]
+}

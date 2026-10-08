@@ -8,30 +8,17 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
-public record ClientboundCenterAccessPayload(
-      BlockPos pos,
-      List<String> blacklistedPlayers,
-      List<String> controllerPlayers
-) implements CustomPacketPayload {
-   public static final Type<ClientboundCenterAccessPayload> TYPE = new Type<>(
-         ResourceLocation.fromNamespaceAndPath(
-               "immortal_cultivation_mod", "center_access_sync"));
-   private static final StreamCodec<ByteBuf, List<String>> BLACKLIST_CODEC =
-         ByteBufCodecs.stringUtf8(64).apply(ByteBufCodecs.list(64));
-   private static final StreamCodec<ByteBuf, List<String>> CONTROLLER_CODEC =
-         ByteBufCodecs.stringUtf8(64).apply(ByteBufCodecs.list(16));
-   public static final StreamCodec<ByteBuf, ClientboundCenterAccessPayload> STREAM_CODEC =
-         StreamCodec.composite(
-               BlockPos.STREAM_CODEC,
-               ClientboundCenterAccessPayload::pos,
-               BLACKLIST_CODEC,
-               ClientboundCenterAccessPayload::blacklistedPlayers,
-               CONTROLLER_CODEC,
-               ClientboundCenterAccessPayload::controllerPlayers,
-               ClientboundCenterAccessPayload::new);
+public record ClientboundCenterAccessPayload(BlockPos pos, List<String> blacklistedPlayers, List<String> controllerPlayers) implements CustomPacketPayload {
+   public static final CustomPacketPayload.Type<ClientboundCenterAccessPayload> TYPE = new CustomPacketPayload.Type(ResourceLocation.fromNamespaceAndPath("immortal_cultivation_mod", "center_access_sync"));
+   private static final StreamCodec<ByteBuf, List<String>> BLACKLIST_CODEC = ByteBufCodecs.stringUtf8(64).apply(ByteBufCodecs.list(64));
+   private static final StreamCodec<ByteBuf, List<String>> CONTROLLER_CODEC = ByteBufCodecs.stringUtf8(64).apply(ByteBufCodecs.list(16));
+   public static final StreamCodec<ByteBuf, ClientboundCenterAccessPayload> STREAM_CODEC;
 
-   @Override
-   public Type<? extends CustomPacketPayload> type() {
+   public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
       return TYPE;
+   }
+
+   static {
+      STREAM_CODEC = StreamCodec.composite(BlockPos.STREAM_CODEC, ClientboundCenterAccessPayload::pos, BLACKLIST_CODEC, ClientboundCenterAccessPayload::blacklistedPlayers, CONTROLLER_CODEC, ClientboundCenterAccessPayload::controllerPlayers, ClientboundCenterAccessPayload::new);
    }
 }

@@ -1,6 +1,8 @@
 {
   "replace": false,
   "values": [
-    "immortal_cultivation_mod:zhongyi"
+    "immortal_cultivation_mod:zhongyi",
+    "immortal_cultivation_mod:shenyi",
+    "immortal_cultivation_mod:hufu"
   ]
 }

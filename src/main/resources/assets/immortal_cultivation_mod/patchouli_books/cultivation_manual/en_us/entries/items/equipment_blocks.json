@@ -22,7 +22,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Crude Iron Small Ding is a rough beginner cauldron for Lianqi Early practice. It is heavy, uneven, and easy to fail.$(br2)Bronze Fire-Guiding Ding is a basic sect cauldron for early Lianqi, better than crude iron but still low success."
+      "text": "$(br)Crude Iron Small Ding provides 10 material slots. Bronze Fire-Guiding Ding provides 15 material slots. The jade slip and result each have their own separate slot.$(br2)Foundation Establishment weapons require 10–15 material slots. Golden Core weapon recipes use 15 slots, including one stack of 64 spirit stones. Beast cores match the weapon realm."
     },
     {
       "type": "patchouli:text",
@@ -30,7 +30,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Layers 1-9 use independent paths. Layers 10-36 add linked nodes. Layers 37-72 add locked and unstable nodes. Beyond 72, targets may be hidden, circuits overlap, and moves are limited.$(br2)Withdrawing or exhausting the formation causes failure. Severe mismatch triggers backlash that damages the cultivator and artifact; dangerous high-tier collapse may tear away a previous layer. At 72 layers, Evolve advances the artifact tier."
+      "text": "Ling Shu Abacus difficulty grows with restrictions, and failure can cause backlash. At 72 layers, a weapon's Evolve action starts a tribulation; advancement requires success.$(br2)See $(l:weapons/weapon_growth)Restrictions and Advancement$(/l) and $(l:weapons/weapon_trial)Weapon Tribulations$(/l)."
     }
   ]
 }

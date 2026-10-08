@@ -56,7 +56,7 @@
           "name": "immortal_cultivation_mod:yaoyuan_fist_bone",
           "conditions": [
             {
-              "condition": "minecraft:random_chance",
+              "condition": "immortal_cultivation_mod:fortune_chance",
               "chance": 0.01
             }
           ]

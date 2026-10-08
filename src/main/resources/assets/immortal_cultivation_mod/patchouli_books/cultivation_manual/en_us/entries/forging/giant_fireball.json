@@ -1,0 +1,18 @@
+{
+  "name": "Giant Fireballs and Terrain",
+  "icon": "immortal_cultivation_mod:thunder_flame_seed",
+  "category": "immortal_cultivation_mod:forging",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Area Attacks",
+      "text": "A charged impact attacks eligible creatures throughout its area and applies the matching lingering burn. Leaving ground fire does not immediately end that burn.$(br2)Charged blasts can instantly destroy ordinary terrain and liquids in their radius. Protected locations, containers, and unbreakable blocks retain their protection."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Block Breaking Settings",
+      "text": "Open cultivation settings and choose its first entry, Block Breaking. Separate options govern spells, weapons, external Qi, Flame Vessels, and other terrain effects.$(br2)Disabling vessel terrain damage still permits the fireball to damage creatures. Turning off block breaking does not turn off combat."
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:jigsaw",
+  "biomes": "#immortal_cultivation_mod:has_structure/small_sect1",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "spawn_overrides": {},
+  "start_pool": "immortal_cultivation_mod:small_sect1/start_pool",
+  "size": 1,
+  "start_height": {
+    "absolute": 2
+  },
+  "project_start_to_heightmap": "WORLD_SURFACE_WG",
+  "max_distance_from_center": 116,
+  "use_expansion_hack": false
+}

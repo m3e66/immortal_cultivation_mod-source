@@ -10,6 +10,10 @@ public interface CultivationNpc {
 
     void setNpcSkinId(String skinId);
 
+    /** 0 = idle, 1 = meditating, 2 = attempting a breakthrough. */
+    default int npcCultivationState() { return 0; }
+    default void setNpcCultivationState(int state) {}
+
     /** Starts the synced pose for an actual, interruptible spell wind-up. */
     default void beginNpcCast(int ticks) {
     }

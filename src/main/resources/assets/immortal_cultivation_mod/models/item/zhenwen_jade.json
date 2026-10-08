@@ -1,7 +1,25 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "ultramarine:item/jade",
-    "layer1": "immortal_cultivation_mod:item/zhenwen_jade_pattern"
+    "layer0": "immortal_cultivation_mod:item/zhenwen_jade"
+  },
+  "display": {
+    "gui": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    }
   }
 }

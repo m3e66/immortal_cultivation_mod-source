@@ -3,8 +3,11 @@ package com.example.immortal_cultivation_mod.screen;
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.client.ClientData;
+import com.example.immortal_cultivation_mod.client.DaoGuidanceClient;
 import com.example.immortal_cultivation_mod.client.NpcClientData;
+import com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
+import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -44,6 +47,7 @@ public final class NpcOptionScreen extends AbstractNpcScreen {
     private int playerMethodIndex;
     private int tradeScroll;
     private int inventoryScroll;
+    private final List<NpcButton> guidanceButtons = new ArrayList<>();
 
     public NpcOptionScreen(NpcClientData data, Page page) {
         super(data, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".npc.action." + page.key));
@@ -52,6 +56,7 @@ public final class NpcOptionScreen extends AbstractNpcScreen {
 
     @Override
     protected void buildContent() {
+        guidanceButtons.clear();
         addNpcButton(panelX() + panelWidth() - 78, panelY() + 8, 48, 17,
                 Component.translatable("screen." + ImmortalCultivationMod.MODID + ".npc.back"),
                 () -> minecraft.setScreen(new NpcInteractionScreen(data.withoutStatus())));
@@ -62,9 +67,18 @@ public final class NpcOptionScreen extends AbstractNpcScreen {
         switch (page) {
             case TALK -> {
                 boolean canTalk = data.hatred() < 50;
-                addAction(x, y + 22, w, "talk.greet", "TALK_GREET").active = canTalk;
-                addAction(x, y + 55, w, "talk.realm", "TALK_REALM").active = canTalk;
-                addAction(x, y + 88, w, "talk.world", "TALK_WORLD").active = canTalk;
+                NpcButton greet = addAction(x, y + 22, w,
+                        "talk.greet", "TALK_GREET");
+                NpcButton realm = addAction(x, y + 55, w,
+                        "talk.realm", "TALK_REALM");
+                NpcButton world = addAction(x, y + 88, w,
+                        "talk.world", "TALK_WORLD");
+                greet.active = canTalk;
+                realm.active = canTalk;
+                world.active = canTalk;
+                guidanceButtons.add(greet);
+                guidanceButtons.add(realm);
+                guidanceButtons.add(world);
             }
             case INTERACT -> {
                 int gap = 8;
@@ -74,10 +88,12 @@ public final class NpcOptionScreen extends AbstractNpcScreen {
                 addCompactAction(x + half + gap, y + 35, half, "interact.joke", "INTERACT_JOKE");
                 addCompactAction(x, y + 58, half, "interact.insult", "INTERACT_INSULT");
                 addCompactAction(x + half + gap, y + 58, half, "interact.threaten", "INTERACT_THREATEN");
-                addNpcButton(x, y + 81, half, 21, tr("npc.interact.spar"), () -> {
+                NpcButton spar = addNpcButton(x, y + 81, half, 21,
+                        tr("npc.interact.spar"), () -> {
                     sendAction("INTERACT_SPAR");
                     minecraft.setScreen(null);
                 });
+                guidanceButtons.add(spar);
                 NpcButton sect = addCompactAction(x + half + gap, y + 81, half,
                         "interact.invite_sect", "INTERACT_INVITE_SECT");
                 NpcButton master = addCompactAction(x, y + 104, half,
@@ -99,6 +115,7 @@ public final class NpcOptionScreen extends AbstractNpcScreen {
                     NpcButton buy = addNpcButton(x + w - 66, y + 6 + i * 40, 62, 22,
                             tr("npc.trade.buy"), () -> sendAction("TRADE_EXCHANGE", offer.offerIndex()));
                     buy.active = data.hatred() < 50;
+                    guidanceButtons.add(buy);
                 }
             }
             case QUEST -> {
@@ -106,6 +123,7 @@ public final class NpcOptionScreen extends AbstractNpcScreen {
                 NpcButton button = addNpcButton(x, y + 139, w, 27, tr(key),
                         () -> sendAction(data.questState() == 0 ? "QUEST_ACCEPT" : "QUEST_COMPLETE"));
                 button.active = data.questState() < 2;
+                if (data.questState() == 0) guidanceButtons.add(button);
             }
             case TEACH -> buildTeachingButtons(x, y, w);
             case INVENTORY -> buildInventoryButtons(x, y, w);
@@ -319,9 +337,28 @@ public final class NpcOptionScreen extends AbstractNpcScreen {
 
     @Override
     protected void renderForeground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        if (page != Page.INVENTORY) {
-            return;
+        String action = switch (page) {
+            case TALK -> DaoGuidanceContent.TALK_NPC;
+            case INTERACT -> DaoGuidanceContent.WEAPON_ATTACK;
+            case TRADE -> DaoGuidanceContent.TRADE_NPC;
+            case QUEST -> DaoGuidanceContent.ACCEPT_QUEST;
+            default -> "";
+        };
+        if (!action.isBlank() && DaoGuidanceClient.isCurrentAction(action)) {
+            int pulse = 145 + (int) (Math.sin(
+                    System.currentTimeMillis() / 180.0D) * 65.0D);
+            int color = (Math.max(70, Math.min(230, pulse)) << 24)
+                    | 0xF0C66B;
+            for (NpcButton button : guidanceButtons) {
+                if (button.active) {
+                    graphics.renderOutline(button.getX() - 3,
+                            button.getY() - 3,
+                            button.getWidth() + 6,
+                            button.getHeight() + 6, color);
+                }
+            }
         }
+        if (page != Page.INVENTORY) return;
         int x = contentX();
         int y = contentY() + 31;
         int w = contentWidth();

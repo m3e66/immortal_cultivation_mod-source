@@ -1,0 +1,25 @@
+{
+  "gui_light": "front",
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "#layer0"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 7.46875],
+      "to": [16, 16, 8.53125],
+      "faces": {
+        "north": {
+          "uv": [16, 0, 0, 16],
+          "texture": "#layer0",
+          "tintindex": 1
+        },
+        "south": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#layer0",
+          "tintindex": 1
+        }
+      }
+    }
+  ]
+}

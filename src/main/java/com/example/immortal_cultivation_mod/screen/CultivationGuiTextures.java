@@ -98,6 +98,25 @@ public final class CultivationGuiTextures {
         graphics.pose().popPose();
     }
 
+    public static void drawButtonText(GuiGraphics graphics, Component message,
+                                      int x, int y, int width, int height, boolean active, float preferredScale) {
+        if (preferredScale == 1.0F) {
+            drawButtonText(graphics, message, x, y, width, height, active);
+            return;
+        }
+        var font = Minecraft.getInstance().font;
+        int textWidth = font.width(message);
+        float scale = Math.min(preferredScale, Math.min(
+                Math.max(1, width - 16) / (float)Math.max(1, textWidth),
+                Math.max(1, height - 8) / (float)font.lineHeight));
+        graphics.pose().pushPose();
+        graphics.pose().translate(x + width / 2.0F, y + height / 2.0F, 0);
+        graphics.pose().scale(scale, scale, 1.0F);
+        graphics.drawString(font, message, -textWidth / 2, -font.lineHeight / 2,
+                active ? 0xFFF8F3DF : 0xFFB8B5A8, true);
+        graphics.pose().popPose();
+    }
+
     public static void drawInnerBox(
             GuiGraphics graphics,
             int x,

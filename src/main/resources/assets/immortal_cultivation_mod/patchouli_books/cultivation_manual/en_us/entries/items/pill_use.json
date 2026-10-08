@@ -1,0 +1,23 @@
+{
+  "name": "Using Pills",
+  "icon": "immortal_cultivation_mod:qingling_pill",
+  "category": "immortal_cultivation_mod:items",
+  "sortnum": 8,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Read the Tooltip",
+      "text": "Check a pill tooltip for its purpose, duration, and activation conditions. Pills stack to 16.$(br2)Qi Return restores Qi; Qingling also adds cultivation progress; Spring Return restores health; Spirit Nourishing restores Thoughts; Spirit Gathering aids cultivation. Consult the actual item for its current values."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Defenses and Status",
+      "text": "Crimson Flame aids fire attacks and cold resistance; Ice Heart extinguishes burning and resists fire; Essence Stabilizing aids defense and knockback resistance; Iron Bones strengthens defense but slows movement; Evil Warding removes and prevents Wither.$(br2)These effects expire. Observe your actual status rather than treating them as permanent attributes."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Conditional Pills",
+      "text": "Barrier Breaking strengthens the next successful melee hit; Qi Condensing discounts the next Qi-consuming spell; Meridian Renewal triggers recovery when health falls dangerously low.$(br2)Swallowing a pill does not immediately trigger every effect. Meet its conditions before expiry and check the remaining effect."
+    }
+  ]
+}

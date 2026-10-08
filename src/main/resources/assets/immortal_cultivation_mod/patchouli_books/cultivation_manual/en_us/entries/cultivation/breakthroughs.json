@@ -6,11 +6,13 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Cultivation progress builds while meditating. When progress reaches the requirement, use the stat menu breakthrough button.$(br2)Failure resets progress to 0 and deals damage equal to 50% of max health."
+      "title": "Breakthrough Requirements",
+      "text": "Fill cultivation progress and Qi, then open cultivation stats. Check the method limit, required pills, and displayed success chance before beginning.$(br2)Ordinary failure costs progress and health; Golden Core challenges and lightning have separate consequences."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Luck controls breakthrough chance directly. For example, 50 luck means a 50% chance to succeed.$(br2)Leveling up grants 10 skill points."
+      "title": "Golden Core and Recovery",
+      "text": "Golden Core advancement requires its challenge and lightning trial. Death during lightning leaves a cracked core and Half-step Golden Core.$(br2)Retrying needs twice the Late Foundation progress requirement plus the other breakthrough conditions. See $(l:cultivation/core_recovery)Cracked Core and Recovery$(/l)."
     }
   ]
 }

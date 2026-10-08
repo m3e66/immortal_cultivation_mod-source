@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "minecraft:wheat"
+    },
+    {
+      "item": "minecraft:wheat"
+    },
+    {
+      "item": "minecraft:wheat"
+    },
+    {
+      "item": "immortal_cultivation_mod:lingquan_leaf"
+    },
+    {
+      "item": "immortal_cultivation_mod:qingling_grass"
+    }
+  ],
+  "result": {
+    "id": "immortal_cultivation_mod:bigu_formula",
+    "count": 1
+  }
+}

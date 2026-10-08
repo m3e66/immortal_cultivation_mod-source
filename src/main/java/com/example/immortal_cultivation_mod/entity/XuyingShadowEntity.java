@@ -1,11 +1,13 @@
 package com.example.immortal_cultivation_mod.entity;
 
 import com.example.immortal_cultivation_mod.event.ServerEvents;
+import com.example.immortal_cultivation_mod.spell.ThoughtDamageHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
@@ -95,8 +97,10 @@ public class XuyingShadowEntity extends PathfinderMob {
 
     private void explodeThoughts(ServerLevel level) {
         level.explode(this, getX(), getY(0.5D), getZ(), 1.2F, Level.ExplosionInteraction.NONE);
+        Entity owner = ownerUuid().map(level::getEntity).orElse(null);
+        int thoughtDamage = ThoughtDamageHelper.total(owner, 10);
         for (Player player : level.getEntitiesOfClass(Player.class, new AABB(blockPosition()).inflate(2.0D), Player::isAlive)) {
-            ServerEvents.adjustThoughts(player, -10);
+            ServerEvents.adjustThoughts(player, -thoughtDamage);
         }
     }
 

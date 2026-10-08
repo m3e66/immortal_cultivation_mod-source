@@ -8,17 +8,23 @@ import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import com.example.immortal_cultivation_mod.block.ModBlocks;
 import com.example.immortal_cultivation_mod.effect.ModEffects;
 import com.example.immortal_cultivation_mod.event.ServerEvents;
+import com.example.immortal_cultivation_mod.item.AttackTalismanItem;
 import com.example.immortal_cultivation_mod.item.CultivationItemRarity;
+import com.example.immortal_cultivation_mod.item.CultivationAccessoryItem;
+import com.example.immortal_cultivation_mod.item.DisguiseMaskItem;
 import com.example.immortal_cultivation_mod.item.ForgingSystem;
 import com.example.immortal_cultivation_mod.item.IdentityItems;
 import com.example.immortal_cultivation_mod.item.ModItems;
 import com.example.immortal_cultivation_mod.item.QiInfusedWeapon;
 import com.example.immortal_cultivation_mod.item.ShihunfanItem;
+import com.example.immortal_cultivation_mod.item.TalismanItem;
 import com.example.immortal_cultivation_mod.item.WantedOrderItem;
 import com.example.immortal_cultivation_mod.item.WeaponRestrictionSystem;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
 import com.example.immortal_cultivation_mod.spell.UndeadControl;
+import com.example.immortal_cultivation_mod.spell.UndeadAbilitySystem;
+import com.example.immortal_cultivation_mod.system.SystemShopPrices;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -65,17 +71,27 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 public final class NpcProfile {
     public static final String FANREN = "fanren";
+    public static final String LIANQI = "lianqi";
     public static final String ZHUJI = "zhuji";
     public static final String JINDAN = "jindan";
 
     private static final String TAG = "ImmortalCultivationNpc";
-    private static final int PROFILE_VERSION = 15;
+    private static final int PROFILE_VERSION = 19;
     private static final int INVENTORY_SIZE = 27;
     private static final int INVENTORY_TRUST_REQUIRED = 50;
     private static final int NPC_LEARNING_TRUST_REQUIRED = 10;
     private static final float NPC_INVENTORY_DROP_CHANCE = 0.65F;
+    private static final long FOG_MIRROR_RECIPE_SALT = 0x464F474D495252L;
+    private static final long YINYANG_COMPASS_RECIPE_SALT = 0x59494E59414E47L;
+    private static final long SOUL_BOTTLE_RECIPE_SALT = 0x534F554C424F54L;
     private static final List<Integer> METHOD_LEARNING_TRUST_BY_REALM = List.of(
             0, 20, 30, 40, 50, 60, 70, 80, 90, 100);
+    // One gift expectation per major realm, from Mortal through Tribulation.
+    private static final List<Integer> GIFT_EXPECTATION_BY_REALM = List.of(
+            1,
+            10, 100, 1_000,
+            10_000, 100_000, 500_000,
+            1_000_000, 1_500_000, 10_000_000);
     private static final long INTERACTION_TIMEOUT_TICKS = 120L;
     private static final long SOCIAL_REFUSAL_TICKS = 1_200L;
     private static final long SOCIAL_CHANCE_RESET_TICKS = 24_000L;
@@ -85,20 +101,24 @@ public final class NpcProfile {
     private static final String EQUIPPED_WEAPON_SLOT_TAG = "EquippedCombatWeaponSlot";
     public static final String PLAYER_GENDER_TAG = "ImmortalCultivationPlayerGender";
     private static final String PLAYER_SPAR_NPC_TAG = "ImmortalCultivationSparNpc";
+    private static final String WEAPON_CARE_SPAR_REWARD_DAY =
+            "WeaponCareSparRewardDay";
     private static final String NPC_OWNED_EFFECT_TAG = "ImmortalCultivationNpcOwnedAtLaunch";
     private static final String LOW_SPIRIT_STONE = "immortal_cultivation_mod:spirit_stone";
     private static final String MEDIUM_SPIRIT_STONE = "immortal_cultivation_mod:medium_spirit_stone";
     private static final String HIGH_SPIRIT_STONE = "immortal_cultivation_mod:high_spirit_stone";
     private static final String COPPER_COIN = ImmortalCultivationMod.MODID + ":copper_coin";
-    private static final String GENDER_MALE = "male";
-    private static final String GENDER_FEMALE = "female";
+    private static final String HOTELKEEPER_SKIN = "hotelkeeper";
+    private static final int HOTELKEEPER_KIT_VERSION = 2;
+    private static final String GENDER_MALE = NpcSkinCatalog.MALE;
+    private static final String GENDER_FEMALE = NpcSkinCatalog.FEMALE;
     private static final String CORPSE_SUMMON_USED = "CorpseSummonUsed";
     private static final String CORPSE_SUMMON_UUID = "CorpseSummonUuid";
     private static final String ROYAL_PENDANT_USED = "RoyalPendantUsed";
     private static final List<String> CULTIVATOR_IDENTITIES = List.of(
             "wandering_cultivator", "sword_cultivator", "saber_cultivator", "demonic_cultivator",
             "artifact_cultivator", "corpse_cultivator", "body_cultivator", "evil_cultivator",
-            "clan_heir", "royal", "wanted");
+            "talisman_cultivator", "formation_cultivator", "clan_heir", "royal", "wanted");
     private static final Map<String, List<QuestDef>> IDENTITY_QUESTS = createIdentityQuests();
     private static final Map<String, NpcTradePrice> NPC_TRADE_PRICES = Map.ofEntries(
             Map.entry("minecraft:bread", new NpcTradePrice(COPPER_COIN, 1)),
@@ -143,7 +163,6 @@ public final class NpcProfile {
             Map.entry(ImmortalCultivationMod.MODID + ":qi_pouch", new NpcTradePrice(LOW_SPIRIT_STONE, 64)),
             Map.entry(ImmortalCultivationMod.MODID + ":lethal_poison", new NpcTradePrice(LOW_SPIRIT_STONE, 2)),
             Map.entry(ImmortalCultivationMod.MODID + ":wanted_order", new NpcTradePrice(LOW_SPIRIT_STONE, 1)),
-            Map.entry(ImmortalCultivationMod.MODID + ":yuanhun_bottle", new NpcTradePrice(MEDIUM_SPIRIT_STONE, 5)),
             Map.entry(ImmortalCultivationMod.MODID + ":shihunfan", new NpcTradePrice(HIGH_SPIRIT_STONE, 3)),
 
             Map.entry(ImmortalCultivationMod.MODID + ":fireball_scroll", new NpcTradePrice(LOW_SPIRIT_STONE, 6)),
@@ -165,26 +184,14 @@ public final class NpcProfile {
             Map.entry(ImmortalCultivationMod.MODID + ":dao", new NpcTradePrice(MEDIUM_SPIRIT_STONE, 12)),
             Map.entry(ImmortalCultivationMod.MODID + ":jingtie_spear", new NpcTradePrice(MEDIUM_SPIRIT_STONE, 16)),
             Map.entry(ImmortalCultivationMod.MODID + ":taomu_sword", new NpcTradePrice(LOW_SPIRIT_STONE, 8)),
-            Map.entry(ImmortalCultivationMod.MODID + ":copper_coin_sword", new NpcTradePrice(LOW_SPIRIT_STONE, 10)),
-
-            Map.entry(ImmortalCultivationMod.MODID + ":big_level_up", new NpcTradePrice(HIGH_SPIRIT_STONE, 16))
+            Map.entry(ImmortalCultivationMod.MODID + ":copper_coin_sword", new NpcTradePrice(LOW_SPIRIT_STONE, 10))
     );
     private static volatile List<SystemPriceBenchmark> systemPriceBenchmarks;
 
-    private static final List<NpcSkin> FANREN_SKINS = List.of(
-            new NpcSkin("fanren_npc", GENDER_MALE),
-            new NpcSkin("fanren2", GENDER_MALE)
-    );
-    private static final List<NpcSkin> CULTIVATOR_SKINS = List.of(
-            new NpcSkin("zhuji1", GENDER_FEMALE),
-            new NpcSkin("zhuji2", GENDER_FEMALE),
-            new NpcSkin("zhuji3", GENDER_MALE),
-            new NpcSkin("zhuji4", GENDER_FEMALE),
-            new NpcSkin("jindan1", GENDER_MALE),
-            new NpcSkin("jindan2", GENDER_MALE),
-            new NpcSkin("jindan3", GENDER_FEMALE),
-            new NpcSkin("jindan4", GENDER_FEMALE)
-    );
+    private static final List<NpcSkinCatalog.Skin> FANREN_SKINS =
+            NpcSkinCatalog.MORTAL_SKINS;
+    private static final List<NpcSkinCatalog.Skin> CULTIVATOR_SKINS =
+            NpcSkinCatalog.CULTIVATOR_SKINS;
 
     private static final String[] SURNAMES = {
             "林", "叶", "沈", "韩", "萧", "莫", "秦", "苏", "江", "陆", "顾", "楚", "白", "宁", "温", "谢"
@@ -243,14 +250,34 @@ public final class NpcProfile {
         mob.setCustomNameVisible(false);
     }
 
+    public static void ensureHotelkeeper(HotelNpcEntity mob) {
+        ensure(mob, FANREN);
+        CompoundTag profile = profile(mob);
+        profile.putString("Skin", HOTELKEEPER_SKIN);
+        profile.putString("Gender", GENDER_MALE);
+        profile.putString("Identity", "hotelkeeper");
+
+        if (profile.getInt("HotelkeeperKitVersion") < HOTELKEEPER_KIT_VERSION) {
+            writeInventory(mob, profile,
+                    hotelkeeperInventory(mob.getUUID().hashCode()));
+            profile.putInt("HotelkeeperKitVersion", HOTELKEEPER_KIT_VERSION);
+        }
+
+        mob.setNpcSkinId(HOTELKEEPER_SKIN);
+    }
+
     public static void ensure(PathfinderMob mob, String archetype) {
+        if (!(mob instanceof CultivationNpc)) {
+            clearAccidentalVanillaProfile(mob);
+            return;
+        }
         CompoundTag profile = profile(mob);
         boolean initialized = profile.getBoolean("Initialized");
         int previousVersion = profile.getInt("ProfileVersion");
         int seed = mob.getUUID().hashCode();
 
         if (!initialized) {
-            NpcSkin skin = selectSkin(archetype, seed);
+            NpcSkinCatalog.Skin skin = selectSkin(archetype, seed);
             String realm = defaultRealm(archetype, seed);
             String identity = selectIdentity(archetype, seed);
             List<String> roots = defaultRoots(archetype);
@@ -292,7 +319,9 @@ public final class NpcProfile {
 
         String normalizedIdentity = normalizeIdentity(profile.getString("Identity"));
         if (FANREN.equals(archetype)) {
-            normalizedIdentity = "village_mortal";
+            normalizedIdentity = mob instanceof HotelNpcEntity
+                    ? "hotelkeeper"
+                    : "village_mortal";
         } else if (!CULTIVATOR_IDENTITIES.contains(normalizedIdentity)) {
             normalizedIdentity = selectIdentity(archetype, seed);
         }
@@ -300,6 +329,7 @@ public final class NpcProfile {
 
         if (!mob.level().isClientSide) {
             ensureFirstQuestRewardStock(mob, profile);
+            NpcPillStock.ensure(mob, profile, archetype);
         }
         syncMethodSpecialSpells(profile);
         refreshWantedOrder(mob, profile);
@@ -314,10 +344,32 @@ public final class NpcProfile {
         }
     }
 
+    /**
+     * Removes profiles accidentally created on vanilla mobs by cultivation
+     * method checks. A player-assigned custom name is preserved.
+     */
+    public static void clearAccidentalVanillaProfile(PathfinderMob mob) {
+        if (mob instanceof CultivationNpc) {
+            return;
+        }
+        CompoundTag persistentData = mob.getPersistentData();
+        if (!persistentData.contains(TAG)) {
+            return;
+        }
+        CompoundTag accidentalProfile = persistentData.getCompound(TAG);
+        String generatedName = accidentalProfile.getString("Name");
+        if (!generatedName.isBlank() && mob.hasCustomName()
+                && generatedName.equals(mob.getCustomName().getString())) {
+            mob.setCustomName(null);
+            mob.setCustomNameVisible(false);
+        }
+        persistentData.remove(TAG);
+    }
+
     private static void migrateProfile(PathfinderMob mob, CompoundTag profile, String archetype, int seed) {
         int previousVersion = profile.getInt("ProfileVersion");
         if (!profile.contains("Skin") || !profile.contains("Gender") || previousVersion < 5) {
-            NpcSkin skin = selectSkin(archetype, seed);
+            NpcSkinCatalog.Skin skin = selectSkin(archetype, seed);
             profile.putString("Skin", skin.texture());
             profile.putString("Gender", skin.gender());
         }
@@ -354,6 +406,18 @@ public final class NpcProfile {
             writeInventory(mob, profile, defaultInventory(archetype, profile.getString("Identity"), seed));
         } else if (previousVersion < 3) {
             mergeMissingDefaultInventory(mob, profile, archetype);
+        }
+        if (previousVersion < 16
+                && ("talisman_cultivator".equals(profile.getString("Identity"))
+                || "formation_cultivator".equals(profile.getString("Identity")))) {
+            mergeMissingDefaultInventory(mob, profile, archetype);
+        }
+        if (previousVersion < 18
+                && "corpse_cultivator".equals(profile.getString("Identity"))) {
+            mergeMissingCorpseCultivatorItems(mob, profile, seed);
+        }
+        if (previousVersion < 19) {
+            mergeMissingSpecialistForgingSlip(mob, profile, seed);
         }
         if (previousVersion < 15) {
             migrateNpcLoadout(profile, archetype, seed);
@@ -408,6 +472,7 @@ public final class NpcProfile {
         ensure(mob, archetype);
         if (!mob.level().isClientSide) {
             tickControlState(mob);
+            NpcCultivation.tick(mob);
         }
         if (mob.level().isClientSide || mob.tickCount % 20 != 0) {
             return;
@@ -424,6 +489,7 @@ public final class NpcProfile {
         int qiRegen = switch (archetype) {
             case JINDAN -> 18;
             case ZHUJI -> 8;
+            case LIANQI -> 3;
             default -> 1;
         };
         if (mob.hasEffect(ModEffects.QI_GATHERING)) {
@@ -431,19 +497,56 @@ public final class NpcProfile {
         }
         qiRegen = com.example.immortal_cultivation_mod.magicritual.center.CenterEffectSupport
                 .adjustNaturalQiRegen(mob, qiRegen);
-        long progressGain = switch (archetype) {
-            case JINDAN -> 6L;
-            case ZHUJI -> 2L;
-            default -> 0L;
-        };
-        profile.putInt("Qi", Math.min(maxQi, profile.getInt("Qi") + qiRegen));
-        String methodId = profile.getString("Method");
-        if (progressGain > 0L && CultivationMethods.canGainProgress(methodId, profile.getString("Realm"))) {
-            int methodMultiplier = methodMultiplierPercent(
-                    CultivationMethods.get(methodId), strings(profile.getList("SpiritRoots", 8)));
-            long adjustedGain = Math.max(1L, progressGain * methodMultiplier / 100L);
-            profile.putLong("CultivationProgress", profile.getLong("CultivationProgress") + adjustedGain);
+        if (mob.hasEffect(ModEffects.SPIRIT_SEAL)) {
+            qiRegen = Math.max(0, Mth.floor(qiRegen * 0.30D));
         }
+        qiRegen = UndeadAbilitySystem.adjustQiRegen(mob, qiRegen);
+        qiRegen = CultivationBestiaryBeastEntity.adjustQiRegeneration(mob, qiRegen);
+        profile.putInt("Qi", (int) Math.min(maxQi, (long) profile.getInt("Qi") + qiRegen));
+    }
+
+    /** Internal training state shares the NPC profile's existing save/load lifecycle. */
+    static CompoundTag cultivationProfile(PathfinderMob mob) { return profile(mob); }
+
+    static double autonomousProgressPerSecond(CompoundTag profile) {
+        String realm = profile.getString("Realm");
+        String methodId = profile.getString("Method");
+        if (!CultivationMethods.canGainProgress(methodId, realm)) return 0;
+        double seconds = 1200.0 + 600.0 * Math.max(0, CultivationLevels.getRealmIndex(realm) - 1);
+        int multiplier = methodMultiplierPercent(CultivationMethods.get(methodId),
+                strings(profile.getList("SpiritRoots", 8)));
+        return CultivationLevels.getTotalQiNeeded(realm) / seconds * multiplier / 100.0;
+    }
+
+    static boolean completeAutonomousBreakthrough(PathfinderMob mob, String expectedRealm) {
+        CompoundTag profile = profile(mob);
+        String realm = profile.getString("Realm");
+        String next = CultivationLevels.getNextStage(realm);
+        long required = CultivationLevels.getTotalQiNeeded(realm);
+        if (!realm.equals(expectedRealm) || next == null
+                || !CultivationMethods.canGainProgress(profile.getString("Method"), realm)
+                || profile.getLong("CultivationProgress") < required) return false;
+        var previous = CultivationLevels.getLevelDef(realm);
+        var promoted = CultivationLevels.getLevelDef(next);
+        profile.putString("Realm", next);
+        profile.putLong("CultivationProgress", Math.min(CultivationLevels.getTotalQiNeeded(next),
+                profile.getLong("CultivationProgress") - required));
+        profile.putInt("MaxQi", promoted.maxQi());
+        profile.putInt("Qi", promoted.maxQi());
+        profile.putInt("Age", (int) Math.min(Integer.MAX_VALUE, Math.max(0L, profile.getInt("Age"))
+                + Math.max(0, promoted.maxAge() - previous.maxAge())));
+        chooseBestKnownMethod(profile);
+        LinkedHashSet<String> spells = new LinkedHashSet<>(strings(profile.getList("Spells", 8)));
+        spells.addAll(selectRandomSpells(archetypeOf(mob), next,
+                strings(profile.getList("SpiritRoots", 8)), profile.getString("Identity"),
+                profile.getString("Method"), mob.getUUID().hashCode()));
+        profile.put("Spells", stringList(List.copyOf(spells)));
+        applyRealmStats(mob, next, true);
+        var attack = mob.getAttribute(Attributes.ATTACK_DAMAGE);
+        if (attack != null) attack.setBaseValue(Math.max(attack.getBaseValue(),
+                2.0 + CultivationLevels.getStageIndex(next) * 2.0));
+        refreshWantedOrder(mob, profile);
+        return true;
     }
 
     private static void tickThoughts(PathfinderMob mob, CompoundTag profile) {
@@ -606,10 +709,16 @@ public final class NpcProfile {
             if (mob.tickCount % 10 == 0) {
                 ServerPlayer hatedPlayer = null;
                 double closest = 32.0D * 32.0D;
+                boolean cultivator = !FANREN.equals(archetypeOf(mob));
                 for (ServerPlayer candidate : serverLevel.players()) {
                     double distance = mob.distanceToSqr(candidate);
+                    boolean exposedLivingCorpse = cultivator
+                            && CultivationAccessoryItem.isLivingCorpse(candidate)
+                            && !DisguiseMaskItem.isWearing(candidate)
+                            && mob.getSensing().hasLineOfSight(candidate);
                     if (candidate.isAlive() && distance <= closest
-                            && relationship(mob, candidate).getInt("Hatred") >= 100) {
+                            && (exposedLivingCorpse
+                            || relationship(mob, candidate).getInt("Hatred") >= 100)) {
                         hatedPlayer = candidate;
                         closest = distance;
                     }
@@ -775,6 +884,21 @@ public final class NpcProfile {
             case "INVENTORY_WITHDRAW" -> withdrawInventoryItem(mob, player, index);
             default -> "";
         };
+        if (action.startsWith("TALK_") && !status.isBlank()) {
+            com.example.immortal_cultivation_mod.guidance.DaoGuidanceSystem.record(
+                    player,
+                    com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent.TALK_NPC);
+        } else if ("TRADE_EXCHANGE".equals(action)
+                && "npc.status.trade_complete".equals(status)) {
+            com.example.immortal_cultivation_mod.guidance.DaoGuidanceSystem.record(
+                    player,
+                    com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent.TRADE_NPC);
+        } else if ("QUEST_ACCEPT".equals(action)
+                && "npc.status.quest_accepted".equals(status)) {
+            com.example.immortal_cultivation_mod.guidance.DaoGuidanceSystem.record(
+                    player,
+                    com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent.ACCEPT_QUEST);
+        }
         boolean retaliate = profile.getBoolean("SocialRetaliation");
         profile.remove("SocialRetaliation");
         boolean startSpar = profile.getBoolean("StartSpar");
@@ -854,6 +978,73 @@ public final class NpcProfile {
                                      net.minecraft.world.entity.LivingEntity second) {
         net.minecraft.world.entity.LivingEntity partner = sparPartner(first);
         return partner != null && partner.getUUID().equals(second.getUUID());
+    }
+
+    public static void finishSpar(
+            net.minecraft.world.entity.LivingEntity defeated,
+            net.minecraft.world.entity.LivingEntity winner) {
+        net.minecraft.world.entity.LivingEntity partner = sparPartner(defeated);
+        ServerPlayer player = defeated instanceof ServerPlayer sp
+                ? sp : partner instanceof ServerPlayer sp ? sp : null;
+        PathfinderMob mob = defeated instanceof PathfinderMob pathfinder
+                && defeated instanceof CultivationNpc
+                ? pathfinder
+                : partner instanceof PathfinderMob pathfinder
+                        && partner instanceof CultivationNpc
+                        ? pathfinder : null;
+        if (player != null
+                && mob != null
+                && defeated.getUUID().equals(mob.getUUID())
+                && winner != null
+                && winner.getUUID().equals(player.getUUID())) {
+            rewardWeaponCareSparVictory(mob, player);
+        }
+        endSpar(defeated);
+    }
+
+    private static void rewardWeaponCareSparVictory(
+            PathfinderMob mob, ServerPlayer player) {
+        String identity = normalizeIdentity(
+                profile(mob).getString("Identity"));
+        String suffix;
+        if ("sword_cultivator".equals(identity)) {
+            long day = mob.level().getGameTime() / TICKS_PER_INGAME_DAY;
+            int choice = Math.floorMod(
+                    mob.getUUID().hashCode()
+                            ^ player.getUUID().hashCode()
+                            ^ Long.hashCode(day),
+                    3);
+            suffix = choice == 0
+                    ? "yangjian_stone" : "sword_grindstone";
+        } else if ("saber_cultivator".equals(identity)) {
+            suffix = "saber_grindstone";
+        } else {
+            return;
+        }
+
+        CompoundTag relation = relationship(mob, player);
+        long rewardDay = mob.level().getGameTime() / TICKS_PER_INGAME_DAY + 1L;
+        if (relation.getLong(WEAPON_CARE_SPAR_REWARD_DAY) == rewardDay) {
+            player.displayClientMessage(Component.translatable(
+                    "message." + ImmortalCultivationMod.MODID
+                            + ".spar_weapon_care_reward_cooldown"), false);
+            return;
+        }
+
+        int tier = weaponCareTier(mob);
+        ItemStack reward = new ItemStack(item(tieredItemId(suffix, tier)));
+        if (reward.isEmpty() || reward.is(Items.AIR)) {
+            return;
+        }
+        Component rewardName = reward.getHoverName();
+        giveToPlayer(player, reward);
+        relation.putLong(WEAPON_CARE_SPAR_REWARD_DAY, rewardDay);
+        saveRelationship(mob, player, relation);
+        changeRelationship(mob, player, 2, 2, 1, 0);
+        player.displayClientMessage(Component.translatable(
+                "message." + ImmortalCultivationMod.MODID
+                        + ".spar_weapon_care_reward",
+                rewardName), false);
     }
 
     public static void endSpar(net.minecraft.world.entity.LivingEntity participant) {
@@ -1015,7 +1206,11 @@ public final class NpcProfile {
             index = first + Math.floorMod(index - first + 1 + mob.getRandom().nextInt(count - 1), count);
         }
         npcProfile.putInt(lastTag, index);
-        return "npc.dialogue.identity." + identity + "." + index;
+        String dialogueIdentity = switch (identity) {
+            case "talisman_cultivator", "formation_cultivator" -> "wandering_cultivator";
+            default -> identity;
+        };
+        return "npc.dialogue.identity." + dialogueIdentity + "." + index;
     }
 
     private static String realmDialogueGroup(PathfinderMob mob) {
@@ -1037,14 +1232,17 @@ public final class NpcProfile {
         }
         List<ItemStack> inventory = inventory(mob);
         ItemStack gift = held.copyWithCount(1);
-        if (!insertInventory(inventory, gift)) {
+        // Score the original gift before inventory stacking can consume this
+        // temporary stack. Otherwise, a matching existing stack turns the
+        // gift empty and makes it look like a value-1 present.
+        GiftEvaluation evaluation = evaluateGift(mob, gift);
+        if (!insertInventory(inventory, gift.copy())) {
             return "npc.status.inventory_full";
         }
         if (!player.getAbilities().instabuild) {
             held.shrink(1);
         }
         writeInventory(mob, profile(mob), inventory);
-        GiftEvaluation evaluation = evaluateGift(mob, gift);
         switch (evaluation.tier()) {
             case POOR -> changeRelationship(mob, player, -4, -3, -2, 3);
             case ACCEPTABLE -> changeRelationship(mob, player, 2, 1, 0, -1);
@@ -1060,9 +1258,9 @@ public final class NpcProfile {
         GiftTier tier;
         if (quality < expected) {
             tier = GiftTier.POOR;
-        } else if (quality < expected * 2) {
+        } else if ((long) quality < (long) expected * 2L) {
             tier = GiftTier.ACCEPTABLE;
-        } else if (quality < expected * 4) {
+        } else if ((long) quality < (long) expected * 4L) {
             tier = GiftTier.GOOD;
         } else {
             tier = GiftTier.EXCELLENT;
@@ -1071,23 +1269,13 @@ public final class NpcProfile {
     }
 
     private static int giftQuality(ItemStack stack) {
-        return CultivationItemRarity.giftValue(stack);
+        return Math.max(1, SystemShopPrices.price(stack));
     }
 
     private static int giftExpectation(PathfinderMob mob) {
         int realm = CultivationLevels.getRealmIndex(profile(mob).getString("Realm"));
-        return switch (realm) {
-            case 1 -> 20;
-            case 2 -> 50;
-            case 3 -> 65;
-            case 4 -> 150;
-            case 5 -> 250;
-            case 6 -> 500;
-            case 7 -> 750;
-            case 8 -> 1000;
-            case 9 -> 2000;
-            default -> 2;
-        };
+        int index = Mth.clamp(realm, 0, GIFT_EXPECTATION_BY_REALM.size() - 1);
+        return GIFT_EXPECTATION_BY_REALM.get(index);
     }
 
     private static String performSocialAction(PathfinderMob mob, ServerPlayer player, SocialAction action) {
@@ -1475,7 +1663,7 @@ public final class NpcProfile {
         if (relationshipValue(mob, player, "Hatred") >= 50) {
             return "npc.status.hatred_refusal";
         }
-        List<TradeOffer> offers = tradeOffers(mob);
+        List<TradeOffer> offers = tradeOffers(mob, player);
         if (index < 0 || index >= offers.size()) {
             return "npc.status.trade_invalid";
         }
@@ -1563,6 +1751,8 @@ public final class NpcProfile {
         profile(mob).put("CompletedQuests", completed);
         changeRelationship(mob, player, 10, 8, 2, -5);
         addPlayerReputation(player, 5);
+        com.example.immortal_cultivation_mod.fate.LuckSystem.rewardOnce(
+                player, "npc_" + mob.getUUID() + "_" + quest.id(), 3);
         return "npc.status.quest_completed";
     }
 
@@ -1946,7 +2136,10 @@ public final class NpcProfile {
 
     public static boolean shouldAttackPlayer(PathfinderMob mob, ServerPlayer player) {
         CompoundTag relation = relationship(mob, player);
-        return relation.getInt("Hatred") >= 100
+        return !FANREN.equals(archetypeOf(mob))
+                && CultivationAccessoryItem.isLivingCorpse(player)
+                && !DisguiseMaskItem.isWearing(player)
+                || relation.getInt("Hatred") >= 100
                 || relation.getBoolean("PermanentEnemy")
                 || relation.getLong("RetaliateUntil") > mob.level().getGameTime();
     }
@@ -2187,7 +2380,7 @@ public final class NpcProfile {
         data.put("Inventory", inventoryData);
 
         ListTag tradeData = new ListTag();
-        List<TradeOffer> offers = tradeOffers(mob);
+        List<TradeOffer> offers = tradeOffers(mob, player);
         for (int i = 0; i < offers.size(); i++) {
             TradeOffer offer = offers.get(i);
             CompoundTag encoded = new CompoundTag();
@@ -2216,13 +2409,22 @@ public final class NpcProfile {
     }
 
     public static List<TradeOffer> tradeOffers(PathfinderMob mob) {
+        return tradeOffers(mob, Integer.MAX_VALUE);
+    }
+
+    private static List<TradeOffer> tradeOffers(PathfinderMob mob, ServerPlayer player) {
+        return tradeOffers(mob, relationshipValue(mob, player, "Trust"));
+    }
+
+    private static List<TradeOffer> tradeOffers(PathfinderMob mob, int trust) {
         List<ItemStack> inventory = inventory(mob);
         List<TradeOffer> offers = new ArrayList<>();
         for (int slot = 0; slot < inventory.size(); slot++) {
             ItemStack stack = inventory.get(slot);
             if (stack.isEmpty()
                     || isCurrencyItem(stack.getItem())
-                    || isIdentityProtectedTradeItem(mob, stack)) {
+                    || isIdentityProtectedTradeItem(mob, stack)
+                    || requiresHighTrustTrade(stack) && trust < INVENTORY_TRUST_REQUIRED) {
                 continue;
             }
             String resultId = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
@@ -2231,6 +2433,14 @@ public final class NpcProfile {
                     resultId, 1, stack.getCount()));
         }
         return List.copyOf(offers);
+    }
+
+    private static boolean requiresHighTrustTrade(ItemStack stack) {
+        return stack.is(ModItems.ZHENHUN_BELL_YUJIAN.get())
+                || stack.is(ModItems.YINHUN_GONG_YUJIAN.get())
+                || stack.is(ModItems.FOG_REVEALING_MIRROR_YUJIAN.get())
+                || stack.is(ModItems.YINYANG_COMPASS_YUJIAN.get())
+                || stack.is(ModItems.YUANHUN_BOTTLE_YUJIAN.get());
     }
 
     private static boolean isIdentityProtectedTradeItem(PathfinderMob mob, ItemStack stack) {
@@ -2246,7 +2456,9 @@ public final class NpcProfile {
             case "artifact_cultivator" -> stack.is(ModBlocks.CU_TIE_XIAODING.get().asItem())
                     || stack.is(ModBlocks.QINGTONG_YINHUO_DING.get().asItem());
             case "corpse_cultivator" -> stack.is(ModItems.COFFIN.get())
-                    || stack.is(ModItems.CORPSE_REFINING_SECRET.get());
+                    || stack.is(ModItems.CORPSE_REFINING_SECRET.get())
+                    || stack.is(ModItems.ZHENHUN_BELL.get())
+                    || stack.is(ModItems.YINHUN_GONG.get());
             case "royal" -> stack.is(ModItems.ROYAL_TOKEN.get())
                     || stack.is(ModItems.PROTECTIVE_JADE_PENDANT.get())
                     || isCultivationMethod(stack);
@@ -2282,7 +2494,79 @@ public final class NpcProfile {
                     "fanren_village_supplies", "minecraft:wheat", 12, COPPER_COIN, 6));
         }
         String identity = normalizeIdentity(profile(mob).getString("Identity"));
-        return IDENTITY_QUESTS.getOrDefault(identity, IDENTITY_QUESTS.get("wandering_cultivator"));
+        if ("sword_cultivator".equals(identity)
+                || "saber_cultivator".equals(identity)) {
+            return weaponCareQuestPool(mob, identity);
+        }
+        return IDENTITY_QUESTS.getOrDefault(
+                identity, IDENTITY_QUESTS.get("wandering_cultivator"));
+    }
+
+    private static List<QuestDef> weaponCareQuestPool(
+            PathfinderMob mob, String identity) {
+        String mod = ImmortalCultivationMod.MODID + ":";
+        int tier = weaponCareTier(mob);
+        String currency = tier >= 3
+                ? HIGH_SPIRIT_STONE
+                : tier == 2 ? MEDIUM_SPIRIT_STONE : LOW_SPIRIT_STONE;
+        String nurturingMaterial = tier >= 3
+                ? mod + "star_dust_stone"
+                : tier == 2
+                        ? mod + "yunwen_silver_crystal"
+                        : "minecraft:amethyst_shard";
+        int nurturingCount = tier >= 3 ? 3 : tier == 2 ? 2 : 4;
+        String sharpeningMaterial = tier >= 2
+                ? mod + "jingtie_motherstone" : "minecraft:flint";
+        int sharpeningCount = tier >= 3 ? 6 : tier == 2 ? 2 : 8;
+
+        if ("sword_cultivator".equals(identity)) {
+            return List.of(
+                    new QuestDef(
+                            "sword_nourishment",
+                            nurturingMaterial,
+                            nurturingCount,
+                            tieredItemId("yangjian_stone", tier),
+                            1),
+                    new QuestDef(
+                            "sword_sharpening",
+                            sharpeningMaterial,
+                            sharpeningCount,
+                            tieredItemId("sword_grindstone", tier),
+                            1),
+                    new QuestDef(
+                            "sword_forging_materials",
+                            mod + "jingtie_motherstone",
+                            Math.max(1, tier * 2),
+                            currency,
+                            tier >= 3 ? 5 : tier == 2 ? 9 : 12)
+            );
+        }
+        return List.of(
+                new QuestDef(
+                        "saber_sharpening",
+                        sharpeningMaterial,
+                        sharpeningCount,
+                        tieredItemId("saber_grindstone", tier),
+                        1),
+                new QuestDef(
+                        "saber_forging_materials",
+                        mod + "jingtie_motherstone",
+                        Math.max(1, tier * 2),
+                        currency,
+                        tier >= 3 ? 5 : tier == 2 ? 9 : 12),
+                new QuestDef(
+                        "saber_spiritual_tempering",
+                        mod + "yunwen_silver_crystal",
+                        Math.max(1, tier * 2),
+                        currency,
+                        tier >= 3 ? 6 : tier == 2 ? 11 : 14)
+        );
+    }
+
+    private static int weaponCareTier(PathfinderMob mob) {
+        String archetype = archetypeOf(mob);
+        return JINDAN.equals(archetype)
+                ? 3 : ZHUJI.equals(archetype) ? 2 : 1;
     }
 
     private static Map<String, List<QuestDef>> createIdentityQuests() {
@@ -2294,14 +2578,14 @@ public final class NpcProfile {
                         new QuestDef("wandering_spiritual_medicine", mod + "ninglu_zhi", 3, LOW_SPIRIT_STONE, 12)
                 )),
                 Map.entry("sword_cultivator", List.of(
-                        new QuestDef("sword_nourishment", mod + "middle_yangjian_stone", 3, MEDIUM_SPIRIT_STONE, 16),
-                        new QuestDef("sword_sharpening", mod + "middle_sword_grindstone", 3, MEDIUM_SPIRIT_STONE, 16),
-                        new QuestDef("sword_forging_materials", mod + "jingtie_motherstone", 2, MEDIUM_SPIRIT_STONE, 9)
+                        new QuestDef("sword_nourishment", "minecraft:amethyst_shard", 4, mod + "low_yangjian_stone", 1),
+                        new QuestDef("sword_sharpening", "minecraft:flint", 8, mod + "low_sword_grindstone", 1),
+                        new QuestDef("sword_forging_materials", mod + "jingtie_motherstone", 2, LOW_SPIRIT_STONE, 12)
                 )),
                 Map.entry("saber_cultivator", List.of(
-                        new QuestDef("saber_sharpening", mod + "middle_saber_grindstone", 3, MEDIUM_SPIRIT_STONE, 16),
-                        new QuestDef("saber_forging_materials", mod + "jingtie_motherstone", 2, MEDIUM_SPIRIT_STONE, 9),
-                        new QuestDef("saber_spiritual_tempering", mod + "yunwen_silver_crystal", 2, MEDIUM_SPIRIT_STONE, 11)
+                        new QuestDef("saber_sharpening", "minecraft:flint", 8, mod + "low_saber_grindstone", 1),
+                        new QuestDef("saber_forging_materials", mod + "jingtie_motherstone", 2, LOW_SPIRIT_STONE, 12),
+                        new QuestDef("saber_spiritual_tempering", mod + "yunwen_silver_crystal", 2, LOW_SPIRIT_STONE, 14)
                 )),
                 Map.entry("demonic_cultivator", List.of(
                         new QuestDef("demonic_blood_crystal", mod + "blood_crystal", 5, LOW_SPIRIT_STONE, 20),
@@ -2379,6 +2663,10 @@ public final class NpcProfile {
     private static NpcTradePrice tradePriceFor(PathfinderMob mob, ItemStack stack) {
         ResourceLocation key = BuiltInRegistries.ITEM.getKey(stack.getItem());
         NpcTradePrice listedPrice = key == null ? null : NPC_TRADE_PRICES.get(key.toString());
+        if (listedPrice == null && key != null
+                && ImmortalCultivationMod.MODID.equals(key.getNamespace())) {
+            return systemShopTradePrice(mob, stack);
+        }
         int price;
         if (listedPrice != null) {
             price = listedPrice.price();
@@ -2409,6 +2697,29 @@ public final class NpcProfile {
             case EPIC -> HIGH_SPIRIT_STONE;
         };
         return new NpcTradePrice(currency, Mth.clamp(price, 1, 64));
+    }
+
+    /**
+     * Keeps newly introduced mod items in NPC inventories synchronized with the
+     * canonical system-shop price list without requiring a second hard-coded
+     * price entry. One trade uses the largest denomination that represents the
+     * system value exactly.
+     */
+    private static NpcTradePrice systemShopTradePrice(PathfinderMob mob, ItemStack stack) {
+        int systemPrice = Math.max(1, SystemShopPrices.price(stack));
+        if (FANREN.equals(archetypeOf(mob))) {
+            return new NpcTradePrice(COPPER_COIN, systemPrice);
+        }
+        if (systemPrice >= 1_000 && systemPrice % 1_000 == 0) {
+            return new NpcTradePrice(HIGH_SPIRIT_STONE, systemPrice / 1_000);
+        }
+        if (systemPrice >= 100 && systemPrice % 100 == 0) {
+            return new NpcTradePrice(MEDIUM_SPIRIT_STONE, systemPrice / 100);
+        }
+        if (systemPrice >= 10 && systemPrice % 10 == 0) {
+            return new NpcTradePrice(LOW_SPIRIT_STONE, systemPrice / 10);
+        }
+        return new NpcTradePrice(COPPER_COIN, systemPrice);
     }
 
     public static int systemPointPrice(ItemStack stack) {
@@ -2612,7 +2923,7 @@ public final class NpcProfile {
         return 1;
     }
 
-    private static List<ItemStack> inventory(PathfinderMob mob) {
+    static List<ItemStack> inventory(PathfinderMob mob) {
         List<ItemStack> inventory = new ArrayList<>(INVENTORY_SIZE);
         for (int i = 0; i < INVENTORY_SIZE; i++) {
             inventory.add(ItemStack.EMPTY);
@@ -2628,7 +2939,7 @@ public final class NpcProfile {
         return inventory;
     }
 
-    private static void writeInventory(PathfinderMob mob, CompoundTag profile, List<ItemStack> inventory) {
+    static void writeInventory(PathfinderMob mob, CompoundTag profile, List<ItemStack> inventory) {
         ListTag list = new ListTag();
         for (int i = 0; i < Math.min(INVENTORY_SIZE, inventory.size()); i++) {
             ItemStack stack = inventory.get(i);
@@ -2716,6 +3027,66 @@ public final class NpcProfile {
             }
         }
         writeInventory(mob, profile, inventory);
+    }
+
+    private static void mergeMissingCorpseCultivatorItems(
+            PathfinderMob mob, CompoundTag profile, int seed) {
+        List<ItemStack> inventory = inventory(mob);
+        if (countInventoryItem(inventory, ModItems.ZHENHUN_BELL.get()) == 0) {
+            insertInventory(inventory, new ItemStack(ModItems.ZHENHUN_BELL.get(), 1));
+        }
+        if (countInventoryItem(inventory, ModItems.YINHUN_GONG.get()) == 0) {
+            insertInventory(inventory, new ItemStack(ModItems.YINHUN_GONG.get(), 1));
+        }
+        if (hasRareCorpseForgingSlip(seed, true)
+                && countInventoryItem(inventory, ModItems.ZHENHUN_BELL_YUJIAN.get()) == 0) {
+            insertInventory(inventory, new ItemStack(ModItems.ZHENHUN_BELL_YUJIAN.get(), 1));
+        }
+        if (hasRareCorpseForgingSlip(seed, false)
+                && countInventoryItem(inventory, ModItems.YINHUN_GONG_YUJIAN.get()) == 0) {
+            insertInventory(inventory, new ItemStack(ModItems.YINHUN_GONG_YUJIAN.get(), 1));
+        }
+        writeInventory(mob, profile, inventory);
+    }
+
+    private static boolean hasRareCorpseForgingSlip(int seed, boolean bell) {
+        long salt = bell ? 0x5A48454E48554E4CL : 0x59494E48554E474CL;
+        return hasRareForgingSlip(seed, salt);
+    }
+
+    private static void mergeMissingSpecialistForgingSlip(
+            PathfinderMob mob, CompoundTag profile, int seed) {
+        Item slip;
+        long salt;
+        switch (normalizeIdentity(profile.getString("Identity"))) {
+            case "artifact_cultivator" -> {
+                slip = ModItems.FOG_REVEALING_MIRROR_YUJIAN.get();
+                salt = FOG_MIRROR_RECIPE_SALT;
+            }
+            case "formation_cultivator" -> {
+                slip = ModItems.YINYANG_COMPASS_YUJIAN.get();
+                salt = YINYANG_COMPASS_RECIPE_SALT;
+            }
+            case "evil_cultivator" -> {
+                slip = ModItems.YUANHUN_BOTTLE_YUJIAN.get();
+                salt = SOUL_BOTTLE_RECIPE_SALT;
+            }
+            default -> {
+                return;
+            }
+        }
+        if (!hasRareForgingSlip(seed, salt)) {
+            return;
+        }
+        List<ItemStack> inventory = inventory(mob);
+        if (countInventoryItem(inventory, slip) == 0) {
+            insertInventory(inventory, new ItemStack(slip, 1));
+            writeInventory(mob, profile, inventory);
+        }
+    }
+
+    private static boolean hasRareForgingSlip(int seed, long salt) {
+        return new Random(((long) seed << 32) ^ salt).nextInt(100) < 2;
     }
 
     private static List<ItemStack> defaultInventory(String archetype, String identity, int seed) {
@@ -2888,6 +3259,52 @@ public final class NpcProfile {
                 }
             }
 
+            case LIANQI -> {
+                slot = addInventoryItem(
+                        inventory,
+                        slot,
+                        new ItemStack(item(LOW_SPIRIT_STONE), random.nextInt(8, 17))
+                );
+
+                if (chance(random, 65)) {
+                    slot = addInventoryItem(
+                            inventory,
+                            slot,
+                            new ItemStack(
+                                    item(ImmortalCultivationMod.MODID + ":qingling_grass"),
+                                    random.nextInt(2, 7)
+                            )
+                    );
+                }
+
+                if (chance(random, 40)) {
+                    slot = addInventoryItem(
+                            inventory,
+                            slot,
+                            new ItemStack(
+                                    item(ImmortalCultivationMod.MODID + ":chiyan_flower"),
+                                    random.nextInt(1, 4)
+                            )
+                    );
+                }
+
+                if (chance(random, 45)) {
+                    slot = addInventoryItem(
+                            inventory,
+                            slot,
+                            new ItemStack(item(ImmortalCultivationMod.MODID + ":bigu_pill"), random.nextInt(1, 3))
+                    );
+                }
+
+                if (chance(random, 35)) {
+                    addInventoryItem(
+                            inventory,
+                            slot,
+                            new ItemStack(item(ImmortalCultivationMod.MODID + ":low_qi_recovery_pill"), 1)
+                    );
+                }
+            }
+
             default -> {
                 slot = addInventoryItem(
                         inventory,
@@ -2951,12 +3368,40 @@ public final class NpcProfile {
         return inventory;
     }
 
+    private static List<ItemStack> hotelkeeperInventory(int seed) {
+        List<ItemStack> inventory = new ArrayList<>();
+        for (int i = 0; i < INVENTORY_SIZE; i++) {
+            inventory.add(ItemStack.EMPTY);
+        }
+        Random random = new Random(seed ^ 0x484F54454C4CL);
+        insertInventory(inventory, new ItemStack(
+                ModItems.COPPER_COIN.get(), random.nextInt(24, 49)));
+        insertInventory(inventory, new ItemStack(
+                ModItems.WINE.get(), random.nextInt(10, 17)));
+        insertInventory(inventory, new ItemStack(
+                ModItems.STEAMED_BUN.get(), random.nextInt(16, 25)));
+        insertInventory(inventory, new ItemStack(
+                ModItems.NOODLE_BOWL.get(), random.nextInt(8, 14)));
+        insertInventory(inventory, new ItemStack(
+                ModItems.BRAISED_PORK.get(), random.nextInt(6, 12)));
+        insertInventory(inventory, new ItemStack(
+                ModItems.ROAST_DUCK.get(), random.nextInt(4, 10)));
+        insertInventory(inventory, new ItemStack(
+                Items.BREAD, random.nextInt(8, 14)));
+        insertInventory(inventory, new ItemStack(
+                Items.COOKED_CHICKEN, random.nextInt(6, 11)));
+        insertInventory(inventory, new ItemStack(
+                Items.BAKED_POTATO, random.nextInt(8, 15)));
+        return inventory;
+    }
+
     private static void addIdentityLoadout(List<ItemStack> inventory, String archetype, String identity, int seed) {
         if (FANREN.equals(archetype)) {
             return;
         }
-        int tier = JINDAN.equals(archetype) ? 3 : 2;
-        int amount = tier == 3 ? 4 : 2;
+        int tier = JINDAN.equals(archetype) ? 3 : ZHUJI.equals(archetype) ? 2 : 1;
+        int amount = tier == 3 ? 4 : tier == 2 ? 2 : 1;
+        String spiritStone = tier == 3 ? HIGH_SPIRIT_STONE : tier == 2 ? MEDIUM_SPIRIT_STONE : LOW_SPIRIT_STONE;
         String qiPill = tieredItemId("qi_recovery_pill", tier);
         String yangjian = tieredItemId("yangjian_stone", tier);
         String swordStone = tieredItemId("sword_grindstone", tier);
@@ -2964,7 +3409,7 @@ public final class NpcProfile {
 
         switch (identity) {
             case "wandering_cultivator" -> {
-                insertInventory(inventory, new ItemStack(item(tier == 3 ? HIGH_SPIRIT_STONE : MEDIUM_SPIRIT_STONE), 8 * amount));
+                insertInventory(inventory, new ItemStack(item(spiritStone), 8 * amount));
                 insertInventory(inventory, new ItemStack(item(ImmortalCultivationMod.MODID + ":bigu_pill"), 2 * amount));
                 insertInventory(inventory, new ItemStack(item(qiPill), amount));
                 insertInventory(inventory, new ItemStack(item(ImmortalCultivationMod.MODID
@@ -2989,6 +3434,9 @@ public final class NpcProfile {
             case "evil_cultivator" -> {
                 insertInventory(inventory, new ItemStack(Items.BONE, 4 * amount));
                 insertInventory(inventory, new ItemStack(ModItems.YUANHUN_BOTTLE.get(), 1));
+                if (hasRareForgingSlip(seed, SOUL_BOTTLE_RECIPE_SALT)) {
+                    insertInventory(inventory, new ItemStack(ModItems.YUANHUN_BOTTLE_YUJIAN.get(), 1));
+                }
                 insertInventory(inventory, evilCultivatorBanner(defaultRealm(archetype, seed)));
             }
             case "artifact_cultivator" -> {
@@ -2996,11 +3444,22 @@ public final class NpcProfile {
                 insertInventory(inventory, new ItemStack(ModBlocks.JINGTIE_MOTHERSTONE.get().asItem(), 3 * amount));
                 insertInventory(inventory, new ItemStack(Items.IRON_INGOT, 8 * amount));
                 insertInventory(inventory, new ItemStack(tier == 3 ? ModItems.DAO_YUJIAN.get() : ModItems.FEIJIAN_YUJIAN.get(), 1));
+                if (hasRareForgingSlip(seed, FOG_MIRROR_RECIPE_SALT)) {
+                    insertInventory(inventory, new ItemStack(ModItems.FOG_REVEALING_MIRROR_YUJIAN.get(), 1));
+                }
                 insertInventory(inventory, npcForgedMold(seed, tier));
             }
             case "corpse_cultivator" -> {
                 insertInventory(inventory, new ItemStack(ModItems.ZHENSHI_TALISMAN.get(), 2 * amount));
                 insertInventory(inventory, new ItemStack(ModItems.COFFIN.get(), 1));
+                insertInventory(inventory, new ItemStack(ModItems.ZHENHUN_BELL.get(), 1));
+                insertInventory(inventory, new ItemStack(ModItems.YINHUN_GONG.get(), 1));
+                if (hasRareCorpseForgingSlip(seed, true)) {
+                    insertInventory(inventory, new ItemStack(ModItems.ZHENHUN_BELL_YUJIAN.get(), 1));
+                }
+                if (hasRareCorpseForgingSlip(seed, false)) {
+                    insertInventory(inventory, new ItemStack(ModItems.YINHUN_GONG_YUJIAN.get(), 1));
+                }
                 insertInventory(inventory, new ItemStack(ModItems.BLOOD_CRYSTAL.get(), 2 * amount));
                 if (Math.floorMod(seed, 100) < 2) {
                     insertInventory(inventory, new ItemStack(ModItems.CORPSE_REFINING_SECRET.get(), 1));
@@ -3015,8 +3474,33 @@ public final class NpcProfile {
                     insertInventory(inventory, new ItemStack(ModItems.CUIGU_LIANSHEN_METHOD.get(), 1));
                 }
             }
+            case "talisman_cultivator" -> {
+                Random talismanRandom = new Random(
+                        ((long) seed << 32) ^ tier ^ 0x46555849554CL);
+                insertInventory(inventory, new ItemStack(talismanPaper(tier), 16));
+                insertInventory(inventory, new ItemStack(talismanInk(tier), 16));
+                insertInventory(inventory, npcFinishedTalisman(
+                        randomAttackTalisman(talismanRandom, tier), 16, tier));
+                insertInventory(inventory, npcFinishedTalisman(
+                        randomDefenseTalisman(talismanRandom, tier), 8, tier));
+            }
+            case "formation_cultivator" -> {
+                Random formationRandom = new Random(
+                        ((long) seed << 32) ^ tier ^ 0x5A48454E5855L);
+                insertInventory(inventory, new ItemStack(
+                        com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENPAN.get(), 1));
+                insertInventory(inventory, new ItemStack(
+                        randomFormationFlag(formationRandom), 1));
+                if (hasRareForgingSlip(seed, YINYANG_COMPASS_RECIPE_SALT)) {
+                    insertInventory(inventory, new ItemStack(ModItems.YINYANG_COMPASS_YUJIAN.get(), 1));
+                }
+                insertInventory(inventory, new ItemStack(item(spiritStone), 16));
+                insertInventory(inventory, ServerEvents.createMagicRitualGuide());
+                insertInventory(inventory, new ItemStack(
+                        com.example.immortal_cultivation_mod.magicritual.item.ModItems.RITUAL_DAGGER.get(), 1));
+            }
             case "clan_heir" -> {
-                insertInventory(inventory, new ItemStack(item(MEDIUM_SPIRIT_STONE), 16 * amount));
+                insertInventory(inventory, new ItemStack(item(spiritStone), 16 * amount));
                 insertInventory(inventory, new ItemStack(ModItems.FAMILY_TOKEN.get(), 1));
                 insertInventory(inventory, npcForgedWeapon((seed & 1) == 0, tier, seed + 31));
                 if (chance(new Random(seed + 1997), 60)) {
@@ -3030,7 +3514,6 @@ public final class NpcProfile {
                 insertInventory(inventory, new ItemStack(Items.GOLD_INGOT, 12 * amount));
                 insertInventory(inventory, new ItemStack(Items.IRON_INGOT, 20 * amount));
                 insertInventory(inventory, new ItemStack(ModItems.HIGH_QI_RECOVERY_PILL.get(), 3 * amount));
-                insertInventory(inventory, new ItemStack(ModItems.BIG_LEVEL_UP.get(), 1));
                 insertInventory(inventory, npcForgedWeapon((seed & 1) == 0, 3, seed + 73));
                 insertInventory(inventory, new ItemStack(ModItems.PROTECTIVE_JADE_PENDANT.get(), 1));
                 insertInventory(inventory, new ItemStack(ModItems.POKONG_JUE_METHOD.get(), 1));
@@ -3045,12 +3528,78 @@ public final class NpcProfile {
                         chineseName(seed, 0, selectSkin(archetype, seed).gender()),
                         selectSkin(archetype, seed).texture(),
                         defaultRealm(archetype, seed),
-                        tier == 3 ? HIGH_SPIRIT_STONE : MEDIUM_SPIRIT_STONE,
-                        tier == 3 ? 16 : 24));
+                        spiritStone,
+                        tier == 3 ? 16 : tier == 2 ? 24 : 32));
             }
             default -> {
             }
         }
+    }
+
+    private static Item talismanPaper(int tier) {
+        return switch (tier) {
+            case 3 -> ModItems.RED_VEINED_MULBERRY_PAPER.get();
+            case 2 -> ModItems.LINGSANG_TALISMAN_PAPER.get();
+            default -> ModItems.ORDINARY_YELLOW_TALISMAN_PAPER.get();
+        };
+    }
+
+    private static Item talismanInk(int tier) {
+        return switch (tier) {
+            case 3 -> ModItems.MYSTERIOUS_SPIRIT_INK.get();
+            case 2 -> ModItems.SPIRITUAL_CINNABAR_INK.get();
+            default -> ModItems.MUNDANE_CINNABAR_INK.get();
+        };
+    }
+
+    private static Item randomAttackTalisman(Random random, int tier) {
+        List<Item> pool = new ArrayList<>(List.of(
+                ModItems.FIREBALL_TALISMAN.get(),
+                ModItems.FENGREN_TALISMAN.get()));
+        if (tier >= 2) {
+            pool.add(ModItems.XINGHUO_TALISMAN.get());
+            pool.add(ModItems.CHANSI_KUN_TALISMAN.get());
+        }
+        if (tier >= 3) {
+            pool.add(ModItems.BAOFENG_TALISMAN.get());
+            pool.add(ModItems.WULEI_XIAOFA_TALISMAN.get());
+            pool.add(ModItems.HUOYU_FENXIE_TALISMAN.get());
+        }
+        return pool.get(random.nextInt(pool.size()));
+    }
+
+    private static Item randomDefenseTalisman(Random random, int tier) {
+        List<Item> pool = new ArrayList<>(List.of(
+                ModItems.LIANSHENG_TALISMAN.get()));
+        if (tier >= 2) {
+            pool.add(ModItems.BOJIN_HUFU.get());
+            pool.add(ModItems.DUANTU_SHENXING_TALISMAN.get());
+        }
+        if (tier >= 3) {
+            pool.add(ModItems.BIXIE_ANHUN_TALISMAN.get());
+            pool.add(ModItems.ZHENRAO_TALISMAN.get());
+        }
+        return pool.get(random.nextInt(pool.size()));
+    }
+
+    private static ItemStack npcFinishedTalisman(Item item, int count, int tier) {
+        ItemStack stack = new ItemStack(item, count);
+        TalismanItem.setQuality(stack, switch (tier) {
+            case 3 -> TalismanItem.Quality.HIGH;
+            case 2 -> TalismanItem.Quality.MID;
+            default -> TalismanItem.Quality.LOW;
+        });
+        return stack;
+    }
+
+    private static Item randomFormationFlag(Random random) {
+        List<Item> flags = List.of(
+                com.example.immortal_cultivation_mod.magicritual.item.ModItems.DURATION_FLAG.get(),
+                com.example.immortal_cultivation_mod.magicritual.item.ModItems.AMPLIFIER_FLAG.get(),
+                com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_GATHERING_FLAG.get(),
+                com.example.immortal_cultivation_mod.magicritual.item.ModItems.HASTE_FLAG.get(),
+                com.example.immortal_cultivation_mod.magicritual.item.ModItems.QI_RETURN_FLAG.get());
+        return flags.get(random.nextInt(flags.size()));
     }
 
     private static String tieredItemId(String suffix, int tier) {
@@ -3312,6 +3861,10 @@ public final class NpcProfile {
             return false;
         }
         profile.putInt("Qi", currentQi - cost);
+        if (mob.hasEffect(ModEffects.SPIRIT_SEAL)
+                && cost * 4 >= Math.max(1, profile.getInt("MaxQi"))) {
+            mob.removeEffect(ModEffects.SPIRIT_SEAL);
+        }
         return true;
     }
 
@@ -3341,6 +3894,14 @@ public final class NpcProfile {
     public static long cultivationProgress(PathfinderMob mob, String archetype) {
         ensure(mob, archetype);
         return profile(mob).getLong("CultivationProgress");
+    }
+
+    public static void restoreCultivationProgress(PathfinderMob mob, String archetype, long amount) {
+        ensure(mob, archetype);
+        CompoundTag data = profile(mob);
+        long maximum = CultivationLevels.getTotalQiNeeded(data.getString("Realm"));
+        data.putLong("CultivationProgress", Math.min(maximum,
+                data.getLong("CultivationProgress") + Math.max(0, amount)));
     }
 
     public static String spiritRootsDisplay(PathfinderMob mob, String archetype) {
@@ -3440,7 +4001,7 @@ public final class NpcProfile {
         mob.setDropChance(EquipmentSlot.MAINHAND, 0.0F);
     }
 
-    private static void syncEquippedCombatWeapon(PathfinderMob mob) {
+    static void syncEquippedCombatWeapon(PathfinderMob mob) {
         ItemStack equipped = mob.getMainHandItem();
         CompoundTag npcProfile = profile(mob);
         List<ItemStack> stored = inventory(mob);
@@ -3483,6 +4044,17 @@ public final class NpcProfile {
             stored.set(slot, liveCopy);
             writeInventory(mob, npcProfile, stored);
         }
+    }
+
+    static boolean consumeEquippedArtifact(PathfinderMob mob) {
+        syncEquippedCombatWeapon(mob);
+        var p=profile(mob);
+        if (!p.contains(EQUIPPED_WEAPON_SLOT_TAG)||mob.getMainHandItem().isEmpty())return false;
+        var stored=inventory(mob);int slot=p.getInt(EQUIPPED_WEAPON_SLOT_TAG);
+        if(slot<0||slot>=stored.size()||stored.get(slot).isEmpty())return false;
+        stored.get(slot).shrink(1);writeInventory(mob,p,stored);
+        p.remove(EQUIPPED_WEAPON_SLOT_TAG);mob.setItemSlot(EquipmentSlot.MAINHAND,ItemStack.EMPTY);
+        return true;
     }
 
     private static int findStoredWeaponSlot(List<ItemStack> stored, ItemStack selected) {
@@ -3543,6 +4115,46 @@ public final class NpcProfile {
                 writeInventory(mob, profile(mob), inventory);
                 return true;
             }
+        }
+        return false;
+    }
+
+    public static boolean isTalismanCultivator(PathfinderMob mob) {
+        return "talisman_cultivator".equals(
+                identity(mob, archetypeOf(mob)));
+    }
+
+    /**
+     * Uses and consumes one real offensive talisman from the NPC's stored
+     * inventory. The item itself launches the same registered projectile used
+     * by players, so all damage, impact effects, particles, and ownership rules
+     * remain authoritative.
+     */
+    public static boolean tryUseAttackTalisman(
+            PathfinderMob mob, LivingEntity target) {
+        return tryUseAttackTalisman(mob,target,false);
+    }
+
+    public static boolean tryUseAttackTalisman(PathfinderMob mob,LivingEntity target,boolean emergency) {
+        if (!emergency&&!isTalismanCultivator(mob)) {
+            return false;
+        }
+        List<ItemStack> inventory = inventory(mob);
+        if (inventory.isEmpty())return false;
+        int start = mob.getRandom().nextInt(inventory.size());
+        for (int offset = 0; offset < inventory.size(); offset++) {
+            int slot = (start + offset) % inventory.size();
+            ItemStack stack = inventory.get(slot);
+            if (!(stack.getItem() instanceof AttackTalismanItem talisman)
+                    || !talisman.launchForNpc(mob, target)) {
+                continue;
+            }
+            stack.shrink(1);
+            if (stack.isEmpty()) {
+                inventory.set(slot, ItemStack.EMPTY);
+            }
+            writeInventory(mob, profile(mob), inventory);
+            return true;
         }
         return false;
     }
@@ -3633,10 +4245,13 @@ public final class NpcProfile {
             case "器修", "artifact_cultivator", "artifact_refiner" -> "artifact_cultivator";
             case "尸修", "corpse_cultivator" -> "corpse_cultivator";
             case "体修", "body_cultivator" -> "body_cultivator";
+            case "符修", "talisman_cultivator", "talisman_master" -> "talisman_cultivator";
+            case "阵修", "formation_cultivator", "formation_master" -> "formation_cultivator";
             case "世家子弟", "clan_heir" -> "clan_heir";
             case "皇族", "royal", "royalty" -> "royal";
             case "通缉犯", "wanted", "wanted_criminal" -> "wanted";
             case "凡人", "村中凡人", "mortal", "village_resident", "village_mortal" -> "village_mortal";
+            case "掌柜", "客栈掌柜", "hotelkeeper", "innkeeper" -> "hotelkeeper";
             case "sect_zhuji", "wandering_jindan" -> normalized;
             default -> "";
         };
@@ -3656,6 +4271,7 @@ public final class NpcProfile {
         return switch (archetype) {
             case JINDAN -> "玄灵体";
             case ZHUJI -> "清灵体";
+            case LIANQI -> "\u521d\u7075\u4f53";
             default -> "凡体";
         };
     }
@@ -3669,6 +4285,7 @@ public final class NpcProfile {
         return switch (archetype) {
             case JINDAN -> CultivationLevels.REALM_JINDAN + stage;
             case ZHUJI -> CultivationLevels.REALM_ZHUJI + stage;
+            case LIANQI -> CultivationLevels.REALM_LIANQI + stage;
             default -> CultivationLevels.REALM_MORTAL;
         };
     }
@@ -3677,6 +4294,7 @@ public final class NpcProfile {
         return switch (archetype) {
             case JINDAN -> 230;
             case ZHUJI -> 120;
+            case LIANQI -> 60;
             default -> 24;
         };
     }
@@ -3685,6 +4303,7 @@ public final class NpcProfile {
         return switch (archetype) {
             case JINDAN -> 45;
             case ZHUJI -> 18;
+            case LIANQI -> 5;
             default -> 0;
         };
     }
@@ -3693,6 +4312,7 @@ public final class NpcProfile {
         return switch (archetype) {
             case JINDAN -> 50_000L;
             case ZHUJI -> 9_000L;
+            case LIANQI -> 600L;
             default -> 0L;
         };
     }
@@ -3701,6 +4321,7 @@ public final class NpcProfile {
         return switch (archetype) {
             case JINDAN -> List.of(SpiritRoots.THUNDER, SpiritRoots.WIND);
             case ZHUJI -> List.of(SpiritRoots.FIRE, SpiritRoots.WATER);
+            case LIANQI -> List.of(SpiritRoots.METAL, SpiritRoots.WOOD);
             default -> List.of();
         };
     }
@@ -3711,6 +4332,8 @@ public final class NpcProfile {
                     ModSpells.YINLEI_JUE, ModSpells.ZHENSHAN_PALM);
             case ZHUJI -> List.of(ModSpells.QI_GATHERING, ModSpells.REGENERATION, ModSpells.FIREBALL,
                     ModSpells.WIND_STEP, ModSpells.LINGBENG);
+            case LIANQI -> List.of(ModSpells.QI_GATHERING, ModSpells.REGENERATION,
+                    ModSpells.FIREBALL, ModSpells.WIND_STEP);
             default -> List.of();
         };
     }
@@ -3799,8 +4422,12 @@ public final class NpcProfile {
                 ^ Integer.rotateLeft(combatRole.hashCode(), 19)
                 ^ 0x4E50435350454C4CL);
         LinkedHashSet<String> selected = new LinkedHashSet<>();
-        selected.add(ModSpells.QI_GATHERING);
-        selected.add(ModSpells.REGENERATION);
+        if (isRealmValidNpcSpell(ModSpells.QI_GATHERING, realm)) {
+            selected.add(ModSpells.QI_GATHERING);
+        }
+        if (isRealmValidNpcSpell(ModSpells.REGENERATION, realm)) {
+            selected.add(ModSpells.REGENERATION);
+        }
 
         List<String> movement = NpcSpellcasting.movementSpellIds().stream()
                 .filter(id -> isRealmValidNpcSpell(id, realm))
@@ -3860,7 +4487,8 @@ public final class NpcProfile {
             fullSpellPool.remove(extra);
         }
 
-        if (ZHUJI.equals(archetype) && isRealmValidNpcSpell(ModSpells.DIELANG_SHIELD, realm)) {
+        if ((ZHUJI.equals(archetype) || LIANQI.equals(archetype))
+                && isRealmValidNpcSpell(ModSpells.DIELANG_SHIELD, realm)) {
             selected.add(ModSpells.DIELANG_SHIELD);
         }
         return List.copyOf(selected);
@@ -3890,13 +4518,15 @@ public final class NpcProfile {
         if (spell == null) {
             return 1;
         }
-        int weight = spell.element().isBlank() ? 2 : (roots.contains(spell.element()) ? 6 : 1);
+        int weight = spell.element().isBlank() ? 2
+                : (SpiritRoots.matchesAny(roots, spell.element()) ? 6 : 1);
         CultivationMethods.MethodDef method = CultivationMethods.get(methodId);
         if (method != null) {
             if ("any".equals(method.element()) || "none".equals(method.element())) {
                 weight += 1;
             } else if (!spell.element().isBlank()
-                    && List.of(method.element().split(",")).contains(spell.element())) {
+                    && SpiritRoots.matchesAny(
+                    List.of(method.element().split(",")), spell.element())) {
                 weight += 5;
             }
             if (method.bloodDemon() && isOneOf(spellId,
@@ -3918,8 +4548,12 @@ public final class NpcProfile {
         }
         if (CultivationMethods.CHANGQING_JUE.equals(methodId)
                 || CultivationMethods.HANTI_BINGQIN.equals(methodId)
-                || CultivationMethods.JIUYOU_LIANSHI_JUE.equals(methodId)) {
+                || CultivationMethods.JIUYOU_LIANSHI_JUE.equals(methodId)
+                || CultivationMethods.HANLAN_NINGYUAN_JING.equals(methodId)) {
             return "control";
+        }
+        if (CultivationMethods.XUANYUE_SUIFENG_JUE.equals(methodId)) {
+            return "defender";
         }
         if (CultivationMethods.FENTIAN_LIFE_RENEWAL.equals(methodId)
                 || methodId.startsWith("blood_demon_")) {
@@ -3930,6 +4564,8 @@ public final class NpcProfile {
             case "saber_cultivator", "demonic_cultivator" -> "pressure";
             case "sword_cultivator", "wanted" -> "skirmisher";
             case "artifact_cultivator", "corpse_cultivator" -> "control";
+            case "formation_cultivator" -> "control";
+            case "talisman_cultivator" -> "ranged";
             case "clan_heir", "royal" -> "defender";
             default -> "ranged";
         };
@@ -3991,7 +4627,6 @@ public final class NpcProfile {
     private static boolean isRealmValidNpcSpell(String spellId, String realm) {
         ModSpells.SpellDef spell = ModSpells.get(spellId);
         return spell != null
-                && !spell.requiredLevel().isBlank()
                 && ModSpells.meetsRequirement(realm, spell);
     }
 
@@ -4013,10 +4648,14 @@ public final class NpcProfile {
         String realm = profile.getString("Realm");
         int currentStage = CultivationLevels.getStageIndex(realm);
         List<String> roots = strings(profile.getList("SpiritRoots", 8));
-        String best = knownMethodIds(profile).stream()
+        List<CultivationMethods.MethodDef> available = knownMethodIds(profile).stream()
                 .map(CultivationMethods::get)
                 .filter(java.util.Objects::nonNull)
                 .filter(method -> CultivationLevels.getStageIndex(method.limitLevel()) >= currentStage)
+                .toList();
+        boolean canTrain = available.stream().anyMatch(method -> CultivationMethods.canGainProgress(method.id(), realm));
+        String best = available.stream()
+                .filter(method -> !canTrain || CultivationMethods.canGainProgress(method.id(), realm))
                 .max(Comparator.comparingInt(method -> methodScore(method, roots, currentStage)))
                 .map(CultivationMethods.MethodDef::id)
                 .orElse("");
@@ -4037,6 +4676,21 @@ public final class NpcProfile {
                     spells.add(ModSpells.HANJING_SUOZHUA);
                     spells.add(ModSpells.SHUANGTIAN_QI);
                     spells.add(ModSpells.SUISHUANG_LINGXIAO);
+                }
+                case CultivationMethods.XUANYUE_SUIFENG_JUE -> {
+                    spells.add(ModSpells.XUANYUE_BI);
+                    spells.add(ModSpells.JINYAN_SHENGFENG);
+                    spells.add(ModSpells.SHANSUO_ZHENYU);
+                    spells.add(ModSpells.WANFENG_YUEZANG);
+                }
+                case CultivationMethods.HANLAN_NINGYUAN_JING -> {
+                    spells.add(ModSpells.DONGLIU_SUO);
+                    spells.add(ModSpells.CANGYUAN_HONGLIU);
+                    spells.add(ModSpells.HANYUAN_FENGJIE);
+                }
+                case CultivationMethods.CHANGQING_JUE -> {
+                    spells.add(ModSpells.WANMU_SHENG);
+                    spells.add(ModSpells.QINGTENG_FU);
                 }
                 default -> {
                 }
@@ -4126,9 +4780,9 @@ public final class NpcProfile {
         return names[Math.floorMod(seed / 7 + offset * 17, names.length)];
     }
 
-    private static NpcSkin selectSkin(String archetype, int seed) {
-        List<NpcSkin> skins = switch (archetype) {
-            case JINDAN, ZHUJI -> CULTIVATOR_SKINS;
+    private static NpcSkinCatalog.Skin selectSkin(String archetype, int seed) {
+        List<NpcSkinCatalog.Skin> skins = switch (archetype) {
+            case JINDAN, ZHUJI, LIANQI -> CULTIVATOR_SKINS;
             default -> FANREN_SKINS;
         };
         return skins.get(Math.floorMod(seed / 31, skins.size()));
@@ -4243,9 +4897,6 @@ public final class NpcProfile {
 
     private record RelationshipBaseline(int friendship, int trust, int affection, int hatred, boolean custom) {
         private static final RelationshipBaseline NORMAL = new RelationshipBaseline(0, 0, 0, 0, false);
-    }
-
-    private record NpcSkin(String texture, String gender) {
     }
 
     private record WantedReward(String itemId, int count) {

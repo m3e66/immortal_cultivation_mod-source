@@ -5,11 +5,11 @@ import com.example.immortal_cultivation_mod.item.FuchenItem;
 import com.example.immortal_cultivation_mod.spell.DielangShield;
 import com.example.immortal_cultivation_mod.spell.JindanCreativeFlight;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -29,6 +29,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 public class JindanCultivatorEntity extends PathfinderMob implements CultivationNpc {
+    private static final EntityDataAccessor<Integer> CULTIVATION_STATE =
+            SynchedEntityData.defineId(JindanCultivatorEntity.class, EntityDataSerializers.INT);
+    @Override public int npcCultivationState() { return entityData.get(CULTIVATION_STATE); }
+    @Override public void setNpcCultivationState(int state) { entityData.set(CULTIVATION_STATE, state); }
     private static final EntityDataAccessor<Integer> CAST_TICKS =
             SynchedEntityData.defineId(JindanCultivatorEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<String> NPC_SKIN =
@@ -38,6 +42,7 @@ public class JindanCultivatorEntity extends PathfinderMob implements Cultivation
 
     public JindanCultivatorEntity(EntityType<? extends JindanCultivatorEntity> entityType, Level level) {
         super(entityType, level);
+        moveControl = new NpcMoveControl(this);
         xpReward = 80;
         setPersistenceRequired();
     }
@@ -59,6 +64,7 @@ public class JindanCultivatorEntity extends PathfinderMob implements Cultivation
     @Override
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
+        goalSelector.addGoal(4, new NpcCultivationGoal(this));
         goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.85D));
         goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 10.0F));
         goalSelector.addGoal(7, new RandomLookAroundGoal(this));
@@ -70,6 +76,7 @@ public class JindanCultivatorEntity extends PathfinderMob implements Cultivation
         super.defineSynchedData(builder);
         builder.define(CAST_TICKS, 0);
         builder.define(NPC_SKIN, "");
+        builder.define(CULTIVATION_STATE, 0);
     }
 
     @Override
@@ -102,20 +109,7 @@ public class JindanCultivatorEntity extends PathfinderMob implements Cultivation
     }
 
     private void tickNpcFlight(double speed) {
-        if (NpcSpellcasting.hasFlightEffect(this)) {
-            setNoGravity(true);
-            fallDistance = 0.0F;
-            resetFallDistance();
-            if (tickCount % 4 == 0 && level() instanceof ServerLevel serverLevel) {
-                serverLevel.sendParticles(ParticleTypes.CLOUD,
-                        getX(), getY() + 0.15D, getZ(),
-                        8, 0.45D, 0.12D, 0.45D, 0.03D);
-            }
-            combatBrain.tickFlightMotion(speed);
-        } else if (isNoGravity()) {
-            setNoGravity(false);
-            combatBrain.clearFlightIntent();
-        }
+        combatBrain.tickFlightMotion(speed);
     }
 
     @Override

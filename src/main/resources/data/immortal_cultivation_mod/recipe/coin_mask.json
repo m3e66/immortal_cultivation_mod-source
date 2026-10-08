@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "SSS",
+    "CCC",
+    "CCC"
+  ],
+  "key": {
+    "S": {
+      "item": "immortal_cultivation_mod:red_string"
+    },
+    "C": {
+      "item": "immortal_cultivation_mod:copper_coin"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:coin_mask",
+    "count": 1
+  }
+}

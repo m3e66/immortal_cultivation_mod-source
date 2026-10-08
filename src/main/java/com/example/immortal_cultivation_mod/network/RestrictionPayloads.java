@@ -37,7 +37,7 @@ public final class RestrictionPayloads {
         public static final Type<ServerboundStartCarving> TYPE = RestrictionPayloads.type("restriction_start");
         public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundStartCarving> STREAM_CODEC =
                 StreamCodec.of((buf, payload) -> writeInts(buf, payload.additions()),
-                        buf -> new ServerboundStartCarving(readInts(buf, 7)));
+                        buf -> new ServerboundStartCarving(readInts(buf, com.example.immortal_cultivation_mod.item.WeaponRestrictionSystem.RestrictionType.values().length)));
 
         @Override
         public Type<? extends CustomPacketPayload> type() {

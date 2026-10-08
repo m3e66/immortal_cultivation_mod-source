@@ -1,11 +1,18 @@
 package com.example.immortal_cultivation_mod.screen;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
+import com.example.immortal_cultivation_mod.client.DaoGuidanceClient;
 import com.example.immortal_cultivation_mod.client.NpcClientData;
+import com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
 public final class NpcInteractionScreen extends AbstractNpcScreen {
+    private NpcButton talkButton;
+    private NpcButton interactButton;
+    private NpcButton tradeButton;
+    private NpcButton questButton;
+
     public NpcInteractionScreen(NpcClientData data) {
         super(data.withoutStatus(), Component.translatable("screen." + ImmortalCultivationMod.MODID + ".npc.title"));
     }
@@ -18,10 +25,15 @@ public final class NpcInteractionScreen extends AbstractNpcScreen {
         int buttonWidth = (contentWidth() - gap) / 2;
         int buttonHeight = 25;
 
-        addPageButton(x, y, buttonWidth, buttonHeight, "talk", NpcOptionScreen.Page.TALK);
-        addPageButton(x + buttonWidth + gap, y, buttonWidth, buttonHeight, "interact", NpcOptionScreen.Page.INTERACT);
-        addPageButton(x, y + 32, buttonWidth, buttonHeight, "trade", NpcOptionScreen.Page.TRADE);
-        addPageButton(x + buttonWidth + gap, y + 32, buttonWidth, buttonHeight, "quest", NpcOptionScreen.Page.QUEST);
+        talkButton = addPageButton(x, y, buttonWidth, buttonHeight,
+                "talk", NpcOptionScreen.Page.TALK);
+        interactButton = addPageButton(x + buttonWidth + gap, y,
+                buttonWidth, buttonHeight,
+                "interact", NpcOptionScreen.Page.INTERACT);
+        tradeButton = addPageButton(x, y + 32, buttonWidth, buttonHeight,
+                "trade", NpcOptionScreen.Page.TRADE);
+        questButton = addPageButton(x + buttonWidth + gap, y + 32,
+                buttonWidth, buttonHeight, "quest", NpcOptionScreen.Page.QUEST);
         Component travelLabel = Component.translatable("screen." + ImmortalCultivationMod.MODID
                 + ("following".equals(data.commandMode()) ? ".npc.travel.stop" : ".npc.action.travel"));
         addNpcButton(x, y + 64, buttonWidth, buttonHeight, travelLabel, () -> sendAction("TOGGLE_FOLLOW"));
@@ -33,10 +45,31 @@ public final class NpcInteractionScreen extends AbstractNpcScreen {
         addPageButton(x, y + 128, contentWidth(), buttonHeight, "about", NpcOptionScreen.Page.ABOUT);
     }
 
-    private void addPageButton(int x, int y, int width, int height, String key, NpcOptionScreen.Page page) {
-        addNpcButton(x, y, width, height,
+    private NpcButton addPageButton(int x, int y, int width, int height, String key, NpcOptionScreen.Page page) {
+        return addNpcButton(x, y, width, height,
                 Component.translatable("screen." + ImmortalCultivationMod.MODID + ".npc.action." + key),
                 () -> minecraft.setScreen(new NpcOptionScreen(data, page)));
+    }
+
+    @Override
+    protected void renderForeground(
+            GuiGraphics graphics, int mouseX, int mouseY,
+            float partialTick) {
+        NpcButton target = DaoGuidanceClient.isCurrentAction(
+                DaoGuidanceContent.TALK_NPC) ? talkButton
+                : DaoGuidanceClient.isCurrentAction(
+                DaoGuidanceContent.WEAPON_ATTACK) ? interactButton
+                : DaoGuidanceClient.isCurrentAction(
+                DaoGuidanceContent.TRADE_NPC) ? tradeButton
+                : DaoGuidanceClient.isCurrentAction(
+                DaoGuidanceContent.ACCEPT_QUEST) ? questButton : null;
+        if (target == null) return;
+        int pulse = 145 + (int) (Math.sin(
+                System.currentTimeMillis() / 180.0D) * 65.0D);
+        int color = (Math.max(70, Math.min(230, pulse)) << 24)
+                | 0xF0C66B;
+        graphics.renderOutline(target.getX() - 3, target.getY() - 3,
+                target.getWidth() + 6, target.getHeight() + 6, color);
     }
 
     @Override

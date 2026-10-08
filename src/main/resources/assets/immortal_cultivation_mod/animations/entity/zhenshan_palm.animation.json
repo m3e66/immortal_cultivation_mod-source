@@ -3,6 +3,7 @@
   "animations": {
     "animation.immortal_cultivation_mod.zhenshan_palm.static": {
       "loop": true,
+      "animation_length": 1.0,
       "bones": {}
     }
   }

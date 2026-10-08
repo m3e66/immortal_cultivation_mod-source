@@ -1,10 +1,11 @@
 {
   "parent": "builtin/entity",
-  "gui_light": "front",
+  "gui_light": "side",
   "display": {
     "gui": {
-      "translation": [0, -4, 0],
-      "scale": [0.72, 0.72, 0.72]
+      "rotation": [30, 225, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.625, 0.625, 0.625]
     },
     "ground": {
       "translation": [0, 2, 0],

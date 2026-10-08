@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "BBB",
+    "BEB",
+    "S S"
+  ],
+  "key": {
+    "B": {
+      "item": "immortal_cultivation_mod:black_wool_strip"
+    },
+    "E": {
+      "item": "minecraft:emerald"
+    },
+    "S": {
+      "item": "minecraft:string"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:futou",
+    "count": 1
+  }
+}

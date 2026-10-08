@@ -18,7 +18,19 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Tomb and Ruined Ritual structures can appear in the world. Tomb chests use Zhuji-level spell and material loot. Ruined Ritual chests can contain many spirit stones, a Magic Ritual dagger, and a Magic Ritual guide book."
+      "text": "$(bold)Mountain Cave$()$(br)This is the Chapter 0 destination. One chest guarantees exactly one Enlightenment Pill, while the other contains a Zhuji wandering cultivator kit.$(br2)$(bold)Daoist Temple$()$(br)A rare surface structure containing cultivation and forging supplies."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Small Sect$()$(br)This rare Overworld treasury is protected by a Vault Guardian. The structure's original blocks resist mining, explosions, and external-Qi damage until its bound guardian dies. Blocks placed afterward remain normally breakable."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Abandoned Spirit Mine$()$(br)An exceptionally rare underground mineshaft with exposed spirit ore. Its minecarts favor Low-Grade Spirit Stones, may hold 1–2 Medium-Grade Spirit Stones, and never contain High-Grade Spirit Stones."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Tombs$()$(br)Tomb I and Tomb II are separate structures with independent locations. Their chests contain Zhuji-level spells and cultivation materials; Tomb II carries a poorer wandering-cultivator cache."
     }
   ]
 }

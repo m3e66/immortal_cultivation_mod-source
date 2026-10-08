@@ -1,5 +1,7 @@
 package com.example.immortal_cultivation_mod.entity;
 
+import com.example.immortal_cultivation_mod.config.BlockBreakingSettings;
+
 import com.example.immortal_cultivation_mod.item.FlyingNeedleItem;
 import com.example.immortal_cultivation_mod.item.ForgingSystem;
 import com.example.immortal_cultivation_mod.item.ModItems;
@@ -111,10 +113,9 @@ public class FlyingNeedleEntity extends ThrowableItemProjectile {
             return;
         }
 
-        float damage = (float) Math.max(
-                FlyingNeedleItem.BASE_DAMAGE,
-                QiInfusedWeapon.baseAttackDamage(weaponStack))
-                + injectedQiDamage;
+        float baseDamage = (float) QiInfusedWeapon.baseAttackDamage(weaponStack);
+        if (baseDamage <= 0.0F) baseDamage = FlyingNeedleItem.BASE_DAMAGE;
+        float damage = baseDamage + injectedQiDamage;
         if (target instanceof LivingEntity living) {
             damage = ForgingSystem.adjustWeaponDamage(
                     weaponStack, living, damage);
@@ -159,14 +160,16 @@ public class FlyingNeedleEntity extends ThrowableItemProjectile {
                     0.0D,
                     0.0D);
             Entity source = getOwner() == null ? this : getOwner();
-            serverLevel.explode(
+            BlockBreakingSettings.runWithSource(
+                    BlockBreakingSettings.Category.WEAPONS, source,
+                    () -> com.example.immortal_cultivation_mod.spell.SpellDestruction.explode(serverLevel,
                     source,
                     location.x,
                     location.y,
                     location.z,
                     radius,
                     false,
-                    Level.ExplosionInteraction.BLOCK);
+                    Level.ExplosionInteraction.BLOCK));
         } else {
             serverLevel.sendParticles(
                     ParticleTypes.CRIT,

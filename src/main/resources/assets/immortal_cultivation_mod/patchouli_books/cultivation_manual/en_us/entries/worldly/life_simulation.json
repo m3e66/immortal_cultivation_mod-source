@@ -1,0 +1,23 @@
+{
+  "name": "Life Simulation",
+  "icon": "immortal_cultivation_mod:cultivation_manual",
+  "category": "immortal_cultivation_mod:worldly",
+  "sortnum": 10,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Start and Choose",
+      "text": "Open Life Simulation and begin a new life. Read events and available actions before choosing.$(br2)Earlier choices influence later experiences and opportunities. Your simulated life is separate from your actual character; a simulated realm is not automatically your real cultivation realm."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Manual Settlement",
+      "text": "While a simulation is active, Manual Settlement ends it early and settles its existing experiences and achievements. There is no need to wait for a long-lived cultivator to die.$(br2)Settlement ends this simulation; that same life cannot continue afterward."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Claim an Inheritance",
+      "text": "After the simulation ends, inspect its inheritance rewards and choose one to claim. Only an actual claim applies the reward to your real character.$(br2)The same life cannot be claimed repeatedly, and opening settlement does not grant every displayed reward at once."
+    }
+  ]
+}

@@ -1,6 +1,5 @@
 package com.example.immortal_cultivation_mod.entity;
 
-import com.example.immortal_cultivation_mod.effect.PhotonEffects;
 import com.example.immortal_cultivation_mod.magicritual.center.behavior.ForcefieldCenterBehavior;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -29,7 +28,6 @@ public class LiuguangJianyingProjectileEntity extends ThrowableItemProjectile {
 
     private int redirects;
     private int lifeTicks;
-    private int photonTicks;
     private Vec3 lastRedirectPos = Vec3.ZERO;
 
     public LiuguangJianyingProjectileEntity(EntityType<? extends ThrowableItemProjectile> entityType, Level level) {
@@ -73,9 +71,6 @@ public class LiuguangJianyingProjectileEntity extends ThrowableItemProjectile {
             return;
         }
 
-        if (photonTicks++ % 10 == 0) {
-            PhotonEffects.liuguangJianyingProjectile(this);
-        }
 
         Vec3 movement = getDeltaMovement();
         if (movement.lengthSqr() < 0.0001D) {
@@ -261,15 +256,11 @@ public class LiuguangJianyingProjectileEntity extends ThrowableItemProjectile {
         if (level().isClientSide || isRemoved()) {
             return;
         }
-        PhotonEffects.removeLiuguangJianyingProjectile(this);
         discard();
     }
 
     @Override
     public void remove(RemovalReason reason) {
-        if (!level().isClientSide) {
-            PhotonEffects.removeLiuguangJianyingProjectile(this);
-        }
         super.remove(reason);
     }
 

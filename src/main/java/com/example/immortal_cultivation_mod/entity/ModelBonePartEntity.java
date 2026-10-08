@@ -19,7 +19,7 @@ import javax.annotation.Nullable;
  */
 public final class ModelBonePartEntity<T extends Entity> extends PartEntity<T> {
     private final String boneName;
-    private final EntityDimensions dimensions;
+    private EntityDimensions dimensions;
 
     public ModelBonePartEntity(T parent, String boneName, float width, float height) {
         super(parent);
@@ -30,6 +30,18 @@ public final class ModelBonePartEntity<T extends Entity> extends PartEntity<T> {
 
     public String boneName() {
         return boneName;
+    }
+
+    /** Resizes dynamic multipart shells without recreating their network IDs. */
+    public void resize(float width, float height) {
+        float safeWidth = Math.max(0.01F, width);
+        float safeHeight = Math.max(0.01F, height);
+        if (Math.abs(dimensions.width() - safeWidth) < 1.0E-4F
+                && Math.abs(dimensions.height() - safeHeight) < 1.0E-4F) {
+            return;
+        }
+        dimensions = EntityDimensions.scalable(safeWidth, safeHeight);
+        refreshDimensions();
     }
 
     /** Resolves a ray-traced bone segment to the real entity that owns it. */

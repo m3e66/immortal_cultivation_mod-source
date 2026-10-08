@@ -1,0 +1,4906 @@
+{
+  "credit": "Sealed Passenger lantern \u2014 native Blender cuboid export",
+  "ambientocclusion": false,
+  "gui_light": "side",
+  "textures": {
+    "iron": "minecraft:block/polished_blackstone",
+    "bronze": "minecraft:block/netherite_block",
+    "trim": "minecraft:block/gilded_blackstone",
+    "jade": "minecraft:block/dark_prismarine",
+    "paper": "minecraft:block/brown_mushroom_block",
+    "red": "minecraft:block/nether_wart_block",
+    "ember": "minecraft:block/sculk",
+    "core": "minecraft:block/prismarine",
+    "particle": "minecraft:block/netherite_block"
+  },
+  "elements": [
+    {
+      "name": "Lower bronze rim",
+      "from": [
+        3.6,
+        0.8,
+        3.6
+      ],
+      "to": [
+        12.4,
+        1.6,
+        12.4
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            1.6
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            1.6
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            1.6
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            1.6
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Recessed iron plinth",
+      "from": [
+        4.1,
+        1.6,
+        4.1
+      ],
+      "to": [
+        11.9,
+        2.3,
+        11.9
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            15.6,
+            1.4
+          ],
+          "texture": "#iron"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            15.6,
+            1.4
+          ],
+          "texture": "#iron"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            15.6,
+            15.6
+          ],
+          "texture": "#iron"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            15.6,
+            15.6
+          ],
+          "texture": "#iron"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            15.6,
+            1.4
+          ],
+          "texture": "#iron"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            15.6,
+            1.4
+          ],
+          "texture": "#iron"
+        }
+      }
+    },
+    {
+      "name": "Upper plinth trim",
+      "from": [
+        4.0,
+        2.3,
+        4.0
+      ],
+      "to": [
+        12.0,
+        2.65,
+        12.0
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            0.7
+          ],
+          "texture": "#trim"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            0.7
+          ],
+          "texture": "#trim"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#trim"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#trim"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            0.7
+          ],
+          "texture": "#trim"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            0.7
+          ],
+          "texture": "#trim"
+        }
+      }
+    },
+    {
+      "name": "Cage corner pillar",
+      "from": [
+        4.15,
+        2.65,
+        4.15
+      ],
+      "to": [
+        4.95,
+        10.65,
+        4.95
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            16
+          ],
+          "texture": "#iron"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            16
+          ],
+          "texture": "#iron"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            1.6
+          ],
+          "texture": "#iron"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            1.6
+          ],
+          "texture": "#iron"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            16
+          ],
+          "texture": "#iron"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            16
+          ],
+          "texture": "#iron"
+        }
+      }
+    },
+    {
+      "name": "Bronze pillar foot",
+      "from": [
+        4.0,
+        2.7,
+        4.0
+      ],
+      "to": [
+        5.1,
+        3.55,
+        5.1
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.7
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.7
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.7
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.7
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Bronze pillar capital",
+      "from": [
+        4.0,
+        9.65,
+        4.0
+      ],
+      "to": [
+        5.1,
+        10.65,
+        5.1
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.0
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.0
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.0
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.0
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Jade seal pin",
+      "from": [
+        4.33,
+        7.5,
+        4.07
+      ],
+      "to": [
+        4.77,
+        8.05,
+        5.03
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.92,
+            1.1
+          ],
+          "texture": "#jade"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.92,
+            1.1
+          ],
+          "texture": "#jade"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.88,
+            1.92
+          ],
+          "texture": "#jade"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.88,
+            1.92
+          ],
+          "texture": "#jade"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.88,
+            1.1
+          ],
+          "texture": "#jade"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.88,
+            1.1
+          ],
+          "texture": "#jade"
+        }
+      }
+    },
+    {
+      "name": "Cage corner pillar.001",
+      "from": [
+        4.15,
+        2.65,
+        11.05
+      ],
+      "to": [
+        4.95,
+        10.65,
+        11.85
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            16
+          ],
+          "texture": "#iron"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            16
+          ],
+          "texture": "#iron"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            1.6
+          ],
+          "texture": "#iron"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            1.6
+          ],
+          "texture": "#iron"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            16
+          ],
+          "texture": "#iron"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            16
+          ],
+          "texture": "#iron"
+        }
+      }
+    },
+    {
+      "name": "Bronze pillar foot.001",
+      "from": [
+        4.0,
+        2.7,
+        10.9
+      ],
+      "to": [
+        5.1,
+        3.55,
+        12.0
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.7
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.7
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.7
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.7
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Bronze pillar capital.001",
+      "from": [
+        4.0,
+        9.65,
+        10.9
+      ],
+      "to": [
+        5.1,
+        10.65,
+        12.0
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.0
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.0
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.0
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.0
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Jade seal pin.001",
+      "from": [
+        4.33,
+        7.5,
+        10.97
+      ],
+      "to": [
+        4.77,
+        8.05,
+        11.93
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.92,
+            1.1
+          ],
+          "texture": "#jade"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.92,
+            1.1
+          ],
+          "texture": "#jade"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.88,
+            1.92
+          ],
+          "texture": "#jade"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.88,
+            1.92
+          ],
+          "texture": "#jade"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.88,
+            1.1
+          ],
+          "texture": "#jade"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.88,
+            1.1
+          ],
+          "texture": "#jade"
+        }
+      }
+    },
+    {
+      "name": "Cage corner pillar.002",
+      "from": [
+        11.05,
+        2.65,
+        4.15
+      ],
+      "to": [
+        11.85,
+        10.65,
+        4.95
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            16
+          ],
+          "texture": "#iron"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            16
+          ],
+          "texture": "#iron"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            1.6
+          ],
+          "texture": "#iron"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            1.6
+          ],
+          "texture": "#iron"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            16
+          ],
+          "texture": "#iron"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            16
+          ],
+          "texture": "#iron"
+        }
+      }
+    },
+    {
+      "name": "Bronze pillar foot.002",
+      "from": [
+        10.9,
+        2.7,
+        4.0
+      ],
+      "to": [
+        12.0,
+        3.55,
+        5.1
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.7
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.7
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.7
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.7
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Bronze pillar capital.002",
+      "from": [
+        10.9,
+        9.65,
+        4.0
+      ],
+      "to": [
+        12.0,
+        10.65,
+        5.1
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.0
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.0
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.0
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.0
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Jade seal pin.002",
+      "from": [
+        11.23,
+        7.5,
+        4.07
+      ],
+      "to": [
+        11.67,
+        8.05,
+        5.03
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.92,
+            1.1
+          ],
+          "texture": "#jade"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.92,
+            1.1
+          ],
+          "texture": "#jade"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.88,
+            1.92
+          ],
+          "texture": "#jade"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.88,
+            1.92
+          ],
+          "texture": "#jade"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.88,
+            1.1
+          ],
+          "texture": "#jade"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.88,
+            1.1
+          ],
+          "texture": "#jade"
+        }
+      }
+    },
+    {
+      "name": "Cage corner pillar.003",
+      "from": [
+        11.05,
+        2.65,
+        11.05
+      ],
+      "to": [
+        11.85,
+        10.65,
+        11.85
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            16
+          ],
+          "texture": "#iron"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            16
+          ],
+          "texture": "#iron"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            1.6
+          ],
+          "texture": "#iron"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            1.6
+          ],
+          "texture": "#iron"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            16
+          ],
+          "texture": "#iron"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            16
+          ],
+          "texture": "#iron"
+        }
+      }
+    },
+    {
+      "name": "Bronze pillar foot.003",
+      "from": [
+        10.9,
+        2.7,
+        10.9
+      ],
+      "to": [
+        12.0,
+        3.55,
+        12.0
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.7
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.7
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.7
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.7
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Bronze pillar capital.003",
+      "from": [
+        10.9,
+        9.65,
+        10.9
+      ],
+      "to": [
+        12.0,
+        10.65,
+        12.0
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.0
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.0
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.0
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.0
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Jade seal pin.003",
+      "from": [
+        11.23,
+        7.5,
+        10.97
+      ],
+      "to": [
+        11.67,
+        8.05,
+        11.93
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.92,
+            1.1
+          ],
+          "texture": "#jade"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.92,
+            1.1
+          ],
+          "texture": "#jade"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.88,
+            1.92
+          ],
+          "texture": "#jade"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.88,
+            1.92
+          ],
+          "texture": "#jade"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.88,
+            1.1
+          ],
+          "texture": "#jade"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.88,
+            1.1
+          ],
+          "texture": "#jade"
+        }
+      }
+    },
+    {
+      "name": "Front cage rail",
+      "from": [
+        4.8,
+        3.55,
+        4.3
+      ],
+      "to": [
+        11.2,
+        3.85,
+        4.65
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.7
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.7
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.6
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Back cage rail",
+      "from": [
+        4.8,
+        3.55,
+        11.35
+      ],
+      "to": [
+        11.2,
+        3.85,
+        11.7
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.7
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.7
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.6
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Left cage rail",
+      "from": [
+        4.3,
+        3.55,
+        4.8
+      ],
+      "to": [
+        4.65,
+        3.85,
+        11.2
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            12.8
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            12.8
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            0.6
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Right cage rail",
+      "from": [
+        11.35,
+        3.55,
+        4.8
+      ],
+      "to": [
+        11.7,
+        3.85,
+        11.2
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            12.8
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            12.8
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            0.6
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Front cage rail.001",
+      "from": [
+        4.8,
+        9.25,
+        4.3
+      ],
+      "to": [
+        11.2,
+        9.55,
+        4.65
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.7
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.7
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.6
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Back cage rail.001",
+      "from": [
+        4.8,
+        9.25,
+        11.35
+      ],
+      "to": [
+        11.2,
+        9.55,
+        11.7
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.7
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.7
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.6
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Left cage rail.001",
+      "from": [
+        4.3,
+        9.25,
+        4.8
+      ],
+      "to": [
+        4.65,
+        9.55,
+        11.2
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            12.8
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            12.8
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            0.6
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Right cage rail.001",
+      "from": [
+        11.35,
+        9.25,
+        4.8
+      ],
+      "to": [
+        11.7,
+        9.55,
+        11.2
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            12.8,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            12.8
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            12.8
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.7,
+            0.6
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Fine front bars",
+      "from": [
+        6.05,
+        3.8,
+        4.5
+      ],
+      "to": [
+        6.3,
+        9.25,
+        4.75
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#iron"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#iron"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        }
+      }
+    },
+    {
+      "name": "Fine back bars",
+      "from": [
+        6.05,
+        3.8,
+        11.25
+      ],
+      "to": [
+        6.3,
+        9.25,
+        11.5
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#iron"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#iron"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        }
+      }
+    },
+    {
+      "name": "Fine front bars.001",
+      "from": [
+        9.6,
+        3.8,
+        4.5
+      ],
+      "to": [
+        9.85,
+        9.25,
+        4.75
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#iron"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#iron"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        }
+      }
+    },
+    {
+      "name": "Fine back bars.001",
+      "from": [
+        9.6,
+        3.8,
+        11.25
+      ],
+      "to": [
+        9.85,
+        9.25,
+        11.5
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#iron"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#iron"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        }
+      }
+    },
+    {
+      "name": "Fine side bars",
+      "from": [
+        4.5,
+        3.8,
+        6.05
+      ],
+      "to": [
+        4.75,
+        9.25,
+        6.3
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#iron"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#iron"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        }
+      }
+    },
+    {
+      "name": "Fine side bars.001",
+      "from": [
+        11.25,
+        3.8,
+        6.05
+      ],
+      "to": [
+        11.5,
+        9.25,
+        6.3
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#iron"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#iron"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        }
+      }
+    },
+    {
+      "name": "Fine side bars.002",
+      "from": [
+        4.5,
+        3.8,
+        9.6
+      ],
+      "to": [
+        4.75,
+        9.25,
+        9.85
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#iron"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#iron"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        }
+      }
+    },
+    {
+      "name": "Fine side bars.003",
+      "from": [
+        11.25,
+        3.8,
+        9.6
+      ],
+      "to": [
+        11.5,
+        9.25,
+        9.85
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#iron"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#iron"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            10.9
+          ],
+          "texture": "#iron"
+        }
+      }
+    },
+    {
+      "name": "Suspended ash bowl",
+      "from": [
+        6.2,
+        3.55,
+        6.2
+      ],
+      "to": [
+        9.8,
+        4.0,
+        9.8
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            7.2,
+            0.9
+          ],
+          "texture": "#iron"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            7.2,
+            0.9
+          ],
+          "texture": "#iron"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            7.2,
+            7.2
+          ],
+          "texture": "#iron"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            7.2,
+            7.2
+          ],
+          "texture": "#iron"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            7.2,
+            0.9
+          ],
+          "texture": "#iron"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            7.2,
+            0.9
+          ],
+          "texture": "#iron"
+        }
+      }
+    },
+    {
+      "name": "Bowl bronze lip",
+      "from": [
+        6.0,
+        4.0,
+        6.0
+      ],
+      "to": [
+        10.0,
+        4.3,
+        10.0
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            8.0,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            8.0,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            8.0,
+            8.0
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            8.0,
+            8.0
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            8.0,
+            0.6
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            8.0,
+            0.6
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Ember broad base",
+      "from": [
+        6.6,
+        4.3,
+        6.6
+      ],
+      "to": [
+        9.4,
+        5.35,
+        9.4
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            5.6,
+            2.1
+          ],
+          "texture": "#ember"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            5.6,
+            2.1
+          ],
+          "texture": "#ember"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            5.6,
+            5.6
+          ],
+          "texture": "#ember"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            5.6,
+            5.6
+          ],
+          "texture": "#ember"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            5.6,
+            2.1
+          ],
+          "texture": "#ember"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            5.6,
+            2.1
+          ],
+          "texture": "#ember"
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Rising ember",
+      "from": [
+        7.0,
+        5.35,
+        7.0
+      ],
+      "to": [
+        9.15,
+        7.2,
+        9.15
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            4.3,
+            3.7
+          ],
+          "texture": "#ember"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4.3,
+            3.7
+          ],
+          "texture": "#ember"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            4.3,
+            4.3
+          ],
+          "texture": "#ember"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            4.3,
+            4.3
+          ],
+          "texture": "#ember"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            4.3,
+            3.7
+          ],
+          "texture": "#ember"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            4.3,
+            3.7
+          ],
+          "texture": "#ember"
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Curved ember tongue",
+      "from": [
+        7.75,
+        7.2,
+        7.35
+      ],
+      "to": [
+        9.0,
+        8.4,
+        8.7
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            2.7,
+            2.4
+          ],
+          "texture": "#ember"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2.7,
+            2.4
+          ],
+          "texture": "#ember"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2.5,
+            2.7
+          ],
+          "texture": "#ember"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            2.5,
+            2.7
+          ],
+          "texture": "#ember"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2.5,
+            2.4
+          ],
+          "texture": "#ember"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2.5,
+            2.4
+          ],
+          "texture": "#ember"
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Ember tip",
+      "from": [
+        8.4,
+        8.4,
+        7.7
+      ],
+      "to": [
+        9.0,
+        9.0,
+        8.3
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.2,
+            1.2
+          ],
+          "texture": "#ember"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.2,
+            1.2
+          ],
+          "texture": "#ember"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.2,
+            1.2
+          ],
+          "texture": "#ember"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.2,
+            1.2
+          ],
+          "texture": "#ember"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.2,
+            1.2
+          ],
+          "texture": "#ember"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.2,
+            1.2
+          ],
+          "texture": "#ember"
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Pale inner flame",
+      "from": [
+        7.35,
+        4.65,
+        6.45
+      ],
+      "to": [
+        8.65,
+        6.5,
+        7.1
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.3,
+            3.7
+          ],
+          "texture": "#core"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.3,
+            3.7
+          ],
+          "texture": "#core"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2.6,
+            1.3
+          ],
+          "texture": "#core"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            2.6,
+            1.3
+          ],
+          "texture": "#core"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2.6,
+            3.7
+          ],
+          "texture": "#core"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2.6,
+            3.7
+          ],
+          "texture": "#core"
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Pale flame tip",
+      "from": [
+        7.6,
+        6.5,
+        6.8
+      ],
+      "to": [
+        8.35,
+        7.3,
+        7.3
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.0,
+            1.6
+          ],
+          "texture": "#core"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.0,
+            1.6
+          ],
+          "texture": "#core"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1.0
+          ],
+          "texture": "#core"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1.0
+          ],
+          "texture": "#core"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1.6
+          ],
+          "texture": "#core"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1.6
+          ],
+          "texture": "#core"
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Canopy lower shadow",
+      "from": [
+        3.3,
+        10.5,
+        3.3
+      ],
+      "to": [
+        12.7,
+        10.95,
+        12.7
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            0.9
+          ],
+          "texture": "#iron"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            0.9
+          ],
+          "texture": "#iron"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#iron"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#iron"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            0.9
+          ],
+          "texture": "#iron"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            0.9
+          ],
+          "texture": "#iron"
+        }
+      }
+    },
+    {
+      "name": "Wide bronze eaves",
+      "from": [
+        2.8,
+        10.95,
+        2.8
+      ],
+      "to": [
+        13.2,
+        11.4,
+        13.2
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            0.9
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            0.9
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            0.9
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            0.9
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Canopy middle",
+      "from": [
+        3.65,
+        11.4,
+        3.65
+      ],
+      "to": [
+        12.35,
+        11.85,
+        12.35
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            0.9
+          ],
+          "texture": "#iron"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            0.9
+          ],
+          "texture": "#iron"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#iron"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#iron"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            0.9
+          ],
+          "texture": "#iron"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            0.9
+          ],
+          "texture": "#iron"
+        }
+      }
+    },
+    {
+      "name": "Canopy crown",
+      "from": [
+        4.6,
+        11.85,
+        4.6
+      ],
+      "to": [
+        11.4,
+        12.35,
+        11.4
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            13.6,
+            1.0
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            13.6,
+            1.0
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            13.6,
+            13.6
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            13.6,
+            13.6
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            13.6,
+            1.0
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            13.6,
+            1.0
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Raised roof boss",
+      "from": [
+        6.5,
+        12.35,
+        6.5
+      ],
+      "to": [
+        9.5,
+        12.9,
+        9.5
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            6.0,
+            1.1
+          ],
+          "texture": "#iron"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            6.0,
+            1.1
+          ],
+          "texture": "#iron"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            6.0,
+            6.0
+          ],
+          "texture": "#iron"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            6.0,
+            6.0
+          ],
+          "texture": "#iron"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            6.0,
+            1.1
+          ],
+          "texture": "#iron"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            6.0,
+            1.1
+          ],
+          "texture": "#iron"
+        }
+      }
+    },
+    {
+      "name": "Upturned eave tip",
+      "from": [
+        2.8,
+        11.4,
+        2.8
+      ],
+      "to": [
+        3.75,
+        12.0,
+        3.75
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.9
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.9
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Upturned eave tip.001",
+      "from": [
+        2.8,
+        11.4,
+        12.25
+      ],
+      "to": [
+        3.75,
+        12.0,
+        13.2
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.9
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.9
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Upturned eave tip.002",
+      "from": [
+        12.25,
+        11.4,
+        2.8
+      ],
+      "to": [
+        13.2,
+        12.0,
+        3.75
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.9
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.9
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Upturned eave tip.003",
+      "from": [
+        12.25,
+        11.4,
+        12.25
+      ],
+      "to": [
+        13.2,
+        12.0,
+        13.2
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.9
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.9
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Handle left",
+      "from": [
+        6.15,
+        12.9,
+        7.65
+      ],
+      "to": [
+        6.7,
+        15.65,
+        8.35
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.4,
+            5.5
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.4,
+            5.5
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.1,
+            1.4
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.1,
+            1.4
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.1,
+            5.5
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.1,
+            5.5
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Handle right",
+      "from": [
+        9.3,
+        12.9,
+        7.65
+      ],
+      "to": [
+        9.85,
+        15.65,
+        8.35
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.4,
+            5.5
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.4,
+            5.5
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.1,
+            1.4
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.1,
+            1.4
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.1,
+            5.5
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.1,
+            5.5
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Handle crown",
+      "from": [
+        6.7,
+        15.15,
+        7.65
+      ],
+      "to": [
+        9.3,
+        15.7,
+        8.35
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.4,
+            1.1
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.4,
+            1.1
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            5.2,
+            1.4
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            5.2,
+            1.4
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            5.2,
+            1.1
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            5.2,
+            1.1
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Handle bottom",
+      "from": [
+        6.7,
+        12.9,
+        7.65
+      ],
+      "to": [
+        9.3,
+        13.35,
+        8.35
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.4,
+            0.9
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.4,
+            0.9
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            5.2,
+            1.4
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            5.2,
+            1.4
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            5.2,
+            0.9
+          ],
+          "texture": "#bronze"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            5.2,
+            0.9
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Hanging red cord",
+      "from": [
+        5.53,
+        8.8,
+        3.92
+      ],
+      "to": [
+        5.67,
+        10.85,
+        4.12
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.4,
+            4.1
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.4,
+            4.1
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.28,
+            0.4
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.28,
+            0.4
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.28,
+            4.1
+          ],
+          "texture": "#red"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.28,
+            4.1
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Paper binding tag",
+      "from": [
+        5.05,
+        6.2,
+        3.76
+      ],
+      "to": [
+        6.15,
+        9.1,
+        4.0
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.48,
+            5.8
+          ],
+          "texture": "#paper"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.48,
+            5.8
+          ],
+          "texture": "#paper"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            0.48
+          ],
+          "texture": "#paper"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            0.48
+          ],
+          "texture": "#paper"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            5.8
+          ],
+          "texture": "#paper"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            5.8
+          ],
+          "texture": "#paper"
+        }
+      }
+    },
+    {
+      "name": "Seal vertical stroke",
+      "from": [
+        5.53,
+        6.55,
+        3.68
+      ],
+      "to": [
+        5.69,
+        8.75,
+        3.77
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.18,
+            4.4
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.18,
+            4.4
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.32,
+            0.18
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.32,
+            0.18
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.32,
+            4.4
+          ],
+          "texture": "#red"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.32,
+            4.4
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Seal cross stroke",
+      "from": [
+        5.275,
+        6.95,
+        3.67
+      ],
+      "to": [
+        5.925,
+        7.1,
+        3.77
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.2,
+            0.3
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.2,
+            0.3
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.3,
+            0.2
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.3,
+            0.2
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.3,
+            0.3
+          ],
+          "texture": "#red"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.3,
+            0.3
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Seal cross stroke.001",
+      "from": [
+        5.175,
+        7.58,
+        3.67
+      ],
+      "to": [
+        6.025,
+        7.73,
+        3.77
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.2,
+            0.3
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.2,
+            0.3
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.7,
+            0.2
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.7,
+            0.2
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.7,
+            0.3
+          ],
+          "texture": "#red"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.7,
+            0.3
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Seal cross stroke.002",
+      "from": [
+        5.35,
+        8.21,
+        3.67
+      ],
+      "to": [
+        5.85,
+        8.36,
+        3.77
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.2,
+            0.3
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.2,
+            0.3
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.0,
+            0.2
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.0,
+            0.2
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.0,
+            0.3
+          ],
+          "texture": "#red"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.0,
+            0.3
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Hanging red cord.001",
+      "from": [
+        10.33,
+        7.95,
+        3.92
+      ],
+      "to": [
+        10.47,
+        10.85,
+        4.12
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.4,
+            5.8
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.4,
+            5.8
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.28,
+            0.4
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.28,
+            0.4
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.28,
+            5.8
+          ],
+          "texture": "#red"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.28,
+            5.8
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Paper binding tag.001",
+      "from": [
+        9.85,
+        5.35,
+        3.76
+      ],
+      "to": [
+        10.95,
+        8.25,
+        4.0
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.48,
+            5.8
+          ],
+          "texture": "#paper"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.48,
+            5.8
+          ],
+          "texture": "#paper"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            0.48
+          ],
+          "texture": "#paper"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            0.48
+          ],
+          "texture": "#paper"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            5.8
+          ],
+          "texture": "#paper"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            5.8
+          ],
+          "texture": "#paper"
+        }
+      }
+    },
+    {
+      "name": "Seal vertical stroke.001",
+      "from": [
+        10.33,
+        5.7,
+        3.68
+      ],
+      "to": [
+        10.49,
+        7.9,
+        3.77
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.18,
+            4.4
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.18,
+            4.4
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.32,
+            0.18
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.32,
+            0.18
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.32,
+            4.4
+          ],
+          "texture": "#red"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.32,
+            4.4
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Seal cross stroke.003",
+      "from": [
+        10.075,
+        6.1,
+        3.67
+      ],
+      "to": [
+        10.725,
+        6.25,
+        3.77
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.2,
+            0.3
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.2,
+            0.3
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.3,
+            0.2
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.3,
+            0.2
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.3,
+            0.3
+          ],
+          "texture": "#red"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.3,
+            0.3
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Seal cross stroke.004",
+      "from": [
+        9.975,
+        6.73,
+        3.67
+      ],
+      "to": [
+        10.825,
+        6.88,
+        3.77
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.2,
+            0.3
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.2,
+            0.3
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.7,
+            0.2
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.7,
+            0.2
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.7,
+            0.3
+          ],
+          "texture": "#red"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.7,
+            0.3
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Seal cross stroke.005",
+      "from": [
+        10.15,
+        7.36,
+        3.67
+      ],
+      "to": [
+        10.65,
+        7.51,
+        3.77
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.2,
+            0.3
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.2,
+            0.3
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.0,
+            0.2
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.0,
+            0.2
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.0,
+            0.3
+          ],
+          "texture": "#red"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.0,
+            0.3
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Bottom hanging jade",
+      "from": [
+        7.45,
+        0.15,
+        7.45
+      ],
+      "to": [
+        8.55,
+        0.8,
+        8.55
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.3
+          ],
+          "texture": "#jade"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.3
+          ],
+          "texture": "#jade"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.2
+          ],
+          "texture": "#jade"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            2.2
+          ],
+          "texture": "#jade"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.3
+          ],
+          "texture": "#jade"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2.2,
+            1.3
+          ],
+          "texture": "#jade"
+        }
+      }
+    }
+  ],
+  "display": {
+    "gui": {
+      "rotation": [
+        22,
+        -35,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ]
+    },
+    "ground": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.45,
+        0.45
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        -18,
+        0
+      ],
+      "translation": [
+        -1,
+        6,
+        -1
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        18,
+        0
+      ],
+      "translation": [
+        -1,
+        6,
+        -1
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Protective Accessories",
+  "icon": "immortal_cultivation_mod:fortune_guard_coin",
+  "category": "immortal_cultivation_mod:items",
+  "sortnum": 12,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Fortune Coin and Ring",
+      "text": "Protective accessories use their designated slots rather than normal armor slots.$(br2)$(bold)Fortune Guarding Coin$(): consumes itself to protect against an eligible misfortune.$(br2)$(bold)Shieldbreaker Ring$(): equip in a ring slot and strike a blocking enemy in melee to trigger its shield-breaking effect."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Blood Fang Pendant",
+      "text": "Equip the Blood Fang Pendant in a necklace slot. Blood-demon cultivators or living corpses carrying blood or blood crystals can receive automatic replenishment when Blood Qi or grudge is low.$(br2)Equipping it does not create resources without suitable blood materials and the required cultivation state."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Enlightenment Leaf",
+      "text": "Equip the Enlightenment Leaf in a charm slot and practice a cultivation method through meditation or a spell to benefit from its proficiency bonus.$(br2)Change accessories to suit enemies, cultivation, and current goals. Their activation conditions differ; consult their tooltips before use."
+    }
+  ]
+}

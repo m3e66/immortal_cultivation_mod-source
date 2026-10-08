@@ -1,0 +1,18 @@
+{
+  "name": "Obtaining the Tools",
+  "icon": "immortal_cultivation_mod:spirit_stone",
+  "category": "immortal_cultivation_mod:getting_started",
+  "sortnum": -1,
+  "pages": [
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortal_cultivation_mod:magic_ritual_guide_book",
+      "text": "Craft this guide shapelessly from one Book and one Low-Grade Spirit Stone. No structure exploration is required."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortal_cultivation_mod:ritual_dagger",
+      "text": "Craft a Ritual Dagger from a Formation Pattern Jade, an Iron Ingot, and a Stick. Formation cultivators also sell it with other formation supplies."
+    }
+  ]
+}

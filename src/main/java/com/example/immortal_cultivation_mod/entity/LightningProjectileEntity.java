@@ -2,7 +2,12 @@ package com.example.immortal_cultivation_mod.entity;
 
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
+import com.example.immortal_cultivation_mod.config.BlockBreakingSettings;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Stream;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -21,6 +26,7 @@ import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
@@ -138,6 +144,7 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
         Vec3 hitPos = result.getLocation();
 
         if (level() instanceof ServerLevel serverLevel) {
+            com.example.immortal_cultivation_mod.network.SpellRibbonPayload.send(serverLevel, isGreater() ? "wulei_zhengfa" : "yinlei_jue", hitPos, new Vec3(0,0,1), -1, 22, chargeScale());
             lightningStrikeParticles(serverLevel, hitPos, isGreater(), chargeScale());
             summonLightning(serverLevel, hitPos, isGreater(), chargeScale(), getOwner());
         }
@@ -180,6 +187,10 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
 
         if (hurt && target instanceof LivingEntity living) {
             living.setRemainingFireTicks(Math.max(living.getRemainingFireTicks(), isGreater() ? 60 : 30));
+            if (getOwner() instanceof LivingEntity owner) {
+                com.example.immortal_cultivation_mod.spell.GangtingXiaokongLu
+                        .maybeChainLightning(owner, living, damage);
+            }
         }
     }
 
@@ -206,7 +217,7 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
         setChargeScale(tag.getFloat("ChargeScale"));
     }
 
-    private boolean isGreater() {
+    public boolean isGreater() {
         return entityData.get(DATA_GREATER);
     }
 
@@ -235,14 +246,18 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
             double ox = strikes > 1 ? (level.random.nextDouble() - 0.5D) * radius * 2.0D : 0.0D;
             double oz = strikes > 1 ? (level.random.nextDouble() - 0.5D) * radius * 2.0D : 0.0D;
 
-            LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level);
+            boolean npcOwned = owner instanceof LivingEntity && owner instanceof CultivationNpc;
+            // Visual-only vanilla bolts still clean copper and power lightning rods. A combat-only
+            // bolt keeps entity strikes and rendering without entering any vanilla terrain paths.
+            LightningBolt bolt = npcOwned || !BlockBreakingSettings.enabled(owner, BlockBreakingSettings.Category.SPELLS)
+                    ? new CombatOnlyLightningBolt(level, !npcOwned)
+                    : EntityType.LIGHTNING_BOLT.create(level);
             if (bolt != null) {
                 Vec3 strike = new Vec3(pos.x + ox, pos.y, pos.z + oz);
                 bolt.moveTo(strike.x, strike.y, strike.z);
                 if (owner instanceof ServerPlayer player) {
                     bolt.setCause(player);
                 }
-                boolean npcOwned = owner instanceof LivingEntity && owner instanceof CultivationNpc;
                 bolt.setVisualOnly(npcOwned);
                 level.addFreshEntity(bolt);
                 if (npcOwned) {
@@ -250,6 +265,56 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
                 }
             }
         }
+    }
+
+    /** Native lightning rendering and strike timing, with no fire, copper cleaning, or rod activation. */
+    private static final class CombatOnlyLightningBolt extends LightningBolt {
+        private final boolean damageEntities;
+        private final Set<Entity> struck = new HashSet<>();
+        private int life = 2;
+        private int flashes;
+
+        CombatOnlyLightningBolt(ServerLevel level, boolean damageEntities) {
+            super(EntityType.LIGHTNING_BOLT, level);
+            this.damageEntities = damageEntities;
+            flashes = random.nextInt(3) + 1;
+        }
+
+        @Override public void tick() {
+            baseTick();
+            ServerLevel level = (ServerLevel) level();
+            if (life == 2) gameEvent(GameEvent.LIGHTNING_STRIKE);
+            life--;
+            if (life < 0) {
+                if (flashes == 0) {
+                    var nearby = level.getEntities(this,
+                            new AABB(getX() - 15, getY() - 15, getZ() - 15,
+                                    getX() + 15, getY() + 21, getZ() + 15),
+                            target -> target.isAlive() && !struck.contains(target));
+                    for (ServerPlayer viewer : level.getPlayers(player -> player.distanceTo(this) < 256))
+                        CriteriaTriggers.LIGHTNING_STRIKE.trigger(viewer, this, nearby);
+                    discard();
+                    return;
+                }
+                if (life < -random.nextInt(10)) {
+                    flashes--;
+                    life = 1;
+                    seed = random.nextLong();
+                }
+            }
+            if (life < 0 || !damageEntities) return;
+            var targets = level.getEntities(this,
+                    new AABB(getX() - 3, getY() - 3, getZ() - 3,
+                            getX() + 3, getY() + 9, getZ() + 3), Entity::isAlive);
+            for (Entity target : targets) {
+                if (!net.neoforged.neoforge.event.EventHooks.onEntityStruckByLightning(target, this))
+                    target.thunderHit(level, this);
+            }
+            struck.addAll(targets);
+            if (getCause() != null) CriteriaTriggers.CHANNELED_LIGHTNING.trigger(getCause(), targets);
+        }
+
+        @Override public Stream<Entity> getHitEntities() { return struck.stream().filter(Entity::isAlive); }
     }
 
     private static void applyNpcLightningDamage(
@@ -267,7 +332,9 @@ public class LightningProjectileEntity extends ThrowableItemProjectile {
                 area,
                 target -> target != owner && target.isAlive()
                         && NpcProfile.isCombatEnemy(owner, target))) {
-            if (target.hurt(damageSource, 5.0F)) {
+            if (com.example.immortal_cultivation_mod.combat.CombatFeedbackEvents.hurtWithFlags(
+                    target, damageSource, 5.0F,
+                    com.example.immortal_cultivation_mod.network.CombatFeedbackPayloads.LIGHTNING)) {
                 target.setRemainingFireTicks(Math.max(target.getRemainingFireTicks(), 30));
             }
         }

@@ -16,4 +16,9 @@ public enum ComboType implements StringRepresentable {
    public String getSerializedName() {
       return this.name;
    }
+
+   // $FF: synthetic method
+   private static ComboType[] $values() {
+      return new ComboType[]{FOG, INVERTED, FORCEFIELD};
+   }
 }

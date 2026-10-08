@@ -13,38 +13,16 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 
 public class XiujianCurioRenderer implements ICurioRenderer {
-    private final XiujianItemRenderer renderer =
-            new XiujianItemRenderer();
+   private final XiujianItemRenderer renderer = new XiujianItemRenderer();
 
-    @Override
-    public <T extends LivingEntity, M extends EntityModel<T>> void render(
-            ItemStack stack,
-            SlotContext slotContext,
-            PoseStack poseStack,
-            RenderLayerParent<T, M> renderLayerParent,
-            MultiBufferSource buffer,
-            int packedLight,
-            float limbSwing,
-            float limbSwingAmount,
-            float partialTicks,
-            float ageInTicks,
-            float netHeadYaw,
-            float headPitch) {
-        LivingEntity entity = slotContext.entity();
-        if (!(renderLayerParent.getModel()
-                instanceof HumanoidModel<?> humanoidModel)) {
-            return;
-        }
-        poseStack.pushPose();
-        ICurioRenderer.translateIfSneaking(poseStack, entity);
-        XiujianArmRenderHelper.render(
-                renderer,
-                stack,
-                humanoidModel,
-                HumanoidArm.RIGHT,
-                poseStack,
-                buffer,
-                packedLight);
-        poseStack.popPose();
-    }
+   public <T extends LivingEntity, M extends EntityModel<T>> void render(ItemStack stack, SlotContext slotContext, PoseStack poseStack, RenderLayerParent<T, M> renderLayerParent, MultiBufferSource buffer, int packedLight, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+      LivingEntity entity = slotContext.entity();
+      EntityModel var15 = renderLayerParent.getModel();
+      if (var15 instanceof HumanoidModel<?> humanoidModel) {
+         poseStack.pushPose();
+         ICurioRenderer.translateIfSneaking(poseStack, entity);
+         XiujianArmRenderHelper.render(this.renderer, stack, humanoidModel, HumanoidArm.RIGHT, poseStack, buffer, packedLight);
+         poseStack.popPose();
+      }
+   }
 }

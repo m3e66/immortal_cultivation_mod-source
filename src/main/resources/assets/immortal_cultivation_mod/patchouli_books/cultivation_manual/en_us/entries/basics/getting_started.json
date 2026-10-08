@@ -6,11 +6,25 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Use an Enlightenment Pill to step from mortal life into Qi Refining.$(br2)The stat menu shows qi, realm, max health, max age, luck, moral, soul, thoughts, spirit roots, and cultivation progress."
+      "text": "Chapter 0 of Dao Guidance begins automatically for a new mortal. Use the Open Dao Guidance keybind to track it; the HUD and chapter page show the direction, distance, and X/Z coordinates of the nearest mountain cave."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "immortal_cultivation_mod:enlightenment_pill",
+      "text": "The cave has two supply chests. One guarantees exactly one Enlightenment Pill; the other contains a Zhuji wandering cultivator kit. Taking the pill completes Chapter 0."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Consume an Enlightenment Pill and complete awakening and its separate selection screen to enter Qi Refining. The selection cannot be dismissed before completion.$(br2)Cultivation stats show realm, roots, health, Qi, lifespan, Thoughts, and cultivation progress."
     },
     {
       "type": "patchouli:text",
       "text": "$(br)Qi appears above the hunger bar. Mortals can still see the qi bar, but they do not naturally regenerate qi.$(br2)High ambient qi from nearby spirit-vein centers increases natural qi regeneration. Every 25 ambient qi makes it 25% faster.$(br2)Meditation requires standing on the ground and stops movement while active."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Dao Guidance Side Lessons",
+      "text": "Open Dao Guidance to track practical objectives. Relevant items and systems reveal side lessons.$(br2)Use Understood to acknowledge explanations; practical objectives require real actions. Matching manual entries remain available as a reference."
     }
   ]
 }

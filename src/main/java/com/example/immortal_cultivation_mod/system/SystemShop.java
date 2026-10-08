@@ -1,7 +1,10 @@
 package com.example.immortal_cultivation_mod.system;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
-import com.example.immortal_cultivation_mod.item.CultivationItemRarity;
+import com.example.immortal_cultivation_mod.item.ModItems.CultivationMethodItem;
+import com.example.immortal_cultivation_mod.item.ManifestedWeaponItem;
+import com.example.immortal_cultivation_mod.item.TalismanFormulaItem;
+import com.example.immortal_cultivation_mod.item.TalismanItem;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -27,6 +30,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
+import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 public final class SystemShop {
     private static final String SHOP = "Shop";
@@ -44,10 +48,34 @@ public final class SystemShop {
     private static final int REQUEST_PERCENT = 35;
     private static final long REFRESH_INTERVAL_MILLIS = 20L * 60L * 1000L;
 
-    private static final Set<String> UNIQUE_ITEM_IDS = Set.of(
+    /** Items bought once per player and never restored by a shop refresh. */
+    private static final List<String> NON_REFRESHABLE_ITEM_IDS = List.of(
             "immortal_cultivation_mod:reincarnation_true_art_method",
             "immortal_cultivation_mod:tuntian_demon_art_method",
-            "minecraft:dragon_egg");
+            "minecraft:dragon_egg",
+            "blood_demon_huashen_method",
+            "dari_bati_method",
+            "hanti_bingqin_method",
+            "reincarnation_true_art_method",
+            "tuntian_demon_art_method",
+            "corpse_refining_secret",
+            "qianli_chuanxun_talisman",
+            "xuanyan_fenjie_talisman",
+            "wuyue_bie_talisman",
+            "jinkong_talisman"
+    );
+
+    /** Daily stock ranges by inclusive system price. -1/-1 means unlimited stock. */
+    private static final List<DailyStockRule> DAILY_STOCK_RULES = List.of(
+            new DailyStockRule(1, 9, StockTier.COMMON, -1, -1),
+            new DailyStockRule(10, 99, StockTier.COMMON, 128, 128),
+            new DailyStockRule(100, 999, StockTier.UNCOMMON, 64, 64),
+            new DailyStockRule(1_000, 9_999, StockTier.UNCOMMON, 32, 32),
+            new DailyStockRule(10_000, 99_999, StockTier.RARE, 16, 16),
+            new DailyStockRule(100_000, 999_999, StockTier.RARE, 8, 8),
+            new DailyStockRule(1_000_000, 9_999_999, StockTier.RARE, 4, 4),
+            new DailyStockRule(10_000_000, 99_999_999, StockTier.RARE, 2, 2),
+            new DailyStockRule(100_000_000, 1_000_000_000, StockTier.RARE, 1, 1));
     private static final Set<String> DENIED_PATHS = Set.of(
             "air",
             "barrier",
@@ -70,28 +98,54 @@ public final class SystemShop {
             "debug_stat_editor",
             "heavy_iron_bracer_chestplate_debug",
             "yaoyuan_fist_bone_chestplate_debug",
+            "spell_model_metal_needle",
+            "spell_model_metal_blade",
+            "spell_model_thorns",
+            "spell_model_vines",
+            "spell_model_earth_spear",
+            "spell_model_mountain_seal",
+            "spell_model_mountain_pillar",
+            "spell_model_mountain_cliff",
+            "spell_model_mountain_spire",
+            "spell_model_metal_spear",
+            "spell_model_metal_broad_blade",
+            "spell_model_metal_hook_blade",
+            "spell_model_wanfeng_metal_bloom",
+            "spell_model_water_crescent",
+            "spell_model_wave",
+            "spell_model_ice_spike",
+            "spell_model_xuanyan_plate",
+            "spell_model_solar_orb",
+            "spell_model_solar_halo",
             "zhenshi_seal_helmet",
+            "talisman_formula",
             "system",
             "lottery_ticket",
             "great_creation_shard",
+            "ashes",
             "infinite_spirit_stone",
             "mysterious_ring",
             "noob_hat",
-            "small_level_up",
-            "big_level_up",
             "wanted_order",
             "family_token",
             "royal_token",
+            "lianqi_cultivator_spawn_egg",
             "zhuji_cultivator_spawn_egg",
             "jindan_cultivator_spawn_egg",
-            "liusan_spawn_egg",
             "fanren_npc_spawn_egg",
+            "hotel_npc_spawn_egg",
             "crimson_scale_flame_lizard_spawn_egg",
             "crimson_sky_flame_flood_dragon_spawn_egg",
             "blood_ape_demon_general_spawn_egg",
+            "zhuji_vault_guardian_spawn_egg",
+            "jindan_vault_guardian_spawn_egg",
             "azure_spirit_silkworm_spawn_egg",
+            "kongming_beetle_spawn_egg",
+            "thunderhorn_rock_badger_spawn_egg",
+            "frostspine_cave_bear_spawn_egg",
             "magic_center_block",
-            "magic_circle_block");
+            "magic_circle_block",
+            "dead_skeleton");
     private static volatile List<CatalogEntry> catalog;
     private static volatile Map<String, CatalogEntry> catalogById;
 
@@ -159,6 +213,11 @@ public final class SystemShop {
     }
 
     public static void buy(ServerPlayer player, String itemId) {
+        buy(player, itemId, false);
+    }
+
+    public static void buy(ServerPlayer player, String itemId,
+                           boolean buyStack) {
         if (!isShopActive(player)) {
             return;
         }
@@ -172,38 +231,52 @@ public final class SystemShop {
         CompoundTag state = OuterSystemData.read(player);
         CompoundTag shop = state.getCompound(SHOP).copy();
         long points = shop.getLong(POINTS);
-        if (points < entry.price()) {
-            fail(player, "message.immortal_cultivation_mod.system.shop.no_points");
-            return;
-        }
-        if (remainingStock(player, shop, entry) == 0) {
+        int remaining = remainingStock(player, shop, entry);
+        if (remaining == 0) {
             fail(player, "message.immortal_cultivation_mod.system.shop.no_stock");
             return;
         }
 
         ItemStack purchased = new ItemStack(entry.item());
+        int quantity = buyStack ? purchased.getMaxStackSize() : 1;
+        if (remaining > 0) {
+            quantity = Math.min(quantity, remaining);
+        }
+        long totalPrice = (long) entry.price() * quantity;
+        if (points < totalPrice) {
+            fail(player, "message.immortal_cultivation_mod.system.shop.no_points");
+            return;
+        }
+
+        purchased.setCount(quantity);
+        ManifestedWeaponItem.bindToOwner(purchased, player);
+        Component purchasedName = purchased.getHoverName();
         if (!player.getInventory().add(purchased)) {
             player.drop(purchased, false);
         }
-        shop.putLong(POINTS, points - entry.price());
+        shop.putLong(POINTS, points - totalPrice);
         if (entry.stockTier() == StockTier.UNIQUE) {
             ListTag bought = shop.getList(UNIQUE_BOUGHT, Tag.TAG_STRING).copy();
             if (!containsString(bought, entry.id())) {
                 bought.add(StringTag.valueOf(entry.id()));
             }
             shop.put(UNIQUE_BOUGHT, bought);
-        } else if (entry.stockTier() != StockTier.COMMON) {
+        } else if (maxStock(entry, shop.getLong(DAY)) >= 0) {
             CompoundTag purchases = shop.getCompound(PURCHASES).copy();
             purchases.putInt(
-                    entry.id(), purchases.getInt(entry.id()) + 1);
+                    entry.id(), purchases.getInt(entry.id()) + quantity);
             shop.put(PURCHASES, purchases);
         }
         state.put(SHOP, shop);
         OuterSystemData.save(player, state);
         player.containerMenu.broadcastChanges();
-        player.displayClientMessage(Component.translatable(
-                "message.immortal_cultivation_mod.system.shop.bought",
-                purchased.getHoverName(), entry.price()), true);
+        player.displayClientMessage(quantity == 1
+                ? Component.translatable(
+                        "message.immortal_cultivation_mod.system.shop.bought",
+                        purchasedName, totalPrice)
+                : Component.translatable(
+                        "message.immortal_cultivation_mod.system.shop.bought_multiple",
+                        purchasedName, quantity, totalPrice), true);
     }
 
     public static void recycle(ServerPlayer player, int inventorySlot) {
@@ -285,13 +358,20 @@ public final class SystemShop {
     }
 
     public static int maxStock(CatalogEntry entry, long day) {
-        return switch (entry.stockTier()) {
-            case COMMON -> -1;
-            case UNCOMMON -> 16;
-            case RARE -> 1 + Math.floorMod(
-                    31 * entry.id().hashCode() + Long.hashCode(day), 4);
-            case UNIQUE -> 1;
-        };
+        if (entry.stockTier() == StockTier.UNIQUE) {
+            return 1;
+        }
+        return dailyStock(entry.id(), entry.price(), day);
+    }
+
+    public static int dailyStock(String itemId, int price, long day) {
+        for (DailyStockRule rule : DAILY_STOCK_RULES) {
+            if (rule.includes(price)) {
+                return rule.stock(itemId, day);
+            }
+        }
+        throw new IllegalStateException(
+                "Missing daily stock rule for price " + price);
     }
 
     public static List<CatalogEntry> catalog() {
@@ -316,7 +396,7 @@ public final class SystemShop {
                             id.toString(),
                             item,
                             price,
-                            stockTier(stack, id),
+                            stockTier(id, price),
                             category(item, id)));
                 }
                 entries.sort(Comparator
@@ -412,6 +492,9 @@ public final class SystemShop {
                 || item instanceof SpawnEggItem
                 || item instanceof BundleItem
                 || path.endsWith("_spawn_egg")
+                || path.endsWith("_spell_scroll_block")
+                || path.equals("painting_scroll")
+                || path.endsWith("_painting_scroll")
                 || path.contains("debug")
                 || DENIED_PATHS.contains(path)) {
             return false;
@@ -429,10 +512,14 @@ public final class SystemShop {
     private static int categoryOrder(Category category) {
         return switch (category) {
             case PILL -> 0;
-            case MATERIAL -> 1;
-            case WEAPON -> 2;
-            case SPELL -> 3;
-            case BLOCK -> 4;
+            case FOOD -> 1;
+            case MATERIAL -> 2;
+            case TALISMAN -> 3;
+            case WEAPON -> 4;
+            case ACCESSORY -> 5;
+            case SPELL -> 6;
+            case FORMATION -> 7;
+            case BLOCK -> 8;
         };
     }
 
@@ -451,6 +538,7 @@ public final class SystemShop {
         ItemStack stack = entry.item().getDefaultInstance();
         return switch (entry.category()) {
             case PILL -> path.contains("potion") ? 0 : 1;
+            case FOOD -> path.contains("cooked") || path.contains("meal") ? 1 : 0;
             case MATERIAL -> {
                 if (stack.has(DataComponents.FOOD)) {
                     yield 0;
@@ -474,6 +562,7 @@ public final class SystemShop {
                 }
                 yield path.contains("bucket") ? 3 : 4;
             }
+            case TALISMAN -> path.contains("formula") || path.contains("yujian") ? 1 : 0;
             case WEAPON -> {
                 if (containsAny(
                         path,
@@ -497,7 +586,9 @@ public final class SystemShop {
                 }
                 yield 2;
             }
+            case ACCESSORY -> 0;
             case SPELL -> 0;
+            case FORMATION -> path.contains("flag") ? 0 : 1;
             case BLOCK -> {
                 if (containsAny(path, "log", "wood", "planks", "stem")) {
                     yield 0;
@@ -538,26 +629,46 @@ public final class SystemShop {
         return false;
     }
 
-    private static StockTier stockTier(ItemStack stack, ResourceLocation id) {
-        if (UNIQUE_ITEM_IDS.contains(id.toString())) {
+    private static StockTier stockTier(ResourceLocation id, int price) {
+        if (NON_REFRESHABLE_ITEM_IDS.contains(id.toString())) {
             return StockTier.UNIQUE;
         }
-        return switch (CultivationItemRarity.of(stack)) {
-            case COMMON -> StockTier.COMMON;
-            case UNCOMMON -> StockTier.UNCOMMON;
-            case RARE -> StockTier.RARE;
-            // The explicit list above is now the only way to receive unique stock.
-            case EPIC -> StockTier.RARE;
-        };
+        for (DailyStockRule rule : DAILY_STOCK_RULES) {
+            if (rule.includes(price)) {
+                return rule.stockTier();
+            }
+        }
+        throw new IllegalStateException(
+                "Missing daily stock rule for price " + price);
     }
 
     private static Category category(Item item, ResourceLocation id) {
         String path = id.getPath();
+        if (path.equals("throwing_knife_yujian")) {
+            return Category.MATERIAL;
+        }
+        if (path.equals("throwing_knife")
+                || path.equals("manifested_talisman_sword")) {
+            return Category.WEAPON;
+        }
         if (path.equals("pill") || path.endsWith("_pill")
                 || path.contains("potion") || path.contains("elixir")) {
             return Category.PILL;
         }
-        if (path.endsWith("_scroll") || path.endsWith("_method")
+        if (item.getDefaultInstance().has(DataComponents.FOOD)) {
+            return Category.FOOD;
+        }
+        if (item instanceof TalismanItem || item instanceof TalismanFormulaItem) {
+            return Category.TALISMAN;
+        }
+        if (isFormationItem(path)) {
+            return Category.FORMATION;
+        }
+        if (item instanceof ICurioItem) {
+            return Category.ACCESSORY;
+        }
+        if (item instanceof CultivationMethodItem
+                || path.endsWith("_scroll") || path.endsWith("_method")
                 || path.contains("manual")) {
             return Category.SPELL;
         }
@@ -569,6 +680,12 @@ public final class SystemShop {
             return Category.WEAPON;
         }
         return Category.MATERIAL;
+    }
+
+    private static boolean isFormationItem(String path) {
+        return path.contains("zhenpan")
+                || path.contains("formation")
+                || path.contains("flag");
     }
 
     private static int countSellable(ServerPlayer player, Item item) {
@@ -657,8 +774,12 @@ public final class SystemShop {
     public enum Category {
         MATERIAL("material"),
         PILL("pill"),
+        FOOD("food"),
+        TALISMAN("talisman"),
         WEAPON("weapon"),
+        ACCESSORY("accessory"),
         SPELL("spell"),
+        FORMATION("formation"),
         BLOCK("block");
 
         private final String id;
@@ -678,5 +799,40 @@ public final class SystemShop {
             int price,
             StockTier stockTier,
             Category category) {
+    }
+
+    private record DailyStockRule(
+            int minimumPrice,
+            int maximumPrice,
+            StockTier stockTier,
+            int minimumStock,
+            int maximumStock) {
+        private DailyStockRule {
+            if (minimumPrice < 1 || maximumPrice < minimumPrice
+                    || stockTier == StockTier.UNIQUE) {
+                throw new IllegalArgumentException(
+                        "Invalid daily stock price range: "
+                                + minimumPrice + "-" + maximumPrice);
+            }
+            boolean unlimited = minimumStock == -1 && maximumStock == -1;
+            if (!unlimited
+                    && (minimumStock < 0 || maximumStock < minimumStock)) {
+                throw new IllegalArgumentException(
+                        "Invalid daily stock amount for " + stockTier);
+            }
+        }
+
+        private boolean includes(int price) {
+            return price >= minimumPrice && price <= maximumPrice;
+        }
+
+        private int stock(String itemId, long day) {
+            if (minimumStock < 0) {
+                return -1;
+            }
+            int range = maximumStock - minimumStock + 1;
+            return minimumStock + Math.floorMod(
+                    31 * itemId.hashCode() + Long.hashCode(day), range);
+        }
     }
 }

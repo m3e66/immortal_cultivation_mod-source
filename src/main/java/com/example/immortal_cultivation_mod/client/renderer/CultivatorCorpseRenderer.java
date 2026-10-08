@@ -13,37 +13,27 @@ import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.resources.ResourceLocation;
 
 public class CultivatorCorpseRenderer extends LivingEntityRenderer<CultivatorCorpseEntity, CultivatorCorpseModel> {
-    public CultivatorCorpseRenderer(EntityRendererProvider.Context context) {
-        super(context, new CultivatorCorpseModel(context.bakeLayer(ModelLayers.PLAYER_SLIM)), 0.0F);
-        addLayer(new HumanoidArmorLayer<>(
-                this,
-                new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_INNER_ARMOR)),
-                new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_OUTER_ARMOR)),
-                context.getModelManager()));
-        addLayer(new ZhenshiSealHelmetLayer<>(this));
-    }
+   public CultivatorCorpseRenderer(EntityRendererProvider.Context context) {
+      super(context, new CultivatorCorpseModel(context.bakeLayer(ModelLayers.PLAYER_SLIM)), 0.0F);
+      this.addLayer(new HumanoidArmorLayer(this, new HumanoidModel(context.bakeLayer(ModelLayers.PLAYER_INNER_ARMOR)), new HumanoidModel(context.bakeLayer(ModelLayers.PLAYER_OUTER_ARMOR)), context.getModelManager()));
+      this.addLayer(new ZhenshiSealHelmetLayer(this));
+   }
 
-    @Override
-    public ResourceLocation getTextureLocation(CultivatorCorpseEntity entity) {
-        if (!entity.getTextureId().isBlank()) {
-            return ResourceLocation.parse(entity.getTextureId());
-        }
-        return Minecraft.getInstance().getSkinManager().getInsecureSkin(entity.getGameProfile()).texture();
-    }
+   public ResourceLocation getTextureLocation(CultivatorCorpseEntity entity) {
+      return !entity.getTextureId().isBlank() ? ResourceLocation.parse(entity.getTextureId()) : Minecraft.getInstance().getSkinManager().getInsecureSkin(entity.getGameProfile()).texture();
+   }
 
-    @Override
-    protected float getBob(CultivatorCorpseEntity livingBase, float partialTicks) {
-        return 0.0F;
-    }
+   protected float getBob(CultivatorCorpseEntity livingBase, float partialTicks) {
+      return 0.0F;
+   }
 
-    @Override
-    protected void setupRotations(CultivatorCorpseEntity entity, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks, float scale) {
-        if (entity.isRaised()) {
-            super.setupRotations(entity, poseStack, ageInTicks, rotationYaw, partialTicks, scale);
-            return;
-        }
-        poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - entity.getCorpseYaw()));
-        poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
-        poseStack.translate(0.0D, -0.50D, 0.0D);
-    }
+   protected void setupRotations(CultivatorCorpseEntity entity, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks, float scale) {
+      if (entity.isRaised()) {
+         super.setupRotations(entity, poseStack, ageInTicks, rotationYaw, partialTicks, scale);
+      } else {
+         poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - entity.getCorpseYaw()));
+         poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
+         poseStack.translate((double)0.0F, (double)-0.5F, (double)0.0F);
+      }
+   }
 }

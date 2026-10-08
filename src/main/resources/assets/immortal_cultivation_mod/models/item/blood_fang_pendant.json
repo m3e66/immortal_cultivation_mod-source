@@ -1,0 +1,27 @@
+{
+  "format_version": "1.21.11",
+  "credit": "Made with Blockbench",
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "immortal_cultivation_mod:item/blood_fang_pendant"
+  },
+  "display": {
+    "gui": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0.9491525,
+        -0.1186441,
+        0
+      ],
+      "scale": [
+        0.9491525,
+        0.9491525,
+        0.9491525
+      ]
+    }
+  }
+}

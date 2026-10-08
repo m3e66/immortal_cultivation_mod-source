@@ -5,7 +5,7 @@ import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 
 public class FanrenNpcModel extends PlayerModel<FanrenNpcEntity> {
-    public FanrenNpcModel(ModelPart root) {
-        super(root, true);
-    }
+   public FanrenNpcModel(ModelPart root) {
+      super(root, true);
+   }
 }

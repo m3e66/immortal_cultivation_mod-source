@@ -1,0 +1,23 @@
+{
+  "name": "护身饰品",
+  "icon": "immortal_cultivation_mod:fortune_guard_coin",
+  "category": "immortal_cultivation_mod:items",
+  "sortnum": 12,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "镇运铜钱与破法戒",
+      "text": "护身饰品使用对应饰品槽，不占普通护甲位置。$(br2)$(bold)镇运铜钱$()：装备后遇到可抵挡的厄运，会消耗自身保护你。$(br2)$(bold)破法戒$()：放入戒指栏；近战命中正在格挡的敌人，可触发破盾作用。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "血煞牙坠",
+      "text": "将血煞牙坠放入项链栏。血魔功法修士或活尸携带血液、血晶，在血气或怨气不足时，它会自动补充。$(br2)缺少合适血液材料或不满足修行条件时，佩戴本身不会凭空生成资源。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "悟道叶与换装",
+      "text": "将悟道叶放入护符栏，通过打坐修炼功法或练习术法，获得熟练度增益。$(br2)根据敌人、修炼方式与当前目标更换饰品。各饰品触发条件不同，使用前查看物品提示。"
+    }
+  ]
+}

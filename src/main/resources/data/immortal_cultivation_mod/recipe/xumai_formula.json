@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "immortal_cultivation_mod:jiuye_xianlan"
+    },
+    {
+      "item": "immortal_cultivation_mod:ziyun_vine"
+    },
+    {
+      "item": "immortal_cultivation_mod:ziyun_vine"
+    }
+  ],
+  "result": {
+    "id": "immortal_cultivation_mod:xumai_formula",
+    "count": 1
+  }
+}

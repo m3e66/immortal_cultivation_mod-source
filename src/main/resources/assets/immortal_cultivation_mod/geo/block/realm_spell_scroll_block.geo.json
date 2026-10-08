@@ -1,0 +1,64 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.realm_spell_scroll_block",
+				"texture_width": 194,
+				"texture_height": 194,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 1.35,
+				"visible_bounds_offset": [0, 0.325, 0]
+			},
+			"bones": [
+				{
+					"name": "root",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "jade_slip_bundle",
+					"parent": "root",
+					"pivot": [8, 0, 8],
+					"cubes": [
+						{
+							"origin": [3.4, -0.45, 2.25],
+							"size": [3, 3, 11.5],
+							"uv": {
+								"north": {"uv": [23, 55], "uv_size": [2, 6]},
+								"east": {"uv": [0, 55], "uv_size": [23, 6]},
+								"south": {"uv": [48, 55], "uv_size": [2, 6]},
+								"west": {"uv": [25, 55], "uv_size": [23, 6]},
+								"up": {"uv": [19, 32], "uv_size": [6, 23]},
+								"down": {"uv": [31, 32], "uv_size": [-6, 23]}
+							}
+						},
+						{
+							"origin": [5.5, 2.55, 2.25],
+							"size": [3, 3, 11.5],
+							"uv": {
+								"north": {"uv": [131, 55], "uv_size": [2, 6]},
+								"east": {"uv": [108, 55], "uv_size": [23, 6]},
+								"south": {"uv": [156, 55], "uv_size": [2, 6]},
+								"west": {"uv": [133, 55], "uv_size": [23, 6]},
+								"up": {"uv": [127, 32], "uv_size": [6, 23]},
+								"down": {"uv": [133, 32], "uv_size": [6, 23]}
+							}
+						},
+						{
+							"origin": [7.6, -0.45, 2.25],
+							"size": [3, 3, 11.5],
+							"uv": {
+								"north": {"uv": [77, 83], "uv_size": [2, 6]},
+								"east": {"uv": [54, 83], "uv_size": [23, 6]},
+								"south": {"uv": [102, 83], "uv_size": [2, 6]},
+								"west": {"uv": [79, 83], "uv_size": [23, 6]},
+								"up": {"uv": [73, 60], "uv_size": [6, 23]},
+								"down": {"uv": [85, 60], "uv_size": [-6, 23]}
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}

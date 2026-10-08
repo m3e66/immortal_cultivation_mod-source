@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:river",
+    "minecraft:swamp",
+    "minecraft:forest",
+    "minecraft:birch_forest"
+  ]
+}

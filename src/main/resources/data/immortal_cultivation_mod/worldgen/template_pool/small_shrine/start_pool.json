@@ -1,0 +1,24 @@
+{
+  "name": "immortal_cultivation_mod:small_shrine/start_pool",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "immortal_cultivation_mod:small_shrine1",
+        "processors": "immortal_cultivation_mod:small_shrine_clear_terrain",
+        "projection": "rigid"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "immortal_cultivation_mod:small_shrine2",
+        "processors": "immortal_cultivation_mod:small_shrine_clear_terrain",
+        "projection": "rigid"
+      }
+    }
+  ]
+}

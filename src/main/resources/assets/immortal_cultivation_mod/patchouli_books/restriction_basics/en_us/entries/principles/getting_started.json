@@ -23,7 +23,7 @@
     {
       "type": "patchouli:text",
       "title": "Seventy-Two Layers",
-      "text": "Each artifact tier holds 72 layers. At 72, Evolve merges those restrictions into the artifact. They stop appearing individually but remain effective; current progress resets and the artifact advances one tier."
+      "text": "Each tier holds 72 layers. A weapon's Evolve action starts a tribulation at a full cycle. After success, existing restrictions merge into the artifact and remain effective; its current cycle resets and it advances one tier.$(br2)Armor and other non-weapon equipment follow different evolution rules."
     },
     {
       "type": "patchouli:text",

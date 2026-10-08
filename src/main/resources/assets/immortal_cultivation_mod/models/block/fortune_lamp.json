@@ -1,0 +1,2356 @@
+{
+  "credit": "Native fortune artifact geometry",
+  "ambientocclusion": false,
+  "gui_light": "front",
+  "textures": {
+    "straw": "minecraft:block/stripped_bamboo_block",
+    "straw_end": "minecraft:block/hay_block_top",
+    "wood": "minecraft:block/stripped_oak_log",
+    "red": "minecraft:block/red_wool",
+    "paper": "minecraft:block/birch_planks",
+    "ink": "minecraft:block/black_concrete",
+    "bronze": "minecraft:block/copper_block",
+    "dark": "minecraft:block/dark_prismarine",
+    "gold": "minecraft:block/gold_block",
+    "jade": "minecraft:block/oxidized_copper",
+    "silver": "minecraft:block/iron_block",
+    "glass": "minecraft:block/blue_ice",
+    "deep": "minecraft:block/cyan_terracotta",
+    "white": "minecraft:block/quartz_block_side",
+    "glow": "minecraft:block/cyan_terracotta",
+    "amber": "minecraft:block/dark_prismarine",
+    "ruby": "minecraft:block/redstone_block",
+    "particle": "minecraft:block/copper_block"
+  },
+  "elements": [
+    {
+      "name": "Octagonal foot",
+      "from": [
+        3.5,
+        0,
+        3.5
+      ],
+      "to": [
+        12.5,
+        0.7,
+        12.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            3.5,
+            15.3,
+            12.5,
+            16
+          ],
+          "texture": "#dark"
+        },
+        "south": {
+          "uv": [
+            3.5,
+            15.3,
+            12.5,
+            16
+          ],
+          "texture": "#dark"
+        },
+        "west": {
+          "uv": [
+            3.5,
+            15.3,
+            12.5,
+            16
+          ],
+          "texture": "#dark"
+        },
+        "east": {
+          "uv": [
+            3.5,
+            15.3,
+            12.5,
+            16
+          ],
+          "texture": "#dark"
+        },
+        "up": {
+          "uv": [
+            3.5,
+            3.5,
+            12.5,
+            12.5
+          ],
+          "texture": "#dark"
+        },
+        "down": {
+          "uv": [
+            3.5,
+            3.5,
+            12.5,
+            12.5
+          ],
+          "texture": "#dark"
+        }
+      }
+    },
+    {
+      "name": "Foot bevel",
+      "from": [
+        4,
+        0.7,
+        4
+      ],
+      "to": [
+        12,
+        1.25,
+        12
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            14.75,
+            12,
+            15.3
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            4,
+            14.75,
+            12,
+            15.3
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            4,
+            14.75,
+            12,
+            15.3
+          ],
+          "texture": "#bronze"
+        },
+        "east": {
+          "uv": [
+            4,
+            14.75,
+            12,
+            15.3
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Raised plinth",
+      "from": [
+        4.8,
+        1.25,
+        4.8
+      ],
+      "to": [
+        11.2,
+        2.3,
+        11.2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.8,
+            13.7,
+            11.2,
+            14.75
+          ],
+          "texture": "#jade"
+        },
+        "south": {
+          "uv": [
+            4.8,
+            13.7,
+            11.2,
+            14.75
+          ],
+          "texture": "#jade"
+        },
+        "west": {
+          "uv": [
+            4.8,
+            13.7,
+            11.2,
+            14.75
+          ],
+          "texture": "#jade"
+        },
+        "east": {
+          "uv": [
+            4.8,
+            13.7,
+            11.2,
+            14.75
+          ],
+          "texture": "#jade"
+        },
+        "up": {
+          "uv": [
+            4.8,
+            4.8,
+            11.2,
+            11.2
+          ],
+          "texture": "#jade"
+        },
+        "down": {
+          "uv": [
+            4.8,
+            4.8,
+            11.2,
+            11.2
+          ],
+          "texture": "#jade"
+        }
+      }
+    },
+    {
+      "name": "Gold base rim",
+      "from": [
+        3.8,
+        2.3,
+        3.8
+      ],
+      "to": [
+        12.2,
+        2.85,
+        12.2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            3.8,
+            13.15,
+            12.2,
+            13.7
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            3.8,
+            13.15,
+            12.2,
+            13.7
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            3.8,
+            13.15,
+            12.2,
+            13.7
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            3.8,
+            13.15,
+            12.2,
+            13.7
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            3.8,
+            3.8,
+            12.2,
+            12.2
+          ],
+          "texture": "#gold"
+        },
+        "down": {
+          "uv": [
+            3.8,
+            3.8,
+            12.2,
+            12.2
+          ],
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "name": "Oil basin",
+      "from": [
+        4.4,
+        2.85,
+        4.4
+      ],
+      "to": [
+        11.6,
+        3.65,
+        11.6
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.4,
+            12.35,
+            11.6,
+            13.15
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            4.4,
+            12.35,
+            11.6,
+            13.15
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            4.4,
+            12.35,
+            11.6,
+            13.15
+          ],
+          "texture": "#bronze"
+        },
+        "east": {
+          "uv": [
+            4.4,
+            12.35,
+            11.6,
+            13.15
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            4.4,
+            4.4,
+            11.6,
+            11.6
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            4.4,
+            4.4,
+            11.6,
+            11.6
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Dark oil",
+      "from": [
+        5.2,
+        3.66,
+        5.2
+      ],
+      "to": [
+        10.8,
+        3.85,
+        10.8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5.2,
+            12.15,
+            10.8,
+            12.34
+          ],
+          "texture": "#dark"
+        },
+        "south": {
+          "uv": [
+            5.2,
+            12.15,
+            10.8,
+            12.34
+          ],
+          "texture": "#dark"
+        },
+        "west": {
+          "uv": [
+            5.2,
+            12.15,
+            10.8,
+            12.34
+          ],
+          "texture": "#dark"
+        },
+        "east": {
+          "uv": [
+            5.2,
+            12.15,
+            10.8,
+            12.34
+          ],
+          "texture": "#dark"
+        },
+        "up": {
+          "uv": [
+            5.2,
+            5.2,
+            10.8,
+            10.8
+          ],
+          "texture": "#dark"
+        },
+        "down": {
+          "uv": [
+            5.2,
+            5.2,
+            10.8,
+            10.8
+          ],
+          "texture": "#dark"
+        }
+      }
+    },
+    {
+      "name": "Bronze pillar",
+      "from": [
+        4.4,
+        3.6,
+        4.4
+      ],
+      "to": [
+        5.300000000000001,
+        11.25,
+        5.300000000000001
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.4,
+            4.75,
+            5.3,
+            12.4
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            4.4,
+            4.75,
+            5.3,
+            12.4
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            4.4,
+            4.75,
+            5.3,
+            12.4
+          ],
+          "texture": "#bronze"
+        },
+        "east": {
+          "uv": [
+            4.4,
+            4.75,
+            5.3,
+            12.4
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            4.4,
+            4.4,
+            5.3,
+            5.3
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            4.4,
+            4.4,
+            5.3,
+            5.3
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Pillar jade band",
+      "from": [
+        4.28,
+        6.4,
+        4.28
+      ],
+      "to": [
+        5.42,
+        7.1,
+        5.42
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.28,
+            8.9,
+            5.42,
+            9.6
+          ],
+          "texture": "#jade"
+        },
+        "south": {
+          "uv": [
+            4.28,
+            8.9,
+            5.42,
+            9.6
+          ],
+          "texture": "#jade"
+        },
+        "west": {
+          "uv": [
+            4.28,
+            8.9,
+            5.42,
+            9.6
+          ],
+          "texture": "#jade"
+        },
+        "east": {
+          "uv": [
+            4.28,
+            8.9,
+            5.42,
+            9.6
+          ],
+          "texture": "#jade"
+        },
+        "up": {
+          "uv": [
+            4.28,
+            4.28,
+            5.42,
+            5.42
+          ],
+          "texture": "#jade"
+        },
+        "down": {
+          "uv": [
+            4.28,
+            4.28,
+            5.42,
+            5.42
+          ],
+          "texture": "#jade"
+        }
+      }
+    },
+    {
+      "name": "Bronze pillar",
+      "from": [
+        10.7,
+        3.6,
+        4.4
+      ],
+      "to": [
+        11.6,
+        11.25,
+        5.300000000000001
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            10.7,
+            4.75,
+            11.6,
+            12.4
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            10.7,
+            4.75,
+            11.6,
+            12.4
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            4.4,
+            4.75,
+            5.3,
+            12.4
+          ],
+          "texture": "#bronze"
+        },
+        "east": {
+          "uv": [
+            4.4,
+            4.75,
+            5.3,
+            12.4
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            10.7,
+            4.4,
+            11.6,
+            5.3
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            10.7,
+            4.4,
+            11.6,
+            5.3
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Pillar jade band",
+      "from": [
+        10.58,
+        6.4,
+        4.28
+      ],
+      "to": [
+        11.719999999999999,
+        7.1,
+        5.42
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            10.58,
+            8.9,
+            11.72,
+            9.6
+          ],
+          "texture": "#jade"
+        },
+        "south": {
+          "uv": [
+            10.58,
+            8.9,
+            11.72,
+            9.6
+          ],
+          "texture": "#jade"
+        },
+        "west": {
+          "uv": [
+            4.28,
+            8.9,
+            5.42,
+            9.6
+          ],
+          "texture": "#jade"
+        },
+        "east": {
+          "uv": [
+            4.28,
+            8.9,
+            5.42,
+            9.6
+          ],
+          "texture": "#jade"
+        },
+        "up": {
+          "uv": [
+            10.58,
+            4.28,
+            11.72,
+            5.42
+          ],
+          "texture": "#jade"
+        },
+        "down": {
+          "uv": [
+            10.58,
+            4.28,
+            11.72,
+            5.42
+          ],
+          "texture": "#jade"
+        }
+      }
+    },
+    {
+      "name": "Bronze pillar",
+      "from": [
+        4.4,
+        3.6,
+        10.7
+      ],
+      "to": [
+        5.300000000000001,
+        11.25,
+        11.6
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.4,
+            4.75,
+            5.3,
+            12.4
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            4.4,
+            4.75,
+            5.3,
+            12.4
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            10.7,
+            4.75,
+            11.6,
+            12.4
+          ],
+          "texture": "#bronze"
+        },
+        "east": {
+          "uv": [
+            10.7,
+            4.75,
+            11.6,
+            12.4
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            4.4,
+            10.7,
+            5.3,
+            11.6
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            4.4,
+            10.7,
+            5.3,
+            11.6
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Pillar jade band",
+      "from": [
+        4.28,
+        6.4,
+        10.58
+      ],
+      "to": [
+        5.42,
+        7.1,
+        11.719999999999999
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.28,
+            8.9,
+            5.42,
+            9.6
+          ],
+          "texture": "#jade"
+        },
+        "south": {
+          "uv": [
+            4.28,
+            8.9,
+            5.42,
+            9.6
+          ],
+          "texture": "#jade"
+        },
+        "west": {
+          "uv": [
+            10.58,
+            8.9,
+            11.72,
+            9.6
+          ],
+          "texture": "#jade"
+        },
+        "east": {
+          "uv": [
+            10.58,
+            8.9,
+            11.72,
+            9.6
+          ],
+          "texture": "#jade"
+        },
+        "up": {
+          "uv": [
+            4.28,
+            10.58,
+            5.42,
+            11.72
+          ],
+          "texture": "#jade"
+        },
+        "down": {
+          "uv": [
+            4.28,
+            10.58,
+            5.42,
+            11.72
+          ],
+          "texture": "#jade"
+        }
+      }
+    },
+    {
+      "name": "Bronze pillar",
+      "from": [
+        10.7,
+        3.6,
+        10.7
+      ],
+      "to": [
+        11.6,
+        11.25,
+        11.6
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            10.7,
+            4.75,
+            11.6,
+            12.4
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            10.7,
+            4.75,
+            11.6,
+            12.4
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            10.7,
+            4.75,
+            11.6,
+            12.4
+          ],
+          "texture": "#bronze"
+        },
+        "east": {
+          "uv": [
+            10.7,
+            4.75,
+            11.6,
+            12.4
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            10.7,
+            10.7,
+            11.6,
+            11.6
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            10.7,
+            10.7,
+            11.6,
+            11.6
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Pillar jade band",
+      "from": [
+        10.58,
+        6.4,
+        10.58
+      ],
+      "to": [
+        11.719999999999999,
+        7.1,
+        11.719999999999999
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            10.58,
+            8.9,
+            11.72,
+            9.6
+          ],
+          "texture": "#jade"
+        },
+        "south": {
+          "uv": [
+            10.58,
+            8.9,
+            11.72,
+            9.6
+          ],
+          "texture": "#jade"
+        },
+        "west": {
+          "uv": [
+            10.58,
+            8.9,
+            11.72,
+            9.6
+          ],
+          "texture": "#jade"
+        },
+        "east": {
+          "uv": [
+            10.58,
+            8.9,
+            11.72,
+            9.6
+          ],
+          "texture": "#jade"
+        },
+        "up": {
+          "uv": [
+            10.58,
+            10.58,
+            11.72,
+            11.72
+          ],
+          "texture": "#jade"
+        },
+        "down": {
+          "uv": [
+            10.58,
+            10.58,
+            11.72,
+            11.72
+          ],
+          "texture": "#jade"
+        }
+      }
+    },
+    {
+      "name": "Hearth pedestal",
+      "from": [
+        6.3,
+        3.8,
+        6.3
+      ],
+      "to": [
+        9.7,
+        4.5,
+        9.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.3,
+            11.5,
+            9.7,
+            12.2
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            6.3,
+            11.5,
+            9.7,
+            12.2
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            6.3,
+            11.5,
+            9.7,
+            12.2
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            6.3,
+            11.5,
+            9.7,
+            12.2
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            6.3,
+            6.3,
+            9.7,
+            9.7
+          ],
+          "texture": "#gold"
+        },
+        "down": {
+          "uv": [
+            6.3,
+            6.3,
+            9.7,
+            9.7
+          ],
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "name": "Spirit flame",
+      "from": [
+        6.65,
+        4.5,
+        6.65
+      ],
+      "to": [
+        9.35,
+        6.8,
+        9.35
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.65,
+            9.2,
+            9.35,
+            11.5
+          ],
+          "texture": "#glow"
+        },
+        "south": {
+          "uv": [
+            6.65,
+            9.2,
+            9.35,
+            11.5
+          ],
+          "texture": "#glow"
+        },
+        "west": {
+          "uv": [
+            6.65,
+            9.2,
+            9.35,
+            11.5
+          ],
+          "texture": "#glow"
+        },
+        "east": {
+          "uv": [
+            6.65,
+            9.2,
+            9.35,
+            11.5
+          ],
+          "texture": "#glow"
+        },
+        "up": {
+          "uv": [
+            6.65,
+            6.65,
+            9.35,
+            9.35
+          ],
+          "texture": "#glow"
+        },
+        "down": {
+          "uv": [
+            6.65,
+            6.65,
+            9.35,
+            9.35
+          ],
+          "texture": "#glow"
+        }
+      }
+    },
+    {
+      "name": "Spirit flame taper",
+      "from": [
+        7,
+        6.8,
+        7
+      ],
+      "to": [
+        9,
+        8.5,
+        9
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7,
+            7.5,
+            9,
+            9.2
+          ],
+          "texture": "#glow"
+        },
+        "south": {
+          "uv": [
+            7,
+            7.5,
+            9,
+            9.2
+          ],
+          "texture": "#glow"
+        },
+        "west": {
+          "uv": [
+            7,
+            7.5,
+            9,
+            9.2
+          ],
+          "texture": "#glow"
+        },
+        "east": {
+          "uv": [
+            7,
+            7.5,
+            9,
+            9.2
+          ],
+          "texture": "#glow"
+        },
+        "up": {
+          "uv": [
+            7,
+            7,
+            9,
+            9
+          ],
+          "texture": "#glow"
+        },
+        "down": {
+          "uv": [
+            7,
+            7,
+            9,
+            9
+          ],
+          "texture": "#glow"
+        }
+      }
+    },
+    {
+      "name": "Spirit flame tip",
+      "from": [
+        7.3,
+        8.5,
+        7.3
+      ],
+      "to": [
+        8.3,
+        10.05,
+        8.3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7.3,
+            5.95,
+            8.3,
+            7.5
+          ],
+          "texture": "#amber"
+        },
+        "south": {
+          "uv": [
+            7.3,
+            5.95,
+            8.3,
+            7.5
+          ],
+          "texture": "#amber"
+        },
+        "west": {
+          "uv": [
+            7.3,
+            5.95,
+            8.3,
+            7.5
+          ],
+          "texture": "#amber"
+        },
+        "east": {
+          "uv": [
+            7.3,
+            5.95,
+            8.3,
+            7.5
+          ],
+          "texture": "#amber"
+        },
+        "up": {
+          "uv": [
+            7.3,
+            7.3,
+            8.3,
+            8.3
+          ],
+          "texture": "#amber"
+        },
+        "down": {
+          "uv": [
+            7.3,
+            7.3,
+            8.3,
+            8.3
+          ],
+          "texture": "#amber"
+        }
+      }
+    },
+    {
+      "name": "Lintel",
+      "from": [
+        4.4,
+        10.7,
+        4.3
+      ],
+      "to": [
+        11.6,
+        11.3,
+        4.6499999999999995
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.4,
+            4.7,
+            11.6,
+            5.3
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            4.4,
+            4.7,
+            11.6,
+            5.3
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            4.3,
+            4.7,
+            4.65,
+            5.3
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            4.3,
+            4.7,
+            4.65,
+            5.3
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            4.4,
+            4.3,
+            11.6,
+            4.65
+          ],
+          "texture": "#gold"
+        },
+        "down": {
+          "uv": [
+            4.4,
+            4.3,
+            11.6,
+            4.65
+          ],
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "name": "Lintel",
+      "from": [
+        4.4,
+        10.7,
+        11.35
+      ],
+      "to": [
+        11.6,
+        11.3,
+        11.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.4,
+            4.7,
+            11.6,
+            5.3
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            4.4,
+            4.7,
+            11.6,
+            5.3
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            11.35,
+            4.7,
+            11.7,
+            5.3
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            11.35,
+            4.7,
+            11.7,
+            5.3
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            4.4,
+            11.35,
+            11.6,
+            11.7
+          ],
+          "texture": "#gold"
+        },
+        "down": {
+          "uv": [
+            4.4,
+            11.35,
+            11.6,
+            11.7
+          ],
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "name": "Wide eaves",
+      "from": [
+        2.8,
+        11.3,
+        2.8
+      ],
+      "to": [
+        13.2,
+        11.9,
+        13.2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            2.8,
+            4.1,
+            13.2,
+            4.7
+          ],
+          "texture": "#dark"
+        },
+        "south": {
+          "uv": [
+            2.8,
+            4.1,
+            13.2,
+            4.7
+          ],
+          "texture": "#dark"
+        },
+        "west": {
+          "uv": [
+            2.8,
+            4.1,
+            13.2,
+            4.7
+          ],
+          "texture": "#dark"
+        },
+        "east": {
+          "uv": [
+            2.8,
+            4.1,
+            13.2,
+            4.7
+          ],
+          "texture": "#dark"
+        },
+        "up": {
+          "uv": [
+            2.8,
+            2.8,
+            13.2,
+            13.2
+          ],
+          "texture": "#dark"
+        },
+        "down": {
+          "uv": [
+            2.8,
+            2.8,
+            13.2,
+            13.2
+          ],
+          "texture": "#dark"
+        }
+      }
+    },
+    {
+      "name": "Roof lower tier",
+      "from": [
+        3.5,
+        11.9,
+        3.5
+      ],
+      "to": [
+        12.5,
+        12.5,
+        12.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            3.5,
+            3.5,
+            12.5,
+            4.1
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            3.5,
+            3.5,
+            12.5,
+            4.1
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            3.5,
+            3.5,
+            12.5,
+            4.1
+          ],
+          "texture": "#bronze"
+        },
+        "east": {
+          "uv": [
+            3.5,
+            3.5,
+            12.5,
+            4.1
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            3.5,
+            3.5,
+            12.5,
+            12.5
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            3.5,
+            3.5,
+            12.5,
+            12.5
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Roof upper tier",
+      "from": [
+        4.5,
+        12.5,
+        4.5
+      ],
+      "to": [
+        11.5,
+        13.2,
+        11.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.5,
+            2.8,
+            11.5,
+            3.5
+          ],
+          "texture": "#jade"
+        },
+        "south": {
+          "uv": [
+            4.5,
+            2.8,
+            11.5,
+            3.5
+          ],
+          "texture": "#jade"
+        },
+        "west": {
+          "uv": [
+            4.5,
+            2.8,
+            11.5,
+            3.5
+          ],
+          "texture": "#jade"
+        },
+        "east": {
+          "uv": [
+            4.5,
+            2.8,
+            11.5,
+            3.5
+          ],
+          "texture": "#jade"
+        },
+        "up": {
+          "uv": [
+            4.5,
+            4.5,
+            11.5,
+            11.5
+          ],
+          "texture": "#jade"
+        },
+        "down": {
+          "uv": [
+            4.5,
+            4.5,
+            11.5,
+            11.5
+          ],
+          "texture": "#jade"
+        }
+      }
+    },
+    {
+      "name": "Roof crown",
+      "from": [
+        6.1,
+        13.2,
+        6.1
+      ],
+      "to": [
+        9.9,
+        13.8,
+        9.9
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.1,
+            2.2,
+            9.9,
+            2.8
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            6.1,
+            2.2,
+            9.9,
+            2.8
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            6.1,
+            2.2,
+            9.9,
+            2.8
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            6.1,
+            2.2,
+            9.9,
+            2.8
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            6.1,
+            6.1,
+            9.9,
+            9.9
+          ],
+          "texture": "#gold"
+        },
+        "down": {
+          "uv": [
+            6.1,
+            6.1,
+            9.9,
+            9.9
+          ],
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "name": "Handle",
+      "from": [
+        6.65,
+        13.8,
+        7.65
+      ],
+      "to": [
+        7.15,
+        15.5,
+        8.35
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.65,
+            0.5,
+            7.15,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            6.65,
+            0.5,
+            7.15,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            7.65,
+            0.5,
+            8.35,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "east": {
+          "uv": [
+            7.65,
+            0.5,
+            8.35,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            6.65,
+            7.65,
+            7.15,
+            8.35
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            6.65,
+            7.65,
+            7.15,
+            8.35
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Handle",
+      "from": [
+        8.85,
+        13.8,
+        7.65
+      ],
+      "to": [
+        9.35,
+        15.5,
+        8.35
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8.85,
+            0.5,
+            9.35,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            8.85,
+            0.5,
+            9.35,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            7.65,
+            0.5,
+            8.35,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "east": {
+          "uv": [
+            7.65,
+            0.5,
+            8.35,
+            2.2
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            8.85,
+            7.65,
+            9.35,
+            8.35
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            8.85,
+            7.65,
+            9.35,
+            8.35
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Handle",
+      "from": [
+        7.15,
+        15.1,
+        7.65
+      ],
+      "to": [
+        8.85,
+        15.6,
+        8.35
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7.15,
+            0.4,
+            8.85,
+            0.9
+          ],
+          "texture": "#bronze"
+        },
+        "south": {
+          "uv": [
+            7.15,
+            0.4,
+            8.85,
+            0.9
+          ],
+          "texture": "#bronze"
+        },
+        "west": {
+          "uv": [
+            7.65,
+            0.4,
+            8.35,
+            0.9
+          ],
+          "texture": "#bronze"
+        },
+        "east": {
+          "uv": [
+            7.65,
+            0.4,
+            8.35,
+            0.9
+          ],
+          "texture": "#bronze"
+        },
+        "up": {
+          "uv": [
+            7.15,
+            7.65,
+            8.85,
+            8.35
+          ],
+          "texture": "#bronze"
+        },
+        "down": {
+          "uv": [
+            7.15,
+            7.65,
+            8.85,
+            8.35
+          ],
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "name": "Front blessing slip",
+      "from": [
+        7.05,
+        9,
+        4.05
+      ],
+      "to": [
+        8.95,
+        11.5,
+        4.3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7.05,
+            4.5,
+            8.95,
+            7
+          ],
+          "texture": "#paper"
+        },
+        "south": {
+          "uv": [
+            7.05,
+            4.5,
+            8.95,
+            7
+          ],
+          "texture": "#paper"
+        },
+        "west": {
+          "uv": [
+            4.05,
+            4.5,
+            4.3,
+            7
+          ],
+          "texture": "#paper"
+        },
+        "east": {
+          "uv": [
+            4.05,
+            4.5,
+            4.3,
+            7
+          ],
+          "texture": "#paper"
+        },
+        "up": {
+          "uv": [
+            7.05,
+            4.05,
+            8.95,
+            4.3
+          ],
+          "texture": "#paper"
+        },
+        "down": {
+          "uv": [
+            7.05,
+            4.05,
+            8.95,
+            4.3
+          ],
+          "texture": "#paper"
+        }
+      }
+    },
+    {
+      "name": "Talisman stroke",
+      "from": [
+        7.65,
+        10.799999999999999,
+        3.94
+      ],
+      "to": [
+        8.35,
+        11.0,
+        4.01
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7.65,
+            5.0,
+            8.35,
+            5.2
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            7.65,
+            5.0,
+            8.35,
+            5.2
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            3.94,
+            5.0,
+            4.01,
+            5.2
+          ],
+          "texture": "#red"
+        },
+        "east": {
+          "uv": [
+            3.94,
+            5.0,
+            4.01,
+            5.2
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            7.65,
+            3.94,
+            8.35,
+            4.01
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            7.65,
+            3.94,
+            8.35,
+            4.01
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Talisman stroke",
+      "from": [
+        7.9,
+        9.399999999999999,
+        3.94
+      ],
+      "to": [
+        8.1,
+        10.899999999999999,
+        4.01
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7.9,
+            5.1,
+            8.1,
+            6.6
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            7.9,
+            5.1,
+            8.1,
+            6.6
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            3.94,
+            5.1,
+            4.01,
+            6.6
+          ],
+          "texture": "#red"
+        },
+        "east": {
+          "uv": [
+            3.94,
+            5.1,
+            4.01,
+            6.6
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            7.9,
+            3.94,
+            8.1,
+            4.01
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            7.9,
+            3.94,
+            8.1,
+            4.01
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Talisman stroke",
+      "from": [
+        7.5,
+        10.299999999999999,
+        3.94
+      ],
+      "to": [
+        8.5,
+        10.5,
+        4.01
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7.5,
+            5.5,
+            8.5,
+            5.7
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            7.5,
+            5.5,
+            8.5,
+            5.7
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            3.94,
+            5.5,
+            4.01,
+            5.7
+          ],
+          "texture": "#red"
+        },
+        "east": {
+          "uv": [
+            3.94,
+            5.5,
+            4.01,
+            5.7
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            7.5,
+            3.94,
+            8.5,
+            4.01
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            7.5,
+            3.94,
+            8.5,
+            4.01
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Talisman stroke",
+      "from": [
+        8.1,
+        9.6,
+        3.94
+      ],
+      "to": [
+        8.5,
+        9.799999999999999,
+        4.01
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8.1,
+            6.2,
+            8.5,
+            6.4
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            8.1,
+            6.2,
+            8.5,
+            6.4
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            3.94,
+            6.2,
+            4.01,
+            6.4
+          ],
+          "texture": "#red"
+        },
+        "east": {
+          "uv": [
+            3.94,
+            6.2,
+            4.01,
+            6.4
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            8.1,
+            3.94,
+            8.5,
+            4.01
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            8.1,
+            3.94,
+            8.5,
+            4.01
+          ],
+          "texture": "#red"
+        }
+      }
+    }
+  ],
+  "display": {
+    "gui": {
+      "rotation": [
+        12,
+        -22,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ]
+    },
+    "ground": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        3,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.45,
+        0.45
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        1
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        1
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        -12,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        12,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    }
+  }
+}

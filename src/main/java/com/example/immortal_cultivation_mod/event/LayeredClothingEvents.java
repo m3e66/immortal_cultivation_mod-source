@@ -93,6 +93,27 @@ public final class LayeredClothingEvents {
         DamageSource source =
                 event.getDamageSource();
 
+        if (player.getAbilities().instabuild || source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_ARMOR)) {
+            return;
+        }
+
+        // Headwear and boots cover separate body regions. Cosmetic Curios slots never wear.
+        for (String slotId : new String[]{LayeredClothingSlots.HEAD_ACCESSORY, "boots"}) {
+            EquippedCurio garment = findDamageableClothing(player, slotId, source);
+            if (garment != null && garment.stack().getItem()
+                    instanceof com.example.immortal_cultivation_mod.item.CultivationGarmentItem) {
+                damageCurio(player, garment, durabilityDamage);
+            }
+        }
+
+        EquippedCurio cloak = findDamageableClothing(player, "cloak", source);
+        if (cloak != null && cloak.stack().getItem()
+                instanceof com.example.immortal_cultivation_mod.item.CultivationGarmentItem) {
+            event.setNewDamage(EquipmentSlot.CHEST, 0.0F);
+            damageCurio(player, cloak, durabilityDamage);
+            return;
+        }
+
         EquippedCurio outer =
                 findDamageableClothing(
                         player,
@@ -352,7 +373,11 @@ public final class LayeredClothingEvents {
         damaged.hurtAndBreak(
                 damage,
                 player,
-                EquipmentSlot.CHEST);
+                switch (curio.slotId()) {
+                    case "head_accessory" -> EquipmentSlot.HEAD;
+                    case "boots" -> EquipmentSlot.FEET;
+                    default -> EquipmentSlot.CHEST;
+                });
 
         curio.handler().setEquippedCurio(
                 curio.slotId(),

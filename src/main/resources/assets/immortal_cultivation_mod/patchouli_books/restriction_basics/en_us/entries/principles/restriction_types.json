@@ -1,5 +1,5 @@
 {
-  "name": "Seven Restrictions",
+  "name": "Equipment Restrictions",
   "icon": "immortal_cultivation_mod:flying_sword",
   "category": "immortal_cultivation_mod:principles",
   "sortnum": 4,
@@ -23,6 +23,11 @@
       "type": "patchouli:text",
       "title": "Armor Breaking",
       "text": "Armor Breaking: +1% damage per layer when the target is wearing armor.$(br2)Restrictions of the same type stack. Restrictions merged during evolution still contribute to the final effect."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Armor Restrictions",
+      "text": "Insert armor or clothing to see defensive restrictions only. Protection reduces incoming damage by 0.25% per layer. Fire Ward, Blast Ward, Arrow Ward and Light Fall reduce matching damage by 0.5% per layer. Worn pieces stack, capped at 80% total reduction. Sturdy and Spirit Gathering also work on armor. Cosmetic slots do not count."
     }
   ]
 }

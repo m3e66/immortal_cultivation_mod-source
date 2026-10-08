@@ -1,6 +1,6 @@
 package com.example.immortal_cultivation_mod.spell;
 
-import com.example.immortal_cultivation_mod.effect.PhotonEffects;
+import com.example.immortal_cultivation_mod.effect.NativeSpellEffects;
 import com.example.immortal_cultivation_mod.entity.CultivationNpc;
 import com.example.immortal_cultivation_mod.entity.NpcProfile;
 import net.minecraft.core.BlockPos;
@@ -56,7 +56,7 @@ public final class SlidingWater {
         for (BlockPos puddlePos : BlockPos.betweenClosed(pos.offset(-radius, 0, -radius), pos.offset(radius, 0, radius))) {
             PUDDLES.computeIfAbsent(level.dimension(), ignored -> new ConcurrentHashMap<>())
                     .put(puddlePos.immutable(), puddle);
-            PhotonEffects.puddle(level, puddlePos.getX() + 0.5D, puddlePos.getY(), puddlePos.getZ() + 0.5D);
+            NativeSpellEffects.puddle(level, puddlePos.getX() + 0.5D, puddlePos.getY(), puddlePos.getZ() + 0.5D);
         }
     }
 
@@ -71,7 +71,7 @@ public final class SlidingWater {
         for (var entry : puddles.entrySet()) {
             if (entry.getValue().expiresAt() <= now) {
                 puddles.remove(entry.getKey());
-                PhotonEffects.removePuddle(level, entry.getKey());
+                NativeSpellEffects.removePuddle(level, entry.getKey());
             }
         }
         if (puddles.isEmpty()) {
@@ -81,6 +81,9 @@ public final class SlidingWater {
 
         if (now % 5L == 0L) {
             for (BlockPos pos : puddles.keySet()) {
+                if (now % 20L == 0L) {
+                    NativeSpellEffects.puddle(level, pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D);
+                }
                 level.sendParticles(ParticleTypes.SPLASH,
                         pos.getX() + 0.5D, pos.getY() + 0.04D, pos.getZ() + 0.5D,
                         10, 0.35D, 0.01D, 0.35D, 0.02D);
@@ -106,9 +109,13 @@ public final class SlidingWater {
                             && (!puddle.npcOwned()
                             || owner != null && NpcProfile.isCombatEnemy(owner, entity)));
             if (!targets.isEmpty()) {
+                if (owner != null) {
+                    HanlanNingyuanJing.applyDampFromWater(
+                            owner, targets.getFirst(), 140);
+                }
                 applyInvertedControl(targets.getFirst());
                 puddles.remove(pos);
-                PhotonEffects.removePuddle(level, pos);
+                NativeSpellEffects.removePuddle(level, pos);
             }
         }
         if (puddles.isEmpty()) {

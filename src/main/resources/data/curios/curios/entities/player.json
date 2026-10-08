@@ -12,7 +12,10 @@
     "back_accessory",
     "waist_accessory",
     "ring",
-    "system"
+    "charm",
+    "necklace",
+    "system",
+    "boots"
   ],
   "replace": false
 }

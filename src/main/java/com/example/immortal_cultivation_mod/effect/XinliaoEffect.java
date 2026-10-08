@@ -4,6 +4,7 @@ import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.entity.CultivationNpc;
 import com.example.immortal_cultivation_mod.entity.NpcProfile;
 import com.example.immortal_cultivation_mod.event.ServerEvents;
+import com.example.immortal_cultivation_mod.spell.ThoughtDamageHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -22,13 +23,14 @@ public class XinliaoEffect extends MobEffect {
     public boolean applyEffectTick(LivingEntity entity, int amplifier) {
         entity.setRemainingFireTicks(Math.max(entity.getRemainingFireTicks(), 40));
         if (!entity.level().isClientSide && entity.tickCount % 20 == 0) {
+            int thoughtDamage = ThoughtDamageHelper.total(THOUGHT_DRAIN_PER_SECOND, amplifier);
             if (entity instanceof ServerPlayer player) {
                 var data = ModAttachments.getData(player);
                 ModAttachments.setData(player, data.withQi(Math.max(0, data.qi() - QI_DRAIN_PER_SECOND)));
-                ServerEvents.adjustThoughts(player, -THOUGHT_DRAIN_PER_SECOND);
+                ServerEvents.adjustThoughts(player, -thoughtDamage);
             } else if (entity instanceof PathfinderMob mob && entity instanceof CultivationNpc npc) {
                 NpcProfile.drainQi(mob, npc.npcArchetype(), QI_DRAIN_PER_SECOND);
-                NpcProfile.adjustThoughts(mob, npc.npcArchetype(), -THOUGHT_DRAIN_PER_SECOND);
+                NpcProfile.adjustThoughts(mob, npc.npcArchetype(), -thoughtDamage);
             }
         }
         return true;

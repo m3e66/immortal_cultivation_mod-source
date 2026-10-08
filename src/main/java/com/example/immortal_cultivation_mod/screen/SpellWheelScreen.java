@@ -2,7 +2,6 @@ package com.example.immortal_cultivation_mod.screen;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.client.ClientData;
-import com.example.immortal_cultivation_mod.client.ClientSpellCombos;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -33,7 +32,7 @@ public class SpellWheelScreen extends Screen {
 
         ArrayList<String> spellIds = new ArrayList<>(data.knownSpells() == null ? List.of() : data.knownSpells());
         for (String spellId : ModSpells.innateSpellIds()) {
-            if (ModSpells.isInnateKnown(spellId, data)) {
+            if (ClientData.isInnateSpellKnown(spellId)) {
                 spellIds.add(spellId);
             }
         }
@@ -50,13 +49,6 @@ public class SpellWheelScreen extends Screen {
                                 .append(ModSpells.spellProficiencyDescription(data, spell.id())),
                         0xFFFFFFFF)));
 
-        for (ClientSpellCombos.SpellCombo combo : ClientSpellCombos.combos()) {
-            availableEntries.put(combo.castId(), new WheelEntry(
-                        combo.castId(),
-                        Component.literal(combo.name()),
-                        ClientSpellCombos.castModeDescription(combo),
-                        0xFFFFDDAA));
-        }
 
         ArrayList<WheelEntry> entries = new ArrayList<>();
         for (String selectedId : ClientData.selectedWheelSpellIds()) {

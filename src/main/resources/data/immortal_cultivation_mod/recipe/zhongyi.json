@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "S S",
+    "WWW",
+    "W W"
+  ],
+  "key": {
+    "S": {
+      "item": "immortal_cultivation_mod:spirit_guiding_thread"
+    },
+    "W": {
+      "item": "immortal_cultivation_mod:white_wool_strip"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:zhongyi",
+    "count": 1
+  }
+}

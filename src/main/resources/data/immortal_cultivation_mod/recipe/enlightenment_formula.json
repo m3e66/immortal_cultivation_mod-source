@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "immortal_cultivation_mod:enlightenment_leaf"
+    },
+    {
+      "item": "immortal_cultivation_mod:jiuye_xianlan"
+    },
+    {
+      "item": "immortal_cultivation_mod:jiuye_xianlan"
+    },
+    {
+      "item": "immortal_cultivation_mod:ningling_flower"
+    },
+    {
+      "item": "immortal_cultivation_mod:ningling_flower"
+    },
+    {
+      "item": "immortal_cultivation_mod:harmonizing_herb"
+    }
+  ],
+  "result": {
+    "id": "immortal_cultivation_mod:enlightenment_formula",
+    "count": 1
+  }
+}

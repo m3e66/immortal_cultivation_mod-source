@@ -1,0 +1,18 @@
+{
+  "name": "Combat Controls",
+  "icon": "immortal_cultivation_mod:dao",
+  "category": "immortal_cultivation_mod:basics",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Normal and Heavy Attacks",
+      "text": "Enter combat mode with its keybind. Tap the attack key for a normal weapon attack; hold it to charge a heavy attack. Holding attack and use together guards with a combat weapon."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Barrage",
+      "text": "Quickly double-left-click with a battle-system weapon to start Barrage: ten automatic normal attacks over three seconds. Keep aiming at your target; each strike follows your current direction.$(br2)Strikes use normal weapon, ammunition and Qi rules. Switching weapons, guarding, preparing a spell, losing combat state or becoming unable to act stops the sequence."
+    }
+  ]
+}

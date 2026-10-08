@@ -7,9 +7,16 @@ import software.bernie.geckolib.model.DefaultedItemGeoModel;
 import software.bernie.geckolib.renderer.GeoArmorRenderer;
 
 public class DaofuArmorRenderer extends GeoArmorRenderer<DaofuChestplateItem> {
+    private static final ResourceLocation[] TEXTURES = ClothingWear.textures("daofu");
+
     public DaofuArmorRenderer() {
         super(new DefaultedItemGeoModel<>(
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "armor/daofu")));
+    }
+
+    @Override
+    public ResourceLocation getTextureLocation(DaofuChestplateItem animatable) {
+        return TEXTURES[ClothingWear.stage(getCurrentStack())];
     }
 
     @Override

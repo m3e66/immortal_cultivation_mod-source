@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Component;
 
 public final class CultivationGuiButton extends AbstractButton {
     private final Runnable action;
+    private float textScale = 1.0F;
 
     public CultivationGuiButton(int x, int y, int width, int height,
                                 Component message, Runnable action) {
@@ -19,12 +20,17 @@ public final class CultivationGuiButton extends AbstractButton {
         action.run();
     }
 
+    public CultivationGuiButton setTextScale(float scale) {
+        this.textScale = scale;
+        return this;
+    }
+
     @Override
     protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         CultivationGuiTextures.drawButton(graphics, getX(), getY(), width, height,
                 active, isHoveredOrFocused());
         CultivationGuiTextures.drawButtonText(graphics, getMessage(), getX(), getY(),
-                width, height, active);
+                width, height, active, textScale);
     }
 
     @Override

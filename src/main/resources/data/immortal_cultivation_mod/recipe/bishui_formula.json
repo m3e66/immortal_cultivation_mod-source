@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "immortal_cultivation_mod:xuanbing_lotus"
+    },
+    {
+      "item": "immortal_cultivation_mod:ninglu_zhi"
+    },
+    {
+      "item": "immortal_cultivation_mod:ninglu_zhi"
+    }
+  ],
+  "result": {
+    "id": "immortal_cultivation_mod:bishui_formula",
+    "count": 1
+  }
+}

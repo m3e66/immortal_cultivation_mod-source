@@ -87,6 +87,18 @@ public final class TechniqueDescriptions {
         if (CultivationMethods.isJiuyouLianshiJue(methodId)) {
             return "method_special." + ImmortalCultivationMod.MODID + ".jiuyou_lianshi_jue";
         }
+        if (CultivationMethods.isDariBatiJue(methodId)) {
+            return "method_special." + ImmortalCultivationMod.MODID + ".dari_bati_jue";
+        }
+        if (CultivationMethods.isGangtingXiaokongLu(methodId)) {
+            return "method_special." + ImmortalCultivationMod.MODID + ".gangting_xiaokong_lu";
+        }
+        if (CultivationMethods.isXuanyueSuifengJue(methodId)) {
+            return "method_special." + ImmortalCultivationMod.MODID + ".xuanyue_suifeng_jue";
+        }
+        if (CultivationMethods.isHanlanNingyuanJing(methodId)) {
+            return "method_special." + ImmortalCultivationMod.MODID + ".hanlan_ningyuan_jing";
+        }
         return "method_special." + ImmortalCultivationMod.MODID + ".none";
     }
 }

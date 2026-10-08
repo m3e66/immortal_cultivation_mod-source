@@ -8,8 +8,8 @@ import com.example.immortal_cultivation_mod.item.HeavyIronBracerItem;
 import com.example.immortal_cultivation_mod.item.QiInfusedWeapon;
 import com.example.immortal_cultivation_mod.item.TieguShanItem;
 import com.example.immortal_cultivation_mod.magicritual.center.CenterEffectSupport;
-import com.example.immortal_cultivation_mod.network.ModPayloads;
 import com.example.immortal_cultivation_mod.spell.DielangShield;
+import com.example.immortal_cultivation_mod.spell.HealingTechniques;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
 import com.example.immortal_cultivation_mod.spell.YufengJue;
 import java.util.ArrayDeque;
@@ -23,10 +23,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.function.BooleanSupplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -36,6 +38,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -48,9 +51,12 @@ import net.minecraft.world.phys.Vec3;
 
 /** One-action-at-a-time tactical combat controller shared by cultivator NPC tiers. */
 public final class NpcCombatBrain {
-    private static final int MIN_DECISION_DELAY = 4;
-    private static final int RANDOM_DECISION_DELAY = 4;
+    private static final int MIN_DECISION_DELAY = 2;
+    private static final int RANDOM_DECISION_DELAY = 3;
     private static final double TARGET_SEARCH_RANGE = 40.0D;
+    private static final double HOSTILE_MOB_AGGRO_RADIUS = 10.0D;
+    private static final double HOSTILE_MOB_AGGRO_RADIUS_SQUARED =
+            HOSTILE_MOB_AGGRO_RADIUS * HOSTILE_MOB_AGGRO_RADIUS;
     private static final double LOCAL_COMBAT_RADIUS = 12.0D;
     private static final float SURVIVAL_HP_RATIO = 0.20F;
     private static final float LOW_QI_RATIO = 0.15F;
@@ -60,12 +66,28 @@ public final class NpcCombatBrain {
     private static final String COMBAT_STATE_TAG = "ImmortalCultivationNpcCombatState";
 
     private final PathfinderMob mob;
+    private final NpcBattlePlan battle = new NpcBattlePlan();
+    private final NpcCombatRhythm rhythm = new NpcCombatRhythm();
+    private NpcCombatKnowledge.View knowledge;
+    private Vec3 escapeProgressOrigin;
+    private long escapeProgressTick;
+    private double escapeThreatDistance;
+    private long stuckUntil;
+    private Vec3 feintEnemyOrigin;
+    private Vec3 feintOrigin;
+    private long feintUntil;
+    private long counterUntil;
     private final Map<UUID, RecentDamage> recentDamageByAttacker = new HashMap<>();
     private final Deque<ActionKind> recentActions = new ArrayDeque<>();
+    private final Deque<String> recentSpells = new ArrayDeque<>();
     private PendingCast pendingCast;
+    private PendingPill pendingPill;
+    private long nextThreatCheck;
     private Vec3 flightDestination;
     private long flightIntentUntil;
     private boolean flightRequiresGround;
+    private Vec3 idleLanding;
+    private long nextLandingCheck;
     private Vec3 recoveryAnchor;
     private long nextDecisionTick;
     private long actionLockUntil;
@@ -89,13 +111,30 @@ public final class NpcCombatBrain {
             return;
         }
         long now = mob.level().getGameTime();
+        NpcCombatResources.tick(mob);
         HeavyIronBracerItem.syncNpcOffhandCompanion(mob);
         if (mob.isNoAi() || NpcProfile.isInteracting(mob)) {
+            cancelPendingPill(now);
             cancelPendingCast(now);
             clearFlightIntent();
+            mob.removeEffect(ModEffects.NPC_WEAPON_GUARD);
+            rhythm.reset();
+            return;
+        }
+        if (NpcCombatReactions.disabled(mob)) {
+            cancelPendingPill(now);
+            cancelPendingCast(now);
+            clearFlightIntent();
+            mob.getNavigation().stop();
+            mob.removeEffect(ModEffects.NPC_WEAPON_GUARD);
+            rhythm.reset();
             return;
         }
         tickRecoveryAnchor();
+        if (pendingPill != null) {
+            tickPendingPill(now);
+            return;
+        }
         if (pendingCast != null) {
             tickPendingCast(now);
             return;
@@ -107,6 +146,20 @@ public final class NpcCombatBrain {
         }
         boolean survivalEmergency = healthRatio(mob) < SURVIVAL_HP_RATIO;
         boolean canPreemptMovement = survivalEmergency && isMovementAction(lastRememberedAction);
+        // Navigation can yield to danger even between broad decisions. Committed attacks,
+        // casting, and dodges retain their recovery; a reaction cooldown prevents chaining evasions.
+        LivingEntity currentTarget = mob.getTarget();
+        if (isMovementAction(lastRememberedAction) && readyTick("Reaction") <= now
+                && now >= nextThreatCheck && currentTarget != null && validTarget(currentTarget)) {
+            nextThreatCheck = now + 2;
+            if (NpcCombatReactions.projectile(mob) != null || currentTarget.swinging || isCasting(currentTarget)) {
+                if (reactToThreat(observe(currentTarget), now)) {
+                    diagnostic("react_to_threat");
+                    nextDecisionTick = now + 2;
+                    return;
+                }
+            }
+        }
         if ((now < actionLockUntil && !canPreemptMovement) || now < nextDecisionTick) {
             return;
         }
@@ -126,17 +179,29 @@ public final class NpcCombatBrain {
 
         LivingEntity target = selectTarget();
         if (target == null) {
+            battle.reset();
+            rhythm.reset();
+            mob.removeEffect(ModEffects.NPC_WEAPON_GUARD);
+            mob.setTarget(null);
             clearFlightIntent();
             clearCoverPlan();
             if (healthRatio(mob) < SURVIVAL_HP_RATIO) {
-                tryCast(null, ModSpells.REGENERATION, ActionKind.SURVIVAL);
+                tryBestHealing(ActionKind.SURVIVAL);
             }
             return;
         }
         if (mob.getTarget() != target) {
+            rhythm.reset();
             mob.setTarget(target);
         }
+        NpcCultivation.interrupt(mob, "combat");
+        battle.begin(target.getUUID(), now, realmIndex(mob), NpcProfile.personality(mob, archetype()));
+        if (!mob.hasLineOfSight(target)) {
+            searchLastSeen(target, now);
+            return;
+        }
         Context context = observe(target);
+        updateBattle(context, now);
 
         if (mob.hasEffect(ModEffects.QI_GATHERING)) {
             if (isThreatenedDuringRecovery(context)) {
@@ -146,56 +211,262 @@ public final class NpcCombatBrain {
             return;
         }
 
-        // 1. Immediate survival.
-        if (context.selfHealthRatio() < SURVIVAL_HP_RATIO) {
-            immediateSurvival(context);
-            return;
-        }
-
-        // 2. Interrupt dangerous enemy actions.
-        if (context.targetDangerousAction() && interrupt(context)) {
-            return;
-        }
-
-        // 3. Recover qi only when genuinely safe.
-        if (context.selfQiRatio() < LOW_QI_RATIO && lowQiBehavior(context)) {
-            return;
-        }
-
-        // Harmful effects are worth cleansing once survival/interrupt pressure is handled.
-        if (context.negativeEffects() > 0
-                && tryCast(null, ModSpells.CLEANSE, ActionKind.DEFENSE)) {
-            return;
-        }
-
-        // 4. Maintain weapon-appropriate distance.
-        if (maintainDistance(context)) {
-            return;
-        }
-
-        // 5. Control/defense.
-        if (controlOrDefense(context)) {
-            return;
-        }
-
-        // 6. Best useful attack.
-        if (bestAttack(context)) {
-            return;
-        }
-
-        // 7. Reposition while all useful attacks cool down.
-        reposition(context, ActionKind.REPOSITION);
+        chooseIntent(context, now);
     }
+
+    private record Intent(String name, double utility, BooleanSupplier perform) {}
+
+    private void chooseIntent(Context c, long now) {
+        if (battle.frenzy()) {
+            feintUntil=0; clearCoverPlan();
+            if (deathFrenzy(c)) diagnostic("last_stand");
+            return;
+        }
+        List<Intent> choices=new ArrayList<>();
+        boolean survival=battle.mode()==NpcBattlePlan.Mode.SURVIVAL;
+        choices.add(new Intent("survive",survival?1000:-1,()->immediateSurvival(c)));
+        choices.add(new Intent("react_to_threat",readyTick("Reaction")<=now?940:-1,()->reactToThreat(c,now)));
+        choices.add(new Intent("interrupt",c.targetDangerousAction()?900:-1,()->interrupt(c)));
+        choices.add(new Intent("avoid_desperation",knowledge.frenzy()?850:-1,()->
+                tryCast(c.target(),ModSpells.DIELANG_SHIELD,ActionKind.DEFENSE)
+                        || moveToSafety(c,true,true,ActionKind.MOVEMENT) || rangedAttack(c)));
+        choices.add(new Intent("dodge_preparation",c.targetDangerousAction()?800:-1,()->
+                controlOrDefense(c)||moveToSafety(c,true,true,ActionKind.MOVEMENT)));
+        choices.add(new Intent("recover_qi",c.selfQiRatio()<LOW_QI_RATIO?650:-1,()->
+                useResource(c,NpcCombatResources.Purpose.QI)||lowQiBehavior(c)));
+        choices.add(new Intent("cleanse",c.negativeEffects()>0?600:-1,()->
+                useResource(c,NpcCombatResources.Purpose.CLEANSE)||tryCast(null,ModSpells.CLEANSE,ActionKind.DEFENSE)));
+        choices.add(new Intent("heal",c.selfHealthRatio()<.65F?610:-1,()->
+                healingOpening()&&tryBestHealing(ActionKind.DEFENSE)));
+        choices.add(new Intent("protect_ally",battle.loyal()&&threatensWoundedAlly(c.target())?560:-1,()->
+                interrupt(c)||bestAttack(c)));
+        choices.add(new Intent("formation",NpcBattlefield.needsFormationResponse(mob,c.target())?520:-1,()->formationResponse(c)));
+        choices.add(new Intent("external_qi",!survival&&readyTick("ExternalQi")<=now?490:-1,
+                ()->tryExternalQi(c,false)));
+        choices.add(new Intent("counter_pursuit",feintUntil>now?480:-1,()->continueFeint(c,now)));
+        choices.add(new Intent("counterattack",!survival&&counterUntil>now?475:-1,()->
+                weaponAttack(c,c.targetBlocking())||tryExternalQi(c,true)||approachPredicted(c)));
+        choices.add(new Intent("close_gap",!survival&&c.distance()>(c.weaponStyle().isMelee()
+                &&!hasUsableRangedSpell(c)?weaponRange(c.weaponStyle())+.75:Math.max(8,weaponRange(c.weaponStyle())+2))?470:-1,
+                ()->approachPredicted(c)||tryMovementSpell(c,false,ActionKind.MOVEMENT)));
+        choices.add(new Intent("combo_followup",!survival&&rhythm.follows(c.target().getUUID(),now)?460:-1,()->
+                weaponAttack(c,c.targetBlocking())||approachPredicted(c)));
+        choices.add(new Intent("reset_spacing",!survival&&rhythm.recovering(now)?455:-1,()->
+                combatStep(c,false)||reposition(c,ActionKind.REPOSITION)));
+        choices.add(new Intent("pressure",battle.pressure()||counterUntil>now?430:-1,()->
+                controlOrDefense(c)||bestAttack(c)||maintainDistance(c)));
+        choices.add(new Intent("probe",battle.probing()?350:-1,()->probe(c)));
+        choices.add(new Intent("distance",220+Math.min(90,Math.abs(c.distance()-c.preferredDistance())*12),()->maintainDistance(c)));
+        choices.add(new Intent("defense",200+(shieldUseful(c)?60:0),()->controlOrDefense(c)));
+        choices.add(new Intent("deceive",battle.cunning()&&!battle.probing()&&!survival&&readyTick("Feint")<=now?250:-1,()->startFeint(c,now)));
+        choices.add(new Intent("attack",310+((battle.momentum()==NpcBattlePlan.Momentum.ADVANTAGE)?45:0),()->bestAttack(c)));
+        choices.add(new Intent("reposition",20,()->reposition(c,ActionKind.REPOSITION)));
+        // Sample once per candidate: a random comparator would violate ordering and resample scores.
+        choices.replaceAll(i->new Intent(i.name(),i.utility()<0?-1:i.utility()+mob.getRandom().nextDouble()*6,i.perform()));
+        choices.sort(Comparator.comparingDouble(Intent::utility).reversed());
+        for (Intent intent:choices) if (intent.utility()>=0&&intent.perform().getAsBoolean()) {
+            diagnostic(intent.name()); return;
+        }
+        diagnostic("wait_for_opening");
+    }
+
+    private boolean reactToThreat(Context context, long now) {
+        // Check only visible trajectories and visible melee wind-ups, never an opponent's hidden skill data.
+        var projectile = NpcCombatReactions.projectile(mob);
+        Vec3 toward = mob.position().subtract(context.target().position()).multiply(1,0,1).normalize();
+        boolean melee = context.distance() <= weaponRange(context.weaponStyle())+1
+                && context.target().swinging
+                && context.target().getLookAngle().multiply(1,0,1).normalize().dot(toward) > .25;
+        if (projectile == null && !melee && !context.targetCasting()) return false;
+        Vec3 threat = projectile == null ? context.target().position() : projectile.position();
+        boolean dodgeFirst = projectile != null || context.targetCasting() || mob.getRandom().nextBoolean();
+        if (dodgeFirst && combatStep(context,true,threat)) {
+            setReadyTick("Reaction",now+24+mob.getRandom().nextInt(13));
+            counterUntil=now+32;
+            rhythm.reset();
+            return true;
+        }
+        if (NpcCombatReactions.startGuard(mob)) {
+            Vec3 delta=threat.subtract(mob.position());
+            mob.setYRot((float)Math.toDegrees(Math.atan2(-delta.x,delta.z)));
+            mob.setYHeadRot(mob.getYRot());
+            mob.getNavigation().stop();clearFlightIntent();holdForAction();
+            remember(ActionKind.DEFENSE,"weapon_guard");
+            actionLockUntil = Math.max(actionLockUntil, mob.getPersistentData().getLong("NpcGuardRecoveryUntil"));
+            setReadyTick("Reaction",now+32);
+            counterUntil=now+36;
+            rhythm.reset();
+            return true;
+        }
+        if (!dodgeFirst && combatStep(context,true,threat)) {
+            setReadyTick("Reaction",now+28);
+            counterUntil=now+32;
+            rhythm.reset();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean combatStep(Context context, boolean evasive) {
+        return combatStep(context,evasive,context.target().position());
+    }
+
+    private boolean combatStep(Context context, boolean evasive, Vec3 threat) {
+        if (!mob.onGround() && !NpcSpellcasting.canFly(mob)) return false;
+        Vec3 radial=mob.position().subtract(threat).multiply(1,0,1).normalize();
+        if (radial.lengthSqr()<.01) radial=new Vec3(1,0,0);
+        Vec3 side=new Vec3(-radial.z,0,radial.x).scale(strafeSign);
+        // Try both sides, then a backstep. Validate the whole route before adding any impulse.
+        for (Vec3 direction:List.of(side,side.reverse(),radial)) {
+            Vec3 destination=mob.position().add(direction.scale(evasive?1.8:1.2));
+            boolean safe=true;
+            for(int sample=1;sample<=6;sample++) {
+                Vec3 point=mob.position().lerp(destination,sample/6D);
+                if (!isSafe(point)||!isClearTravelSpace(point)
+                        ||CenterEffectSupport.isForcefieldRouteBlocked(mob,mob.position(),point)) {safe=false;break;}
+            }
+            if (!safe || !issueMovement(destination,evasive?1.8:1.15,ActionKind.REPOSITION)) continue;
+            if (!NpcSpellcasting.canFly(mob)) {
+                Vec3 impulse=direction.scale(evasive?.42:.2);
+                mob.setDeltaMovement(impulse.x,mob.getDeltaMovement().y,impulse.z);
+                if (evasive) com.example.immortal_cultivation_mod.combat.CombatFeedbackEvents.dashStarted(mob,direction,.25F,7);
+                mob.hurtMarked=true;
+            }
+            mob.lookAt(context.target(),60,60);
+            strafeSign=-strafeSign;
+            actionLockUntil=Math.max(actionLockUntil,mob.level().getGameTime()+(evasive?7:5));
+            return true;
+        }
+        return false;
+    }
+
+    private void diagnostic(String intent) {
+        var state=mob.getPersistentData().getCompound(COMBAT_STATE_TAG);
+        state.putString("Mode",battle.mode().name());state.putString("Phase",battle.phase().name());
+        state.putString("Momentum",battle.momentum().name());state.putString("Intent",intent);
+        state.putFloat("SurvivalConfidence",battle.confidence());state.putInt("FailedEscapes",battle.escapeFailures());
+        state.putString("EnemyKnowledge",knowledge==null?"UNKNOWN":knowledge.confidence().name());
+        mob.getPersistentData().put(COMBAT_STATE_TAG,state);
+    }
+
+    private void updateBattle(Context c,long now) {
+        NpcCombatKnowledge.shareObserved(mob,c.target());
+        if(NpcCombatKnowledge.newThreat(mob,c.target()))battle.reassess(now);
+        boolean route=c.escapeDestination()!=null;
+        if (escapeProgressOrigin!=null&&now-escapeProgressTick>=24) {
+            if (mob.position().distanceToSqr(escapeProgressOrigin)<1||c.distance()<escapeThreatDistance-.5) {battle.failedEscape(now);stuckUntil=now+80;}
+            else {battle.escaped(now);stuckUntil=0;}
+            escapeProgressOrigin=null;
+        }
+        if (!route) battle.failedEscape(now);
+        route&=now>=stuckUntil;
+        boolean movement=NpcProfile.learnedSpellIds(mob,archetype()).stream().anyMatch(id-> {
+            var p=NpcSpellcasting.profile(id);
+            return p!=null&&p.role()==NpcSpellcasting.Role.MOVEMENT&&readyTick("Spell."+id)<=now
+                    &&NpcSpellcasting.canCast(mob,c.target(),id)
+                    &&resolveMovementDestination(MovementFollowup.ESCAPE,c.target(),id)!=null;
+        });
+        boolean healing=healthRatio(mob)<.8F&&NpcSpellcasting.healingSpellIds().stream()
+                .anyMatch(id->readyTick("Spell."+id)<=now&&NpcSpellcasting.canCast(mob,null,id));
+        healing|=NpcCombatResources.available(mob,NpcCombatResources.Purpose.HEALTH,null);
+        movement|=NpcCombatResources.available(mob,NpcCombatResources.Purpose.ESCAPE,c.escapeDestination());
+        boolean defense=DielangShield.remaining(mob)>0||NpcCombatResources.shield(mob)>0
+                || NpcCombatResources.available(mob,NpcCombatResources.Purpose.SHIELD,null);
+        battle.update(new NpcBattlePlan.Situation(c.selfHealthRatio(),c.selfQiRatio(),c.negativeEffects(),
+                c.nearbyAllies(),Math.max(1,c.nearbyEnemies()),c.targetRealm()-c.selfRealm(),
+                knowledge.health(),knowledge.qi(),knowledge.opening(),route,movement,healing,defense,
+                !route&&CenterEffectSupport.isDangerousPosition(mob,mob.position()),
+                NpcCombatKnowledge.recentDamage(mob,c.target()),NpcProfile.isSparring(mob)),now,knowledge.observations());
+    }
+
+    private void searchLastSeen(LivingEntity target,long now) {
+        knowledge=NpcCombatKnowledge.view(mob,target);
+        if (knowledge.lastPosition()==null||now-knowledge.lastSeen()>100) {
+            mob.setTarget(null);mob.setLastHurtByMob(null);recentDamageByAttacker.remove(target.getUUID());
+            mob.getNavigation().stop();clearFlightIntent();battle.reset();return;
+        }
+        if (healthRatio(mob)<SURVIVAL_HP_RATIO||battle.mode()==NpcBattlePlan.Mode.SURVIVAL) {
+            escapeProgressOrigin=null;stuckUntil=0;battle.escaped(now);
+            if (tryBestHealing(ActionKind.SURVIVAL))return;
+            if (qiRatio()<COVER_QI_RATIO&&!hasImmediateRecoveryThreat())tryCast(null,ModSpells.QI_GATHERING,ActionKind.RECOVER_QI);
+            return;
+        }
+        if (mob.position().distanceToSqr(knowledge.lastPosition())>4)
+            issueMovement(knowledge.lastPosition(),.9,ActionKind.MOVEMENT);
+        diagnostic("search_last_seen");
+    }
+
+    private boolean probe(Context c) {
+        if (c.distance()<=weaponRange(c.weaponStyle()))return weaponAttack(c,false);
+        if (tryExternalQi(c,false))return true;
+        String cheap=selectSpell(c,id->NpcSpellcasting.isAttackSpell(id)
+                &&NpcSpellcasting.qiCost(mob,id)<=Math.max(1,NpcProfile.maxQi(mob,archetype())*.07),false);
+        return !cheap.isBlank()&&tryCast(c.target(),cheap,ActionKind.SPELL_ATTACK);
+    }
+
+    private boolean rangedAttack(Context c) {
+        String spell=selectSpell(c,NpcSpellcasting::isAttackSpell,false);
+        return !spell.isBlank()&&tryCast(c.target(),spell,ActionKind.SPELL_ATTACK)||tryExternalQi(c,false);
+    }
+
+    private boolean deathFrenzy(Context c) {
+        if (NpcCombatResources.burnEssence(mob)) {finishCastAction(ActionKind.SPELL_ATTACK,"blood_combustion");return true;}
+        if (c.distance()<=5&&NpcCombatResources.detonateArtifact(mob,c.target())) {
+            finishCastAction(ActionKind.SPELL_ATTACK,"artifact_detonation");return true;
+        }
+        return bestAttack(c)||tryMovementSpell(c,false,ActionKind.MOVEMENT)
+                || approachPredicted(c);
+    }
+
+    private boolean useResource(Context c,NpcCombatResources.Purpose purpose) {
+        if (!NpcCombatResources.use(mob,purpose,c.escapeDestination()))return false;
+        finishCastAction(purpose==NpcCombatResources.Purpose.QI?ActionKind.RECOVER_QI:ActionKind.SURVIVAL,"resource_"+purpose.name());
+        return true;
+    }
+
+    private boolean startFeint(Context c,long now) {
+        if (c.selfHealthRatio()<.5F||c.selfQiRatio()<.35F||c.distance()>12||knowledge.frenzy())return false;
+        Vec3 before=mob.position();Vec3 enemy=c.target().position();
+        if (!moveToSafety(c,true,true,ActionKind.FEINT))return false;
+        feintOrigin=before;feintEnemyOrigin=enemy;feintUntil=now+60;setReadyTick("Feint",now+240);return true;
+    }
+
+    private boolean continueFeint(Context c,long now) {
+        if (c.target().position().distanceTo(feintOrigin)+1.5<feintEnemyOrigin.distanceTo(feintOrigin)) {
+            feintUntil=0;counterUntil=now+40;
+            return controlOrDefense(c)||bestAttack(c);
+        }
+        if (c.targetDangerousAction()||c.selfHealthRatio()<.4F) {feintUntil=0;return false;}
+        return moveToSafety(c,true,true,ActionKind.FEINT);
+    }
+
+    private boolean threatensWoundedAlly(LivingEntity target) {
+        return target instanceof Mob attacker&&attacker.getTarget()!=null
+                &&mob.hasLineOfSight(attacker.getTarget())&&NpcProfile.areCombatAllies(mob,attacker.getTarget())
+                &&healthRatio(attacker.getTarget())<.4F;
+    }
+
+    private boolean formationResponse(Context c) {
+        Vec3 refuge=NpcBattlefield.refuge(mob);
+        if (refuge!=null&&(battle.mode()==NpcBattlePlan.Mode.SURVIVAL||c.selfHealthRatio()<.6F)
+                &&mob.position().distanceToSqr(refuge)>4&&issueMovement(refuge,1.15,ActionKind.MOVEMENT))return true;
+        return NpcBattlefield.breakHostileCore(mob,c.target())&&rememberFormationStrike()
+                ||rangedAttack(c)||reposition(c,ActionKind.REPOSITION);
+    }
+
+    private boolean rememberFormationStrike(){remember(ActionKind.WEAPON_HEAVY,"formation_component");return true;}
 
     public void recordDamage(DamageSource source, float amount) {
         if (amount <= 0.0F) {
             return;
         }
+        NpcCultivation.onHurt(mob);
         LivingEntity sourceActor = source.getEntity() instanceof LivingEntity living ? living : null;
         if (sourceActor == mob || sourceActor != null && NpcProfile.areCombatAllies(mob, sourceActor)) {
             return;
         }
         long now = mob.level().getGameTime();
+        cancelPendingPill(now);
         cancelPendingCast(now);
         if (mob.hasEffect(ModEffects.QI_GATHERING)) {
             cancelQiRecovery(now);
@@ -233,6 +504,19 @@ public final class NpcCombatBrain {
         if (candidate == mob || !candidate.isAlive() || NpcProfile.areCombatAllies(mob, candidate)) {
             return false;
         }
+        if (!mob.hasLineOfSight(candidate)) return candidate==mob.getTarget()
+                &&NpcCombatKnowledge.view(mob,candidate).lastPosition()!=null
+                &&mob.level().getGameTime()-NpcCombatKnowledge.view(mob,candidate).lastSeen()<100;
+        if (candidate instanceof EscapedYuanyingCoreEntity core&&NpcCombatKnowledge.witnessedCore(mob,core))return true;
+        if (candidate instanceof Mob attacker&&attacker.getTarget()!=null
+                &&mob.hasLineOfSight(attacker.getTarget())&&NpcProfile.areCombatAllies(mob,attacker.getTarget()))return true;
+        // Every cultivator tier uses this shared brain. Hostile vanilla and
+        // modded mobs that enter the ten-block defense radius are acquired
+        // even when they have not attacked the cultivator yet.
+        if (candidate instanceof Enemy
+                && mob.distanceToSqr(candidate) <= HOSTILE_MOB_AGGRO_RADIUS_SQUARED) {
+            return true;
+        }
         if (!NpcProfile.isSparring(mob)
                 && isHostileBeast(candidate)
                 && mob.hasLineOfSight(candidate)) {
@@ -256,7 +540,8 @@ public final class NpcCombatBrain {
     private static boolean isHostileBeast(LivingEntity candidate) {
         return candidate instanceof CrimsonScaleFlameLizardEntity
                 || candidate instanceof CrimsonSkyFlameFloodDragonEntity
-                || candidate instanceof BloodApeDemonGeneralEntity;
+                || candidate instanceof BloodApeDemonGeneralEntity
+                || candidate instanceof XuanjinZhengEntity beast && beast.isFree();
     }
 
     private boolean validTarget(LivingEntity target) {
@@ -271,11 +556,19 @@ public final class NpcCombatBrain {
     private double targetScore(LivingEntity target) {
         double distance = Math.sqrt(mob.distanceToSqr(target));
         double score = 180.0D - distance * 3.0D;
+        if (target instanceof Enemy
+                && distance <= HOSTILE_MOB_AGGRO_RADIUS) {
+            // Nearby hostile mobs take priority over distant social enemies so
+            // the cultivator actually defends its immediate surroundings.
+            score += 1000.0D;
+        }
         RecentDamage recentDamage = recentDamageByAttacker.get(target.getUUID());
         score += (recentDamage == null ? 0.0F : recentDamage.amount()) * 5.0D;
-        score += (1.0D - healthRatio(target)) * 70.0D;
-        score += realmIndex(target) * 10.0D;
-        if (isCasting(target) || isRecovering(target)) score += 85.0D;
+        var known=NpcCombatKnowledge.view(mob,target);
+        score += (1.0D - known.health()) * 70.0D;
+        score += known.realmDelta() * 10.0D;
+        if (mob.hasLineOfSight(target)&&(isCasting(target) || isRecovering(target))) score += 85.0D;
+        if (threatensWoundedAlly(target)) score+=battle.loyal()?200:70;
         if (isRangedCombatant(target)) score += 30.0D;
         if (target instanceof Mob other && other.getTarget() == mob) score += 45.0D;
         if (canTargetReachQuick(target)) score += 20.0D;
@@ -287,8 +580,11 @@ public final class NpcCombatBrain {
         boolean lineOfSight = mob.hasLineOfSight(target);
         WeaponStyle weaponStyle = weaponStyle(mob.getMainHandItem());
         int selfRealm = realmIndex(mob);
-        int targetRealm = realmIndex(target);
+        knowledge = NpcCombatKnowledge.observe(mob,target,isCasting(target),isRecovering(target),isBlocking(target));
+        int targetRealm = selfRealm+knowledge.realmDelta();
         double preferred = preferredDistance(weaponStyle);
+        if (knowledge.frenzy()&&battle.experience()>.2F) preferred=Math.max(preferred,12);
+        if (knowledge.mobile()&&weaponStyle==WeaponStyle.SPEAR) preferred+=.5;
         if (targetRealm > selfRealm) {
             preferred += 1.5D;
         } else if (targetRealm < selfRealm) {
@@ -297,7 +593,7 @@ public final class NpcCombatBrain {
         List<LivingEntity> nearby = mob.level().getEntitiesOfClass(
                 LivingEntity.class,
                 mob.getBoundingBox().inflate(LOCAL_COMBAT_RADIUS),
-                living -> living != mob && living.isAlive());
+                living -> living != mob && living.isAlive()&&mob.hasLineOfSight(living));
         int allies = 0;
         int alliesNearTarget = mob.level().getEntitiesOfClass(
                 LivingEntity.class,
@@ -333,7 +629,7 @@ public final class NpcCombatBrain {
                 lineOfSight,
                 healthRatio(mob),
                 qiRatio(),
-                healthRatio(target),
+                knowledge.health(),
                 selfRealm,
                 targetRealm,
                 weaponStyle,
@@ -356,7 +652,7 @@ public final class NpcCombatBrain {
     }
 
     private boolean immediateSurvival(Context context) {
-        if (NpcProfile.tryUseRoyalPendant(mob)) {
+        if (context.selfHealthRatio()<SURVIVAL_HP_RATIO&&NpcProfile.tryUseRoyalPendant(mob)) {
             remember(ActionKind.SURVIVAL, "");
             return true;
         }
@@ -364,9 +660,13 @@ public final class NpcCombatBrain {
                 && tryCast(null, ModSpells.CLEANSE, ActionKind.SURVIVAL)) {
             return true;
         }
-        if (tryCast(null, ModSpells.REGENERATION, ActionKind.SURVIVAL)) {
+        if (tryBestHealing(ActionKind.SURVIVAL)) {
             return true;
         }
+        if (context.selfQiRatio()<LOW_QI_RATIO&&(useResource(context,NpcCombatResources.Purpose.QI)
+                ||context.distance()>=16&&lowQiBehavior(context)))return true;
+        if (context.selfHealthRatio()<.25F&&useResource(context,NpcCombatResources.Purpose.ESCAPE))return true;
+        if (shieldUseful(context)&&useResource(context,NpcCombatResources.Purpose.SHIELD))return true;
         if (shieldUseful(context)
                 && tryCast(context.target(), ModSpells.DIELANG_SHIELD, ActionKind.SURVIVAL)) {
             return true;
@@ -377,6 +677,7 @@ public final class NpcCombatBrain {
         if (moveToSafety(context, true, true, ActionKind.SURVIVAL)) {
             return true;
         }
+        if (useResource(context,NpcCombatResources.Purpose.ESCAPE))return true;
         // Fight only when escape is impossible, or a single quick hit can finish the target.
         if (context.escapeDestination() == null || context.targetHealthRatio() <= 0.10F) {
             return finishAttempt(context);
@@ -384,7 +685,84 @@ public final class NpcCombatBrain {
         return false;
     }
 
+    private boolean tryBestHealing(ActionKind action) {
+        if (!healingOpening()) return false;
+        float health = healthRatio(mob);
+        if (health < .8F && healingOpening() && startHealingPill(action)) return true;
+        if (health < 0.45F
+                && tryCast(null, ModSpells.SHENGXI_BAOFA, action)) {
+            return true;
+        }
+        boolean bleeding = mob.hasEffect(
+                com.example.immortal_cultivation_mod.magicritual.effect.ModEffects.BLEEDING);
+        if ((bleeding || health < 0.65F)
+                && tryCast(null, ModSpells.XUE_GUIYUAN_SHU, action)) {
+            return true;
+        }
+        if (tryCast(null, ModSpells.MULING_SHENGXI, action)) {
+            return true;
+        }
+        return tryCast(null, ModSpells.REGENERATION, action);
+    }
+
+    private boolean healingOpening() {
+        if (NpcCombatReactions.projectile(mob) != null) return false;
+        for (LivingEntity enemy : mob.level().getEntitiesOfClass(LivingEntity.class,
+                mob.getBoundingBox().inflate(8), living -> living != mob && validTarget(living)
+                        && isHostileCandidate(living))) {
+            if (!mob.hasLineOfSight(enemy) || isControlled(enemy) || isDistracted(enemy)) continue;
+            double reach = Math.max(3, enemy.getBbWidth() + 1.5);
+            Vec3 closing = mob.position().subtract(enemy.position()).normalize();
+            double approach = Math.max(0, enemy.getDeltaMovement().dot(closing));
+            if (enemy.distanceTo(mob) <= reach + approach * 12 || isCasting(enemy)) return false;
+        }
+        return true;
+    }
+
+    private boolean startHealingPill(ActionKind action) {
+        if (pendingPill != null || pendingCast != null || mob.hurtTime > 0) return false;
+        ItemStack pill = NpcCombatResources.healingPill(mob);
+        if (pill.isEmpty()) return false;
+        long now = mob.level().getGameTime();
+        LivingEntity enemy = mob.getTarget();
+        pendingPill = new PendingPill(pill, enemy == null ? null : enemy.getUUID(), now + 12);
+        mob.removeEffect(ModEffects.NPC_WEAPON_GUARD);
+        mob.getNavigation().stop();clearFlightIntent();holdForAction();
+        mob.swing(InteractionHand.MAIN_HAND, true);
+        remember(action, "healing_pill");
+        actionLockUntil = Math.max(actionLockUntil, now + 18);
+        return true;
+    }
+
+    private void tickPendingPill(long now) {
+        LivingEntity enemy = mob.getTarget();
+        UUID targetId = enemy == null ? null : enemy.getUUID();
+        if (!java.util.Objects.equals(pendingPill.targetId(), targetId)
+                || mob.hasEffect(ModEffects.SPIRIT_SEAL) || !healingOpening()) {
+            cancelPendingPill(now);
+            return;
+        }
+        mob.getNavigation().stop();holdForAction();
+        if (now < pendingPill.releaseTick()) return;
+        ItemStack pill = pendingPill.stack();
+        pendingPill = null;
+        if (!NpcCombatResources.finishHealingPill(mob, pill)) {
+            actionLockUntil = now + 2;
+        }
+        nextDecisionTick = now + 2;
+    }
+
+    private void cancelPendingPill(long now) {
+        if (pendingPill == null) return;
+        pendingPill = null;
+        actionLockUntil = now + 4;
+        nextDecisionTick = now + 4;
+    }
+
     private boolean interrupt(Context context) {
+        if (tryAttackTalisman(context, ActionKind.INTERRUPT)) {
+            return true;
+        }
         // Only Dingshen actually stops the registered preparation state. Blindness and
         // inverted movement remain useful control, but are not fake "interrupts".
         Predicate<String> fastControl = ModSpells.DINGSHEN::equals;
@@ -418,7 +796,7 @@ public final class NpcCombatBrain {
             mob.getNavigation().stop();
             return true;
         }
-        if (safeToRecover && NpcSpellcasting.hasFlightEffect(mob) && !hasStableRecoveryFooting()) {
+        if (safeToRecover && NpcSpellcasting.canFly(mob) && !hasStableRecoveryFooting()) {
             Vec3 landing = findRecoveryLanding();
             if (landing != null && issueMovement(landing, 0.85D, ActionKind.RECOVER_QI)) {
                 return true;
@@ -453,6 +831,7 @@ public final class NpcCombatBrain {
         }
         if (context.targetFlying() && context.weaponStyle().isMelee()
                 && context.distance() > weaponRange(context.weaponStyle())) {
+            if (NpcSpellcasting.hasCreativeFlight(mob) && approachPredicted(context)) return true;
             if (tryMovementSpell(context, false, ActionKind.MOVEMENT)) {
                 return true;
             }
@@ -509,7 +888,8 @@ public final class NpcCombatBrain {
                 && tryCast(context.target(), ModSpells.DIELANG_SHIELD, ActionKind.DEFENSE)) {
             return true;
         }
-        if (context.nearbyEnemies() >= 3 || context.targetBlocking()) {
+        if (context.nearbyEnemies() >= 3 || context.targetBlocking()
+                ||battle.pressure()&&(knowledge!=null&&knowledge.opening()||context.targetRetreating())) {
             String control = selectSpell(context, id -> {
                 var profile = NpcSpellcasting.profile(id);
                 return profile != null && profile.role() == NpcSpellcasting.Role.CONTROL
@@ -534,15 +914,12 @@ public final class NpcCombatBrain {
     }
 
     private boolean bestAttack(Context context) {
-        // Occasional feint, but never while the target is nearly dead or actively recovering.
-        float feintChance = context.weaponStyle() == WeaponStyle.UNARMED ? 0.16F : 0.07F;
-        if (context.targetHealthRatio() > 0.15F && !context.targetRecovering()
-                && mob.getRandom().nextFloat() < feintChance
-                && reposition(context, ActionKind.FEINT)) {
+        boolean reveal=!battle.probing()||battle.mode()!=NpcBattlePlan.Mode.NORMAL||context.targetDangerousAction();
+        if (reveal&&NpcProfile.tryUseIdentityCombatAbility(mob)) {
+            finishCastAction(ActionKind.SPELL_ATTACK, "identity_ability");
             return true;
         }
-        if (NpcProfile.tryUseIdentityCombatAbility(mob)) {
-            finishCastAction(ActionKind.SPELL_ATTACK, "identity_ability");
+        if (reveal&&tryAttackTalisman(context, ActionKind.SPELL_ATTACK)) {
             return true;
         }
 
@@ -565,7 +942,7 @@ public final class NpcCombatBrain {
         }, false);
 
         // Alternate weapon and spell openings instead of repeating one move forever.
-        if (weaponReady && (!recent(ActionKind.WEAPON_LIGHT) && !recent(ActionKind.WEAPON_HEAVY)
+        if (!battle.frenzy()&&weaponReady && (!recent(ActionKind.WEAPON_LIGHT) && !recent(ActionKind.WEAPON_HEAVY)
                 || spell.isBlank() || comboStep % 2 == 0)) {
             if (weaponAttack(context, context.targetBlocking())) {
                 return true;
@@ -578,7 +955,7 @@ public final class NpcCombatBrain {
                 || context.targetRetreating()
                 || !weaponReady
                 || context.targetRealm() >= context.selfRealm());
-        if (bannerUseful && readyTick("SoulBanner") <= now
+        if (reveal&&bannerUseful && readyTick("SoulBanner") <= now
                 && NpcProfile.tryUseSoulBanner(mob, context.target())) {
             setReadyTick("SoulBanner", now + 80L + mob.getRandom().nextInt(41));
             finishCastAction(ActionKind.SPELL_ATTACK, "soul_banner");
@@ -591,6 +968,24 @@ public final class NpcCombatBrain {
             return true;
         }
         return weaponReady && weaponAttack(context, context.targetBlocking());
+    }
+
+    private boolean tryAttackTalisman(Context context, ActionKind action) {
+        long now = mob.level().getGameTime();
+        if (!context.lineOfSight()
+                || !NpcProfile.isTalismanCultivator(mob)&&battle.mode()==NpcBattlePlan.Mode.NORMAL
+                || readyTick("AttackTalisman") > now) {
+            return false;
+        }
+        mob.lookAt(context.target(), 45.0F, 45.0F);
+        if (!NpcProfile.tryUseAttackTalisman(mob, context.target(),battle.mode()!=NpcBattlePlan.Mode.NORMAL)) {
+            return false;
+        }
+        setReadyTick("AttackTalisman",
+                now + 30L + mob.getRandom().nextInt(21));
+        beginCastPose(10);
+        finishCastAction(action, "attack_talisman");
+        return true;
     }
 
     private boolean finishAttempt(Context context) {
@@ -607,6 +1002,7 @@ public final class NpcCombatBrain {
         return !spell.isBlank() && tryCast(context.target(), spell, ActionKind.SPELL_ATTACK);
     }
 
+    private record ScoredSpell(String id,double utility) {}
     private String selectSpell(Context context, Predicate<String> filter, boolean preferFast) {
         long now = mob.level().getGameTime();
         List<String> learned = NpcProfile.learnedSpellIds(mob, archetype());
@@ -619,7 +1015,15 @@ public final class NpcCombatBrain {
                 })
                 .filter(id -> readyTick("Spell." + id) <= now)
                 .filter(id -> NpcSpellcasting.canCast(mob, context.target(), id))
-                .max(Comparator.comparingDouble(id -> spellScore(context, id, preferFast)))
+                .filter(id -> !battle.probing()||battle.mode()!=NpcBattlePlan.Mode.NORMAL
+                        ||context.targetDangerousAction()||NpcCombatKnowledge.wasRevealed(mob,id)
+                        ||NpcSpellcasting.qiCost(mob,id)<=NpcProfile.maxQi(mob,archetype())*.10)
+                .filter(id -> battle.canSpend(NpcSpellcasting.qiCost(mob,id),NpcProfile.qi(mob,archetype()),
+                        NpcProfile.maxQi(mob,archetype()),context.targetDangerousAction()))
+                .map(id->new ScoredSpell(id,spellScore(context,id,preferFast)+mob.getRandom().nextDouble()*8))
+                .filter(scored->scored.utility()>0)
+                .max(Comparator.comparingDouble(ScoredSpell::utility))
+                .map(ScoredSpell::id)
                 .orElse("");
     }
 
@@ -629,7 +1033,9 @@ public final class NpcCombatBrain {
         if (profile == null || spell == null) {
             return Double.NEGATIVE_INFINITY;
         }
-        double score = 50.0D;
+        double score = 90.0D;
+        score += tacticalSpellScore(context.target(), spellId, context.distance(),
+                context.targetCasting() || context.target().swinging);
         if (profile.fast() && preferFast) score += 35.0D;
         if (profile.area()) {
             score += areaAlliesAtRisk(context, spellId) > 0
@@ -638,12 +1044,29 @@ public final class NpcCombatBrain {
         if (profile.role() == NpcSpellcasting.Role.CONTROL && context.targetBlocking()) score += 30.0D;
         if (profile.role() == NpcSpellcasting.Role.CONTROL && context.targetCasting()) score += 45.0D;
         if (spellId.equals(lastSpell)) score -= 65.0D;
+        score-=recentSpells.stream().filter(spellId::equals).count()*14*battle.experience();
         int maxQi = Math.max(1, NpcProfile.maxQi(mob, archetype()));
         double costRatio = NpcSpellcasting.qiCost(mob, spellId) / (double) maxQi;
-        score -= costRatio * (context.targetRealm() > context.selfRealm() ? 95.0D : 55.0D);
+        score += battle.frenzy()?costRatio*180:-costRatio*(context.targetRealm()>context.selfRealm()?95:55);
+        score -= battle.revealPenalty(costRatio,NpcCombatKnowledge.wasRevealed(mob,spellId),context.targetDangerousAction());
+        score -= NpcCombatKnowledge.failurePenalty(mob,context.target(),spellId,spell.element())*(.4+battle.experience());
+        if (knowledge!=null&&knowledge.opening())score+=profile.role()==NpcSpellcasting.Role.CONTROL?50:30;
+        if (knowledge!=null&&Math.abs(knowledge.dodgeSide())>=3&&profile.area())score+=35;
         if (context.selfQiRatio() < 0.35F && costRatio > 0.05D) score -= 60.0D;
         if (context.targetHealthRatio() < 0.20F && profile.fast()) score += 20.0D;
-        return score + mob.getRandom().nextDouble() * 8.0D;
+        return score;
+    }
+
+    /** Only visible defenses and the existing spell's tactical range/preparation are considered. */
+    static double tacticalSpellScore(LivingEntity target, String spellId, double distance, boolean threatened) {
+        var profile = NpcSpellcasting.profile(spellId);
+        var spell = ModSpells.get(spellId);
+        if (profile == null || spell == null) return Double.NEGATIVE_INFINITY;
+        double score = -Math.min(60, Math.max(0, distance - profile.maxRange()) * 4);
+        if (threatened && distance < 5) score -= NpcSpellcasting.windupTicks(spellId) * 4;
+        if (("火".equals(spell.element()) || "fire".equals(spell.element()))
+                && (target.fireImmune() || target.hasEffect(MobEffects.FIRE_RESISTANCE))) score -= 120;
+        return score;
     }
 
     private boolean tryCast(LivingEntity target, String spellId, ActionKind action) {
@@ -657,19 +1080,26 @@ public final class NpcCombatBrain {
             MovementFollowup movementFollowup) {
         String normalized = ModSpells.normalizeId(spellId);
         long now = mob.level().getGameTime();
-        if (pendingCast != null || readyTick("Spell." + normalized) > now
+        if (pendingCast != null || pendingPill != null || readyTick("Spell." + normalized) > now
                 || !NpcSpellcasting.canCast(mob, target, normalized)) {
             return false;
         }
         int cost = NpcSpellcasting.qiCost(mob, normalized);
         int maxQi = Math.max(1, NpcProfile.maxQi(mob, archetype()));
-        if (action != ActionKind.SURVIVAL
+        boolean emergency=action==ActionKind.SURVIVAL||action==ActionKind.INTERRUPT||action==ActionKind.DEFENSE;
+        if (!battle.canSpend(cost,NpcProfile.qi(mob,archetype()),maxQi,emergency))return false;
+        if (!battle.frenzy()&&action != ActionKind.SURVIVAL
                 && qiRatio() < LOW_QI_RATIO && cost > maxQi * 0.03D
                 && !ModSpells.REGENERATION.equals(normalized)
+                && !HealingTechniques.isTechnique(normalized)
                 && !ModSpells.CLEANSE.equals(normalized)) {
             return false;
         }
-        int windup = NpcSpellcasting.windupTicks(normalized) + mob.getRandom().nextInt(3);
+        int windup = NpcSpellcasting.windupTicks(normalized)
+                + mob.getRandom().nextInt(3);
+        if (mob.hasEffect(ModEffects.SPIRIT_SEAL)) {
+            windup = (int) Math.ceil(windup / 0.75D);
+        }
         long releaseTick = now + windup;
         pendingCast = new PendingCast(
                 normalized,
@@ -713,15 +1143,19 @@ public final class NpcCombatBrain {
     }
 
     private boolean weaponAttack(Context context, boolean forceHeavy) {
-        if (!context.lineOfSight() || context.distance() > weaponRange(context.weaponStyle())) {
+        long now=mob.level().getGameTime();
+        if (!context.lineOfSight() || context.distance() > weaponRange(context.weaponStyle())
+                || rhythm.recovering(now)) {
             return false;
         }
         mob.lookAt(context.target(), 55.0F, 55.0F);
-        boolean heavy = forceHeavy
+        boolean heavy = rhythm.finisher(context.target().getUUID(),now)
+                || battle.frenzy()||!battle.probing()&&forceHeavy
                 || context.weaponStyle() == WeaponStyle.SABER && comboStep % 3 != 0
                 || context.weaponStyle() == WeaponStyle.STAFF && context.nearbyEnemies() > 1
                 || comboStep % 4 == 3;
         ItemStack weapon = mob.getMainHandItem();
+        mob.removeEffect(ModEffects.NPC_WEAPON_GUARD);
         if (weapon.getItem() instanceof TieguShanItem) {
             boolean shouldOpen = !heavy;
             if (TieguShanItem.isClosed(weapon) == shouldOpen) {
@@ -751,6 +1185,7 @@ public final class NpcCombatBrain {
                 : heavy
                 ? CombatStateManager.performNpcHeavyAttack(mob, context.target())
                 : mob.doHurtTarget(context.target());
+        rhythm.strike(context.target().getUUID(),now,hit);
         if (!HeavyIronBracerItem.isRealStack(weapon)) {
             mob.swing(InteractionHand.MAIN_HAND, true);
         }
@@ -770,9 +1205,11 @@ public final class NpcCombatBrain {
             return false;
         }
         ExternalQiTier tier = externalQiTier();
-        if (tier == null || context.selfQiRatio() < LOW_QI_RATIO) {
+        if (tier == null || !battle.frenzy()&&context.selfQiRatio() < LOW_QI_RATIO) {
             return false;
         }
+        if (!interrupt&&!battle.frenzy()&&!battle.pressure()
+                &&NpcCombatKnowledge.failurePenalty(mob,context.target(),"external_qi","")>40)return false;
         ItemStack weapon = mob.getMainHandItem();
         double weaponRange = weaponRange(context.weaponStyle());
         double totalRange = weaponRange + tier.additionalRange();
@@ -780,13 +1217,15 @@ public final class NpcCombatBrain {
                 || context.targetRetreating()
                 || context.targetFlying()
                 || context.targetHealthRatio() <= 0.15F
+                || context.distance() >= 2 && context.selfQiRatio() >= .35F
+                && !rhythm.follows(context.target().getUUID(),now)
                 || context.distance() > weaponRange - 0.25D && context.distance() <= totalRange;
         if (!purposeful || context.distance() > totalRange + 0.75D) {
             return false;
         }
         int maxQi = Math.max(1, NpcProfile.maxQi(mob, archetype()));
         int cost = Math.max(1, (int) Math.ceil(maxQi * tier.costRatio()));
-        if (NpcProfile.qi(mob, archetype()) < cost) {
+        if (!battle.canSpend(cost,NpcProfile.qi(mob, archetype()),maxQi,interrupt)) {
             return false;
         }
         // Changing fan form is its own action so attributes refresh before release, but
@@ -819,7 +1258,9 @@ public final class NpcCombatBrain {
                 || context.weaponStyle() == WeaponStyle.FIST
                 || context.targetBlocking();
         int slashStage = comboStep;
-        boolean released = WeaponQiSlashEntity.releaseNpc(
+        mob.getPersistentData().putString("NpcReleasingSpell","external_qi");
+        boolean released;
+        try { released = WeaponQiSlashEntity.releaseNpc(
                 mob,
                 context.target(),
                 totalRange,
@@ -827,13 +1268,15 @@ public final class NpcCombatBrain {
                 radius,
                 element,
                 slashStage,
-                heavyCone);
+                heavyCone); }
+        finally {mob.getPersistentData().remove("NpcReleasingSpell");}
         if (!released) {
             NpcProfile.restoreQi(mob, archetype(), cost);
             return false;
         }
         comboStep = (comboStep + 1) % 12;
-        setReadyTick("ExternalQi", now + 30L + mob.getRandom().nextInt(21));
+        setReadyTick("ExternalQi", now + 16L + mob.getRandom().nextInt(9));
+        NpcCombatKnowledge.attempted(mob,context.target(),"external_qi");
         mob.swing(InteractionHand.MAIN_HAND, true);
         remember(ActionKind.EXTERNAL_QI, "");
         return true;
@@ -863,6 +1306,9 @@ public final class NpcCombatBrain {
         double speed = (NpcSpellcasting.hasMovementEffect(mob) ? 1.4D : 1.05D)
                 * NpcProfile.chaseSpeedMultiplier(mob);
         boolean issued = issueMovement(destination, speed, action);
+        if (issued&&battle.mode()==NpcBattlePlan.Mode.SURVIVAL&&escapeProgressOrigin==null) {
+            escapeProgressOrigin=mob.position();escapeProgressTick=mob.level().getGameTime();escapeThreatDistance=context.distance();
+        }
         if (issued && beginCoverHold) {
             coverTarget = context.target().getUUID();
             coverHoldUntil = mob.level().getGameTime() + 32L + mob.getRandom().nextInt(35);
@@ -897,7 +1343,7 @@ public final class NpcCombatBrain {
             return moveToSafety(context, true, true, ActionKind.MOVEMENT, true);
         }
         if (context.selfHealthRatio() < COVER_HEAL_RATIO
-                && tryCast(null, ModSpells.REGENERATION, ActionKind.DEFENSE)) {
+                && tryBestHealing(ActionKind.DEFENSE)) {
             return true;
         }
         if (context.selfQiRatio() < COVER_QI_RATIO
@@ -928,11 +1374,11 @@ public final class NpcCombatBrain {
         Vec3 predicted = resolveMovementDestination(
                 MovementFollowup.APPROACH,
                 context.target(),
-                NpcSpellcasting.hasFlightEffect(mob) ? ModSpells.YUFENG_JUE : "");
+                NpcSpellcasting.canFly(mob) ? ModSpells.YUFENG_JUE : "");
         if (predicted == null) {
             return false;
         }
-        double speed = (NpcSpellcasting.hasMovementEffect(mob) ? 1.4D : 1.0D)
+        double speed = (NpcSpellcasting.hasMovementEffect(mob) ? 1.6D : 1.3D)
                 * NpcProfile.chaseSpeedMultiplier(mob);
         return issueMovement(predicted, speed, ActionKind.MOVEMENT);
     }
@@ -964,11 +1410,10 @@ public final class NpcCombatBrain {
         if (destination == null) {
             return null;
         }
-        boolean willFly = NpcSpellcasting.hasFlightEffect(mob)
+        boolean willFly = NpcSpellcasting.canFly(mob)
                 || ModSpells.YUFENG_JUE.equals(ModSpells.normalizeId(movementSpellId));
-        return willFly
-                ? canFlyTo(destination) ? destination : null
-                : isSafe(destination) && canWalkTo(destination) ? destination : null;
+        if (willFly && canFlyTo(destination)) return destination;
+        return isSafe(destination) && canWalkTo(destination) ? destination : null;
     }
 
     private boolean issueMovement(Vec3 destination, double speed, ActionKind action) {
@@ -976,7 +1421,7 @@ public final class NpcCombatBrain {
             return false;
         }
         boolean issued;
-        if (NpcSpellcasting.hasFlightEffect(mob)) {
+        if (NpcSpellcasting.canFly(mob) && canFlyTo(destination)) {
             mob.getNavigation().stop();
             flightDestination = destination;
             flightRequiresGround = action == ActionKind.RECOVER_QI;
@@ -986,6 +1431,7 @@ public final class NpcCombatBrain {
             issued = true;
         } else {
             clearFlightIntent();
+            if (NpcSpellcasting.hasCreativeFlight(mob)) mob.setNoGravity(false);
             issued = mob.getNavigation().moveTo(destination.x, destination.y, destination.z, speed);
         }
         if (issued && action != null) {
@@ -995,17 +1441,51 @@ public final class NpcCombatBrain {
     }
 
     public void tickFlightMotion(double speed) {
-        if (!NpcSpellcasting.hasFlightEffect(mob)) {
+        if (mob.level().isClientSide || !mob.isAlive()) return;
+        if (!NpcSpellcasting.canFly(mob)) {
             clearFlightIntent();
+            mob.setNoGravity(false);
+            mob.removeEffect(ModEffects.YUFENG_JUE);
+            idleLanding = null;
             return;
         }
-        if (!YufengJue.hasFlightSupport(mob)) {
+        boolean fighting = mob.getTarget() != null && mob.getTarget().isAlive();
+        // After no-gravity flight touches down, vanilla can clear onGround for one tick
+        // while vertical velocity is zero. Contact must still end flight and its upkeep.
+        AABB bounds = mob.getBoundingBox();
+        AABB belowFeet = new AABB(bounds.minX + .001, bounds.minY - .04, bounds.minZ + .001,
+                bounds.maxX - .001, bounds.minY, bounds.maxZ - .001);
+        boolean touchingGround = mob.onGround() || mob.getDeltaMovement().y <= 0
+                && !mob.level().noBlockCollision(mob, belowFeet);
+        if (mob.isPassenger() || mob.isInWaterOrBubble() || mob.isInLava()
+                || touchingGround && (flightDestination == null || !fighting)) {
+            clearFlightIntent();
+            mob.setNoGravity(false);
+            idleLanding = null;
+            return;
+        }
+        if (!NpcSpellcasting.hasCreativeFlight(mob) && !YufengJue.hasFlightSupport(mob)) {
             mob.removeEffect(ModEffects.YUFENG_JUE);
             clearFlightIntent();
             mob.setNoGravity(false);
             return;
         }
+        if (!NpcFlight.payUpkeep(mob)) {
+            clearFlightIntent();
+            mob.setNoGravity(false);
+            mob.removeEffect(ModEffects.YUFENG_JUE);
+            return;
+        }
+        mob.setNoGravity(true);
+        mob.resetFallDistance();
         long now = mob.level().getGameTime();
+        if (!fighting && !mob.onGround()) {
+            clearFlightIntent();
+            if (tickIdleLanding(now)) return;
+        } else {
+            idleLanding = null;
+            nextLandingCheck = 0;
+        }
         if (mob.isNoAi() || NpcProfile.isInteracting(mob)
                 || mob.hasEffect(ModEffects.QI_GATHERING)
                 || pendingCast != null) {
@@ -1015,7 +1495,8 @@ public final class NpcCombatBrain {
         boolean reachedDestination = flightRequiresGround
                 ? hasStableRecoveryFooting()
                 : flightDestination != null
-                && mob.position().distanceToSqr(flightDestination) <= 1.25D * 1.25D;
+                && mob.position().distanceToSqr(flightDestination) <= .3D * .3D
+                && mob.getDeltaMovement().lengthSqr() <= .09D * .09D;
         if (flightRequiresGround && now >= flightIntentUntil && !reachedDestination) {
             mob.removeEffect(ModEffects.YUFENG_JUE);
             mob.setNoGravity(false);
@@ -1024,10 +1505,46 @@ public final class NpcCombatBrain {
         }
         if (flightDestination == null || now >= flightIntentUntil || reachedDestination) {
             clearFlightIntent();
-            NpcSpellcasting.tickYufengFlight(mob, null, speed);
+            if (NpcSpellcasting.hasCreativeFlight(mob)) NpcSpellcasting.tickCreativeFlight(mob, null);
+            else NpcSpellcasting.tickYufengFlight(mob, null, speed);
             return;
         }
-        NpcSpellcasting.tickYufengFlight(mob, flightDestination, speed);
+        if (NpcSpellcasting.hasCreativeFlight(mob)) NpcSpellcasting.tickCreativeFlight(mob, flightDestination);
+        else NpcSpellcasting.tickYufengFlight(mob, flightDestination, speed);
+    }
+
+    private boolean tickIdleLanding(long now) {
+        // Scan only the loaded column underneath; roofs and partial blocks count as ground.
+        if (now >= nextLandingCheck || idleLanding != null
+                && mob.position().subtract(idleLanding).horizontalDistanceSqr() > .25) {
+            nextLandingCheck = now + 10;
+            idleLanding = null;
+            if (mob.level().hasChunkAt(mob.blockPosition())) {
+                var hit = mob.level().clip(new ClipContext(mob.position().add(0, .01, 0),
+                        new Vec3(mob.getX(), mob.level().getMinBuildHeight(), mob.getZ()),
+                        ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, mob));
+                if (hit.getType() == HitResult.Type.BLOCK) {
+                    var state = mob.level().getBlockState(hit.getBlockPos());
+                    Vec3 landing = hit.getLocation();
+                    if (!isDangerous(state) && state.getFluidState().isEmpty()
+                            && mob.level().noCollision(mob, mob.getBoundingBox().move(landing.subtract(mob.position())))
+                            && !CenterEffectSupport.isDangerousPosition(mob, landing)
+                            && !CenterEffectSupport.isForcefieldRouteBlocked(mob, mob.position(), landing)) {
+                        idleLanding = landing;
+                    }
+                }
+            }
+        }
+        if (idleLanding == null) return false;
+        mob.getNavigation().stop();
+        Vec3 movement = mob.getDeltaMovement();
+        // Gentle 2.4-block/second descent; a small downward probe lets vanilla collision
+        // mark the landing instead of hovering a fraction of a block above the surface.
+        double descent = -Math.min(.12, Math.max(.035, (mob.getY() - idleLanding.y) * .25));
+        Vec3 horizontal = NpcFlight.approachVelocity(movement.multiply(1, 0, 1), Vec3.ZERO, .18);
+        double nextY = movement.y + Mth.clamp(descent - movement.y, -.025, .025);
+        mob.setDeltaMovement(horizontal.x, nextY, horizontal.z);
+        return true;
     }
 
     public void clearFlightIntent() {
@@ -1038,12 +1555,12 @@ public final class NpcCombatBrain {
 
     private void holdForAction() {
         Vec3 movement = mob.getDeltaMovement();
-        if (NpcSpellcasting.hasFlightEffect(mob)) {
-            mob.setDeltaMovement(Vec3.ZERO);
+        if (NpcSpellcasting.canFly(mob)) {
+            NpcFlight.brake(mob);
         } else {
             mob.setDeltaMovement(movement.x * 0.2D, movement.y, movement.z * 0.2D);
+            mob.hurtMarked = true;
         }
-        mob.hurtMarked = true;
     }
 
     private boolean reposition(Context context, ActionKind action) {
@@ -1096,7 +1613,8 @@ public final class NpcCombatBrain {
                 continue;
             }
             double targetDistance = candidate.distanceTo(target.position());
-            double score = retreat ? targetDistance : -Math.abs(targetDistance - 7.0D);
+            double score = (retreat ? targetDistance : -Math.abs(targetDistance - 7.0D))
+                    +NpcBattlefield.positionUtility(mob,candidate);
             if (retreat && !threats.isEmpty()) {
                 double nearestThreat = threats.stream()
                         .mapToDouble(threat -> candidate.distanceTo(threat.position()))
@@ -1120,9 +1638,8 @@ public final class NpcCombatBrain {
     }
 
     private boolean canTravelTo(Vec3 destination) {
-        return NpcSpellcasting.hasFlightEffect(mob)
-                ? canFlyTo(destination)
-                : canWalkTo(destination);
+        return NpcSpellcasting.canFly(mob) && canFlyTo(destination)
+                || canWalkTo(destination);
     }
 
     private boolean canWalkTo(Vec3 destination) {
@@ -1158,7 +1675,8 @@ public final class NpcCombatBrain {
         for (int sample = 1; sample <= samples; sample++) {
             Vec3 point = mob.position().add(delta.scale(sample / (double) samples));
             if (CenterEffectSupport.isForcefieldRouteBlocked(mob, previous, point)
-                    || !isClearTravelSpace(point) || !hasSafeSupportBelow(point, 20)) {
+                    || !isClearTravelSpace(point)
+                    || !NpcSpellcasting.hasCreativeFlight(mob) && !hasSafeSupportBelow(point, 20)) {
                 return false;
             }
             boolean pointDangerous = CenterEffectSupport.isDangerousPosition(mob, point);
@@ -1267,7 +1785,8 @@ public final class NpcCombatBrain {
                 return depth <= 2;
             }
         }
-        return NpcSpellcasting.hasFlightEffect(mob) && hasSafeSupportBelow(position, 20);
+        return NpcSpellcasting.hasCreativeFlight(mob)
+                || NpcSpellcasting.canFly(mob) && hasSafeSupportBelow(position, 20);
     }
 
     private boolean isDangerous(BlockState state) {
@@ -1311,18 +1830,19 @@ public final class NpcCombatBrain {
         return entity.isUsingItem()
                 || entity instanceof ServerPlayer player
                 && (CombatStateManager.isPreparingHeavyAttack(player)
-                || CombatStateManager.isPreparingSpell(player)
-                || ModPayloads.ModPayloadsHandler.isQueuedComboCasting(player));
+                || CombatStateManager.isPreparingSpell(player));
     }
 
     private boolean isRecovering(LivingEntity entity) {
         return entity.hasEffect(ModEffects.QI_GATHERING)
-                || entity.hasEffect(MobEffects.REGENERATION);
+                || entity.hasEffect(MobEffects.REGENERATION)
+                || entity.hasEffect(ModEffects.MULING_SHENGXI)
+                || entity.hasEffect(ModEffects.XUE_GUIYUAN_RECOVERY);
     }
 
     private boolean isBlocking(LivingEntity entity) {
         return entity instanceof ServerPlayer player && CombatStateManager.isBlocking(player)
-                || entity.isBlocking();
+                || entity.isBlocking() || entity.hasEffect(ModEffects.NPC_WEAPON_GUARD);
     }
 
     private boolean isFlying(LivingEntity entity) {
@@ -1387,12 +1907,7 @@ public final class NpcCombatBrain {
     private boolean isRangedCombatant(LivingEntity target) {
         ItemStack weapon = target.getMainHandItem();
         String path = weapon.isEmpty() ? "" : BuiltInRegistries.ITEM.getKey(weapon.getItem()).getPath();
-        return target instanceof CultivationNpc npc && NpcProfile.learnedSpellIds(
-                        (PathfinderMob) target, npc.npcArchetype()).stream()
-                .anyMatch(id -> {
-                    NpcSpellcasting.SpellProfile profile = NpcSpellcasting.profile(id);
-                    return profile != null && NpcSpellcasting.isAttackSpell(id) && profile.maxRange() >= 8.0D;
-                })
+        return NpcCombatKnowledge.view(mob,target).ranged()
                 || path.contains("bow") || path.contains("crossbow")
                 || path.contains("trident") || path.contains("fan")
                 || isCasting(target);
@@ -1438,7 +1953,10 @@ public final class NpcCombatBrain {
 
     private void tickPendingCast(long now) {
         PendingCast cast = pendingCast;
-        if (cast == null) {
+        if (cast == null) return;
+        var profile = NpcSpellcasting.profile(cast.spellId());
+        if (profile != null && profile.role() == NpcSpellcasting.Role.HEAL && !healingOpening()) {
+            cancelPendingCast(now);
             return;
         }
         LivingEntity target = resolvePendingTarget(cast.targetId());
@@ -1448,6 +1966,9 @@ public final class NpcCombatBrain {
                 || mob.hasEffect(ModEffects.DINGSHEN)
                 || mob.hasEffect(ModEffects.FROZEN)
                 || mob.hasEffect(ModEffects.FROZEN_QI)
+                || mob.hasEffect(ModEffects.SPIRIT_SEAL)
+                && mob instanceof CultivationNpc npc
+                && npc.npcCastingTicks() <= 0
                 || ModSpells.QI_GATHERING.equals(cast.spellId()) && shouldCancelRecoveryImmediately()
                 || !NpcSpellcasting.canCast(mob, target, cast.spellId())) {
             cancelPendingCast(now);
@@ -1480,7 +2001,11 @@ public final class NpcCombatBrain {
         MobEffectInstance speedSnapshot = previousSpeed == null
                 ? null : new MobEffectInstance(previousSpeed);
         boolean noGravitySnapshot = mob.isNoGravity();
-        if (!NpcSpellcasting.cast(mob, target, cast.spellId())) {
+        mob.getPersistentData().putString("NpcReleasingSpell",cast.spellId());
+        boolean castSucceeded;
+        try { castSucceeded=NpcSpellcasting.cast(mob,target,cast.spellId()); }
+        finally { mob.getPersistentData().remove("NpcReleasingSpell"); }
+        if (!castSucceeded) {
             actionLockUntil = now + 2L;
             nextDecisionTick = now + 2L;
             return;
@@ -1500,6 +2025,9 @@ public final class NpcCombatBrain {
         }
         setReadyTick("Spell." + cast.spellId(),
                 now + Math.max(1, ModSpells.cooldownTicks(cast.spellId())));
+        NpcCombatKnowledge.reveal(mob,cast.spellId());
+        recentSpells.addLast(cast.spellId());while(recentSpells.size()>ACTION_MEMORY)recentSpells.removeFirst();
+        if (NpcSpellcasting.isAttackSpell(cast.spellId()))NpcCombatKnowledge.attempted(mob,target,cast.spellId());
         actionLockUntil = Math.max(actionLockUntil, now + 5L);
         nextDecisionTick = Math.max(nextDecisionTick, now + 2L);
     }
@@ -1609,7 +2137,7 @@ public final class NpcCombatBrain {
         mob.getNavigation().stop();
         clearFlightIntent();
         Vec3 movement = mob.getDeltaMovement();
-        mob.setDeltaMovement(0.0D, NpcSpellcasting.hasFlightEffect(mob) ? 0.0D : movement.y, 0.0D);
+        mob.setDeltaMovement(0.0D, NpcSpellcasting.canFly(mob) ? 0.0D : movement.y, 0.0D);
         mob.hurtMarked = true;
     }
 
@@ -1635,6 +2163,7 @@ public final class NpcCombatBrain {
     }
 
     private void finishCastAction(ActionKind action, String actionId) {
+        NpcCombatKnowledge.reveal(mob,actionId);
         remember(action, actionId);
         actionLockUntil = Math.max(actionLockUntil, mob.level().getGameTime() + 18L);
     }
@@ -1678,7 +2207,7 @@ public final class NpcCombatBrain {
 
     private static int actionDuration(ActionKind action) {
         return switch (action) {
-            case WEAPON_LIGHT -> 8;
+            case WEAPON_LIGHT -> 10;
             case WEAPON_HEAVY -> 18;
             case WEAPON_FORM -> 3;
             case SPELL_ATTACK, INTERRUPT, CONTROL, DEFENSE, SURVIVAL, EXTERNAL_QI -> 12;
@@ -1822,6 +2351,8 @@ public final class NpcCombatBrain {
 
     private record RecentDamage(float amount, long expiresAt) {
     }
+
+    private record PendingPill(ItemStack stack, UUID targetId, long releaseTick) {}
 
     private record PendingCast(
             String spellId,

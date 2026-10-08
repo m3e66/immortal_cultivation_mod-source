@@ -31,18 +31,29 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.network.PacketDistributor;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class RestrictionTableBlockEntity extends BlockEntity implements Container, MenuProvider {
+public class RestrictionTableBlockEntity extends BlockEntity
+        implements Container, MenuProvider, GeoBlockEntity {
     public static final int WEAPON_SLOT = 0;
     public static final int SLOT_COUNT = 1;
     public static final int MOVE_QI_COST = 300;
+    private static final RawAnimation IDLE_ANIMATION = RawAnimation.begin()
+            .thenLoop("animation.restriction_table.idle");
 
     private final NonNullList<ItemStack> items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
+    private final AnimatableInstanceCache animationCache =
+            GeckoLibUtil.createInstanceCache(this);
     private UUID activePlayer;
     private long activeToken;
     private int[] pendingAdditions = new int[WeaponRestrictionSystem.RestrictionType.values().length];
@@ -76,16 +87,10 @@ public class RestrictionTableBlockEntity extends BlockEntity implements Containe
         }
         ItemStack weapon = getItem(WEAPON_SLOT);
         int total = Arrays.stream(additions).sum();
-        if (!WeaponRestrictionSystem.isWeapon(weapon) || total <= 0
-                || total > WeaponRestrictionSystem.remainingCapacity(weapon)) {
+        if (!WeaponRestrictionSystem.validAdditions(weapon, additions)) {
             player.displayClientMessage(Component.translatable(
                     "message." + ImmortalCultivationMod.MODID + ".restriction.invalid_selection"), true);
             return;
-        }
-        for (int addition : additions) {
-            if (addition < 0) {
-                return;
-            }
         }
 
         activePlayer = player.getUUID();
@@ -156,6 +161,7 @@ public class RestrictionTableBlockEntity extends BlockEntity implements Containe
                 clearSession();
                 return;
             }
+            com.example.immortal_cultivation_mod.guidance.DaoGuidanceObservations.record(player, "restriction_added");
             setChanged();
             playSuccessEffects();
             sendState(player, RestrictionPayloads.RESULT_SOLVED,
@@ -184,7 +190,15 @@ public class RestrictionTableBlockEntity extends BlockEntity implements Containe
         if (activePlayer != null || !stillValid(player)) {
             return;
         }
-        if (WeaponRestrictionSystem.evolve(getItem(WEAPON_SLOT))) {
+        ItemStack stack = getItem(WEAPON_SLOT);
+        if (WeaponRestrictionSystem.isWeapon(stack)) {
+            if (com.example.immortal_cultivation_mod.item.WeaponTribulation.start(player, stack)) {
+                setItem(WEAPON_SLOT, ItemStack.EMPTY);
+                setChanged();
+            }
+            return;
+        }
+        if (WeaponRestrictionSystem.evolve(stack)) {
             setChanged();
             player.displayClientMessage(Component.translatable(
                     "message." + ImmortalCultivationMod.MODID + ".restriction.evolved"), true);
@@ -488,11 +502,21 @@ public class RestrictionTableBlockEntity extends BlockEntity implements Containe
     }
 
     @Override
+    public boolean canPlaceItem(int slot, ItemStack stack) {
+        return slot == WEAPON_SLOT && activePlayer == null && WeaponRestrictionSystem.isEquipment(stack);
+    }
+
+    @Override
+    public int getMaxStackSize() { return 1; }
+
+    @Override
     public boolean stillValid(Player player) {
         return level != null && level.getBlockEntity(worldPosition) == this
-                && player.distanceToSqr(worldPosition.getX() + 0.5D,
+                && (player.distanceToSqr(worldPosition.getX() + 0.5D,
                 worldPosition.getY() + 0.5D,
-                worldPosition.getZ() + 0.5D) <= 64.0D;
+                worldPosition.getZ() + 0.5D) <= 64.0D
+                || com.example.immortal_cultivation_mod.item.QiPouchWorld
+                .isRemoteInteraction(player, level, worldPosition));
     }
 
     @Override
@@ -515,5 +539,19 @@ public class RestrictionTableBlockEntity extends BlockEntity implements Containe
         items.clear();
         ContainerHelper.loadAllItems(tag, items, registries);
         clearSession();
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(
+                this,
+                "idle",
+                0,
+                state -> state.setAndContinue(IDLE_ANIMATION)));
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return animationCache;
     }
 }

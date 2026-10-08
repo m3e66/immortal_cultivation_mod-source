@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "immortal_cultivation_mod:blindfold2"
+    }
+  ],
+  "result": {
+    "id": "immortal_cultivation_mod:blindfold",
+    "count": 1
+  }
+}

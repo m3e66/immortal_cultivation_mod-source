@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "B B",
+    "BTB",
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "immortal_cultivation_mod:blue_wool_strip"
+    },
+    "T": {
+      "item": "immortal_cultivation_mod:spirit_guiding_thread"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:hechang",
+    "count": 1
+  }
+}

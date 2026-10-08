@@ -1,5 +1,7 @@
 package com.example.immortal_cultivation_mod.item;
 
+import com.example.immortal_cultivation_mod.config.BlockBreakingSettings;
+
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.combat.CombatStateManager;
 import com.example.immortal_cultivation_mod.effect.ModEffects;
@@ -396,6 +398,8 @@ public class WhipItem extends SwordItem implements GeoItem {
 
     private static void breakWeakBlocks(
             ServerPlayer player, Vec3 direction) {
+        if (!BlockBreakingSettings.enabled(player,
+                BlockBreakingSettings.Category.WEAPONS)) return;
         ServerLevel level = player.serverLevel();
         BlockPos origin = player.blockPosition();
         int radius = (int) Math.ceil(HEAVY_RANGE);
@@ -420,7 +424,10 @@ public class WhipItem extends SwordItem implements GeoItem {
             }
             BlockState state = level.getBlockState(mutable);
             if (isWeakBlock(state)) {
-                level.destroyBlock(mutable.immutable(), false, player);
+                BlockPos pos = mutable.immutable();
+                BlockBreakingSettings.runWithSource(
+                        BlockBreakingSettings.Category.WEAPONS, player,
+                        () -> com.example.immortal_cultivation_mod.spell.SpellDestruction.breakBlock(level, pos, false, player));
             }
         }
     }

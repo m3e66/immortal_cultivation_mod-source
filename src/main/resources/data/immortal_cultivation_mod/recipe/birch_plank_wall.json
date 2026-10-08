@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "immortal_cultivation_mod:plank_walls",
+  "pattern": [
+    "PPP",
+    "PPP"
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:birch_planks"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:birch_plank_wall",
+    "count": 6
+  }
+}

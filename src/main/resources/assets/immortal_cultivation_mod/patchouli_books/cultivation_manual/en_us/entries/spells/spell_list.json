@@ -138,7 +138,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Shattered Orbit Starfall: Golden Core Middle, light, costs 1500 qi, 20-second cooldown.$(br)Compress the star paths around your body into five falling meteors, or ten at full charge. Each impact explodes across a 30-block radius and leaves a permanent carpet-like star mark that suppresses undead and evil spirits within 5 blocks."
+      "text": "$(br)Shattered Orbit Starfall: Golden Core Middle, light, costs 1500 qi, 20-second cooldown.$(br)Compress the star paths around your body into five falling meteors, or ten at full charge. Each impact damages enemies within 30 blocks, carves a small crater roughly 8 blocks in radius, and leaves a permanent carpet-like star mark that suppresses undead and evil spirits within 5 blocks."
     },
     {
       "type": "patchouli:text",

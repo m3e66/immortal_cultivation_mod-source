@@ -1,15 +1,19 @@
 {
-    "replace":  false,
-    "values":  [
-                   "immortal_cultivation_mod:jingtie_motherstone",
-                   "immortal_cultivation_mod:yunwen_silver_crystal",
-                   "immortal_cultivation_mod:chitong_sui",
-                   "immortal_cultivation_mod:hanpo_jade",
-                   "immortal_cultivation_mod:moxuan_iron",
-                   "immortal_cultivation_mod:liujin_sand",
-                   "immortal_cultivation_mod:bisui_stone",
-                   "immortal_cultivation_mod:star_dust_stone",
-                   "immortal_cultivation_mod:restriction_table",
-                   "immortal_cultivation_mod:spirit_ore"
-               ]
+  "replace": false,
+  "values": [
+    "immortal_cultivation_mod:jingtie_motherstone",
+    "immortal_cultivation_mod:yunwen_silver_crystal",
+    "immortal_cultivation_mod:chitong_sui",
+    "immortal_cultivation_mod:hanpo_jade",
+    "immortal_cultivation_mod:moxuan_iron",
+    "immortal_cultivation_mod:liujin_sand",
+    "immortal_cultivation_mod:bisui_stone",
+    "immortal_cultivation_mod:star_dust_stone",
+    "immortal_cultivation_mod:void_stone",
+    "immortal_cultivation_mod:cu_tie_xiaoding",
+    "immortal_cultivation_mod:qingtong_yinhuo_ding",
+    "immortal_cultivation_mod:restriction_table",
+    "immortal_cultivation_mod:spirit_ore",
+    "immortal_cultivation_mod:chi_jin_sanyang_ding"
+  ]
 }

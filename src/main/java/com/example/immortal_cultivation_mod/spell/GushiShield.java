@@ -6,6 +6,7 @@ import com.example.immortal_cultivation_mod.entity.DingshenProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.DuanliuKongdunProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.FireballProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.IgniteFlareProjectileEntity;
+import com.example.immortal_cultivation_mod.entity.DefensePiercingProjectile;
 import com.example.immortal_cultivation_mod.entity.LingzhiBulletProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.SlidingWaterProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.SmokeProjectileEntity;
@@ -39,7 +40,7 @@ public final class GushiShield {
 
     public static boolean cast(ServerPlayer player) {
         var data = ModAttachments.getData(player);
-        if (!ServerEvents.spendQiOrBlood(player, data, COST)) {
+        if (!ServerEvents.spendSpellQiOrBlood(player, data, COST)) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return false;
         }
@@ -61,9 +62,10 @@ public final class GushiShield {
             return damage;
         }
 
-        float absorbed = Math.min(damage, shield);
+        float multiplier = DefensePiercingProjectile.shieldMultiplier(source);
+        float absorbed = Math.min(damage * multiplier, shield);
         float remainingShield = shield - absorbed;
-        float remainingDamage = damage - absorbed;
+        float remainingDamage = Math.max(0.0F, damage - absorbed / multiplier);
         if (remainingShield <= 0.0F) {
             clear(player);
         } else {

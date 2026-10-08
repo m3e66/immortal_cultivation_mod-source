@@ -21,22 +21,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
       ModelFile attackModel = this.makeCircleModel(CircleType.ATTACK, this.modLoc("block/magic_circle_attack"));
       ModelFile defenseModel = this.makeCircleModel(CircleType.DEFENSE, this.modLoc("block/magic_circle_defense"));
       ModelFile regenModel = this.makeCircleModel(CircleType.REGENERATION, this.modLoc("block/magic_circle_regeneration"));
-      ((VariantBlockStateBuilder)((VariantBlockStateBuilder)this.getVariantBuilder((Block)ModBlocks.MAGIC_CIRCLE_BLOCK.get())
-               .partialState()
-               .with(MagicCircleBlock.CIRCLE_TYPE, CircleType.ATTACK)
-               .modelForState()
-               .modelFile(attackModel)
-               .addModel())
-            .partialState()
-            .with(MagicCircleBlock.CIRCLE_TYPE, CircleType.DEFENSE)
-            .modelForState()
-            .modelFile(defenseModel)
-            .addModel())
-         .partialState()
-         .with(MagicCircleBlock.CIRCLE_TYPE, CircleType.REGENERATION)
-         .modelForState()
-         .modelFile(regenModel)
-         .addModel();
+      ((VariantBlockStateBuilder)((VariantBlockStateBuilder)this.getVariantBuilder((Block)ModBlocks.MAGIC_CIRCLE_BLOCK.get()).partialState().with(MagicCircleBlock.CIRCLE_TYPE, CircleType.ATTACK).modelForState().modelFile(attackModel).addModel()).partialState().with(MagicCircleBlock.CIRCLE_TYPE, CircleType.DEFENSE).modelForState().modelFile(defenseModel).addModel()).partialState().with(MagicCircleBlock.CIRCLE_TYPE, CircleType.REGENERATION).modelForState().modelFile(regenModel).addModel();
       this.simpleBlockItem((Block)ModBlocks.MAGIC_CIRCLE_BLOCK.get(), attackModel);
    }
 

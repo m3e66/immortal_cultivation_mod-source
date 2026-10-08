@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#immortal_cultivation_mod:has_feature/ningling_flower",
+  "features": "immortal_cultivation_mod:ningling_flower",
+  "step": "vegetal_decoration"
+}

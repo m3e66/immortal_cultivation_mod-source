@@ -11,17 +11,25 @@ import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import com.example.immortal_cultivation_mod.combat.CombatStateManager;
 import com.example.immortal_cultivation_mod.effect.ModEffects;
-import com.example.immortal_cultivation_mod.effect.PhotonEffects;
 import com.example.immortal_cultivation_mod.entity.CultivatorCorpseEntity;
 import com.example.immortal_cultivation_mod.entity.CultivationNpc;
 import com.example.immortal_cultivation_mod.entity.BloodDropEntity;
+import com.example.immortal_cultivation_mod.entity.BloodApeDemonGeneralEntity;
+import com.example.immortal_cultivation_mod.entity.PhantomVeilFoxEntity;
+import com.example.immortal_cultivation_mod.entity.CrimsonScaleFlameLizardEntity;
+import com.example.immortal_cultivation_mod.entity.CrimsonSkyFlameFloodDragonEntity;
+import com.example.immortal_cultivation_mod.entity.EscapedYuanyingCoreEntity;
 import com.example.immortal_cultivation_mod.entity.JindanEntity;
+import com.example.immortal_cultivation_mod.entity.DefensePiercingProjectile;
 import com.example.immortal_cultivation_mod.entity.ModEntities;
 import com.example.immortal_cultivation_mod.entity.NpcProfile;
 import com.example.immortal_cultivation_mod.entity.SoulEntity;
 import com.example.immortal_cultivation_mod.item.ModItems;
+import com.example.immortal_cultivation_mod.item.BlackTortoiseHeartguardMirrorItem;
+import com.example.immortal_cultivation_mod.item.CultivationAccessoryItem;
 import com.example.immortal_cultivation_mod.item.FuchenItem;
 import com.example.immortal_cultivation_mod.item.ForgingSystem;
+import com.example.immortal_cultivation_mod.item.PhantomVeilFurItem;
 import com.example.immortal_cultivation_mod.item.HeavyIronBracerItem;
 import com.example.immortal_cultivation_mod.item.MysteriousRingItem;
 import com.example.immortal_cultivation_mod.item.QiInfusedWeapon;
@@ -32,20 +40,27 @@ import com.example.immortal_cultivation_mod.particle.MethodQiParticleEffects;
 import com.example.immortal_cultivation_mod.spell.BloodQiShield;
 import com.example.immortal_cultivation_mod.spell.BodyCultivation;
 import com.example.immortal_cultivation_mod.spell.ChangqingJue;
+import com.example.immortal_cultivation_mod.spell.CultivationShieldSpells;
 import com.example.immortal_cultivation_mod.spell.DielangShield;
+import com.example.immortal_cultivation_mod.spell.DariBatiJue;
 import com.example.immortal_cultivation_mod.spell.FentianLifeRenewal;
 import com.example.immortal_cultivation_mod.spell.Fengya;
 import com.example.immortal_cultivation_mod.spell.GushiShield;
+import com.example.immortal_cultivation_mod.spell.GangtingXiaokongLu;
+import com.example.immortal_cultivation_mod.spell.HanlanNingyuanJing;
+import com.example.immortal_cultivation_mod.spell.XuanyueSuifengJue;
 import com.example.immortal_cultivation_mod.spell.HantiBingqin;
 import com.example.immortal_cultivation_mod.spell.HutiQi;
 import com.example.immortal_cultivation_mod.spell.LightBeamAttack;
 import com.example.immortal_cultivation_mod.spell.JindanCreativeFlight;
 import com.example.immortal_cultivation_mod.spell.MichenZhang;
+import com.example.immortal_cultivation_mod.spell.ModSpells;
 import com.example.immortal_cultivation_mod.spell.PlayerShieldManager;
 import com.example.immortal_cultivation_mod.spell.SifangJie;
 import com.example.immortal_cultivation_mod.spell.ShixuChiliu;
 import com.example.immortal_cultivation_mod.spell.SlidingWater;
 import com.example.immortal_cultivation_mod.spell.UndeadControl;
+import com.example.immortal_cultivation_mod.spell.UndeadAbilitySystem;
 import com.example.immortal_cultivation_mod.spell.Weiya;
 import com.example.immortal_cultivation_mod.spell.WindStep;
 import com.example.immortal_cultivation_mod.spell.XuyingTa;
@@ -60,6 +75,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.commands.CommandSourceStack;
@@ -73,7 +89,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -84,6 +102,7 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -96,15 +115,17 @@ import net.neoforged.neoforge.common.damagesource.DamageContainer;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
+import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingHealEvent;
 import net.neoforged.neoforge.event.entity.living.LivingKnockBackEvent;
+import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.level.BlockDropsEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
@@ -114,30 +135,102 @@ import top.theillusivec4.curios.api.CuriosApi;
 
 @EventBusSubscriber(modid = ImmortalCultivationMod.MODID)
 public class ServerEvents {
+    private static final int LIVING_CORPSE_RETALIATION_TICKS = 100;
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onLivingCorpseTargeted(LivingChangeTargetEvent event) {
+        if (!(event.getEntity() instanceof Mob attacker)
+                || attacker instanceof CultivationNpc
+                || !(attacker instanceof Enemy)
+                || !(event.getNewAboutToBeSetTarget() instanceof ServerPlayer target)
+                || !CultivationAccessoryItem.isLivingCorpse(target)) {
+            return;
+        }
+        boolean recentlyProvoked = attacker.getLastHurtByMob() == target
+                && attacker.getLastHurtByMobTimestamp()
+                        + LIVING_CORPSE_RETALIATION_TICKS >= attacker.tickCount;
+        if (!recentlyProvoked) {
+            event.setNewAboutToBeSetTarget(null);
+        }
+    }
+
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
         JindanPocketWorlds.loadSavedPockets(event.getServer());
     }
 
     @SubscribeEvent
+    public static void onItemCrafted(PlayerEvent.ItemCraftedEvent event) {
+        if (event.getEntity().level().isClientSide) return;
+        ItemStack output = event.getCrafting();
+        if (output.getItem() instanceof com.example.immortal_cultivation_mod.item.TalismanItem) {
+            com.example.immortal_cultivation_mod.item.TalismanItem.rollCraftedQuality(
+                    output, event.getEntity().getRandom());
+        }
+        if (!output.is(ModItems.QI_POUCH.get())) return;
+        int weightedPurity = 0;
+        int totalWeight = 0;
+        for (int slot = 0; slot < event.getInventory().getContainerSize(); slot++) {
+            ItemStack ingredient = event.getInventory().getItem(slot);
+            if (ingredient.isEmpty()
+                    || !ForgingSystem.isPurityMaterial(ingredient)) continue;
+            int ingredientPurity;
+            if (ForgingSystem.hasDeterminedPurity(ingredient)) {
+                ingredientPurity = ForgingSystem.purity(ingredient);
+            } else {
+                ResourceLocation id = BuiltInRegistries.ITEM
+                        .getKey(ingredient.getItem());
+                int seed = id.hashCode() * 31
+                        + event.getEntity().getUUID().hashCode() * 17
+                        + slot * 13;
+                ingredientPurity = 1 + Math.floorMod(seed, 100);
+            }
+            int weight = Math.max(1, ingredient.getCount());
+            weightedPurity += ingredientPurity * weight;
+            totalWeight += weight;
+        }
+        if (totalWeight > 0) {
+            com.example.immortal_cultivation_mod.item.QiPouchStorage
+                    .setLatentPurity(output,
+                            Math.round(weightedPurity / (float)totalWeight));
+        }
+    }
+
+    @SubscribeEvent
     public static void onLevelTickPost(LevelTickEvent.Post event) {
         if (event.getLevel() instanceof ServerLevel level) {
             SlidingWater.tick(level);
-            Fengya.tick(level);
         }
     }
 
     private static final ResourceLocation CULTIVATION_MAX_HEALTH_MODIFIER =
             ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "cultivation_max_health");
+    private static final ResourceLocation LIVING_CORPSE_MAX_HEALTH_MODIFIER =
+            ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "living_corpse_max_health");
     private static final ResourceLocation ULTRAMARINE_JADE_ID =
             ResourceLocation.fromNamespaceAndPath("ultramarine", "jade");
     private static final ResourceLocation CULTIVATION_ARMOR_MODIFIER =
             ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "cultivation_armor");
     private static final ResourceLocation HEAVY_IRON_BRACER_ARMOR_MODIFIER =
             ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "heavy_iron_bracer_armor");
+    private static final ResourceLocation PATCHOULI_GUIDE_ITEM_ID =
+            ResourceLocation.fromNamespaceAndPath("patchouli", "guide_book");
+    private static final ResourceLocation PATCHOULI_BOOK_COMPONENT_ID =
+            ResourceLocation.fromNamespaceAndPath("patchouli", "book");
+    private static final ResourceLocation CULTIVATION_GUIDE_BOOK_ID =
+            ResourceLocation.fromNamespaceAndPath(
+                    ImmortalCultivationMod.MODID, "cultivation_manual");
+    private static final ResourceLocation MAGIC_RITUAL_GUIDE_BOOK_ID =
+            ResourceLocation.fromNamespaceAndPath(
+                    ImmortalCultivationMod.MODID, "guide_book");
     private static final String JINDAN_CHALLENGE_PENDING_TAG = "ImmortalCultivationPendingJindanBreakthrough";
     private static final String JINDAN_QUALITY_TAG = "ImmortalCultivationJindanQuality";
     private static final String LAST_AGE_DAY_TAG = "ImmortalCultivationLastAgeDay";
+    private static final String CULTIVATION_GUIDE_RECEIVED_TAG =
+            "ImmortalCultivationGuideReceived";
+    private static final String QI_FLOW_ACTIVE_UNTIL_TAG =
+            "ImmortalCultivationQiFlowActiveUntil";
+    private static final int QI_FLOW_AFTER_USE_TICKS = 30;
     private static final long TICKS_PER_INGAME_DAY = 24000L;
     private static final int AMBIENT_QI_SCAN_RADIUS = 48;
     private static final int AMBIENT_QI_PER_SPIRIT_VEIN_CENTER = 25;
@@ -227,7 +320,12 @@ public class ServerEvents {
                                                 .executes(context -> setRestrictionHints(
                                                         context.getSource(),
                                                         EntityArgument.getPlayers(context, "targets"),
-                                                        IntegerArgumentType.getInteger(context, "amount"))))))));
+                                                        IntegerArgumentType.getInteger(context, "amount")))))))
+                .then(Commands.literal("unlock_all_spells")
+                        .then(Commands.argument("targets", EntityArgument.players())
+                                .executes(context -> unlockAllSpells(
+                                        context.getSource(),
+                                        EntityArgument.getPlayers(context, "targets"))))));
     }
 
     @SubscribeEvent
@@ -238,6 +336,10 @@ public class ServerEvents {
         if (player instanceof ServerPlayer serverPlayer) {
             HeavyIronBracerItem.syncOffhandCompanion(serverPlayer);
             CombatStateManager.lockMovement(serverPlayer);
+            com.example.immortal_cultivation_mod.item.UtilityTalismanItem
+                    .tickPlayer(serverPlayer);
+            com.example.immortal_cultivation_mod.item.ManifestedWeaponItem
+                    .tickPlayer(serverPlayer);
         }
 
         var data = ModAttachments.getData(player);
@@ -280,12 +382,17 @@ public class ServerEvents {
             if (player.distanceToSqr(anchor) > 0.01D) {
                 player.removeEffect(ModEffects.QI_GATHERING);
                 QI_GATHERING_ANCHORS.remove(player.getUUID());
-                if (player instanceof ServerPlayer sp) {
-                    PhotonEffects.meditatingStop(sp);
-                }
             }
         } else {
             QI_GATHERING_ANCHORS.remove(player.getUUID());
+        }
+    }
+
+    @SubscribeEvent
+    public static void onEntityTickPre(EntityTickEvent.Pre event) {
+        if (!event.getEntity().level().isClientSide
+                && event.getEntity() instanceof Projectile projectile) {
+            CultivationShieldSpells.interceptProjectile(projectile);
         }
     }
 
@@ -300,7 +407,24 @@ public class ServerEvents {
         if (event.getEntity() instanceof LivingEntity living && living.hasEffect(ModEffects.XINLIAO)) {
             living.setRemainingFireTicks(Math.max(living.getRemainingFireTicks(), 40));
         }
+        if (event.getEntity() instanceof LivingEntity living) {
+            HanlanNingyuanJing.tickDampVfx(living);
+        }
+        if (event.getEntity() instanceof PathfinderMob mob) {
+            NpcProfile.clearAccidentalVanillaProfile(mob);
+            XuanyueSuifengJue.tickNpc(mob);
+        }
         if (event.getEntity() instanceof ItemEntity itemEntity) {
+            if (com.example.immortal_cultivation_mod.item.ManifestedWeaponItem
+                    .isManifested(itemEntity.getItem())) {
+                com.example.immortal_cultivation_mod.item.ManifestedWeaponItem
+                        .recoverDropped(itemEntity);
+                return;
+            }
+            if (com.example.immortal_cultivation_mod.item.QiPouchStorage
+                    .tickLinkedItemEntity(itemEntity)) {
+                return;
+            }
             if (HeavyIronBracerItem.isDebugStack(itemEntity.getItem())
                     || HeavyIronBracerItem.isDebugChestplate(itemEntity.getItem())) {
                 itemEntity.discard();
@@ -323,7 +447,11 @@ public class ServerEvents {
         if (!(event.getEntity() instanceof LivingEntity living)) {
             return;
         }
+        UndeadAbilitySystem.tickEntityState(living);
         UndeadControl.tick(living);
+        com.example.immortal_cultivation_mod.entity.FireballTalismanProjectileEntity
+                .tickTalismanEffects(living);
+        com.example.immortal_cultivation_mod.spell.SpiritSealSystem.tick(living);
         FuchenItem.tick(living);
         WhipItem.tickWallImpact(living);
         if (!living.hasEffect(ModEffects.DINGSHEN) && !living.hasEffect(ModEffects.FROZEN)) {
@@ -351,14 +479,23 @@ public class ServerEvents {
         if (player.level().isClientSide) return;
 
         if (player instanceof ServerPlayer serverPlayer) {
-            ModPayloads.ModPayloadsHandler.tickQueuedComboCasts(serverPlayer);
             MethodQiParticleEffects.tick(serverPlayer);
             CombatStateManager.tick(serverPlayer);
             NoobAchievement.tick(serverPlayer);
             MysteriousRingItem.tick(serverPlayer);
+            CultivationAccessoryItem.tickPlayer(serverPlayer);
+            BlackTortoiseHeartguardMirrorItem.tick(serverPlayer);
+            com.example.immortal_cultivation_mod.item.QiPouchWorld
+                    .tickPlayer(serverPlayer);
         }
 
         var data = ModAttachments.getData(player);
+        if (player instanceof ServerPlayer serverPlayer
+                && CultivationAccessoryItem.isLivingCorpse(serverPlayer)
+                && data.isMeditating()) {
+            stopMeditating(serverPlayer, data);
+            data = ModAttachments.getData(player);
+        }
 
         var levelDef = CultivationLevels.getLevelDef(data.cultivationLevel());
         int maxQi = getEffectiveMaxQi(data, levelDef);
@@ -372,6 +509,10 @@ public class ServerEvents {
         int maxAge = levelDef.maxAge() - data.agePenalty();
         if (maxAge <= 0) {
             if (player instanceof ServerPlayer serverPlayer) {
+                if (CultivationAccessoryItem.isLivingCorpse(serverPlayer)
+                        || CultivationAccessoryItem.tryBecomeLivingCorpse(serverPlayer)) {
+                    return;
+                }
                 HeavyIronBracerItem.restoreStoredOffhand(serverPlayer);
                 spawnAgeExhaustedCorpse(serverPlayer);
             }
@@ -390,6 +531,7 @@ public class ServerEvents {
 
         if (!player.hasEffect(ModEffects.FROZEN_QI)
                 && !com.example.immortal_cultivation_mod.spell.DuanliuKongdun.isInsideAny(player)
+                && !CultivationShieldSpells.blocksNaturalQiRegen(player)
                 && !CultivationLevels.isMortal(data.cultivationLevel()) && maxQi > 0 && data.qi() < maxQi && player.tickCount % 20 == 0) {
             AmbientQi ambientQi = getAmbientQi(player);
             int regen = Math.max(1, player.hasEffect(ModEffects.QI_GATHERING) ? maxQi * 5 / 100 : maxQi / 100);
@@ -405,6 +547,14 @@ public class ServerEvents {
             }
             regen = com.example.immortal_cultivation_mod.magicritual.center.CenterEffectSupport
                     .adjustNaturalQiRegen(player, regen);
+            if (player instanceof ServerPlayer serverPlayer) {
+                regen = ChangqingJue.adjustQiRegen(serverPlayer, regen);
+            }
+            regen = com.example.immortal_cultivation_mod.spell.SpiritSealSystem
+                    .adjustNaturalQiRegen(player, regen);
+            regen = UndeadAbilitySystem.adjustQiRegen(player, regen);
+            regen = com.example.immortal_cultivation_mod.entity.CultivationBestiaryBeastEntity
+                    .adjustQiRegeneration(player, regen);
             ModAttachments.setData(player, data.withQi(Math.min(maxQi, data.qi() + regen)));
             data = ModAttachments.getData(player);
         }
@@ -415,7 +565,9 @@ public class ServerEvents {
         }
 
         if (data.isMeditating() && player.tickCount % 20 == 0 && CultivationMethods.get(data.activeCultivationMethod()) != null) {
-            int meditationSpeed = getMeditationSpeedMultiplier(player);
+            int meditationSpeed = getMeditationSpeedMultiplier(player)
+                    * (player instanceof ServerPlayer serverPlayer
+                    ? CultivationAccessoryItem.proficiencyMultiplier(serverPlayer) : 1);
             data = data.withAddedMethodProficiency(data.activeCultivationMethod(), meditationSpeed);
             ModAttachments.setData(player, data);
         }
@@ -429,6 +581,7 @@ public class ServerEvents {
                 int baseGain = SpiritRoots.cultivationProgressGain(data, 10);
                 int meditationSpeed = getMeditationSpeedMultiplier(player);
                 int progressGain = Math.max(1, baseGain * CultivationMethods.progressMultiplierPercent(data) / 100) * meditationSpeed;
+                progressGain = com.example.immortal_cultivation_mod.alchemy.AlchemyEffects.cultivationGain(player, progressGain);
                 ModAttachments.setData(player,
                         data.withCultivationProgress(Math.min(need, data.cultivationProgress() + progressGain)));
             }
@@ -448,15 +601,18 @@ public class ServerEvents {
             ChangqingJue.tick(sp);
             FentianLifeRenewal.tick(sp);
             HantiBingqin.tick(sp);
+            DariBatiJue.tick(sp);
+            GangtingXiaokongLu.tick(sp);
+            XuanyueSuifengJue.tick(sp);
             MichenZhang.tick(sp);
             SifangJie.tick(sp);
             Weiya.tick(sp);
             ShixuChiliu.tick(sp);
             XuyingTa.tick(sp);
             DielangShield.tick(sp);
+            CultivationShieldSpells.tick(sp);
             QiInfusedWeapon.tickAutoChannel(sp);
             QiInfusedWeapon.tickOverflow(sp);
-            PhotonEffects.tick(sp);
             tickFogReveal(sp);
             if (data.isMeditating() && player.tickCount % 40 == 0) {
                 broadcastMeditationState(sp, true);
@@ -473,6 +629,7 @@ public class ServerEvents {
         ModAttachments.setData(player, data);
         applyLevelStats(player, data, CultivationLevels.getLevelDef(data.cultivationLevel()));
         if (player instanceof ServerPlayer sp) {
+            CultivationShieldSpells.clear(sp);
             syncPlayerData(sp);
         }
     }
@@ -563,15 +720,31 @@ public class ServerEvents {
         serverLevel.addFreshEntity(soul);
     }
 
-    @SubscribeEvent
-    public static void onPlayerDeath(LivingDeathEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            HeavyIronBracerItem.restoreStoredOffhand(player);
-        }
+    /** Resolve revival before Luck, and before any death cleanup or kill rewards. */
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void preventProtectedDeath(LivingDeathEvent event) {
+        if (com.example.immortal_cultivation_mod.pagoda.PagodaSystem.adminKill(event.getEntity(),event.getSource())) return;
+        if (event.isCanceled() || event.getEntity().level().isClientSide) return;
         if (event.getEntity() instanceof ServerPlayer player
                 && com.example.immortal_cultivation_mod.item.IdentityItems.tryUseProtectivePendant(player)) {
             event.setCanceled(true);
             return;
+        }
+        if (event.getEntity() instanceof ServerPlayer player
+                && !CultivationAccessoryItem.isLivingCorpse(player)) {
+            var data = ModAttachments.getData(player);
+            var levelDef = CultivationLevels.getLevelDef(data.cultivationLevel());
+            var agedData = data.withAgePenalty(data.agePenalty() + 10)
+                    .withQi(getEffectiveMaxQi(data, levelDef));
+            if (levelDef.maxAge() - agedData.agePenalty() <= 0
+                    && CultivationAccessoryItem.hasSoulAnchorPearl(player)) {
+                ModAttachments.setData(player, agedData);
+                if (CultivationAccessoryItem.tryBecomeLivingCorpse(player)) {
+                    player.setHealth(1.0F);
+                    event.setCanceled(true);
+                    return;
+                }
+            }
         }
         if (event.getEntity() instanceof PathfinderMob mob
                 && mob instanceof CultivationNpc
@@ -579,14 +752,34 @@ public class ServerEvents {
             event.setCanceled(true);
             return;
         }
+        if (event.getEntity() instanceof ServerPlayer player && FentianLifeRenewal.tryCatchDeath(player)) {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onPlayerDeath(LivingDeathEvent event) {
+        if (event.isCanceled()) return;
+        if (event.getEntity() instanceof ServerPlayer player) {
+            com.example.immortal_cultivation_mod.item.ManifestedWeaponItem
+                    .removeAll(player);
+            HeavyIronBracerItem.restoreStoredOffhand(player);
+        }
         if (!event.getEntity().level().isClientSide
                 && event.getSource().getEntity() instanceof ServerPlayer playerKiller) {
             MysteriousRingItem.onEntityKilled(playerKiller, event.getEntity());
         }
         if (!event.getEntity().level().isClientSide) {
             if (event.getSource().getEntity() instanceof LivingEntity killer
-                    && UndeadControl.isUndeadServantType(killer)) {
-                killer.heal(event.getEntity().getMaxHealth() * 0.5F);
+                    && UndeadControl.hasUndeadPowers(killer)) {
+                float healing = event.getEntity().getMaxHealth() * 0.5F;
+                if (killer instanceof ServerPlayer livingCorpse
+                        && CultivationAccessoryItem.isLivingCorpse(livingCorpse)) {
+                    CultivationAccessoryItem.healLivingCorpseFromUndeadAbility(
+                            livingCorpse, healing);
+                } else {
+                    killer.heal(healing);
+                }
             }
             if (event.getEntity() instanceof PathfinderMob mob
                     && mob instanceof CultivationNpc) {
@@ -612,12 +805,9 @@ public class ServerEvents {
                     amount));
         }
         if (event.getEntity() instanceof ServerPlayer player) {
-            if (FentianLifeRenewal.tryCatchDeath(player)) {
-                event.setCanceled(true);
-                return;
-            }
             NoobAchievement.recordDeath(player);
             CombatStateManager.clear(player);
+            JindanTribulation.failOnDeath(player);
             JindanTribulation.clear(player);
             MEDITATION_ANCHORS.remove(player.getUUID());
             QI_GATHERING_ANCHORS.remove(player.getUUID());
@@ -635,7 +825,9 @@ public class ServerEvents {
             BloodQiShield.clear(player);
             HutiQi.clear(player);
             GushiShield.clear(player);
+            CultivationShieldSpells.clear(player);
             SifangJie.clear(player);
+            BlackTortoiseHeartguardMirrorItem.clear(player);
             PlayerShieldManager.clearAll(player);
             var data = ModAttachments.getData(player);
             var levelDef = CultivationLevels.getLevelDef(data.cultivationLevel());
@@ -643,6 +835,7 @@ public class ServerEvents {
             var agedData = data.withAgePenalty(data.agePenalty() + 10).withQi(maxQi);
             ModAttachments.setData(player, agedData);
             if (levelDef.maxAge() - agedData.agePenalty() <= 0) {
+                CultivationAccessoryItem.clearLivingCorpse(player);
                 spawnAgeExhaustedCorpse(player);
                 spawnSoul(player);
                 resetPlayer(player);
@@ -693,29 +886,13 @@ public class ServerEvents {
                 amount), true);
     }
 
-    @SubscribeEvent
-    public static void onBlockDrops(BlockDropsEvent event) {
-        if (!event.getState().is(
-                com.example.immortal_cultivation_mod.magicritual.block.ModBlocks.SPIRIT_ORE.get())) {
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onLivingDrops(LivingDropsEvent event) {
+        if (UndeadAbilitySystem.suppressDrops(event.getEntity())) {
+            event.getDrops().clear();
             return;
         }
-        int puritySeed = (int) (event.getPos().asLong() ^ event.getLevel().getGameTime());
-        if (event.getBreaker() != null) {
-            puritySeed ^= (int) event.getBreaker().getUUID().getLeastSignificantBits();
-        }
-        int index = 0;
-        for (ItemEntity drop : event.getDrops()) {
-            ItemStack droppedStack = drop.getItem();
-            if (ForgingSystem.isPurityMaterial(droppedStack)
-                    && !ForgingSystem.hasFixedPurity(droppedStack)) {
-                ForgingSystem.ensurePurity(droppedStack, puritySeed + index * 9973);
-            }
-            index++;
-        }
-    }
-
-    @SubscribeEvent
-    public static void onLivingDrops(LivingDropsEvent event) {
+        capBeastDemonCoreDrop(event);
         if (!(event.getEntity() instanceof PathfinderMob mob)
                 || !(mob instanceof CultivationNpc)) {
             return;
@@ -729,10 +906,57 @@ public class ServerEvents {
         event.getDrops().add(drop);
     }
 
+    @SubscribeEvent
+    public static void onLivingExperienceDrop(LivingExperienceDropEvent event) {
+        if (UndeadAbilitySystem.suppressDrops(event.getEntity())) {
+            event.setDroppedExperience(0);
+        }
+    }
+
+    private static void capBeastDemonCoreDrop(LivingDropsEvent event) {
+        LivingEntity dead = event.getEntity();
+        if (!(dead instanceof CrimsonScaleFlameLizardEntity)
+                && !(dead instanceof CrimsonSkyFlameFloodDragonEntity)
+                && !(dead instanceof BloodApeDemonGeneralEntity)
+                && !(dead instanceof PhantomVeilFoxEntity)
+                && !(dead instanceof EscapedYuanyingCoreEntity)) {
+            return;
+        }
+        if (dead instanceof PhantomVeilFoxEntity fox) {
+            for (ItemEntity drop : event.getDrops()) {
+                ItemStack stack = drop.getItem();
+                if (stack.is(ModItems.PHANTOM_VEIL_FUR.get())) {
+                    PhantomVeilFurItem.setRealm(
+                            stack, fox.cultivationRealm());
+                }
+            }
+        }
+        List<ItemEntity> demonCores = event.getDrops().stream()
+                .filter(drop -> drop.getItem().is(ModItems.LIANQI_YAODAN.get())
+                        || drop.getItem().is(ModItems.ZHUJI_YAODAN.get())
+                        || drop.getItem().is(ModItems.JINDAN_YAODAN.get())
+                        || drop.getItem().is(ModItems.YUANYING_YAODAN.get())
+                        || drop.getItem().is(ModItems.HUASHEN_YAODAN.get())
+                        || drop.getItem().is(ModItems.LIANXU_YAODAN.get())
+                        || drop.getItem().is(ModItems.HETI_YAODAN.get())
+                        || drop.getItem().is(ModItems.DACHENG_YAODAN.get())
+                        || drop.getItem().is(ModItems.DUJIE_YAODAN.get()))
+                .toList();
+        if (demonCores.isEmpty()) {
+            return;
+        }
+        demonCores.getFirst().getItem().setCount(1);
+        if (demonCores.size() > 1) {
+            event.getDrops().removeAll(demonCores.subList(1, demonCores.size()));
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void keepNoobHatOnDeath(LivingDropsEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player
-                && NoobAchievement.hasReward(player)) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        event.getDrops().removeIf(
+                drop -> drop.getItem().is(ModItems.SYSTEM.get()));
+        if (NoobAchievement.hasReward(player)) {
             event.getDrops().removeIf(
                     drop -> drop.getItem().is(ModItems.NOOB_HAT.get()));
         }
@@ -750,7 +974,9 @@ public class ServerEvents {
             BloodQiShield.clear(sp);
             HutiQi.clear(sp);
             GushiShield.clear(sp);
+            CultivationShieldSpells.clear(sp);
             SifangJie.clear(sp);
+            BlackTortoiseHeartguardMirrorItem.clear(sp);
             PlayerShieldManager.clearAll(sp);
             syncPlayerData(sp);
             ModPayloads.syncDebugEyeState(sp);
@@ -778,6 +1004,11 @@ public class ServerEvents {
         com.example.immortal_cultivation_mod.item.RestrictionInsightItem.copyHints(
                 event.getOriginal(), event.getEntity());
         NoobAchievement.copyPersistentData(event.getOriginal(), event.getEntity());
+        if (event.getOriginal().getPersistentData()
+                .getBoolean(CULTIVATION_GUIDE_RECEIVED_TAG)) {
+            event.getEntity().getPersistentData()
+                    .putBoolean(CULTIVATION_GUIDE_RECEIVED_TAG, true);
+        }
         if (event.getOriginal().getPersistentData().contains(JINDAN_QUALITY_TAG)) {
             event.getEntity().getPersistentData().putString(
                     JINDAN_QUALITY_TAG,
@@ -791,8 +1022,8 @@ public class ServerEvents {
             JindanTribulation.clear(player);
             HeavyIronBracerItem.restoreStoredOffhand(player);
             ModPayloads.clearPendingLearning(player);
-            ModPayloads.ModPayloadsHandler.cancelQueuedCombo(player);
             ShixuChiliu.clear(player);
+            CultivationShieldSpells.clear(player);
             CombatStateManager.onLogout(player);
         }
     }
@@ -833,7 +1064,9 @@ public class ServerEvents {
             BloodQiShield.clear(sp);
             HutiQi.clear(sp);
             GushiShield.clear(sp);
+            CultivationShieldSpells.clear(sp);
             SifangJie.clear(sp);
+            BlackTortoiseHeartguardMirrorItem.clear(sp);
             PlayerShieldManager.clearAll(sp);
             com.example.immortal_cultivation_mod.item.IdentityItems.ensurePlayerIdentity(sp);
             JindanCreativeFlight.resetControlSync(sp);
@@ -842,7 +1075,63 @@ public class ServerEvents {
             syncRestrictionHints(sp);
             CombatStateManager.sync(sp, true);
             NoobAchievement.ensureReward(sp);
+            ensureCultivationGuide(sp);
         }
+    }
+
+    /** Gives the main cultivation manual once per player save. */
+    private static void ensureCultivationGuide(ServerPlayer player) {
+        if (player.getPersistentData()
+                .getBoolean(CULTIVATION_GUIDE_RECEIVED_TAG)) {
+            return;
+        }
+        ItemStack guide = createCultivationGuide();
+        if (guide.isEmpty()) {
+            // Patchouli is optional. Leave the flag unset so installing it
+            // later still grants the book on the player's next login.
+            return;
+        }
+        if (!player.addItem(guide)) {
+            player.drop(guide, false);
+        }
+        player.getPersistentData()
+                .putBoolean(CULTIVATION_GUIDE_RECEIVED_TAG, true);
+    }
+
+    private static ItemStack createCultivationGuide() {
+        return createPatchouliGuide(CULTIVATION_GUIDE_BOOK_ID);
+    }
+
+    /** Creates the real Patchouli magic-ritual guide for NPC formation kits. */
+    public static ItemStack createMagicRitualGuide() {
+        return createPatchouliGuide(MAGIC_RITUAL_GUIDE_BOOK_ID);
+    }
+
+    private static ItemStack createPatchouliGuide(ResourceLocation bookId) {
+        Item guideItem = BuiltInRegistries.ITEM.get(PATCHOULI_GUIDE_ITEM_ID);
+        if (!PATCHOULI_GUIDE_ITEM_ID.equals(
+                BuiltInRegistries.ITEM.getKey(guideItem))) {
+            return ItemStack.EMPTY;
+        }
+        DataComponentType<?> bookComponent =
+                BuiltInRegistries.DATA_COMPONENT_TYPE.get(
+                        PATCHOULI_BOOK_COMPONENT_ID);
+        if (bookComponent == null
+                || !PATCHOULI_BOOK_COMPONENT_ID.equals(
+                        BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(bookComponent))) {
+            return ItemStack.EMPTY;
+        }
+        ItemStack guide = new ItemStack(guideItem);
+        setDynamicComponent(guide, bookComponent, bookId);
+        return guide;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static void setDynamicComponent(
+            ItemStack stack,
+            DataComponentType<?> component,
+            Object value) {
+        stack.set((DataComponentType) component, value);
     }
 
     @SubscribeEvent
@@ -1114,7 +1403,7 @@ public class ServerEvents {
             triggerLingbeng(player, event.getTarget().getX(), event.getTarget().getY(), event.getTarget().getZ());
             var data = ModAttachments.getData(player);
             if (data.physicalAttack() > 0) {
-                event.getTarget().hurt(player.damageSources().playerAttack(player), data.physicalAttack());
+                event.getTarget().hurt(player.damageSources().playerAttack(player), (float)(data.physicalAttack() * com.example.immortal_cultivation_mod.pagoda.GourdSystem.multiplier(player)));
             }
             QiInfusedWeapon.strike(player, event.getTarget());
         }
@@ -1177,7 +1466,18 @@ public class ServerEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onCultivationArmorIncomingDamage(LivingIncomingDamageEvent event) {
+        if (com.example.immortal_cultivation_mod.pagoda.PagodaSystem.adminKill(event.getEntity(),event.getSource())) return;
         if (event.getEntity() instanceof LivingEntity target) {
+            if ((target instanceof BloodApeDemonGeneralEntity
+                    || target instanceof CrimsonSkyFlameFloodDragonEntity)
+                    && event.getSource().getEntity() instanceof LivingEntity attacker
+                    && UndeadControl.hasUndeadPowers(attacker)
+                    && UndeadControl.isAtLeastRank(attacker, "伏尸")) {
+                event.addReductionModifier(
+                        DamageContainer.Reduction.ARMOR,
+                        (container, vanillaReduction) -> 0.0F);
+                return;
+            }
             addCultivationArmorReduction(event, target);
         }
     }
@@ -1192,7 +1492,11 @@ public class ServerEvents {
             return;
         }
         double cultivationArmor = cultivationArmorValue(target, armor);
-        if (cultivationArmor <= 0.0D) {
+        float defenseBypass = Math.max(
+                DefensePiercingProjectile.defenseBypass(event.getSource()),
+                XuanyueSuifengJue.armorPenetration(event.getSource().getEntity()));
+        boolean armorPiercing = defenseBypass > 0.0F;
+        if (cultivationArmor <= 0.0D && !armorPiercing) {
             return;
         }
 
@@ -1216,12 +1520,22 @@ public class ServerEvents {
                 effectiveness = EnchantmentHelper.modifyArmorEffectiveness(
                         serverLevel, weapon, target, container.getSource(), effectiveness);
             }
+            float bypass = Math.max(
+                    DefensePiercingProjectile.defenseBypass(container.getSource()),
+                    XuanyueSuifengJue.armorPenetration(
+                            container.getSource().getEntity()));
+            if (bypass > 0.0F) {
+                effectiveness *= 1.0F - bypass;
+            }
             effectiveness = Math.max(0.0F, Math.min(0.8F, effectiveness));
             return incomingDamage * effectiveness;
         });
     }
 
     private static double cultivationArmorValue(LivingEntity target, AttributeInstance armor) {
+        if (target instanceof com.example.immortal_cultivation_mod.entity.XuanjinZhengEntity) {
+            return Math.max(0.0D, armor.getValue());
+        }
         if (target instanceof Player) {
             AttributeModifier modifier = armor.getModifier(CULTIVATION_ARMOR_MODIFIER);
             return modifier == null ? 0.0D : Math.max(0.0D, modifier.amount());
@@ -1242,7 +1556,43 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
+        if (com.example.immortal_cultivation_mod.pagoda.PagodaSystem.adminKill(event.getEntity(),event.getSource())) return;
+        boolean shieldBreakerAttack = event.getSource().is(DamageTypes.PLAYER_ATTACK)
+                && event.getSource().getEntity() instanceof ServerPlayer attacker
+                && CultivationAccessoryItem.hasShieldBreaker(attacker);
+        if (shieldBreakerAttack && event.getEntity().isBlocking()) {
+            event.getEntity().stopUsingItem();
+            if (event.getSource().getEntity() instanceof ServerPlayer wielder) { com.example.immortal_cultivation_mod.guidance.DaoGuidanceObservations.record(wielder, "ring_triggered"); }
+        }
+        event.setAmount(CultivationShieldSpells.reflectedDamage(event.getSource(), event.getAmount()));
+        event.setAmount(DariBatiJue.adjustIncomingDamage(
+                event.getEntity(), event.getSource(), event.getAmount()));
+        event.setAmount(GangtingXiaokongLu.adjustIncomingDamage(
+                event.getEntity(), event.getSource(), event.getAmount()));
+        event.setAmount(XuanyueSuifengJue.adjustIncomingDamage(
+                event.getEntity(), event.getSource(), event.getAmount()));
+        if (event.getEntity() instanceof LivingEntity abilityTarget) {
+            if (event.getSource().getEntity() instanceof LivingEntity abilityAttacker) {
+                event.setAmount(UndeadAbilitySystem.adjustOutgoingDamage(
+                        abilityAttacker, abilityTarget, event.getSource(), event.getAmount()));
+            }
+            event.setAmount(UndeadAbilitySystem.adjustIncomingDamage(
+                    abilityTarget, event.getSource(), event.getAmount()));
+        }
         if (event.getEntity() instanceof LivingEntity target) {
+            long dashProtection = target.getPersistentData().getLong(
+                    com.example.immortal_cultivation_mod.spell.ElementalTechniques
+                            .LIGHTNING_DASH_PROTECTION_UNTIL);
+            if (dashProtection >= target.level().getGameTime()) {
+                float reduction = target.getPersistentData().getFloat(
+                        com.example.immortal_cultivation_mod.spell.ElementalTechniques
+                                .LIGHTNING_DASH_DAMAGE_REDUCTION);
+                if (reduction <= 0.0F) {
+                    reduction = 0.50F;
+                }
+                event.setAmount(event.getAmount()
+                        * (1.0F - Math.min(0.95F, reduction)));
+            }
             LivingEntity attacker = NpcProfile.damageAttacker(event.getSource());
             if (attacker instanceof CultivationNpc && !NpcProfile.isCombatEnemy(attacker, target)) {
                 event.setCanceled(true);
@@ -1269,14 +1619,14 @@ public class ServerEvents {
                 float allowed = Math.max(0.0F, target.getHealth() - 1.0F);
                 event.setAmount(Math.min(event.getAmount(), allowed));
                 if (event.getAmount() <= 0.0F) {
-                    NpcProfile.endSpar(target);
+                    NpcProfile.finishSpar(target, NpcProfile.damageAttacker(event.getSource()));
                     event.setCanceled(true);
                     return;
                 }
             }
         }
         if (event.getEntity() instanceof LivingEntity target
-                && UndeadControl.isUndeadServantType(target)
+                && UndeadControl.hasUndeadPowers(target)
                 && UndeadControl.ignoresFireAndSun(target)
                 && (event.getSource().is(DamageTypes.IN_FIRE)
                 || event.getSource().is(DamageTypes.ON_FIRE)
@@ -1288,25 +1638,30 @@ public class ServerEvents {
             return;
         }
         if (event.getEntity() instanceof LivingEntity target
-                && UndeadControl.isUndeadServantType(target)
+                && UndeadControl.hasUndeadPowers(target)
                 && UndeadControl.isAtLeastHopping(target)
-                && event.getSource().is(DamageTypes.PLAYER_ATTACK)
-                && event.getSource().getEntity() instanceof ServerPlayer player
-                && !QiInfusedWeapon.hasQi(player.getMainHandItem())) {
+                && event.getSource().getEntity() instanceof LivingEntity attacker
+                && UndeadAbilitySystem.isDirectMelee(event.getSource(), attacker)
+                && !QiInfusedWeapon.hasQi(attacker instanceof ServerPlayer skillOwner
+                        ? com.example.immortal_cultivation_mod.item.WeaponSkillAttack.sourceWeapon(skillOwner, event.getSource())
+                        : attacker.getMainHandItem())
+                && !UndeadAbilitySystem.isUndeadQiMelee(event.getSource())) {
             event.setCanceled(true);
             return;
         }
         if (event.getEntity() instanceof LivingEntity target
-                && UndeadControl.isUndeadServantType(target)
+                && UndeadControl.hasUndeadPowers(target)
                 && event.getSource().is(DamageTypes.PLAYER_ATTACK)
                 && event.getSource().getEntity() instanceof ServerPlayer player) {
-            if (player.getMainHandItem().is(ModItems.TAOMU_SWORD.get())) {
+            ItemStack sourceWeapon = com.example.immortal_cultivation_mod.item.WeaponSkillAttack.sourceWeapon(player, event.getSource());
+            if (sourceWeapon.is(ModItems.TAOMU_SWORD.get())) {
                 event.setAmount(event.getAmount() * 1.5F);
-            } else if (player.getMainHandItem().is(ModItems.COPPER_COIN_SWORD.get())) {
+            } else if (sourceWeapon.is(ModItems.COPPER_COIN_SWORD.get())) {
                 event.setAmount(event.getAmount() * 1.7F);
             }
         }
-        if (event.getEntity() instanceof ServerPlayer player
+        if (!shieldBreakerAttack
+                && event.getEntity() instanceof ServerPlayer player
                 && CombatStateManager.blockIncomingAttack(
                 player, event.getSource(), event.getAmount())) {
             MysteriousRingItem.onBlockedAttack(player, event.getAmount());
@@ -1328,7 +1683,7 @@ public class ServerEvents {
                     && player.getRandom().nextFloat() < 0.15F) {
                 event.setAmount(event.getAmount() * 1.3F);
             }
-            ItemStack weapon = player.getMainHandItem();
+            ItemStack weapon = com.example.immortal_cultivation_mod.item.WeaponSkillAttack.sourceWeapon(player, event.getSource());
             event.setAmount(com.example.immortal_cultivation_mod.item.ForgingSystem.adjustWeaponDamage(weapon, target, event.getAmount()));
             event.setAmount(com.example.immortal_cultivation_mod.item.WeaponRestrictionSystem
                     .adjustWeaponDamage(weapon, target, event.getAmount()));
@@ -1362,7 +1717,7 @@ public class ServerEvents {
         }
         if (event.getSource().is(DamageTypes.FALL)
                 && event.getEntity() instanceof LivingEntity living
-                && UndeadControl.isUndeadServantType(living)) {
+                && UndeadControl.hasUndeadPowers(living)) {
             living.fallDistance = 0.0F;
             living.resetFallDistance();
             event.setCanceled(true);
@@ -1382,8 +1737,9 @@ public class ServerEvents {
         if (event.getAmount() > 0.0F
                 && event.getEntity() instanceof LivingEntity target
                 && event.getSource().getEntity() instanceof LivingEntity attacker
-                && UndeadControl.isUndeadServantType(attacker)
-                && UndeadControl.isAtLeastRank(attacker, "飞僵")) {
+                && UndeadControl.hasUndeadPowers(attacker)
+                && UndeadControl.isAtLeastRank(attacker, "飞僵")
+                && UndeadAbilitySystem.isDirectMelee(event.getSource(), attacker)) {
             target.addEffect(new MobEffectInstance(ModEffects.SHIDU, 20 * 5, 4, false, true, true), attacker);
         }
         if (event.getEntity() instanceof LivingEntity player && player.hasEffect(ModEffects.QI_GATHERING)) {
@@ -1393,22 +1749,46 @@ public class ServerEvents {
                 && CombatStateManager.isPostureBroken(player)) {
             event.setAmount(event.getAmount() * 1.25F);
         }
+        float fortunePiercing = com.example.immortal_cultivation_mod.fate.FateCombat.shieldPiercing(
+                event.getSource(), event.getAmount());
+        event.setAmount(event.getAmount() - fortunePiercing);
+        if (event.getAmount() > 0.0F
+                && event.getEntity() instanceof ServerPlayer player) {
+            event.setAmount(BlackTortoiseHeartguardMirrorItem.protectFromIncomingDamage(
+                    player, event.getSource(), event.getAmount()));
+        }
         // NPC shields must see the same fully modified hit as player shields. Applying
         // Dielang inside Mob#hurt happened before this event, so stored weapon qi and
         // forging/restriction modifiers could bypass the shield or remain unconsumed.
+        float shieldBreakerBonus = shieldBreakerAttack ? event.getAmount() * 0.30F : 0.0F;
+        if (event.getAmount() > 0.0F && event.getEntity() instanceof LivingEntity target) {
+            event.setAmount(CultivationShieldSpells.absorbDomain(
+                    target, event.getSource(), event.getAmount()));
+            if (shieldBreakerBonus > 0.0F) {
+                shieldBreakerBonus = CultivationShieldSpells.absorbDomain(
+                        target, event.getSource(), shieldBreakerBonus);
+            }
+        }
         if (event.getAmount() > 0.0F
                 && event.getEntity() instanceof LivingEntity target
                 && target instanceof CultivationNpc) {
-            event.setAmount(DielangShield.absorb(target, event.getAmount()));
+            event.setAmount(DielangShield.absorb(target, event.getSource(), event.getAmount()));
+            if (shieldBreakerBonus > 0.0F) {
+                shieldBreakerBonus = DielangShield.absorb(
+                        target, event.getSource(), shieldBreakerBonus);
+            }
         }
+        if (!(event.getEntity() instanceof ServerPlayer)) event.setAmount(event.getAmount() + fortunePiercing);
         if (event.getEntity() instanceof ServerPlayer player) {
             float beforeCultivationShields = event.getAmount();
-            float amount = DielangShield.absorb(player, event.getAmount());
-            amount = GushiShield.absorb(player, event.getSource(), amount);
-            amount = HutiQi.absorb(player, event.getSource(), amount);
-            amount = BloodQiShield.absorb(player, amount);
+            float amount = absorbPlayerCultivationShields(
+                    player, event.getSource(), event.getAmount());
+            if (shieldBreakerBonus > 0.0F) {
+                absorbPlayerCultivationShields(player, event.getSource(), shieldBreakerBonus);
+            }
             CombatStateManager.addBlockedPosture(
                     player, Math.max(0.0F, beforeCultivationShields - amount));
+            amount = ChangqingJue.absorbWithLifeForce(player, amount) + fortunePiercing;
             if (amount > 0.0F) {
                 CombatStateManager.cancelHeavyCharge(player);
             }
@@ -1435,7 +1815,7 @@ public class ServerEvents {
             float allowed = Math.max(0.0F, target.getHealth() - 1.0F);
             event.setAmount(Math.min(event.getAmount(), allowed));
             if (event.getAmount() >= allowed) {
-                NpcProfile.endSpar(target);
+                NpcProfile.finishSpar(target, NpcProfile.damageAttacker(event.getSource()));
             }
             if (event.getAmount() <= 0.0F) {
                 event.setCanceled(true);
@@ -1443,11 +1823,34 @@ public class ServerEvents {
         }
     }
 
+    private static float absorbPlayerCultivationShields(
+            ServerPlayer player, DamageSource source, float amount) {
+        amount = CultivationShieldSpells.absorbPersonal(player, source, amount);
+        amount = DielangShield.absorb(player, source, amount);
+        amount = GushiShield.absorb(player, source, amount);
+        amount = HutiQi.absorb(player, source, amount);
+        amount = BloodQiShield.absorb(player, source, amount);
+        return com.example.immortal_cultivation_mod.item.UtilityTalismanItem
+                .absorbTalismanShields(player, amount);
+    }
+
+    @SubscribeEvent
+    public static void onLivingHeal(LivingHealEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player
+                && CultivationAccessoryItem.blocksHealing(player)) {
+            event.setCanceled(true);
+            return;
+        }
+        event.setAmount(event.getAmount() * UndeadAbilitySystem.healingMultiplier(event.getEntity()));
+    }
+
     @SubscribeEvent
     public static void onDamageApplied(LivingDamageEvent.Post event) {
         if (event.getNewDamage() > 0.0F
                 && event.getSource().getEntity() instanceof LivingEntity attacker) {
             CombatStateManager.recordHostileAction(attacker, event.getEntity());
+            XuanyueSuifengJue.onMeleeDamageApplied(
+                    attacker, event.getEntity(), event.getSource(), event.getNewDamage());
         }
         if (event.getEntity() instanceof ServerPlayer player) {
             CombatStateManager.applyPostDamage(
@@ -1461,20 +1864,34 @@ public class ServerEvents {
                 && event.getSource().getEntity() instanceof ServerPlayer player
                 && event.getEntity() instanceof LivingEntity target) {
             MysteriousRingItem.onPlayerDamagedEnemy(player, target, event.getNewDamage());
+            DariBatiJue.onMeleeDamageApplied(
+                    player, target, event.getSource(), event.getNewDamage());
+            GangtingXiaokongLu.onDamageApplied(
+                    player, target, event.getSource(), event.getNewDamage());
         }
     }
 
     @SubscribeEvent
     public static void onKnockback(LivingKnockBackEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player
-                && CombatStateManager.isInCombat(player)) {
-            CombatStateManager.damagePosture(player, 10.0F);
+        UndeadAbilitySystem.adjustKnockback(event.getEntity(), event);
+        if (event.getEntity() instanceof ServerPlayer player) {
+            event.setStrength(event.getStrength() * CultivationShieldSpells.knockbackMultiplier(player));
+            if (CombatStateManager.isInCombat(player)) {
+                CombatStateManager.damagePosture(player, 10.0F);
+            }
         }
     }
 
     @SubscribeEvent
     public static void onShieldBlock(LivingShieldBlockEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player && player.hasEffect(ModEffects.QI_GATHERING)) {
+        if (event.getDamageSource().is(DamageTypes.PLAYER_ATTACK)
+                && event.getDamageSource().getEntity() instanceof ServerPlayer attacker
+                && CultivationAccessoryItem.hasShieldBreaker(attacker)) {
+            com.example.immortal_cultivation_mod.guidance.DaoGuidanceObservations.record(attacker, "ring_triggered");
+            event.setBlocked(false);
+            event.setBlockedDamage(0.0F);
+            event.getEntity().stopUsingItem();
+        } else if (event.getEntity() instanceof ServerPlayer player && player.hasEffect(ModEffects.QI_GATHERING)) {
             event.setBlocked(false);
             event.setBlockedDamage(0.0F);
             player.stopUsingItem();
@@ -1493,7 +1910,7 @@ public class ServerEvents {
 
         var data = ModAttachments.getData(player);
         int cost = 85;
-        if (!spendQiOrBlood(player, data, cost)) {
+        if (!spendSpellQiOrBlood(player, data, cost)) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return;
         }
@@ -1641,6 +2058,37 @@ public class ServerEvents {
         return changed;
     }
 
+    private static int unlockAllSpells(
+            CommandSourceStack source, Collection<ServerPlayer> targets) {
+        List<String> registeredSpells = ModSpells.all().stream()
+                .map(ModSpells.SpellDef::id)
+                .map(ModSpells::normalizeId)
+                .distinct()
+                .sorted()
+                .toList();
+        int changed = 0;
+        for (ServerPlayer target : targets) {
+            ModAttachments.CultivationData data = ModAttachments.getData(target);
+            ArrayList<String> known = new ArrayList<>(data.knownSpells());
+            int before = known.size();
+            for (String spellId : registeredSpells) {
+                if (!known.contains(spellId)) {
+                    known.add(spellId);
+                }
+            }
+            if (known.size() != before) {
+                ModAttachments.setData(target, data.withKnownSpells(List.copyOf(known)));
+                syncPlayerData(target);
+                changed++;
+            }
+        }
+        int changedPlayers = changed;
+        source.sendSuccess(() -> Component.literal(
+                "Unlocked all " + registeredSpells.size() + " registered spells for "
+                        + changedPlayers + " player(s)."), true);
+        return changed;
+    }
+
     private static void syncRestrictionHints(ServerPlayer player) {
         PacketDistributor.sendToPlayer(player,
                 new ModPayloads.ClientboundDebugHintCountPayload(
@@ -1648,7 +2096,6 @@ public class ServerEvents {
     }
 
     private static ModAttachments.CultivationData handleThoughtsTick(Player player, ModAttachments.CultivationData data) {
-        boolean wasEmpty = data.thoughts() <= 0;
         ModAttachments.CultivationData updated = data;
 
         if (data.thoughts() > data.maxThoughts()) {
@@ -1663,8 +2110,10 @@ public class ServerEvents {
         if (!updated.equals(data)) {
             ModAttachments.setData(player, updated);
         }
-        if (wasEmpty) {
-            player.addEffect(new MobEffectInstance(ModEffects.DAZE, 40, 0, false, true, true));
+        if (updated.thoughts() <= 0) {
+            com.example.immortal_cultivation_mod.combat.ThoughtControlGuard.applyExhaustion(player);
+        } else {
+            com.example.immortal_cultivation_mod.combat.ThoughtControlGuard.releaseRecoveredControls(player);
         }
         return updated;
     }
@@ -1674,7 +2123,9 @@ public class ServerEvents {
         var updated = data.withThoughts(data.thoughts() + delta);
         ModAttachments.setData(player, updated);
         if (updated.thoughts() <= 0) {
-            player.addEffect(new MobEffectInstance(ModEffects.DAZE, 40, 0, false, true, true));
+            com.example.immortal_cultivation_mod.combat.ThoughtControlGuard.applyExhaustion(player);
+        } else if (delta > 0) {
+            com.example.immortal_cultivation_mod.combat.ThoughtControlGuard.releaseRecoveredControls(player);
         }
         if (player instanceof ServerPlayer serverPlayer) {
             syncPlayerData(serverPlayer);
@@ -1717,6 +2168,9 @@ public class ServerEvents {
     }
 
     private static String nextCultivationLevel(String current, int direction) {
+            if (CultivationLevels.REALM_HALF_JINDAN.equals(current)) {
+                return direction < 0 ? CultivationLevels.getPreviousStage(current) : CultivationLevels.getNextStage(current);
+            }
         List<String> values = CultivationLevels.allLevels();
         int index = values.indexOf(current);
         if (index < 0) {
@@ -1773,7 +2227,8 @@ public class ServerEvents {
                         data.mentalAttack(),
                         data.yuqiControlAllMode(),
                         com.example.immortal_cultivation_mod.item.IdentityItems
-                                .ensurePlayerIdentity(subject)
+                                .ensurePlayerIdentity(subject),
+                        CultivationAccessoryItem.isLivingCorpse(subject)
                 )
         );
     }
@@ -1810,6 +2265,16 @@ public class ServerEvents {
     }
 
     public static void tryBreakthrough(ServerPlayer player) {
+        if (JindanTribulation.isActive(player)) {
+            player.sendSystemMessage(Component.translatable("message.immortal_cultivation_mod.jindan_trial_unfinished"));
+            return;
+        }
+        if (CultivationAccessoryItem.isLivingCorpse(player)) {
+            player.sendSystemMessage(Component.translatable(
+                    "message." + ImmortalCultivationMod.MODID
+                            + ".living_corpse_cannot_cultivate"));
+            return;
+        }
         var data = ModAttachments.getData(player);
 
         String next = CultivationLevels.getNextStage(data.cultivationLevel());
@@ -1867,7 +2332,9 @@ public class ServerEvents {
             return;
         }
 
-        if (player.getRandom().nextFloat() < CultivationLevels.getBreakthroughFailChance(data.luck(), data.cultivationLevel())) {
+        if (player.getRandom().nextFloat() < Math.max(0, CultivationLevels.getBreakthroughFailChance(data.luck(), data.cultivationLevel())
+                - com.example.immortal_cultivation_mod.alchemy.AlchemyEffects.bonus(player,
+                com.example.immortal_cultivation_mod.alchemy.AlchemyChemistry.Effect.BREAKTHROUGH))) {
             ModAttachments.setData(player, data.withCultivationProgress(0));
             player.hurt(player.damageSources().magic(), Math.max(1.0F, getEffectiveMaxHp(data, levelDef) * 0.5F));
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".breakthrough_failed"));
@@ -1888,14 +2355,23 @@ public class ServerEvents {
             serverLevel.sendParticles(ParticleTypes.TOTEM_OF_UNDYING, player.getX(), player.getY() + 1.0D, player.getZ(), 30, 0.6D, 0.8D, 0.6D, 0.08D);
         }
 
-        player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".breakthrough_success", next));
+        player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".breakthrough_success", CultivationLevels.displayName(next)));
         MysteriousRingItem.onBreakthroughSuccess(
                 player, data.cultivationLevel(), next);
         syncPlayerData(player);
+        com.example.immortal_cultivation_mod.guidance.DaoGuidanceSystem.record(
+                player, com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent.BREAKTHROUGH_SUCCESS);
     }
 
     public static void completeJindanBreakthrough(ServerPlayer player, float averageScale, int lessThanOne, int atOne) {
         var tag = player.getPersistentData();
+        if (CultivationAccessoryItem.isLivingCorpse(player)) {
+            tag.remove(JINDAN_CHALLENGE_PENDING_TAG);
+            player.sendSystemMessage(Component.translatable(
+                    "message." + ImmortalCultivationMod.MODID
+                            + ".living_corpse_cannot_cultivate"));
+            return;
+        }
         if (!tag.getBoolean(JINDAN_CHALLENGE_PENDING_TAG)) {
             return;
         }
@@ -1946,11 +2422,17 @@ public class ServerEvents {
         MysteriousRingItem.onBreakthroughSuccess(
                 player, data.cultivationLevel(), next);
         syncPlayerData(player);
+        com.example.immortal_cultivation_mod.guidance.DaoGuidanceSystem.record(
+                player, com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent.BREAKTHROUGH_SUCCESS);
         JindanTribulation.start(player, quality);
+        if (data.cultivationLevel().equals(CultivationLevels.REALM_HALF_JINDAN)) {
+            com.example.immortal_cultivation_mod.guidance.DaoGuidanceObservations.record(player, "core_retry");
+        }
     }
 
     private static boolean isZhujiToJindan(String current, String next) {
-        return (CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE).equals(current)
+        return ((CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE).equals(current)
+                || CultivationLevels.REALM_HALF_JINDAN.equals(current))
                 && (CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_EARLY).equals(next);
     }
 
@@ -2036,6 +2518,23 @@ public class ServerEvents {
                 }
             }
 
+            double livingCorpseBonus = UndeadControl.livingCorpseMaxHealthBonus(player);
+            AttributeModifier existingLivingCorpseModifier =
+                    maxHealth.getModifier(LIVING_CORPSE_MAX_HEALTH_MODIFIER);
+            double existingLivingCorpseBonus = existingLivingCorpseModifier == null
+                    ? 0.0D
+                    : existingLivingCorpseModifier.amount();
+            if (Math.abs(existingLivingCorpseBonus - livingCorpseBonus) > 0.001D) {
+                maxHealth.removeModifier(LIVING_CORPSE_MAX_HEALTH_MODIFIER);
+                if (livingCorpseBonus > 0.001D) {
+                    maxHealth.addPermanentModifier(new AttributeModifier(
+                            LIVING_CORPSE_MAX_HEALTH_MODIFIER,
+                            livingCorpseBonus,
+                            AttributeModifier.Operation.ADD_VALUE
+                    ));
+                }
+            }
+
             double currentMax = maxHealth.getValue();
             if (player.getHealth() > currentMax) {
                 player.setHealth((float) currentMax);
@@ -2063,7 +2562,7 @@ public class ServerEvents {
 
         AttributeInstance movementSpeed = player.getAttribute(Attributes.MOVEMENT_SPEED);
         if (movementSpeed != null) {
-            double speed = 0.1D + (data.maxEnergyBonus() / 40) * 0.005D;
+            double speed = 0.1D;
             if (player.hasEffect(ModEffects.EARTH_ESCAPE)) {
                 speed += 0.08D;
             }
@@ -2131,8 +2630,31 @@ public class ServerEvents {
     }
 
     public static boolean spendQiOrBlood(Player player, ModAttachments.CultivationData data, int cost) {
+        return spendQiOrBlood(player, data, cost, false, false);
+    }
+
+    public static boolean spendSpellQiOrBlood(Player player, ModAttachments.CultivationData data, int cost) {
+        return spendQiOrBlood(player, data, cost, false, true);
+    }
+
+    public static boolean spendSustainedQiOrBlood(
+            Player player, ModAttachments.CultivationData data, int cost) {
+        return spendQiOrBlood(player, data, cost, true, false);
+    }
+
+    private static boolean spendQiOrBlood(
+            Player player, ModAttachments.CultivationData data,
+            int cost, boolean sustained, boolean spell) {
+        int sealedCost = sustained
+                ? com.example.immortal_cultivation_mod.spell.SpiritSealSystem
+                        .adjustSustainQiCost(player, Math.max(0, cost))
+                : com.example.immortal_cultivation_mod.spell.SpiritSealSystem
+                        .adjustSpellQiCost(player, Math.max(0, cost));
         int actualCost = com.example.immortal_cultivation_mod.magicritual.center.CenterEffectSupport
-                .adjustSpellQiCost(player, Math.max(0, cost));
+                .adjustSpellQiCost(player, sealedCost);
+        double discount=spell&&actualCost>0
+                ?com.example.immortal_cultivation_mod.alchemy.AlchemyEffects.spellDiscount(player):0;
+        if(discount>0)actualCost=Math.max(1,(int)Math.ceil(actualCost*(1-discount)));
         if (CultivationMethods.isBloodDemon(data.activeCultivationMethod())) {
             if ((long) data.blood() + data.qi() < actualCost) {
                 return false;
@@ -2142,13 +2664,42 @@ public class ServerEvents {
             ModAttachments.setData(player, data
                     .withBlood(data.blood() - bloodSpent)
                     .withQi(data.qi() - qiSpent));
+            if(discount>0)com.example.immortal_cultivation_mod.alchemy.AlchemyEffects.spendSpellDiscount(player);
+            markQiFlowActive(player, actualCost);
+            com.example.immortal_cultivation_mod.spell.SpiritSealSystem
+                    .onQiSpent(player, actualCost);
             return true;
         }
         if (data.qi() < actualCost) {
             return false;
         }
         ModAttachments.setData(player, data.withQi(data.qi() - actualCost));
+        if(discount>0)com.example.immortal_cultivation_mod.alchemy.AlchemyEffects.spendSpellDiscount(player);
+        markQiFlowActive(player, actualCost);
+        com.example.immortal_cultivation_mod.spell.SpiritSealSystem
+                .onQiSpent(player, actualCost);
         return true;
+    }
+
+    private static void markQiFlowActive(Player player, int cost) {
+        if (cost <= 0 || player.level().isClientSide) return;
+        player.getPersistentData().putLong(QI_FLOW_ACTIVE_UNTIL_TAG,
+                player.level().getGameTime() + QI_FLOW_AFTER_USE_TICKS);
+    }
+
+    /** True while an entity is drawing ambient qi or has just spent qi. */
+    public static boolean isDrawingOrUsingQi(LivingEntity entity) {
+        if (entity == null || !entity.isAlive()) return false;
+        if (entity.hasEffect(ModEffects.QI_GATHERING)) return true;
+        if (entity instanceof CultivationNpc npc
+                && npc.npcCastingTicks() > 0) return true;
+        if (!(entity instanceof Player player)) return false;
+        ModAttachments.CultivationData data = ModAttachments.getData(player);
+        return data.isMeditating()
+                || player instanceof ServerPlayer serverPlayer
+                        && CombatStateManager.isPreparingSpell(serverPlayer)
+                || player.getPersistentData().getLong(QI_FLOW_ACTIVE_UNTIL_TAG)
+                        >= player.level().getGameTime();
     }
 
     public static boolean canAffordQiOrBlood(ModAttachments.CultivationData data, int cost) {
@@ -2161,6 +2712,13 @@ public class ServerEvents {
 
     public static void handleToggleMeditate(ServerPlayer player) {
         var data = ModAttachments.getData(player);
+        if (CultivationAccessoryItem.isLivingCorpse(player)) {
+            stopMeditating(player, data);
+            player.sendSystemMessage(Component.translatable(
+                    "message." + ImmortalCultivationMod.MODID
+                            + ".living_corpse_cannot_cultivate"));
+            return;
+        }
         boolean newState = !data.isMeditating();
         if (newState && !player.onGround()) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".meditation_need_ground"));
@@ -2171,16 +2729,25 @@ public class ServerEvents {
             MEDITATION_ANCHORS.put(player.getUUID(), player.position());
             player.setDeltaMovement(Vec3.ZERO);
             player.setPose(Pose.SITTING);
-            if (player.level() instanceof ServerLevel serverLevel) {
-                PhotonEffects.meditatingStart(serverLevel, player);
-            }
         } else {
             MEDITATION_ANCHORS.remove(player.getUUID());
             player.setPose(Pose.STANDING);
-            PhotonEffects.meditatingStop(player);
         }
         broadcastMeditationState(player, newState);
         player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + (newState ? ".meditation_started" : ".meditation_stopped")));
+        syncPlayerData(player);
+    }
+
+    private static void stopMeditating(
+            ServerPlayer player,
+            ModAttachments.CultivationData data) {
+        if (!data.isMeditating()) {
+            return;
+        }
+        ModAttachments.setData(player, data.withMeditating(false));
+        MEDITATION_ANCHORS.remove(player.getUUID());
+        player.setPose(Pose.STANDING);
+        broadcastMeditationState(player, false);
         syncPlayerData(player);
     }
 

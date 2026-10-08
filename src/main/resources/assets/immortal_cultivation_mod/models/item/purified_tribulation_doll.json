@@ -1,0 +1,3364 @@
+{
+  "credit": "Native fortune artifact geometry",
+  "ambientocclusion": false,
+  "gui_light": "front",
+  "textures": {
+    "straw": "minecraft:block/stripped_bamboo_block",
+    "straw_end": "minecraft:block/hay_block_top",
+    "wood": "minecraft:block/stripped_oak_log",
+    "red": "minecraft:block/red_wool",
+    "paper": "minecraft:block/quartz_block_side",
+    "ink": "minecraft:block/black_concrete",
+    "bronze": "minecraft:block/copper_block",
+    "dark": "minecraft:block/dark_prismarine",
+    "gold": "minecraft:block/gold_block",
+    "jade": "minecraft:block/oxidized_copper",
+    "silver": "minecraft:block/iron_block",
+    "glass": "minecraft:block/blue_ice",
+    "deep": "minecraft:block/cyan_terracotta",
+    "white": "minecraft:block/quartz_block_side",
+    "glow": "minecraft:block/sea_lantern",
+    "amber": "minecraft:block/ochre_froglight_side",
+    "ruby": "minecraft:block/redstone_block",
+    "particle": "minecraft:block/stripped_bamboo_block"
+  },
+  "elements": [
+    {
+      "name": "Bundled head0",
+      "from": [
+        6.9875,
+        10.35,
+        6.4
+      ],
+      "to": [
+        9.0125,
+        10.6875,
+        9.600000000000001
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.9875,
+            5.3125,
+            9.0125,
+            5.65
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            6.9875,
+            5.3125,
+            9.0125,
+            5.65
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            6.4,
+            5.3125,
+            9.6,
+            5.65
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            6.4,
+            5.3125,
+            9.6,
+            5.65
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            6.9875,
+            6.4,
+            9.0125,
+            9.6
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            6.9875,
+            6.4,
+            9.0125,
+            9.6
+          ],
+          "texture": "#straw"
+        }
+      }
+    },
+    {
+      "name": "Bundled head1",
+      "from": [
+        6.2,
+        10.6875,
+        6.4
+      ],
+      "to": [
+        9.8,
+        11.475,
+        9.600000000000001
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.2,
+            4.525,
+            9.8,
+            5.3125
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            6.2,
+            4.525,
+            9.8,
+            5.3125
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            6.4,
+            4.525,
+            9.6,
+            5.3125
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            6.4,
+            4.525,
+            9.6,
+            5.3125
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            6.2,
+            6.4,
+            9.8,
+            9.6
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            6.2,
+            6.4,
+            9.8,
+            9.6
+          ],
+          "texture": "#straw"
+        }
+      }
+    },
+    {
+      "name": "Bundled head2",
+      "from": [
+        5.75,
+        11.475,
+        6.4
+      ],
+      "to": [
+        10.25,
+        13.725,
+        9.600000000000001
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5.75,
+            2.275,
+            10.25,
+            4.525
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            5.75,
+            2.275,
+            10.25,
+            4.525
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            6.4,
+            2.275,
+            9.6,
+            4.525
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            6.4,
+            2.275,
+            9.6,
+            4.525
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            5.75,
+            6.4,
+            10.25,
+            9.6
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            5.75,
+            6.4,
+            10.25,
+            9.6
+          ],
+          "texture": "#straw"
+        }
+      }
+    },
+    {
+      "name": "Bundled head3",
+      "from": [
+        6.2,
+        13.725,
+        6.4
+      ],
+      "to": [
+        9.8,
+        14.5125,
+        9.600000000000001
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.2,
+            1.4875,
+            9.8,
+            2.275
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            6.2,
+            1.4875,
+            9.8,
+            2.275
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            6.4,
+            1.4875,
+            9.6,
+            2.275
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            6.4,
+            1.4875,
+            9.6,
+            2.275
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            6.2,
+            6.4,
+            9.8,
+            9.6
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            6.2,
+            6.4,
+            9.8,
+            9.6
+          ],
+          "texture": "#straw"
+        }
+      }
+    },
+    {
+      "name": "Bundled head4",
+      "from": [
+        6.9875,
+        14.5125,
+        6.4
+      ],
+      "to": [
+        9.0125,
+        14.85,
+        9.600000000000001
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.9875,
+            1.15,
+            9.0125,
+            1.4875
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            6.9875,
+            1.15,
+            9.0125,
+            1.4875
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            6.4,
+            1.15,
+            9.6,
+            1.4875
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            6.4,
+            1.15,
+            9.6,
+            1.4875
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            6.9875,
+            6.4,
+            9.0125,
+            9.6
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            6.9875,
+            6.4,
+            9.0125,
+            9.6
+          ],
+          "texture": "#straw"
+        }
+      }
+    },
+    {
+      "name": "Head cap",
+      "from": [
+        6.7,
+        14.5,
+        6.3
+      ],
+      "to": [
+        9.3,
+        14.9,
+        9.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.7,
+            1.1,
+            9.3,
+            1.5
+          ],
+          "texture": "#straw_end"
+        },
+        "south": {
+          "uv": [
+            6.7,
+            1.1,
+            9.3,
+            1.5
+          ],
+          "texture": "#straw_end"
+        },
+        "west": {
+          "uv": [
+            6.3,
+            1.1,
+            9.7,
+            1.5
+          ],
+          "texture": "#straw_end"
+        },
+        "east": {
+          "uv": [
+            6.3,
+            1.1,
+            9.7,
+            1.5
+          ],
+          "texture": "#straw_end"
+        },
+        "up": {
+          "uv": [
+            6.7,
+            6.3,
+            9.3,
+            9.7
+          ],
+          "texture": "#straw_end"
+        },
+        "down": {
+          "uv": [
+            6.7,
+            6.3,
+            9.3,
+            9.7
+          ],
+          "texture": "#straw_end"
+        }
+      }
+    },
+    {
+      "name": "Torso reed",
+      "from": [
+        6.35,
+        5.2,
+        6.4
+      ],
+      "to": [
+        6.739999999999999,
+        10.4,
+        9.3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.35,
+            5.6,
+            6.74,
+            10.8
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            6.35,
+            5.6,
+            6.74,
+            10.8
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            6.4,
+            5.6,
+            9.3,
+            10.8
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            6.4,
+            5.6,
+            9.3,
+            10.8
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            6.35,
+            6.4,
+            6.74,
+            9.3
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            6.35,
+            6.4,
+            6.74,
+            9.3
+          ],
+          "texture": "#straw"
+        }
+      }
+    },
+    {
+      "name": "Torso reed",
+      "from": [
+        6.83,
+        5.3500000000000005,
+        6.4
+      ],
+      "to": [
+        7.22,
+        10.4,
+        9.3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.83,
+            5.6,
+            7.22,
+            10.65
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            6.83,
+            5.6,
+            7.22,
+            10.65
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            6.4,
+            5.6,
+            9.3,
+            10.65
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            6.4,
+            5.6,
+            9.3,
+            10.65
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            6.83,
+            6.4,
+            7.22,
+            9.3
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            6.83,
+            6.4,
+            7.22,
+            9.3
+          ],
+          "texture": "#straw"
+        }
+      }
+    },
+    {
+      "name": "Torso reed",
+      "from": [
+        7.31,
+        5.5,
+        6.4
+      ],
+      "to": [
+        7.699999999999999,
+        10.4,
+        9.3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7.31,
+            5.6,
+            7.7,
+            10.5
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            7.31,
+            5.6,
+            7.7,
+            10.5
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            6.4,
+            5.6,
+            9.3,
+            10.5
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            6.4,
+            5.6,
+            9.3,
+            10.5
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            7.31,
+            6.4,
+            7.7,
+            9.3
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            7.31,
+            6.4,
+            7.7,
+            9.3
+          ],
+          "texture": "#straw"
+        }
+      }
+    },
+    {
+      "name": "Torso reed",
+      "from": [
+        7.789999999999999,
+        5.2,
+        6.4
+      ],
+      "to": [
+        8.18,
+        10.4,
+        9.3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7.79,
+            5.6,
+            8.18,
+            10.8
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            7.79,
+            5.6,
+            8.18,
+            10.8
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            6.4,
+            5.6,
+            9.3,
+            10.8
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            6.4,
+            5.6,
+            9.3,
+            10.8
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            7.79,
+            6.4,
+            8.18,
+            9.3
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            7.79,
+            6.4,
+            8.18,
+            9.3
+          ],
+          "texture": "#straw"
+        }
+      }
+    },
+    {
+      "name": "Torso reed",
+      "from": [
+        8.27,
+        5.3500000000000005,
+        6.4
+      ],
+      "to": [
+        8.66,
+        10.4,
+        9.3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8.27,
+            5.6,
+            8.66,
+            10.65
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            8.27,
+            5.6,
+            8.66,
+            10.65
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            6.4,
+            5.6,
+            9.3,
+            10.65
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            6.4,
+            5.6,
+            9.3,
+            10.65
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            8.27,
+            6.4,
+            8.66,
+            9.3
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            8.27,
+            6.4,
+            8.66,
+            9.3
+          ],
+          "texture": "#straw"
+        }
+      }
+    },
+    {
+      "name": "Torso reed",
+      "from": [
+        8.75,
+        5.5,
+        6.4
+      ],
+      "to": [
+        9.14,
+        10.4,
+        9.3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8.75,
+            5.6,
+            9.14,
+            10.5
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            8.75,
+            5.6,
+            9.14,
+            10.5
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            6.4,
+            5.6,
+            9.3,
+            10.5
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            6.4,
+            5.6,
+            9.3,
+            10.5
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            8.75,
+            6.4,
+            9.14,
+            9.3
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            8.75,
+            6.4,
+            9.14,
+            9.3
+          ],
+          "texture": "#straw"
+        }
+      }
+    },
+    {
+      "name": "Torso reed",
+      "from": [
+        9.23,
+        5.2,
+        6.4
+      ],
+      "to": [
+        9.620000000000001,
+        10.4,
+        9.3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            9.23,
+            5.6,
+            9.62,
+            10.8
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            9.23,
+            5.6,
+            9.62,
+            10.8
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            6.4,
+            5.6,
+            9.3,
+            10.8
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            6.4,
+            5.6,
+            9.3,
+            10.8
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            9.23,
+            6.4,
+            9.62,
+            9.3
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            9.23,
+            6.4,
+            9.62,
+            9.3
+          ],
+          "texture": "#straw"
+        }
+      }
+    },
+    {
+      "name": "Arm straw",
+      "from": [
+        2.0999999999999996,
+        8.75,
+        7.2
+      ],
+      "to": [
+        6.5,
+        9.08,
+        8.8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            2.1,
+            6.92,
+            6.5,
+            7.25
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            2.1,
+            6.92,
+            6.5,
+            7.25
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            7.2,
+            6.92,
+            8.8,
+            7.25
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            7.2,
+            6.92,
+            8.8,
+            7.25
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            2.1,
+            7.2,
+            6.5,
+            8.8
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            2.1,
+            7.2,
+            6.5,
+            8.8
+          ],
+          "texture": "#straw"
+        }
+      },
+      "rotation": {
+        "origin": [
+          4.3,
+          9.5,
+          8
+        ],
+        "axis": "z",
+        "angle": -22.5
+      }
+    },
+    {
+      "name": "Arm straw",
+      "from": [
+        2.0999999999999996,
+        9.17,
+        7.2
+      ],
+      "to": [
+        6.5,
+        9.5,
+        8.8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            2.1,
+            6.5,
+            6.5,
+            6.83
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            2.1,
+            6.5,
+            6.5,
+            6.83
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            7.2,
+            6.5,
+            8.8,
+            6.83
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            7.2,
+            6.5,
+            8.8,
+            6.83
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            2.1,
+            7.2,
+            6.5,
+            8.8
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            2.1,
+            7.2,
+            6.5,
+            8.8
+          ],
+          "texture": "#straw"
+        }
+      },
+      "rotation": {
+        "origin": [
+          4.3,
+          9.5,
+          8
+        ],
+        "axis": "z",
+        "angle": -22.5
+      }
+    },
+    {
+      "name": "Arm straw",
+      "from": [
+        2.0999999999999996,
+        9.59,
+        7.2
+      ],
+      "to": [
+        6.5,
+        9.92,
+        8.8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            2.1,
+            6.08,
+            6.5,
+            6.41
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            2.1,
+            6.08,
+            6.5,
+            6.41
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            7.2,
+            6.08,
+            8.8,
+            6.41
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            7.2,
+            6.08,
+            8.8,
+            6.41
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            2.1,
+            7.2,
+            6.5,
+            8.8
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            2.1,
+            7.2,
+            6.5,
+            8.8
+          ],
+          "texture": "#straw"
+        }
+      },
+      "rotation": {
+        "origin": [
+          4.3,
+          9.5,
+          8
+        ],
+        "axis": "z",
+        "angle": -22.5
+      }
+    },
+    {
+      "name": "Arm straw",
+      "from": [
+        2.0999999999999996,
+        10.01,
+        7.2
+      ],
+      "to": [
+        6.5,
+        10.34,
+        8.8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            2.1,
+            5.66,
+            6.5,
+            5.99
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            2.1,
+            5.66,
+            6.5,
+            5.99
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            7.2,
+            5.66,
+            8.8,
+            5.99
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            7.2,
+            5.66,
+            8.8,
+            5.99
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            2.1,
+            7.2,
+            6.5,
+            8.8
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            2.1,
+            7.2,
+            6.5,
+            8.8
+          ],
+          "texture": "#straw"
+        }
+      },
+      "rotation": {
+        "origin": [
+          4.3,
+          9.5,
+          8
+        ],
+        "axis": "z",
+        "angle": -22.5
+      }
+    },
+    {
+      "name": "Wrist binding",
+      "from": [
+        2.82,
+        8.6,
+        7.08
+      ],
+      "to": [
+        3.28,
+        10.4,
+        8.92
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            2.82,
+            5.6,
+            3.28,
+            7.4
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            2.82,
+            5.6,
+            3.28,
+            7.4
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            7.08,
+            5.6,
+            8.92,
+            7.4
+          ],
+          "texture": "#red"
+        },
+        "east": {
+          "uv": [
+            7.08,
+            5.6,
+            8.92,
+            7.4
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            2.82,
+            7.08,
+            3.28,
+            8.92
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            2.82,
+            7.08,
+            3.28,
+            8.92
+          ],
+          "texture": "#red"
+        }
+      },
+      "rotation": {
+        "origin": [
+          4.3,
+          9.5,
+          8
+        ],
+        "axis": "z",
+        "angle": -22.5
+      }
+    },
+    {
+      "name": "Leg straw",
+      "from": [
+        5.95,
+        0.9,
+        7.25
+      ],
+      "to": [
+        6.319999999999999,
+        5.9,
+        8.75
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5.95,
+            10.1,
+            6.32,
+            15.1
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            5.95,
+            10.1,
+            6.32,
+            15.1
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            7.25,
+            10.1,
+            8.75,
+            15.1
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            7.25,
+            10.1,
+            8.75,
+            15.1
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            5.95,
+            7.25,
+            6.32,
+            8.75
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            5.95,
+            7.25,
+            6.32,
+            8.75
+          ],
+          "texture": "#straw"
+        }
+      },
+      "rotation": {
+        "origin": [
+          6.55,
+          5.6,
+          8
+        ],
+        "axis": "z",
+        "angle": -22.5
+      }
+    },
+    {
+      "name": "Leg straw",
+      "from": [
+        6.4,
+        1.15,
+        7.25
+      ],
+      "to": [
+        6.77,
+        5.9,
+        8.75
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.4,
+            10.1,
+            6.77,
+            14.85
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            6.4,
+            10.1,
+            6.77,
+            14.85
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            7.25,
+            10.1,
+            8.75,
+            14.85
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            7.25,
+            10.1,
+            8.75,
+            14.85
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            6.4,
+            7.25,
+            6.77,
+            8.75
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            6.4,
+            7.25,
+            6.77,
+            8.75
+          ],
+          "texture": "#straw"
+        }
+      },
+      "rotation": {
+        "origin": [
+          6.55,
+          5.6,
+          8
+        ],
+        "axis": "z",
+        "angle": -22.5
+      }
+    },
+    {
+      "name": "Leg straw",
+      "from": [
+        6.8500000000000005,
+        0.9,
+        7.25
+      ],
+      "to": [
+        7.22,
+        5.9,
+        8.75
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.85,
+            10.1,
+            7.22,
+            15.1
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            6.85,
+            10.1,
+            7.22,
+            15.1
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            7.25,
+            10.1,
+            8.75,
+            15.1
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            7.25,
+            10.1,
+            8.75,
+            15.1
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            6.85,
+            7.25,
+            7.22,
+            8.75
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            6.85,
+            7.25,
+            7.22,
+            8.75
+          ],
+          "texture": "#straw"
+        }
+      },
+      "rotation": {
+        "origin": [
+          6.55,
+          5.6,
+          8
+        ],
+        "axis": "z",
+        "angle": -22.5
+      }
+    },
+    {
+      "name": "Ankle binding",
+      "from": [
+        5.85,
+        1.9,
+        7.1
+      ],
+      "to": [
+        7.35,
+        2.4,
+        8.9
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5.85,
+            13.6,
+            7.35,
+            14.1
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            5.85,
+            13.6,
+            7.35,
+            14.1
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            7.1,
+            13.6,
+            8.9,
+            14.1
+          ],
+          "texture": "#red"
+        },
+        "east": {
+          "uv": [
+            7.1,
+            13.6,
+            8.9,
+            14.1
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            5.85,
+            7.1,
+            7.35,
+            8.9
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            5.85,
+            7.1,
+            7.35,
+            8.9
+          ],
+          "texture": "#red"
+        }
+      },
+      "rotation": {
+        "origin": [
+          6.55,
+          5.6,
+          8
+        ],
+        "axis": "z",
+        "angle": -22.5
+      }
+    },
+    {
+      "name": "Arm straw",
+      "from": [
+        9.5,
+        8.75,
+        7.2
+      ],
+      "to": [
+        13.899999999999999,
+        9.08,
+        8.8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            9.5,
+            6.92,
+            13.9,
+            7.25
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            9.5,
+            6.92,
+            13.9,
+            7.25
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            7.2,
+            6.92,
+            8.8,
+            7.25
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            7.2,
+            6.92,
+            8.8,
+            7.25
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            9.5,
+            7.2,
+            13.9,
+            8.8
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            9.5,
+            7.2,
+            13.9,
+            8.8
+          ],
+          "texture": "#straw"
+        }
+      },
+      "rotation": {
+        "origin": [
+          11.7,
+          9.5,
+          8
+        ],
+        "axis": "z",
+        "angle": 22.5
+      }
+    },
+    {
+      "name": "Arm straw",
+      "from": [
+        9.5,
+        9.17,
+        7.2
+      ],
+      "to": [
+        13.899999999999999,
+        9.5,
+        8.8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            9.5,
+            6.5,
+            13.9,
+            6.83
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            9.5,
+            6.5,
+            13.9,
+            6.83
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            7.2,
+            6.5,
+            8.8,
+            6.83
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            7.2,
+            6.5,
+            8.8,
+            6.83
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            9.5,
+            7.2,
+            13.9,
+            8.8
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            9.5,
+            7.2,
+            13.9,
+            8.8
+          ],
+          "texture": "#straw"
+        }
+      },
+      "rotation": {
+        "origin": [
+          11.7,
+          9.5,
+          8
+        ],
+        "axis": "z",
+        "angle": 22.5
+      }
+    },
+    {
+      "name": "Arm straw",
+      "from": [
+        9.5,
+        9.59,
+        7.2
+      ],
+      "to": [
+        13.899999999999999,
+        9.92,
+        8.8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            9.5,
+            6.08,
+            13.9,
+            6.41
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            9.5,
+            6.08,
+            13.9,
+            6.41
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            7.2,
+            6.08,
+            8.8,
+            6.41
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            7.2,
+            6.08,
+            8.8,
+            6.41
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            9.5,
+            7.2,
+            13.9,
+            8.8
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            9.5,
+            7.2,
+            13.9,
+            8.8
+          ],
+          "texture": "#straw"
+        }
+      },
+      "rotation": {
+        "origin": [
+          11.7,
+          9.5,
+          8
+        ],
+        "axis": "z",
+        "angle": 22.5
+      }
+    },
+    {
+      "name": "Arm straw",
+      "from": [
+        9.5,
+        10.01,
+        7.2
+      ],
+      "to": [
+        13.899999999999999,
+        10.34,
+        8.8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            9.5,
+            5.66,
+            13.9,
+            5.99
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            9.5,
+            5.66,
+            13.9,
+            5.99
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            7.2,
+            5.66,
+            8.8,
+            5.99
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            7.2,
+            5.66,
+            8.8,
+            5.99
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            9.5,
+            7.2,
+            13.9,
+            8.8
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            9.5,
+            7.2,
+            13.9,
+            8.8
+          ],
+          "texture": "#straw"
+        }
+      },
+      "rotation": {
+        "origin": [
+          11.7,
+          9.5,
+          8
+        ],
+        "axis": "z",
+        "angle": 22.5
+      }
+    },
+    {
+      "name": "Wrist binding",
+      "from": [
+        12.719999999999999,
+        8.6,
+        7.08
+      ],
+      "to": [
+        13.18,
+        10.4,
+        8.92
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.72,
+            5.6,
+            13.18,
+            7.4
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            12.72,
+            5.6,
+            13.18,
+            7.4
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            7.08,
+            5.6,
+            8.92,
+            7.4
+          ],
+          "texture": "#red"
+        },
+        "east": {
+          "uv": [
+            7.08,
+            5.6,
+            8.92,
+            7.4
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            12.72,
+            7.08,
+            13.18,
+            8.92
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            12.72,
+            7.08,
+            13.18,
+            8.92
+          ],
+          "texture": "#red"
+        }
+      },
+      "rotation": {
+        "origin": [
+          11.7,
+          9.5,
+          8
+        ],
+        "axis": "z",
+        "angle": 22.5
+      }
+    },
+    {
+      "name": "Leg straw",
+      "from": [
+        8.85,
+        0.9,
+        7.25
+      ],
+      "to": [
+        9.219999999999999,
+        5.9,
+        8.75
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8.85,
+            10.1,
+            9.22,
+            15.1
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            8.85,
+            10.1,
+            9.22,
+            15.1
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            7.25,
+            10.1,
+            8.75,
+            15.1
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            7.25,
+            10.1,
+            8.75,
+            15.1
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            8.85,
+            7.25,
+            9.22,
+            8.75
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            8.85,
+            7.25,
+            9.22,
+            8.75
+          ],
+          "texture": "#straw"
+        }
+      },
+      "rotation": {
+        "origin": [
+          9.45,
+          5.6,
+          8
+        ],
+        "axis": "z",
+        "angle": 22.5
+      }
+    },
+    {
+      "name": "Leg straw",
+      "from": [
+        9.299999999999999,
+        1.15,
+        7.25
+      ],
+      "to": [
+        9.669999999999998,
+        5.9,
+        8.75
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            9.3,
+            10.1,
+            9.67,
+            14.85
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            9.3,
+            10.1,
+            9.67,
+            14.85
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            7.25,
+            10.1,
+            8.75,
+            14.85
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            7.25,
+            10.1,
+            8.75,
+            14.85
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            9.3,
+            7.25,
+            9.67,
+            8.75
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            9.3,
+            7.25,
+            9.67,
+            8.75
+          ],
+          "texture": "#straw"
+        }
+      },
+      "rotation": {
+        "origin": [
+          9.45,
+          5.6,
+          8
+        ],
+        "axis": "z",
+        "angle": 22.5
+      }
+    },
+    {
+      "name": "Leg straw",
+      "from": [
+        9.75,
+        0.9,
+        7.25
+      ],
+      "to": [
+        10.12,
+        5.9,
+        8.75
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            9.75,
+            10.1,
+            10.12,
+            15.1
+          ],
+          "texture": "#straw"
+        },
+        "south": {
+          "uv": [
+            9.75,
+            10.1,
+            10.12,
+            15.1
+          ],
+          "texture": "#straw"
+        },
+        "west": {
+          "uv": [
+            7.25,
+            10.1,
+            8.75,
+            15.1
+          ],
+          "texture": "#straw"
+        },
+        "east": {
+          "uv": [
+            7.25,
+            10.1,
+            8.75,
+            15.1
+          ],
+          "texture": "#straw"
+        },
+        "up": {
+          "uv": [
+            9.75,
+            7.25,
+            10.12,
+            8.75
+          ],
+          "texture": "#straw"
+        },
+        "down": {
+          "uv": [
+            9.75,
+            7.25,
+            10.12,
+            8.75
+          ],
+          "texture": "#straw"
+        }
+      },
+      "rotation": {
+        "origin": [
+          9.45,
+          5.6,
+          8
+        ],
+        "axis": "z",
+        "angle": 22.5
+      }
+    },
+    {
+      "name": "Ankle binding",
+      "from": [
+        8.75,
+        1.9,
+        7.1
+      ],
+      "to": [
+        10.25,
+        2.4,
+        8.9
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8.75,
+            13.6,
+            10.25,
+            14.1
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            8.75,
+            13.6,
+            10.25,
+            14.1
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            7.1,
+            13.6,
+            8.9,
+            14.1
+          ],
+          "texture": "#red"
+        },
+        "east": {
+          "uv": [
+            7.1,
+            13.6,
+            8.9,
+            14.1
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            8.75,
+            7.1,
+            10.25,
+            8.9
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            8.75,
+            7.1,
+            10.25,
+            8.9
+          ],
+          "texture": "#red"
+        }
+      },
+      "rotation": {
+        "origin": [
+          9.45,
+          5.6,
+          8
+        ],
+        "axis": "z",
+        "angle": 22.5
+      }
+    },
+    {
+      "name": "Neck binding",
+      "from": [
+        6.75,
+        10.25,
+        6.15
+      ],
+      "to": [
+        9.25,
+        10.85,
+        9.55
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.75,
+            5.15,
+            9.25,
+            5.75
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            6.75,
+            5.15,
+            9.25,
+            5.75
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            6.15,
+            5.15,
+            9.55,
+            5.75
+          ],
+          "texture": "#red"
+        },
+        "east": {
+          "uv": [
+            6.15,
+            5.15,
+            9.55,
+            5.75
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            6.75,
+            6.15,
+            9.25,
+            9.55
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            6.75,
+            6.15,
+            9.25,
+            9.55
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Waist binding",
+      "from": [
+        6.15,
+        5.9,
+        6.12
+      ],
+      "to": [
+        9.85,
+        6.55,
+        9.6
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.15,
+            9.45,
+            9.85,
+            10.1
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            6.15,
+            9.45,
+            9.85,
+            10.1
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            6.12,
+            9.45,
+            9.6,
+            10.1
+          ],
+          "texture": "#red"
+        },
+        "east": {
+          "uv": [
+            6.12,
+            9.45,
+            9.6,
+            10.1
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            6.15,
+            6.12,
+            9.85,
+            9.6
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            6.15,
+            6.12,
+            9.85,
+            9.6
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Cross binding",
+      "from": [
+        7.76,
+        6.45,
+        6.05
+      ],
+      "to": [
+        8.2,
+        10.15,
+        6.4
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7.76,
+            5.85,
+            8.2,
+            9.55
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            7.76,
+            5.85,
+            8.2,
+            9.55
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            6.05,
+            5.85,
+            6.4,
+            9.55
+          ],
+          "texture": "#red"
+        },
+        "east": {
+          "uv": [
+            6.05,
+            5.85,
+            6.4,
+            9.55
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            7.76,
+            6.05,
+            8.2,
+            6.4
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            7.76,
+            6.05,
+            8.2,
+            6.4
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Chest talisman",
+      "from": [
+        7.05,
+        7.05,
+        5.85
+      ],
+      "to": [
+        8.95,
+        9.9,
+        6.08
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7.05,
+            6.1,
+            8.95,
+            8.95
+          ],
+          "texture": "#paper"
+        },
+        "south": {
+          "uv": [
+            7.05,
+            6.1,
+            8.95,
+            8.95
+          ],
+          "texture": "#paper"
+        },
+        "west": {
+          "uv": [
+            5.85,
+            6.1,
+            6.08,
+            8.95
+          ],
+          "texture": "#paper"
+        },
+        "east": {
+          "uv": [
+            5.85,
+            6.1,
+            6.08,
+            8.95
+          ],
+          "texture": "#paper"
+        },
+        "up": {
+          "uv": [
+            7.05,
+            5.85,
+            8.95,
+            6.08
+          ],
+          "texture": "#paper"
+        },
+        "down": {
+          "uv": [
+            7.05,
+            5.85,
+            8.95,
+            6.08
+          ],
+          "texture": "#paper"
+        }
+      }
+    },
+    {
+      "name": "Talisman stroke",
+      "from": [
+        7.5625,
+        9.25,
+        5.74
+      ],
+      "to": [
+        8.4375,
+        9.5,
+        5.8100000000000005
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7.5625,
+            6.5,
+            8.4375,
+            6.75
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            7.5625,
+            6.5,
+            8.4375,
+            6.75
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            5.74,
+            6.5,
+            5.81,
+            6.75
+          ],
+          "texture": "#red"
+        },
+        "east": {
+          "uv": [
+            5.74,
+            6.5,
+            5.81,
+            6.75
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            7.5625,
+            5.74,
+            8.4375,
+            5.81
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            7.5625,
+            5.74,
+            8.4375,
+            5.81
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Talisman stroke",
+      "from": [
+        7.875,
+        7.5,
+        5.74
+      ],
+      "to": [
+        8.125,
+        9.375,
+        5.8100000000000005
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7.875,
+            6.625,
+            8.125,
+            8.5
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            7.875,
+            6.625,
+            8.125,
+            8.5
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            5.74,
+            6.625,
+            5.81,
+            8.5
+          ],
+          "texture": "#red"
+        },
+        "east": {
+          "uv": [
+            5.74,
+            6.625,
+            5.81,
+            8.5
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            7.875,
+            5.74,
+            8.125,
+            5.81
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            7.875,
+            5.74,
+            8.125,
+            5.81
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Talisman stroke",
+      "from": [
+        7.375,
+        8.625,
+        5.74
+      ],
+      "to": [
+        8.625,
+        8.875,
+        5.8100000000000005
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7.375,
+            7.125,
+            8.625,
+            7.375
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            7.375,
+            7.125,
+            8.625,
+            7.375
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            5.74,
+            7.125,
+            5.81,
+            7.375
+          ],
+          "texture": "#red"
+        },
+        "east": {
+          "uv": [
+            5.74,
+            7.125,
+            5.81,
+            7.375
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            7.375,
+            5.74,
+            8.625,
+            5.81
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            7.375,
+            5.74,
+            8.625,
+            5.81
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Talisman stroke",
+      "from": [
+        8.125,
+        7.75,
+        5.74
+      ],
+      "to": [
+        8.625,
+        8.0,
+        5.8100000000000005
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8.125,
+            8.0,
+            8.625,
+            8.25
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            8.125,
+            8.0,
+            8.625,
+            8.25
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            5.74,
+            8.0,
+            5.81,
+            8.25
+          ],
+          "texture": "#red"
+        },
+        "east": {
+          "uv": [
+            5.74,
+            8.0,
+            5.81,
+            8.25
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            8.125,
+            5.74,
+            8.625,
+            5.81
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            8.125,
+            5.74,
+            8.625,
+            5.81
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Stitched eye",
+      "from": [
+        7.12,
+        12.65,
+        6.22
+      ],
+      "to": [
+        7.42,
+        12.95,
+        6.42
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7.12,
+            3.05,
+            7.42,
+            3.35
+          ],
+          "texture": "#ink"
+        },
+        "south": {
+          "uv": [
+            7.12,
+            3.05,
+            7.42,
+            3.35
+          ],
+          "texture": "#ink"
+        },
+        "west": {
+          "uv": [
+            6.22,
+            3.05,
+            6.42,
+            3.35
+          ],
+          "texture": "#ink"
+        },
+        "east": {
+          "uv": [
+            6.22,
+            3.05,
+            6.42,
+            3.35
+          ],
+          "texture": "#ink"
+        },
+        "up": {
+          "uv": [
+            7.12,
+            6.22,
+            7.42,
+            6.42
+          ],
+          "texture": "#ink"
+        },
+        "down": {
+          "uv": [
+            7.12,
+            6.22,
+            7.42,
+            6.42
+          ],
+          "texture": "#ink"
+        }
+      }
+    },
+    {
+      "name": "Stitched eye",
+      "from": [
+        8.65,
+        12.65,
+        6.22
+      ],
+      "to": [
+        8.950000000000001,
+        12.95,
+        6.42
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8.65,
+            3.05,
+            8.95,
+            3.35
+          ],
+          "texture": "#ink"
+        },
+        "south": {
+          "uv": [
+            8.65,
+            3.05,
+            8.95,
+            3.35
+          ],
+          "texture": "#ink"
+        },
+        "west": {
+          "uv": [
+            6.22,
+            3.05,
+            6.42,
+            3.35
+          ],
+          "texture": "#ink"
+        },
+        "east": {
+          "uv": [
+            6.22,
+            3.05,
+            6.42,
+            3.35
+          ],
+          "texture": "#ink"
+        },
+        "up": {
+          "uv": [
+            8.65,
+            6.22,
+            8.95,
+            6.42
+          ],
+          "texture": "#ink"
+        },
+        "down": {
+          "uv": [
+            8.65,
+            6.22,
+            8.95,
+            6.42
+          ],
+          "texture": "#ink"
+        }
+      }
+    },
+    {
+      "name": "Mouth stitch",
+      "from": [
+        7.5,
+        11.75,
+        6.23
+      ],
+      "to": [
+        8.5,
+        11.9,
+        6.43
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7.5,
+            4.1,
+            8.5,
+            4.25
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            7.5,
+            4.1,
+            8.5,
+            4.25
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            6.23,
+            4.1,
+            6.43,
+            4.25
+          ],
+          "texture": "#red"
+        },
+        "east": {
+          "uv": [
+            6.23,
+            4.1,
+            6.43,
+            4.25
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            7.5,
+            6.23,
+            8.5,
+            6.43
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            7.5,
+            6.23,
+            8.5,
+            6.43
+          ],
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "name": "Loose red thread",
+      "from": [
+        7.25,
+        3.65,
+        5.95
+      ],
+      "to": [
+        7.5,
+        6.3,
+        6.18
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7.25,
+            9.7,
+            7.5,
+            12.35
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            7.25,
+            9.7,
+            7.5,
+            12.35
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            5.95,
+            9.7,
+            6.18,
+            12.35
+          ],
+          "texture": "#red"
+        },
+        "east": {
+          "uv": [
+            5.95,
+            9.7,
+            6.18,
+            12.35
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            7.25,
+            5.95,
+            7.5,
+            6.18
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            7.25,
+            5.95,
+            7.5,
+            6.18
+          ],
+          "texture": "#red"
+        }
+      },
+      "rotation": {
+        "origin": [
+          7.25,
+          6.3,
+          6.05
+        ],
+        "axis": "z",
+        "angle": 22.5
+      }
+    },
+    {
+      "name": "Loose red thread",
+      "from": [
+        8.65,
+        3.65,
+        5.95
+      ],
+      "to": [
+        8.9,
+        6.3,
+        6.18
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8.65,
+            9.7,
+            8.9,
+            12.35
+          ],
+          "texture": "#red"
+        },
+        "south": {
+          "uv": [
+            8.65,
+            9.7,
+            8.9,
+            12.35
+          ],
+          "texture": "#red"
+        },
+        "west": {
+          "uv": [
+            5.95,
+            9.7,
+            6.18,
+            12.35
+          ],
+          "texture": "#red"
+        },
+        "east": {
+          "uv": [
+            5.95,
+            9.7,
+            6.18,
+            12.35
+          ],
+          "texture": "#red"
+        },
+        "up": {
+          "uv": [
+            8.65,
+            5.95,
+            8.9,
+            6.18
+          ],
+          "texture": "#red"
+        },
+        "down": {
+          "uv": [
+            8.65,
+            5.95,
+            8.9,
+            6.18
+          ],
+          "texture": "#red"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.65,
+          6.3,
+          6.05
+        ],
+        "axis": "z",
+        "angle": -22.5
+      }
+    }
+  ],
+  "display": {
+    "gui": {
+      "rotation": [
+        12,
+        -22,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ]
+    },
+    "ground": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        3,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.45,
+        0.45
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        1
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        1
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        -12,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        12,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    }
+  }
+}

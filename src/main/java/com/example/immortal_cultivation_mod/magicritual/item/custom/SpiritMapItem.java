@@ -3,22 +3,23 @@ package com.example.immortal_cultivation_mod.magicritual.item.custom;
 import com.example.immortal_cultivation_mod.magicritual.poi.ModPoiTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.village.poi.PoiManager.Occupancy;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MapItem;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 
 public class SpiritMapItem extends MapItem {
-   public SpiritMapItem(Properties properties) {
+   public SpiritMapItem(Item.Properties properties) {
       super(properties);
    }
 
@@ -47,26 +48,15 @@ public class SpiritMapItem extends MapItem {
             addSpiritVeinDecorations((ServerLevel)level, data);
          }
       }
+
    }
 
    private static void addSpiritVeinDecorations(ServerLevel level, MapItemSavedData mapData) {
       int range = 64;
       BlockPos centerPos = new BlockPos(mapData.centerX, 0, mapData.centerZ);
-      level.getPoiManager()
-         .getInRange(holder -> holder.value() == ModPoiTypes.SPIRIT_VEIN_CENTER_POI.get(), centerPos, range * 2, Occupancy.ANY)
-         .forEach(
-            record -> {
-               BlockPos veinPos = record.getPos();
-               mapData.addDecoration(
-                  MapDecorationTypes.RED_MARKER,
-                  level,
-                  "spirit_vein_" + veinPos.getX() + "_" + veinPos.getY() + "_" + veinPos.getZ(),
-                  (double)veinPos.getX() + 0.5,
-                  (double)veinPos.getZ() + 0.5,
-                  0.0,
-                  null
-               );
-            }
-         );
+      level.getPoiManager().getInRange((holder) -> holder.value() == ModPoiTypes.SPIRIT_VEIN_CENTER_POI.get(), centerPos, range * 2, Occupancy.ANY).forEach((record) -> {
+         BlockPos veinPos = record.getPos();
+         mapData.addDecoration(MapDecorationTypes.RED_MARKER, level, "spirit_vein_" + veinPos.getX() + "_" + veinPos.getY() + "_" + veinPos.getZ(), (double)veinPos.getX() + (double)0.5F, (double)veinPos.getZ() + (double)0.5F, (double)0.0F, (Component)null);
+      });
    }
 }

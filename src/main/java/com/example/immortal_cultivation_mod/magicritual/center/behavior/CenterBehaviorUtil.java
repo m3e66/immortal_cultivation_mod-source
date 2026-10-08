@@ -13,24 +13,21 @@ final class CenterBehaviorUtil {
    }
 
    static List<LivingEntity> livingEntities(CenterContext context) {
-      return context.level().getEntitiesOfClass(LivingEntity.class,
-            effectColumn(context), entity -> entity.isAlive() && insideEffectColumn(context, entity));
+      return context.level().getEntitiesOfClass(LivingEntity.class, effectColumn(context), (entity) -> entity.isAlive() && insideEffectColumn(context, entity));
    }
 
    static AABB effectColumn(CenterContext context) {
       Vec3 center = context.center().centerPoint();
-      double radius = context.center().getRadius();
-      return new AABB(
-            center.x - radius, context.pos().getY(), center.z - radius,
-            center.x + radius, context.level().getMaxBuildHeight(), center.z + radius);
+      double radius = (double)context.center().getRadius();
+      return new AABB(center.x - radius, (double)context.pos().getY(), center.z - radius, center.x + radius, (double)context.level().getMaxBuildHeight(), center.z + radius);
    }
 
    static boolean insideEffectColumn(CenterContext context, Entity entity) {
       Vec3 center = context.center().centerPoint();
       double dx = entity.getX() - center.x;
       double dz = entity.getZ() - center.z;
-      double radius = context.center().getRadius();
-      return entity.getY() >= context.pos().getY() && dx * dx + dz * dz <= radius * radius;
+      double radius = (double)context.center().getRadius();
+      return entity.getY() >= (double)context.pos().getY() && dx * dx + dz * dz <= radius * radius;
    }
 
    static boolean hostile(CenterContext context, LivingEntity entity) {

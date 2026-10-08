@@ -2,6 +2,7 @@ package com.example.immortal_cultivation_mod.client.renderer;
 
 import com.example.immortal_cultivation_mod.item.SwordCaseArmorRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -14,26 +15,18 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 
 public class SwordCaseCurioRenderer implements ICurioRenderer {
-    private final SwordCaseArmorRenderer renderer = new SwordCaseArmorRenderer();
+   private final SwordCaseArmorRenderer renderer = new SwordCaseArmorRenderer();
 
-    @Override
-    public <T extends LivingEntity, M extends EntityModel<T>> void render(ItemStack stack, SlotContext slotContext,
-                                                                          PoseStack poseStack,
-                                                                          RenderLayerParent<T, M> renderLayerParent,
-                                                                          MultiBufferSource buffer, int packedLight,
-                                                                          float limbSwing, float limbSwingAmount,
-                                                                          float partialTicks, float ageInTicks,
-                                                                          float netHeadYaw, float headPitch) {
-        LivingEntity entity = slotContext.entity();
-        if (!(renderLayerParent.getModel() instanceof HumanoidModel<?> humanoidModel)) {
-            return;
-        }
-        poseStack.pushPose();
-        ICurioRenderer.translateIfSneaking(poseStack, entity);
-        ICurioRenderer.followBodyRotations(entity, renderer);
-        renderer.prepForRender(entity, stack, EquipmentSlot.CHEST, humanoidModel, buffer,
-                partialTicks, limbSwing, limbSwingAmount, netHeadYaw, headPitch);
-        renderer.renderToBuffer(poseStack, null, packedLight, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
-        poseStack.popPose();
-    }
+   public <T extends LivingEntity, M extends EntityModel<T>> void render(ItemStack stack, SlotContext slotContext, PoseStack poseStack, RenderLayerParent<T, M> renderLayerParent, MultiBufferSource buffer, int packedLight, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+      LivingEntity entity = slotContext.entity();
+      EntityModel var15 = renderLayerParent.getModel();
+      if (var15 instanceof HumanoidModel<?> humanoidModel) {
+         poseStack.pushPose();
+         ICurioRenderer.translateIfSneaking(poseStack, entity);
+         ICurioRenderer.followBodyRotations(entity, new HumanoidModel[]{this.renderer});
+         this.renderer.prepForRender(entity, stack, EquipmentSlot.CHEST, humanoidModel, buffer, partialTicks, limbSwing, limbSwingAmount, netHeadYaw, headPitch);
+         this.renderer.renderToBuffer(poseStack, (VertexConsumer)null, packedLight, OverlayTexture.NO_OVERLAY, -1);
+         poseStack.popPose();
+      }
+   }
 }

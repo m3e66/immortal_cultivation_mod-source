@@ -1,22 +1,27 @@
 package com.example.immortal_cultivation_mod.magicritual.ui;
 
+import com.example.immortal_cultivation_mod.guidance.DaoGuidanceSystem;
 import com.example.immortal_cultivation_mod.magicritual.block.ModBlocks;
-import com.example.immortal_cultivation_mod.magicritual.item.ModItems;
 import com.example.immortal_cultivation_mod.magicritual.block.custom.MagicCenterBlockEntity;
 import com.example.immortal_cultivation_mod.magicritual.center.CenterTargetPolicy;
 import com.example.immortal_cultivation_mod.magicritual.center.MagicCenterTypeRegistry;
+import com.example.immortal_cultivation_mod.magicritual.center.TeleportDestinationInfo;
+import com.example.immortal_cultivation_mod.magicritual.item.ModItems;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
@@ -35,38 +40,29 @@ public class CenterFuelMenu extends AbstractContainerMenu {
    public static final int WEAPON_SLOT_Y = 72;
    public static final int OCTAGON_LAYER_SIZE = 8;
    public static final int OCTAGON_LAYER_COUNT = 3;
-   public static final int OCTAGON_SLOT_COUNT = OCTAGON_LAYER_SIZE * OCTAGON_LAYER_COUNT;
-   public static final int[][] OCTAGON_SLOT_POSITIONS = {
-      // Layer 1 - inner octagon, clockwise from the top.
-      {202, 102}, {223, 111}, {232, 132}, {223, 153},
-      {202, 162}, {181, 153}, {172, 132}, {181, 111},
-      // Layer 2 - middle octagon.
-      {202, 76}, {242, 92}, {258, 132}, {242, 172},
-      {202, 188}, {162, 172}, {146, 132}, {162, 92},
-      // Layer 3 - outer octagon.
-      {202, 50}, {260, 74}, {284, 132}, {260, 190},
-      {202, 214}, {144, 190}, {120, 132}, {144, 74}
-   };
-   public static final int PLAYER_INVENTORY_X = (GUI_WIDTH - 162) / 2;
+   public static final int OCTAGON_SLOT_COUNT = 24;
+   public static final int[][] OCTAGON_SLOT_POSITIONS = new int[][]{{202, 102}, {223, 111}, {232, 132}, {223, 153}, {202, 162}, {181, 153}, {172, 132}, {181, 111}, {202, 76}, {242, 92}, {258, 132}, {242, 172}, {202, 188}, {162, 172}, {146, 132}, {162, 92}, {202, 50}, {260, 74}, {284, 132}, {260, 190}, {202, 214}, {144, 190}, {120, 132}, {144, 74}};
+   public static final int PLAYER_INVENTORY_X = 129;
    public static final int PLAYER_INVENTORY_Y = 266;
    private final ContainerLevelAccess access;
    private final IItemHandler fuelHandler;
    private final IItemHandler reforgeWeaponHandler;
    private final IItemHandler octagonGridHandler;
    private boolean octagonTabActive;
+   private boolean teleportTabActive;
    public final BlockPos centerPos;
    public boolean allowHostileMobs;
    public boolean allowPassiveMobs;
-   public final Set<String> blacklistedPlayers = new HashSet<>();
-   public final Set<String> controllerPlayers = new HashSet<>();
+   public final Set<String> blacklistedPlayers;
+   public final Set<String> controllerPlayers;
    private static final int FUEL_SLOT = 0;
    private static final int WEAPON_SLOT = 1;
    public static final int OCTAGON_SLOT_START = 2;
-   public static final int OCTAGON_SLOT_END = OCTAGON_SLOT_START + OCTAGON_SLOT_COUNT;
-   private static final int CONTAINER_END = OCTAGON_SLOT_END;
-   private static final int PLAYER_INV_START = CONTAINER_END;
-   private static final int PLAYER_INV_END = PLAYER_INV_START + 27;
-   private static final int HOTBAR_END = PLAYER_INV_END + 9;
+   public static final int OCTAGON_SLOT_END = 26;
+   private static final int CONTAINER_END = 26;
+   private static final int PLAYER_INV_START = 26;
+   private static final int PLAYER_INV_END = 53;
+   private static final int HOTBAR_END = 62;
    public boolean particlesEnabled;
    public int glyphColor;
    public ResourceLocation centerTypeId;
@@ -80,13 +76,17 @@ public class CenterFuelMenu extends AbstractContainerMenu {
    public int defenseCircles;
    public int regenerationCircles;
    public UUID ownerUuid;
-   public String ownerLabel = "-";
-   public final Set<UUID> excludedPlayerUuids = new HashSet<>();
+   public String ownerLabel;
+   public final Set<UUID> excludedPlayerUuids;
    private boolean canControlCenter;
    private boolean canManageControllers;
-   public int teleportLinkMode = -1;
-   public String teleportDestinationLabel = "-";
+   public int teleportLinkMode;
+   public String teleportDestinationLabel;
+   public String teleportCode;
+   public String selectedTeleportDestinationCode;
+   public final List<TeleportDestinationInfo> teleportDestinations;
    private int accessRevision;
+   private int teleportRevision;
    private static final int DATA_RADIUS = 0;
    private static final int DATA_ENERGY_LOW = 1;
    private static final int DATA_ENERGY_HIGH = 2;
@@ -103,19 +103,7 @@ public class CenterFuelMenu extends AbstractContainerMenu {
    private MagicCenterBlockEntity centerRef;
 
    public CenterFuelMenu(int id, Inventory playerInv, RegistryFriendlyByteBuf extraData) {
-      this(
-         id,
-         playerInv,
-         new ItemStackHandler(1),
-         new ItemStackHandler(1),
-         new ItemStackHandler(OCTAGON_SLOT_COUNT),
-         ContainerLevelAccess.NULL,
-         extraData.readBlockPos(),
-         extraData.readBoolean(),
-         extraData.readBoolean(),
-         (Set<String>)extraData.readCollection(HashSet::new, buf -> buf.readUtf()),
-         0xFFFFFF
-      );
+      this(id, playerInv, new ItemStackHandler(1), new ItemStackHandler(1), new ItemStackHandler(24), ContainerLevelAccess.NULL, extraData.readBlockPos(), extraData.readBoolean(), extraData.readBoolean(), (Set)extraData.readCollection(HashSet::new, (buf) -> buf.readUtf()), 16777215);
       this.particlesEnabled = extraData.readBoolean();
       this.glyphColor = extraData.readInt();
       this.centerTypeId = extraData.readResourceLocation();
@@ -131,71 +119,45 @@ public class CenterFuelMenu extends AbstractContainerMenu {
       if (extraData.readBoolean()) {
          this.ownerUuid = extraData.readUUID();
       }
+
       this.ownerLabel = extraData.readUtf();
       int excludedCount = extraData.readVarInt();
-      for (int index = 0; index < excludedCount; index++) {
+
+      for(int index = 0; index < excludedCount; ++index) {
          this.excludedPlayerUuids.add(extraData.readUUID());
       }
-      this.controllerPlayers.addAll((Set<String>)extraData.readCollection(
-            HashSet::new, buf -> buf.readUtf()));
+
+      this.controllerPlayers.addAll((Set)extraData.readCollection(HashSet::new, (buf) -> buf.readUtf()));
       this.canControlCenter = extraData.readBoolean();
       this.canManageControllers = extraData.readBoolean();
       this.teleportLinkMode = extraData.readVarInt();
       this.teleportDestinationLabel = extraData.readUtf();
-      seedDataFromFields();
+      this.teleportCode = extraData.readUtf();
+      this.selectedTeleportDestinationCode = extraData.readUtf();
+      int teleportDestinationCount = Math.min(32, extraData.readVarInt());
+
+      for(int index = 0; index < teleportDestinationCount; ++index) {
+         this.teleportDestinations.add(new TeleportDestinationInfo(extraData.readUtf(), extraData.readUtf(), extraData.readVarInt(), extraData.readVarLong(), extraData.readBoolean()));
+      }
+
+      this.seedDataFromFields();
    }
 
-   public CenterFuelMenu(
-      int id,
-      Inventory playerInv,
-      IItemHandler fuelHandler,
-      IItemHandler reforgeWeaponHandler,
-      IItemHandler octagonGridHandler,
-      ContainerLevelAccess access,
-      BlockPos centerPos,
-      boolean allowHostileMobs,
-      boolean allowPassiveMobs,
-      Set<String> blacklistedPlayers,
-      int glyphColor
-   ) {
-      this(id, playerInv, fuelHandler, reforgeWeaponHandler, octagonGridHandler,
-            access, centerPos, allowHostileMobs,
-            allowPassiveMobs, blacklistedPlayers, glyphColor,
-            ResourceLocation.fromNamespaceAndPath("immortal_cultivation_mod", "blank"),
-            5, 0L, 0.0F, true, false, 16,
-            MagicCenterBlockEntity.CircleCounts.ZERO, null, Set.of(), Set.of(),
-            false, false, -1, "-");
+   public CenterFuelMenu(int id, Inventory playerInv, IItemHandler fuelHandler, IItemHandler reforgeWeaponHandler, IItemHandler octagonGridHandler, ContainerLevelAccess access, BlockPos centerPos, boolean allowHostileMobs, boolean allowPassiveMobs, Set<String> blacklistedPlayers, int glyphColor) {
+      this(id, playerInv, fuelHandler, reforgeWeaponHandler, octagonGridHandler, access, centerPos, allowHostileMobs, allowPassiveMobs, blacklistedPlayers, glyphColor, ResourceLocation.fromNamespaceAndPath("immortal_cultivation_mod", "blank"), 5, 0L, 0.0F, true, false, 16, MagicCenterBlockEntity.CircleCounts.ZERO, (UUID)null, Set.of(), Set.of(), false, false, -1, "-", "", "", List.of());
    }
 
-   public CenterFuelMenu(
-      int id,
-      Inventory playerInv,
-      IItemHandler fuelHandler,
-      IItemHandler reforgeWeaponHandler,
-      IItemHandler octagonGridHandler,
-      ContainerLevelAccess access,
-      BlockPos centerPos,
-      boolean allowHostileMobs,
-      boolean allowPassiveMobs,
-      Set<String> blacklistedPlayers,
-      int glyphColor,
-      ResourceLocation centerTypeId,
-      int radius,
-      long energy,
-      float barrierHealth,
-      boolean enabled,
-      boolean active,
-      int fuelCostPerMinute,
-      MagicCenterBlockEntity.CircleCounts circleCounts,
-      UUID ownerUuid,
-      Set<UUID> excludedPlayerUuids,
-      Set<String> controllerPlayers,
-      boolean canControlCenter,
-      boolean canManageControllers,
-      int teleportLinkMode,
-      String teleportDestinationLabel
-   ) {
+   public CenterFuelMenu(int id, final Inventory playerInv, IItemHandler fuelHandler, IItemHandler reforgeWeaponHandler, IItemHandler octagonGridHandler, ContainerLevelAccess access, BlockPos centerPos, boolean allowHostileMobs, boolean allowPassiveMobs, Set<String> blacklistedPlayers, int glyphColor, ResourceLocation centerTypeId, int radius, long energy, float barrierHealth, boolean enabled, boolean active, int fuelCostPerMinute, MagicCenterBlockEntity.CircleCounts circleCounts, UUID ownerUuid, Set<UUID> excludedPlayerUuids, Set<String> controllerPlayers, final boolean canControlCenter, boolean canManageControllers, int teleportLinkMode, String teleportDestinationLabel, String teleportCode, String selectedTeleportDestinationCode, List<TeleportDestinationInfo> teleportDestinations) {
       super((MenuType)ModMenuTypes.CENTER_FUEL.get(), id);
+      this.blacklistedPlayers = new HashSet();
+      this.controllerPlayers = new HashSet();
+      this.ownerLabel = "-";
+      this.excludedPlayerUuids = new HashSet();
+      this.teleportLinkMode = -1;
+      this.teleportDestinationLabel = "-";
+      this.teleportCode = "";
+      this.selectedTeleportDestinationCode = "";
+      this.teleportDestinations = new ArrayList();
       this.access = access;
       this.fuelHandler = fuelHandler;
       this.reforgeWeaponHandler = reforgeWeaponHandler;
@@ -204,7 +166,7 @@ public class CenterFuelMenu extends AbstractContainerMenu {
       this.allowHostileMobs = allowHostileMobs;
       this.allowPassiveMobs = allowPassiveMobs;
       this.blacklistedPlayers.addAll(blacklistedPlayers);
-      this.glyphColor = glyphColor & 0xFFFFFF;
+      this.glyphColor = glyphColor & 16777215;
       this.centerTypeId = centerTypeId;
       this.radius = radius;
       this.energy = energy;
@@ -223,70 +185,76 @@ public class CenterFuelMenu extends AbstractContainerMenu {
       this.canManageControllers = canManageControllers;
       this.teleportLinkMode = teleportLinkMode;
       this.teleportDestinationLabel = teleportDestinationLabel;
-      this.centerData = new SimpleContainerData(DATA_COUNT);
-      seedDataFromFields();
-      addDataSlots(centerData);
-      this.addSlot(new SlotItemHandler(fuelHandler, 0, FUEL_SLOT_X, FUEL_SLOT_Y) {
-         @Override
+      this.teleportCode = teleportCode;
+      this.selectedTeleportDestinationCode = selectedTeleportDestinationCode;
+      this.teleportDestinations.addAll(teleportDestinations);
+      this.centerData = new SimpleContainerData(11);
+      this.seedDataFromFields();
+      this.addDataSlots(this.centerData);
+      this.addSlot(new SlotItemHandler(fuelHandler, 0, 381, 105) {
          public boolean mayPickup(Player player) {
-            return mayWithdrawFuel(player);
+            return CenterFuelMenu.this.mayWithdrawFuel(player);
          }
 
-         @Override
          public boolean isActive() {
-            return centerRef != null || !octagonTabActive;
+            return CenterFuelMenu.this.centerRef != null || !CenterFuelMenu.this.octagonTabActive && !CenterFuelMenu.this.teleportTabActive;
          }
       });
-      this.addSlot(new SlotItemHandler(reforgeWeaponHandler, 0, WEAPON_SLOT_X, WEAPON_SLOT_Y) {
-         @Override
+      this.addSlot(new SlotItemHandler(reforgeWeaponHandler, 0, 381, 72) {
          public boolean mayPickup(Player player) {
-            return mayWithdrawFuel(player);
+            return CenterFuelMenu.this.mayWithdrawFuel(player);
          }
 
-         @Override
          public boolean mayPlace(ItemStack stack) {
-            return isReforgeBlade() && stack.isDamageableItem();
+            return CenterFuelMenu.this.isReforgeBlade() && stack.isDamageableItem();
          }
 
-         @Override
          public boolean isActive() {
-            return (centerRef != null || !octagonTabActive)
-                  && (isReforgeBlade() || hasItem());
+            return (CenterFuelMenu.this.centerRef != null || !CenterFuelMenu.this.octagonTabActive && !CenterFuelMenu.this.teleportTabActive) && (CenterFuelMenu.this.isReforgeBlade() || this.hasItem());
          }
       });
 
-      for (int slotIndex = 0; slotIndex < OCTAGON_SLOT_COUNT; slotIndex++) {
+      for(int slotIndex = 0; slotIndex < 24; ++slotIndex) {
          int[] position = OCTAGON_SLOT_POSITIONS[slotIndex];
-         this.addSlot(new SlotItemHandler(
-               octagonGridHandler, slotIndex, position[0], position[1]) {
-            @Override
-            public boolean mayPickup(Player player) {
-               return mayEditOctagonGrid(player);
+         this.addSlot(new SlotItemHandler(octagonGridHandler, slotIndex, position[0], position[1]) {
+            public void set(ItemStack stack) {
+               ItemStack previous = this.getItem().copy();
+               super.set(stack);
+               boolean inserted = ModItems.isFormationFlag(stack.getItem()) && (!ModItems.isFormationFlag(previous.getItem()) || stack.getCount() > previous.getCount());
+               if (inserted) {
+                  Player var5 = playerInv.player;
+                  if (var5 instanceof ServerPlayer) {
+                     ServerPlayer serverPlayer = (ServerPlayer)var5;
+                     DaoGuidanceSystem.record(serverPlayer, "insert_flag");
+                  }
+               }
+
             }
 
-            @Override
+            public boolean mayPickup(Player player) {
+               return CenterFuelMenu.this.mayEditOctagonGrid(player);
+            }
+
             public boolean mayPlace(ItemStack stack) {
                return canControlCenter && ModItems.isFormationFlag(stack.getItem());
             }
 
-            @Override
             public boolean isActive() {
-               return centerRef != null || octagonTabActive;
+               return CenterFuelMenu.this.centerRef != null || CenterFuelMenu.this.octagonTabActive && !CenterFuelMenu.this.teleportTabActive;
             }
          });
       }
 
-      for (int row = 0; row < 3; row++) {
-         for (int col = 0; col < 9; col++) {
-            this.addSlot(new Slot(playerInv, 9 + row * 9 + col,
-                  PLAYER_INVENTORY_X + col * 18, PLAYER_INVENTORY_Y + row * 18));
+      for(int row = 0; row < 3; ++row) {
+         for(int col = 0; col < 9; ++col) {
+            this.addSlot(new Slot(playerInv, 9 + row * 9 + col, 129 + col * 18, 266 + row * 18));
          }
       }
 
-      for (int col = 0; col < 9; col++) {
-         this.addSlot(new Slot(playerInv, col,
-               PLAYER_INVENTORY_X + col * 18, PLAYER_INVENTORY_Y + 58));
+      for(int col = 0; col < 9; ++col) {
+         this.addSlot(new Slot(playerInv, col, 129 + col * 18, 324));
       }
+
    }
 
    public ItemStack quickMoveStack(Player player, int slotIndex) {
@@ -295,27 +263,28 @@ public class CenterFuelMenu extends AbstractContainerMenu {
       if (slot != null && slot.hasItem()) {
          ItemStack rawStack = slot.getItem();
          quickMovedStack = rawStack.copy();
-         if (slotIndex < CONTAINER_END) {
+         if (slotIndex < 26) {
             if (!slot.mayPickup(player)) {
                return ItemStack.EMPTY;
             }
-            if (!this.moveItemStackTo(rawStack, PLAYER_INV_START, HOTBAR_END, true)) {
+
+            if (!this.moveItemStackTo(rawStack, 26, 62, true)) {
+               return ItemStack.EMPTY;
+            }
+         } else if (ModItems.isSpiritStone(rawStack.getItem())) {
+            if (!this.moveItemStackTo(rawStack, 0, 1, false)) {
+               return ItemStack.EMPTY;
+            }
+         } else if (this.isReforgeBlade() && rawStack.isDamageableItem()) {
+            if (!this.moveItemStackTo(rawStack, 1, 2, false)) {
                return ItemStack.EMPTY;
             }
          } else {
-            if (ModItems.isSpiritStone(rawStack.getItem())) {
-               if (!this.moveItemStackTo(rawStack, FUEL_SLOT, FUEL_SLOT + 1, false)) {
-                  return ItemStack.EMPTY;
-               }
-            } else if (isReforgeBlade() && rawStack.isDamageableItem()) {
-               if (!this.moveItemStackTo(rawStack, WEAPON_SLOT, WEAPON_SLOT + 1, false)) {
-                  return ItemStack.EMPTY;
-               }
-            } else if (ModItems.isFormationFlag(rawStack.getItem())) {
-               if (!this.moveItemStackTo(rawStack, OCTAGON_SLOT_START, OCTAGON_SLOT_END, false)) {
-                  return ItemStack.EMPTY;
-               }
-            } else {
+            if (!ModItems.isFormationFlag(rawStack.getItem())) {
+               return ItemStack.EMPTY;
+            }
+
+            if (!this.moveItemStackTo(rawStack, 2, 26, false)) {
                return ItemStack.EMPTY;
             }
          }
@@ -342,143 +311,160 @@ public class CenterFuelMenu extends AbstractContainerMenu {
    }
 
    public boolean isReforgeBlade() {
-      return MagicCenterTypeRegistry.REFORGE_BLADE.equals(centerTypeId);
+      return MagicCenterTypeRegistry.REFORGE_BLADE.equals(this.centerTypeId);
    }
 
    public boolean canControlCenter() {
-      return canControlCenter;
+      return this.canControlCenter;
    }
 
    public boolean canManageControllers() {
-      return canManageControllers;
+      return this.canManageControllers;
    }
 
    public boolean isOctagonTabActive() {
-      return octagonTabActive;
+      return this.octagonTabActive;
    }
 
    public void setOctagonTabActive(boolean active) {
       this.octagonTabActive = active;
    }
 
-   public int accessRevision() {
-      return accessRevision;
+   public boolean isTeleportTabActive() {
+      return this.teleportTabActive;
    }
 
-   public void replaceAccessLists(Collection<String> blacklisted,
-                                  Collection<String> controllers) {
-      blacklistedPlayers.clear();
-      blacklistedPlayers.addAll(blacklisted);
-      controllerPlayers.clear();
-      controllerPlayers.addAll(controllers);
-      accessRevision++;
+   public void setTeleportTabActive(boolean active) {
+      this.teleportTabActive = active;
+   }
+
+   public int accessRevision() {
+      return this.accessRevision;
+   }
+
+   public void replaceAccessLists(Collection<String> blacklisted, Collection<String> controllers) {
+      this.blacklistedPlayers.clear();
+      this.blacklistedPlayers.addAll(blacklisted);
+      this.controllerPlayers.clear();
+      this.controllerPlayers.addAll(controllers);
+      ++this.accessRevision;
+   }
+
+   public int teleportRevision() {
+      return this.teleportRevision;
+   }
+
+   public void replaceTeleportDestinations(String localCode, String selectedCode, Collection<TeleportDestinationInfo> destinations) {
+      this.teleportCode = localCode;
+      this.selectedTeleportDestinationCode = selectedCode;
+      this.teleportDestinations.clear();
+      this.teleportDestinations.addAll(destinations);
+      this.teleportDestinationLabel = (String)this.teleportDestinations.stream().filter((destination) -> destination.code().equals(selectedCode)).map(TeleportDestinationInfo::label).findFirst().orElse(selectedCode != null && !selectedCode.isBlank() ? selectedCode : "-");
+      this.teleportLinkMode = selectedCode != null && !selectedCode.isBlank() ? 0 : -1;
+      this.centerData.set(10, this.teleportLinkMode);
+      ++this.teleportRevision;
    }
 
    private boolean mayWithdrawFuel(Player player) {
-      return centerRef == null
-            ? canControlCenter
-            : CenterTargetPolicy.canWithdrawFuel(centerRef, player);
+      return this.centerRef == null ? this.canControlCenter : CenterTargetPolicy.canWithdrawFuel(this.centerRef, player);
    }
 
    private boolean mayEditOctagonGrid(Player player) {
-      return centerRef == null
-            ? canControlCenter
-            : CenterTargetPolicy.canEdit(centerRef, player);
+      return this.centerRef == null ? this.canControlCenter : CenterTargetPolicy.canEdit(this.centerRef, player);
    }
 
    public void bindCenter(MagicCenterBlockEntity center) {
       this.centerRef = center;
       this.ownerLabel = center.getOwnerDisplayLabel();
-      syncDataFromCenter();
+      this.syncDataFromCenter();
    }
 
-   @Override
    public void broadcastChanges() {
-      syncDataFromCenter();
+      this.syncDataFromCenter();
       super.broadcastChanges();
    }
 
    private void syncDataFromCenter() {
-      if (centerRef == null) {
-         return;
+      if (this.centerRef != null) {
+         this.radius = this.centerRef.getRadius();
+         this.energy = this.centerRef.getEnergy();
+         this.barrierHealth = this.centerRef.getBarrierHealth();
+         this.enabled = this.centerRef.isEnabled();
+         this.active = this.centerRef.isActive();
+         this.fuelCostPerMinute = this.centerRef.getCurrentFuelCostPerMinute();
+         MagicCenterBlockEntity.CircleCounts counts = this.centerRef.getPassiveCircleCounts();
+         this.attackCircles = counts.attack();
+         this.defenseCircles = counts.defense();
+         this.regenerationCircles = counts.regeneration();
+         this.teleportLinkMode = this.centerRef.getTeleportLinkMode();
+         this.teleportDestinationLabel = this.centerRef.getTeleportDestinationLabel();
+         this.teleportCode = this.centerRef.getTeleportCode();
+         this.selectedTeleportDestinationCode = this.centerRef.getSelectedTeleportDestinationCode();
+         this.seedDataFromFields();
       }
-      radius = centerRef.getRadius();
-      energy = centerRef.getEnergy();
-      barrierHealth = centerRef.getBarrierHealth();
-      enabled = centerRef.isEnabled();
-      active = centerRef.isActive();
-      fuelCostPerMinute = centerRef.getCurrentFuelCostPerMinute();
-      MagicCenterBlockEntity.CircleCounts counts = centerRef.getPassiveCircleCounts();
-      attackCircles = counts.attack();
-      defenseCircles = counts.defense();
-      regenerationCircles = counts.regeneration();
-      teleportLinkMode = centerRef.getTeleportLinkMode();
-      teleportDestinationLabel = centerRef.getTeleportDestinationLabel();
-      seedDataFromFields();
    }
 
    private void seedDataFromFields() {
-      centerData.set(DATA_RADIUS, radius);
-      centerData.set(DATA_ENERGY_LOW, (int)energy);
-      centerData.set(DATA_ENERGY_HIGH, (int)(energy >>> 32));
-      centerData.set(DATA_ENABLED, enabled ? 1 : 0);
-      centerData.set(DATA_ACTIVE, active ? 1 : 0);
-      centerData.set(DATA_COST, fuelCostPerMinute);
-      centerData.set(DATA_ATTACK, attackCircles);
-      centerData.set(DATA_DEFENSE, defenseCircles);
-      centerData.set(DATA_REGENERATION, regenerationCircles);
-      centerData.set(DATA_BARRIER_HEALTH, Float.floatToIntBits(barrierHealth));
-      centerData.set(DATA_TELEPORT_LINK_MODE, teleportLinkMode);
+      this.centerData.set(0, this.radius);
+      this.centerData.set(1, (int)this.energy);
+      this.centerData.set(2, (int)(this.energy >>> 32));
+      this.centerData.set(3, this.enabled ? 1 : 0);
+      this.centerData.set(4, this.active ? 1 : 0);
+      this.centerData.set(5, this.fuelCostPerMinute);
+      this.centerData.set(6, this.attackCircles);
+      this.centerData.set(7, this.defenseCircles);
+      this.centerData.set(8, this.regenerationCircles);
+      this.centerData.set(9, Float.floatToIntBits(this.barrierHealth));
+      this.centerData.set(10, this.teleportLinkMode);
    }
 
    public int displayedRadius() {
-      return centerData.get(DATA_RADIUS);
+      return this.centerData.get(0);
    }
 
    public void setDisplayedRadius(int value) {
-      radius = value;
-      centerData.set(DATA_RADIUS, value);
+      this.radius = value;
+      this.centerData.set(0, value);
    }
 
    public long displayedEnergy() {
-      return (centerData.get(DATA_ENERGY_LOW) & 0xFFFFFFFFL)
-            | ((long)centerData.get(DATA_ENERGY_HIGH) << 32);
+      return (long)this.centerData.get(1) & 4294967295L | (long)this.centerData.get(2) << 32;
    }
 
    public boolean displayedEnabled() {
-      return centerData.get(DATA_ENABLED) != 0;
+      return this.centerData.get(3) != 0;
    }
 
    public boolean displayedActive() {
-      return centerData.get(DATA_ACTIVE) != 0;
+      return this.centerData.get(4) != 0;
    }
 
    public int displayedFuelCost() {
-      return centerData.get(DATA_COST);
+      return this.centerData.get(5);
    }
 
    public int displayedAttackCircles() {
-      return centerData.get(DATA_ATTACK);
+      return this.centerData.get(6);
    }
 
    public int displayedDefenseCircles() {
-      return centerData.get(DATA_DEFENSE);
+      return this.centerData.get(7);
    }
 
    public int displayedRegenerationCircles() {
-      return centerData.get(DATA_REGENERATION);
+      return this.centerData.get(8);
    }
 
    public float displayedBarrierHealth() {
-      return Float.intBitsToFloat(centerData.get(DATA_BARRIER_HEALTH));
+      return Float.intBitsToFloat(this.centerData.get(9));
    }
 
    public int displayedTeleportLinkMode() {
-      return centerData.get(DATA_TELEPORT_LINK_MODE);
+      return this.centerData.get(10);
    }
 
    public void setDisplayedTeleportLinkMode(int mode) {
-      teleportLinkMode = mode;
-      centerData.set(DATA_TELEPORT_LINK_MODE, mode);
+      this.teleportLinkMode = mode;
+      this.centerData.set(10, mode);
    }
 }

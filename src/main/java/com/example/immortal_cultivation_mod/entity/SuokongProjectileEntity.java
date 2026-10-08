@@ -21,8 +21,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class SuokongProjectileEntity extends ThrowableItemProjectile {
-    private Vec3 origin;
-    private double maxDistance = 10.0D;
+    private static final int MAX_LIFETIME_TICKS = 20 * 30;
 
     public SuokongProjectileEntity(EntityType<? extends ThrowableItemProjectile> type, Level level) {
         super(type, level);
@@ -32,8 +31,6 @@ public class SuokongProjectileEntity extends ThrowableItemProjectile {
     public SuokongProjectileEntity(Level level, ServerPlayer owner) {
         super(ModEntities.SUOKONG_PROJECTILE.get(), owner, level);
         setNoGravity(true);
-        origin = owner.getEyePosition();
-        maxDistance = Math.max(1.0D, owner.blockInteractionRange() * 2.0D);
     }
 
     @Override
@@ -51,15 +48,7 @@ public class SuokongProjectileEntity extends ThrowableItemProjectile {
         if (ForcefieldCenterBehavior.interceptProjectileImpact(this, position())) {
             return;
         }
-        if (origin == null) {
-            origin = position();
-            if (getOwner() instanceof ServerPlayer owner) {
-                maxDistance = Math.max(1.0D, owner.blockInteractionRange() * 2.0D);
-            }
-        }
-        if (position().distanceToSqr(origin) >= maxDistance * maxDistance) {
-            activate(position());
-        } else if (tickCount > 200) {
+        if (tickCount > MAX_LIFETIME_TICKS) {
             discard();
         }
     }

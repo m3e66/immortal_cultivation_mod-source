@@ -42,7 +42,12 @@ public final class WeaponRestrictionSystem {
         SWIFT_FLIGHT("swift_flight"),
         STURDY("sturdy"),
         QI_STORAGE("qi_storage"),
-        ARMOR_BREAKING("armor_breaking");
+        ARMOR_BREAKING("armor_breaking"),
+        PROTECTION("protection"),
+        FIRE_PROTECTION("fire_protection"),
+        BLAST_PROTECTION("blast_protection"),
+        PROJECTILE_PROTECTION("projectile_protection"),
+        FEATHER_FALLING("feather_falling");
 
         private final String id;
 
@@ -58,9 +63,52 @@ public final class WeaponRestrictionSystem {
     private WeaponRestrictionSystem() {
     }
 
+    public static boolean isArmor(ItemStack stack) {
+        return !stack.isEmpty() && (stack.getItem() instanceof net.minecraft.world.item.ArmorItem
+                || stack.getItem() instanceof CultivationGarmentItem
+                || stack.is(net.minecraft.tags.ItemTags.ARMOR_ENCHANTABLE));
+    }
+
     public static boolean isWeapon(ItemStack stack) {
-        return !stack.isEmpty()
-                && (stack.is(ModItems.SHIHUNFAN.get()) || QiInfusedWeapon.isWeapon(stack));
+        return !stack.isEmpty() && !isArmor(stack)
+                && (stack.is(ModItems.SHIHUNFAN.get()) || QiInfusedWeapon.isWeapon(stack)
+                || stack.getItem() instanceof net.minecraft.world.item.ProjectileWeaponItem
+                || stack.getItem() instanceof net.minecraft.world.item.TridentItem
+                || stack.is(net.minecraft.tags.ItemTags.WEAPON_ENCHANTABLE));
+    }
+
+    public static boolean isEquipment(ItemStack stack) {
+        return isArmor(stack) || isWeapon(stack);
+    }
+
+    public static boolean canApply(ItemStack stack, RestrictionType type) {
+        if (!isEquipment(stack)) return false;
+        return switch (type) {
+            case STURDY -> stack.isDamageableItem();
+            case SPIRIT_GATHERING -> true;
+            case PROTECTION, FIRE_PROTECTION, BLAST_PROTECTION, PROJECTILE_PROTECTION,
+                    FEATHER_FALLING -> isArmor(stack);
+            case QI_STORAGE, SWIFT_FLIGHT -> isWeapon(stack) && QiInfusedWeapon.isWeapon(stack);
+            default -> isWeapon(stack);
+        };
+    }
+
+    public static List<RestrictionType> availableTypes(ItemStack stack) {
+        return java.util.Arrays.stream(RestrictionType.values())
+                .filter(type -> canApply(stack, type)).toList();
+    }
+
+    public static boolean validAdditions(ItemStack stack, int[] additions) {
+        if (WeaponTribulation.active(stack) || !isEquipment(stack) || additions == null || additions.length != RestrictionType.values().length) {
+            return false;
+        }
+        long total = 0;
+        for (RestrictionType type : RestrictionType.values()) {
+            int amount = additions[type.ordinal()];
+            if (amount < 0 || (amount > 0 && !canApply(stack, type))) return false;
+            total += amount;
+        }
+        return total > 0 && total <= remainingCapacity(stack);
     }
 
     public static boolean hasRestrictions(ItemStack stack) {
@@ -72,7 +120,7 @@ public final class WeaponRestrictionSystem {
     }
 
     public static void setTier(ItemStack stack, int tier) {
-        if (!isWeapon(stack)) {
+        if (!isEquipment(stack) || WeaponTribulation.active(stack)) {
             return;
         }
         CompoundTag root = rootTag(stack);
@@ -108,19 +156,8 @@ public final class WeaponRestrictionSystem {
     }
 
     public static boolean addRestrictions(ItemStack stack, int[] additions) {
-        if (!isWeapon(stack) || additions == null || additions.length != RestrictionType.values().length) {
-            return false;
-        }
-        int total = 0;
-        for (int addition : additions) {
-            if (addition < 0) {
-                return false;
-            }
-            total += addition;
-        }
-        if (total <= 0 || total > remainingCapacity(stack)) {
-            return false;
-        }
+        if (!validAdditions(stack, additions)) return false;
+        int total = java.util.Arrays.stream(additions).sum();
 
         CompoundTag root = rootTag(stack);
         CompoundTag data = root.getCompound(TAG_RESTRICTIONS);
@@ -143,7 +180,7 @@ public final class WeaponRestrictionSystem {
     }
 
     public static boolean evolve(ItemStack stack) {
-        if (!isWeapon(stack) || tierProgress(stack) < MAX_LAYERS_PER_TIER || tier(stack) >= MAX_TIER) {
+        if (WeaponTribulation.active(stack) || !isEquipment(stack) || tierProgress(stack) < MAX_LAYERS_PER_TIER || tier(stack) >= MAX_TIER) {
             return false;
         }
         CompoundTag root = rootTag(stack);
@@ -170,8 +207,68 @@ public final class WeaponRestrictionSystem {
         return true;
     }
 
+    /** Debug-only rank adjustment skips tribulation and preserves or merges existing layer data. */
+    public static void debugSetTier(ItemStack stack, int value) {
+        if (!isWeapon(stack) || WeaponTribulation.active(stack)) return;
+        value = Math.clamp(value, 0, MAX_TIER);
+        if (value > tier(stack) && tierProgress(stack) == MAX_LAYERS_PER_TIER) evolve(stack);
+        CompoundTag root = rootTag(stack), data = root.getCompound(TAG_RESTRICTIONS);
+        data.putInt("tier", value);
+        root.put(TAG_RESTRICTIONS, data);
+        stack.set(DataComponents.CUSTOM_DATA, CustomData.of(root));
+    }
+
+    /** Edits current layers, then removes completed layers when necessary. */
+    public static void debugAdjustLayers(ItemStack stack, RestrictionType type, int delta) {
+        if (!isWeapon(stack) || WeaponTribulation.active(stack) || !canApply(stack, type)) return;
+        delta = Math.clamp(delta, -72, 72);
+        CompoundTag root = rootTag(stack), data = root.getCompound(TAG_RESTRICTIONS);
+        int current = count(stack, type), change = delta > 0 ? Math.min(delta, remainingCapacity(stack)) : -Math.min(-delta, current);
+        data.putInt(type.id(), current + change);
+        data.putInt("tier_progress", Math.clamp(tierProgress(stack) + change, 0, 72));
+        int remainder = delta < 0 ? -delta + change : 0;
+        if (remainder > 0) {
+            CompoundTag merged = data.getCompound(TAG_MERGED);
+            int old = mergedCount(stack, type), updated = Math.max(0, old - remainder);
+            merged.putInt(type.id(), updated); data.put(TAG_MERGED, merged);
+            if (type == RestrictionType.SHARPNESS && old > 0) {
+                ItemAttributeModifiers modifiers = stack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+                ItemAttributeModifiers.Builder builder = ItemAttributeModifiers.builder();
+                for (ItemAttributeModifiers.Entry entry : modifiers.modifiers()) {
+                    if (entry.modifier().id().equals(MERGED_DAMAGE_ID)) {
+                        if (updated > 0) builder.add(entry.attribute(), new AttributeModifier(MERGED_DAMAGE_ID,
+                                entry.modifier().amount() * updated / old, entry.modifier().operation()), entry.slot());
+                    } else builder.add(entry.attribute(), entry.modifier(), entry.slot());
+                }
+                stack.set(DataComponents.ATTRIBUTE_MODIFIERS, builder.build());
+            }
+        }
+        root.put(TAG_RESTRICTIONS, data);
+        stack.set(DataComponents.CUSTOM_DATA, CustomData.of(root));
+        applyDurability(stack);
+    }
+
+    /** Broken weapons retain only completed restrictions within their shard capacity. */
+    public static void retainShardLayers(ItemStack stack, CompoundTag retained) {
+        CompoundTag root = rootTag(stack), data = root.getCompound(TAG_RESTRICTIONS);
+        for (RestrictionType type : RestrictionType.values()) data.remove(type.id());
+        data.putInt("tier_progress", 0); root.put(TAG_RESTRICTIONS, data);
+        stack.set(DataComponents.CUSTOM_DATA, CustomData.of(root));
+        for (RestrictionType type : RestrictionType.values()) {
+            int old = mergedCount(stack, type), keep = Math.max(0, retained.getInt(type.id()));
+            for (int remove = old - keep; remove > 0; remove -= 72) debugAdjustLayers(stack, type, -Math.min(72, remove));
+        }
+        // Re-read after completed-layer modifiers were updated.
+        root = rootTag(stack); data = root.getCompound(TAG_RESTRICTIONS);
+        for (RestrictionType type : RestrictionType.values()) data.remove(type.id());
+        data.putInt("tier_progress", 0); data.remove("inherited_sharpness_unbaked");
+        data.put(TAG_MERGED, retained.copy()); root.put(TAG_RESTRICTIONS, data);
+        stack.set(DataComponents.CUSTOM_DATA, CustomData.of(root));
+        applyDurability(stack);
+    }
+
     public static boolean removeOneRestrictionLayer(ItemStack stack, RandomSource random) {
-        if (!isWeapon(stack) || totalLayers(stack) <= 0) {
+        if (!isEquipment(stack) || totalLayers(stack) <= 0) {
             return false;
         }
         CompoundTag root = rootTag(stack);
@@ -216,7 +313,58 @@ public final class WeaponRestrictionSystem {
 
     public static int heldQiRegenBonusPercent(Player player) {
         return effectiveCount(player.getMainHandItem(), RestrictionType.SPIRIT_GATHERING)
-                + effectiveCount(player.getOffhandItem(), RestrictionType.SPIRIT_GATHERING);
+                + effectiveCount(player.getOffhandItem(), RestrictionType.SPIRIT_GATHERING)
+                + wornLayers(player, RestrictionType.SPIRIT_GATHERING);
+    }
+
+    public static List<ItemStack> wornArmor(LivingEntity entity) {
+        List<ItemStack> result = new ArrayList<>();
+        for (net.minecraft.world.entity.EquipmentSlot slot : net.minecraft.world.entity.EquipmentSlot.values()) {
+            if (!slot.isArmor()) continue;
+            ItemStack stack = entity.getItemBySlot(slot);
+            if (isArmor(stack)) result.add(stack);
+        }
+        top.theillusivec4.curios.api.CuriosApi.getCuriosInventory(entity).ifPresent(handler -> {
+            // getStacks excludes cosmetic slots and items merely carried in inventory.
+            for (var slots : handler.getCurios().values()) {
+                var stacks = slots.getStacks();
+                for (int i = 0; i < stacks.getSlots(); i++) {
+                    ItemStack stack = stacks.getStackInSlot(i);
+                    if (isArmor(stack)) result.add(stack);
+                }
+            }
+        });
+        return result;
+    }
+
+    public static int wornLayers(LivingEntity entity, RestrictionType type) {
+        return wornArmor(entity).stream().mapToInt(stack -> effectiveCount(stack, type)).sum();
+    }
+
+    public static float armorDamageMultiplier(LivingEntity entity, net.minecraft.world.damagesource.DamageSource source) {
+        if (source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)
+                || source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_ENCHANTMENTS)) return 1.0F;
+        var direct = source.getDirectEntity();
+        boolean beastProjectile = direct instanceof com.example.immortal_cultivation_mod.entity.CultivationBeastProjectileEntity;
+        boolean beastFire = direct instanceof com.example.immortal_cultivation_mod.entity.CultivationBeastFirePatchEntity
+                || (direct instanceof com.example.immortal_cultivation_mod.entity.CultivationBeastProjectileEntity projectile
+                    && projectile.projectileKind() == com.example.immortal_cultivation_mod.entity.CultivationBeastProjectileEntity.Kind.FIRE_FEATHER)
+                || (direct instanceof com.example.immortal_cultivation_mod.entity.CultivationBestiaryBeastEntity beast
+                    && beast.kind() == com.example.immortal_cultivation_mod.entity.BestiaryBeastKind.EMBER_FEATHER_FIRE_OWL
+                    && source.is(net.minecraft.world.damagesource.DamageTypes.INDIRECT_MAGIC));
+        float reduction = 0;
+        for (ItemStack stack : wornArmor(entity)) {
+            reduction += effectiveCount(stack, RestrictionType.PROTECTION) * 0.0025F;
+            if (source.is(net.minecraft.tags.DamageTypeTags.IS_FIRE) || beastFire)
+                reduction += effectiveCount(stack, RestrictionType.FIRE_PROTECTION) * 0.005F;
+            if (source.is(net.minecraft.tags.DamageTypeTags.IS_EXPLOSION))
+                reduction += effectiveCount(stack, RestrictionType.BLAST_PROTECTION) * 0.005F;
+            if (source.is(net.minecraft.tags.DamageTypeTags.IS_PROJECTILE) || beastProjectile)
+                reduction += effectiveCount(stack, RestrictionType.PROJECTILE_PROTECTION) * 0.005F;
+            if (source.is(net.minecraft.tags.DamageTypeTags.IS_FALL))
+                reduction += effectiveCount(stack, RestrictionType.FEATHER_FALLING) * 0.005F;
+        }
+        return 1.0F - Math.min(0.8F, reduction);
     }
 
     public static double qiStorageMultiplier(ItemStack stack) {
@@ -273,6 +421,26 @@ public final class WeaponRestrictionSystem {
         }
     }
 
+    /** Shards contribute completed 72-layer sets, preserving their actual restriction types. */
+    public static void inheritCompletedLayers(ItemStack stack,int sets,CompoundTag layers){
+        CompoundTag root=rootTag(stack);CompoundTag data=root.getCompound(TAG_RESTRICTIONS);
+        if(sets<=0||tier(stack)+sets>MAX_TIER)throw new IllegalArgumentException("Too many inherited restriction sets");
+        var merged=data.getCompound(TAG_MERGED);
+        for(var type:RestrictionType.values())merged.putInt(type.id(),merged.getInt(type.id())+layers.getInt(type.id()));
+        data.put(TAG_MERGED,merged);data.putInt("tier",tier(stack)+sets);
+        data.putInt("inherited_sharpness_unbaked",data.getInt("inherited_sharpness_unbaked")+layers.getInt(RestrictionType.SHARPNESS.id()));
+        root.put(TAG_RESTRICTIONS,data);stack.set(DataComponents.CUSTOM_DATA,CustomData.of(root));
+        finalizeInheritedLayers(stack);
+    }
+
+    public static void finalizeInheritedLayers(ItemStack stack){
+        if(!isEquipment(stack))return;
+        var data=restrictionData(stack);int sharpness=data.getInt("inherited_sharpness_unbaked");
+        if(sharpness>0&&isWeapon(stack))bakeSharpnessIntoBaseDamage(stack,sharpness);
+        if(sharpness>0){var root=rootTag(stack);data=root.getCompound(TAG_RESTRICTIONS);data.remove("inherited_sharpness_unbaked");root.put(TAG_RESTRICTIONS,data);stack.set(DataComponents.CUSTOM_DATA,CustomData.of(root));}
+        applyDurability(stack);
+    }
+
     private static void bakeSharpnessIntoBaseDamage(ItemStack stack, int sharpness) {
         double currentDamage = QiInfusedWeapon.baseAttackDamage(stack);
         if (currentDamage <= 0.0D || sharpness <= 0) {
@@ -301,7 +469,7 @@ public final class WeaponRestrictionSystem {
     }
 
     public static List<Component> tooltips(ItemStack stack) {
-        if (!hasRestrictions(stack)) {
+        if (!hasRestrictions(stack) && !isWeapon(stack)) {
             return List.of();
         }
         List<Component> lines = new ArrayList<>();
@@ -318,6 +486,9 @@ public final class WeaponRestrictionSystem {
             String amount = switch (type) {
                 case SPIRIT_DEVOURING -> format(count * 0.01D) + "%";
                 case SWIFT_FLIGHT -> format(count * 0.1D) + "%";
+                case PROTECTION -> format(count * 0.25D) + "%";
+                case FIRE_PROTECTION, BLAST_PROTECTION, PROJECTILE_PROTECTION, FEATHER_FALLING ->
+                        format(count * 0.5D) + "%";
                 default -> count + "%";
             };
             lines.add(Component.translatable("tooltip." + ImmortalCultivationMod.MODID + ".restriction.entry." + type.id(),

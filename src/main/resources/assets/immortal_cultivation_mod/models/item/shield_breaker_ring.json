@@ -1,0 +1,27 @@
+{
+  "format_version": "1.21.11",
+  "credit": "Made with Blockbench",
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "immortal_cultivation_mod:item/shield_breaker_ring"
+  },
+  "display": {
+    "gui": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0.7142857,
+        0.7142857,
+        0
+      ],
+      "scale": [
+        1.1428571,
+        1.1428571,
+        1.1428571
+      ]
+    }
+  }
+}

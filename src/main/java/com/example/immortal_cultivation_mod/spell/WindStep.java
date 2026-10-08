@@ -34,7 +34,7 @@ public final class WindStep {
         }
 
         var data = ModAttachments.getData(player);
-        if (!ServerEvents.spendQiOrBlood(player, data, QI_PER_SECOND)) {
+        if (!ServerEvents.spendSpellQiOrBlood(player, data, QI_PER_SECOND)) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return;
         }
@@ -69,7 +69,7 @@ public final class WindStep {
         }
 
         var data = ModAttachments.getData(player);
-        if (!ServerEvents.spendQiOrBlood(player, data, QI_PER_SECOND)) {
+        if (!ServerEvents.spendSustainedQiOrBlood(player, data, QI_PER_SECOND)) {
             stop(player);
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return;
@@ -85,7 +85,9 @@ public final class WindStep {
         }
 
         Vec3 movement = player.getDeltaMovement();
-        player.setDeltaMovement(movement.x, 0.65D, movement.z);
+        double upward = com.example.immortal_cultivation_mod.entity.TalismanWardEntity
+                .isInsideForbiddenAir(player) ? 0.39D : 0.65D;
+        player.setDeltaMovement(movement.x, upward, movement.z);
         player.hurtMarked = true;
         player.connection.send(new ClientboundSetEntityMotionPacket(player));
         player.fallDistance = 0.0F;

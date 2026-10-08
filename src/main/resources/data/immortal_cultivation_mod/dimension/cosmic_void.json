@@ -1,0 +1,11 @@
+{
+  "type": "immortal_cultivation_mod:cosmic_void",
+  "generator": {
+    "type": "minecraft:noise",
+    "biome_source": {
+      "type": "minecraft:fixed",
+      "biome": "immortal_cultivation_mod:cosmic_void"
+    },
+    "settings": "immortal_cultivation_mod:cosmic_void"
+  }
+}

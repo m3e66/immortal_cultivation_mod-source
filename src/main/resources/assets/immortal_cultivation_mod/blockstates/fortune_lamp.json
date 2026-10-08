@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "immortal_cultivation_mod:block/fortune_lamp"
+    },
+    "lit=true": {
+      "model": "immortal_cultivation_mod:block/fortune_lamp_lit"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Weapon Shards and Reforging",
+  "icon": "immortal_cultivation_mod:weapon_shard",
+  "category": "immortal_cultivation_mod:principles",
+  "sortnum": 8,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Identify Shards",
+      "text": "A weapon above Mortal tier leaves matching shards when fully broken. Blank shards have no weapon attributes.$(br2)Populated shards retain their source weapon information, part number, and restriction data. A Spiritual Weapon leaves one shard retaining at most 72 layers; excess layers are lost."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Reforge the Complete Set",
+      "text": "Collect every distinct part from the same broken weapon and two stacks of spirit stones, 128 in total. Mixed weapons or duplicate part numbers do not form a complete set.$(br2)Put the complete set and stones in the Ding material slots. Reforging needs no extra recipe slip, but still requires suitable heat for the original weapon."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Use Shards in Other Forging",
+      "text": "Instead of restoring the source weapon, valid shards can be extra materials in another forge. Their stored restrictions transfer automatically to the successful result.$(br2)A partial set cannot restore the original weapon, and reforging cannot recover layers already lost at shattering."
+    }
+  ]
+}

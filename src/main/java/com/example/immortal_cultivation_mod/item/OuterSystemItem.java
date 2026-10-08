@@ -64,6 +64,13 @@ public class OuterSystemItem extends Item implements ICurioItem {
     }
 
     @Override
+    public boolean onDroppedByPlayer(ItemStack stack, Player player) {
+        // The System is soul-bound, not a physical item that can be tossed
+        // with Q or dragged out of an inventory screen.
+        return false;
+    }
+
+    @Override
     public ICurio.DropRule getDropRule(
             SlotContext slotContext,
             DamageSource source,

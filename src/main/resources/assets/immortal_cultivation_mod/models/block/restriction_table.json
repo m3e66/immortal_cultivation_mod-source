@@ -1,8 +1,6 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/block",
   "textures": {
-    "bottom": "minecraft:block/polished_deepslate",
-    "side": "minecraft:block/cut_copper",
-    "top": "minecraft:block/chiseled_copper"
+    "particle": "minecraft:block/polished_deepslate"
   }
 }

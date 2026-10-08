@@ -1,0 +1,18 @@
+{
+  "name": "念头与控制抵抗",
+  "icon": "immortal_cultivation_mod:yangshen_pill",
+  "category": "immortal_cultivation_mod:soul",
+  "sortnum": 9,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "抵抗控制",
+      "text": "控制能力试图限制行动时，念头可以帮助修士保持自我。控制持续期间会消耗念头；短时间内反复施加控制不会重复大量扣除。$(br2)念头耗尽后，抵抗能力会失去，控制更加危险。无须故意耗尽念头来学习。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "恢复与保留",
+      "text": "观察念头条，及时脱离持续控制。通过自身恢复或养神丹等手段补充念头。$(br2)面对多个控制型敌人，应保留余量，而不是在第一次控制中耗尽全部念头。"
+    }
+  ]
+}

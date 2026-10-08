@@ -10,6 +10,8 @@ import com.example.immortal_cultivation_mod.entity.FireballProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.IgniteFlareProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.LightBeamProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.LightningProjectileEntity;
+import com.example.immortal_cultivation_mod.entity.JinmangChuanshaProjectileEntity;
+import com.example.immortal_cultivation_mod.entity.ElementalTechniqueProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.LingzhiBulletProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.SlidingWaterProjectileEntity;
 import com.example.immortal_cultivation_mod.entity.SmokeProjectileEntity;
@@ -42,7 +44,7 @@ public final class HutiQi {
 
     public static boolean cast(ServerPlayer player) {
         var data = ModAttachments.getData(player);
-        if (!ServerEvents.spendQiOrBlood(player, data, COST)) {
+        if (!ServerEvents.spendSpellQiOrBlood(player, data, COST)) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return false;
         }
@@ -104,6 +106,8 @@ public final class HutiQi {
                 || direct instanceof XinliaoFireballEntity
                 || direct instanceof StarfallProjectileEntity
                 || direct instanceof LightningProjectileEntity
+                || direct instanceof JinmangChuanshaProjectileEntity
+                || direct instanceof ElementalTechniqueProjectileEntity
                 || direct instanceof ZhenshanPalmEntity) {
             return true;
         }

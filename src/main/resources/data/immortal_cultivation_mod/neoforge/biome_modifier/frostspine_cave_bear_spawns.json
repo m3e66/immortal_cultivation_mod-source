@@ -1,0 +1,18 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": [
+    "minecraft:snowy_slopes",
+    "minecraft:frozen_peaks",
+    "minecraft:jagged_peaks",
+    "minecraft:grove",
+    "minecraft:snowy_taiga",
+    "minecraft:ice_spikes",
+    "minecraft:frozen_river"
+  ],
+  "spawners": {
+    "type": "immortal_cultivation_mod:frostspine_cave_bear",
+    "weight": 3,
+    "minCount": 1,
+    "maxCount": 1
+  }
+}

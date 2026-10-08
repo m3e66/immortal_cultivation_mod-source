@@ -48,22 +48,15 @@ public class IgniteFlareProjectileEntity extends ThrowableItemProjectile {
         super.tick();
         if (level().isClientSide) {
             var movement = getDeltaMovement();
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 2; i++) {
                 double back = i * 0.22D;
-                level().addParticle(ParticleTypes.FLAME,
+                level().addParticle(ParticleTypes.SOUL_FIRE_FLAME,
                         getX() - movement.x * back,
                         getY() - movement.y * back,
                         getZ() - movement.z * back,
                         movement.x * 0.02D,
                         movement.y * 0.02D,
                         movement.z * 0.02D);
-                if (i == 0) {
-                    level().addParticle(ParticleTypes.SMALL_FLAME,
-                            getX() - movement.x * back,
-                            getY() - movement.y * back,
-                            getZ() - movement.z * back,
-                            0.0D, 0.01D, 0.0D);
-                }
             }
         }
     }
@@ -73,7 +66,10 @@ public class IgniteFlareProjectileEntity extends ThrowableItemProjectile {
         super.onHit(result);
         if (!level().isClientSide) {
             if (level() instanceof ServerLevel serverLevel) {
+                com.example.immortal_cultivation_mod.network.SpellRibbonPayload.send(serverLevel,"ignite_flare",result.getLocation(),new net.minecraft.world.phys.Vec3(0,0,1),-1,18,.55F);
                 SpellImpactParticles.flare(serverLevel, result.getLocation());
+                ElementalTechniqueAreaEntity.damageFireSensitiveAreas(
+                        serverLevel, result.getLocation(), 3.0D, 24);
             }
             discard();
         }
@@ -86,7 +82,12 @@ public class IgniteFlareProjectileEntity extends ThrowableItemProjectile {
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
-        ModelBonePartEntity.resolveParent(result.getEntity()).igniteForSeconds(5);
+        if (level().isClientSide) return;
+        Entity target = ModelBonePartEntity.resolveParent(result.getEntity());
+        target.igniteForSeconds(5);
+        if (target instanceof LivingEntity living)
+            living.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                    com.example.immortal_cultivation_mod.effect.ModEffects.QI_FIRE_BURN, 100, 0, false, false, true));
     }
 
     @Override

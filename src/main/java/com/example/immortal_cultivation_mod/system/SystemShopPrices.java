@@ -26,7 +26,7 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 @EventBusSubscriber(modid = ImmortalCultivationMod.MODID)
 public final class SystemShopPrices {
-    private static final int MAX_PRICE = 1_000_000;
+    private static final int MAX_PRICE = 1_000_000_000;
     private static final Map<String, Integer> BASE_PRICES = createBasePrices();
     private static volatile PriceState state;
 
@@ -244,49 +244,202 @@ public final class SystemShopPrices {
         values.put(ImmortalCultivationMod.MODID + ":qingtong_yinhuo_ding", 20_000);
         values.put(ImmortalCultivationMod.MODID + ":chi_lin", 100);
         values.put(ImmortalCultivationMod.MODID + ":huo_xi_blood", 10);
+        values.put(ImmortalCultivationMod.MODID + ":lianqi_yaodan", 100);
         values.put(ImmortalCultivationMod.MODID + ":jindan_yaodan", 10_000);
         values.put(ImmortalCultivationMod.MODID + ":chiyan_bone", 9_000);
+        values.put(ImmortalCultivationMod.MODID + ":xuanduan_iron_shard", 2_000);
+        values.put(ImmortalCultivationMod.MODID + ":spirit_guiding_gear", 6_000);
+        values.put(ImmortalCultivationMod.MODID + ":damaged_forging_furnace_core", 30_000);
 
-        values.put(ImmortalCultivationMod.MODID + ":fireball_scroll", 100); // 火球术玉简
-        values.put(ImmortalCultivationMod.MODID + ":lingbeng_scroll", 500); // 灵崩玉简
-        values.put(ImmortalCultivationMod.MODID + ":regeneration_scroll", 300); // 回春术玉简
+        // Foundation Establishment - beast materials
+        values.put(ImmortalCultivationMod.MODID + ":rock_badger_hide", 500);
+        values.put(ImmortalCultivationMod.MODID + ":thunder_patterned_rock_plate", 800);
+        values.put(ImmortalCultivationMod.MODID + ":zhuji_yaodan", 1_000);
+        values.put(ImmortalCultivationMod.MODID + ":thunder_horn", 800);
+        values.put(ImmortalCultivationMod.MODID + ":frostspine_hide", 650);
+        // Beast meat scales by one major realm step (10x per tier).
+        values.put(ImmortalCultivationMod.MODID + ":lianqi_beast_meat", 35);
+        values.put(ImmortalCultivationMod.MODID + ":zhuji_beast_meat", 350);
+        values.put(ImmortalCultivationMod.MODID + ":jindan_beast_meat", 3_500);
+        values.put(ImmortalCultivationMod.MODID + ":yuanying_beast_meat", 35_000);
+        values.put(ImmortalCultivationMod.MODID + ":huashen_beast_meat", 350_000);
+        values.put(ImmortalCultivationMod.MODID + ":lianxu_beast_meat", 3_500_000);
+        values.put(ImmortalCultivationMod.MODID + ":heti_beast_meat", 35_000_000);
+        values.put(ImmortalCultivationMod.MODID + ":dacheng_beast_meat", 350_000_000);
+        values.put(ImmortalCultivationMod.MODID + ":dujie_beast_meat", 1_000_000_000);
+        values.put(ImmortalCultivationMod.MODID + ":cold_marrow", 900);
+
+
+        // Qi Refining - Early
         values.put(ImmortalCultivationMod.MODID + ":beam_scroll", 100); // 光束术玉简
-        values.put(ImmortalCultivationMod.MODID + ":earth_escape_scroll", 500); // 遁地术玉简
         values.put(ImmortalCultivationMod.MODID + ":cleanse_scroll", 100); // 清洁咒玉简
-        values.put(ImmortalCultivationMod.MODID + ":qi_gathering_scroll", 100); // 引灵诀玉简
+        values.put(ImmortalCultivationMod.MODID + ":fireball_scroll", 100); // 火球术玉简
+        values.put(ImmortalCultivationMod.MODID + ":huti_qi_scroll", 500); // 护体气玉简
         values.put(ImmortalCultivationMod.MODID + ":ignite_flare_scroll", 150); // 燃火诀玉简
-        values.put(ImmortalCultivationMod.MODID + ":spirit_sight_scroll", 250); // 灵视玉简
-        values.put(ImmortalCultivationMod.MODID + ":zhenshan_palm_scroll", 12_800); // 震山掌玉简
-        values.put(ImmortalCultivationMod.MODID + ":light_beam_attack_scroll", 2_000); // 光球术玉简
-        values.put(ImmortalCultivationMod.MODID + ":dielang_shield_scroll", 1_500); // 叠浪盾玉简
         values.put(ImmortalCultivationMod.MODID + ":lingzhi_bullet_scroll", 100); // 灵指弹玉简
+        values.put(ImmortalCultivationMod.MODID + ":qi_gathering_scroll", 100); // 引灵诀玉简
+        values.put(ImmortalCultivationMod.MODID + ":sliding_water_scroll", 800); // 滑水术玉简
+        values.put(ImmortalCultivationMod.MODID + ":smoke_art_scroll", 300); // 迷烟术玉简
+        values.put(ImmortalCultivationMod.MODID + ":spirit_sight_scroll", 250); // 灵视玉简
         values.put(ImmortalCultivationMod.MODID + ":wind_blade_scroll", 100); // 风刃玉简
         values.put(ImmortalCultivationMod.MODID + ":wind_step_scroll", 200); // 踏风步玉简
-        values.put(ImmortalCultivationMod.MODID + ":yufeng_jue_scroll", 1_000); // 御风诀玉简
-        values.put(ImmortalCultivationMod.MODID + ":smoke_art_scroll", 300); // 迷烟术玉简
-        values.put(ImmortalCultivationMod.MODID + ":huti_qi_scroll", 500); // 护体气玉简
-        values.put(ImmortalCultivationMod.MODID + ":michen_zhang_scroll", 800); // 迷尘障玉简
-        values.put(ImmortalCultivationMod.MODID + ":sliding_water_scroll", 800); // 滑水术玉简
-        values.put(ImmortalCultivationMod.MODID + ":dingshen_scroll", 1_000); // 定身咒玉简
+
+        // Qi Refining - Middle
+        values.put(ImmortalCultivationMod.MODID + ":jinfeng_zhi_scroll", 400); // 金锋指玉简
+        values.put(ImmortalCultivationMod.MODID + ":michen_zhang_scroll", 300); // 迷尘障玉简
+        values.put(ImmortalCultivationMod.MODID + ":regeneration_scroll", 800); // 回春术玉简
+        values.put(ImmortalCultivationMod.MODID + ":shuiren_lianzhan_scroll", 500); // 水刃连斩玉简
+
+        // Qi Refining - Late
+        values.put(ImmortalCultivationMod.MODID + ":dielang_shield_scroll", 1_500); // 叠浪盾玉简
+        values.put(ImmortalCultivationMod.MODID + ":earth_escape_scroll", 500); // 遁地术玉简
+        values.put(ImmortalCultivationMod.MODID + ":jingji_tusheng_scroll", 1_500); // 荆棘突生玉简
+        values.put(ImmortalCultivationMod.MODID + ":kongshi_shu_scroll", 2_000); // 控尸术玉简
+        values.put(ImmortalCultivationMod.MODID + ":lingbeng_scroll", 500); // 灵崩玉简
+        values.put(ImmortalCultivationMod.MODID + ":pokong_jianhen_scroll", 2_500); // 破空剑痕玉简
+        values.put(ImmortalCultivationMod.MODID + ":yaoguang_shan_scroll", 1_500); // 曜光闪玉简
         values.put(ImmortalCultivationMod.MODID + ":yinlei_jue_scroll", 1_500); // 引雷诀玉简
+        values.put(ImmortalCultivationMod.MODID + ":yufeng_jue_scroll", 3_000); // 御风诀玉简
+
+        // Qi Refining - Talismans (Tier One)
+        values.put(ImmortalCultivationMod.MODID + ":fengren_talisman", 200); // 风刃符
+        values.put(ImmortalCultivationMod.MODID + ":fireball_talisman", 500);
+        values.put(ImmortalCultivationMod.MODID + ":liansheng_talisman", 300); // 敛声符
+        values.put(ImmortalCultivationMod.MODID + ":qingchen_talisman", 100); // 清尘符
+        values.put(ImmortalCultivationMod.MODID + ":weiguang_talisman", 100); // 微光符
+
+        // Foundation Establishment - Early
+        values.put(ImmortalCultivationMod.MODID + ":diyan_qiang_scroll", 2_000); // 地岩枪玉简
+        values.put(ImmortalCultivationMod.MODID + ":gushi_shield_scroll", 3_000); // 固石盾玉简
+        values.put(ImmortalCultivationMod.MODID + ":leishan_scroll", 3_000); // 雷闪玉简
+        values.put(ImmortalCultivationMod.MODID + ":luohua_chanshen_scroll", 2_000); // 落花缠身玉简
+        values.put(ImmortalCultivationMod.MODID + ":xuanyan_huti_scroll", 3_000); // 玄岩护体玉简
+        values.put(ImmortalCultivationMod.MODID + ":yanbao_dan_scroll", 2_000); // 炎爆弹玉简
+        values.put(ImmortalCultivationMod.MODID + ":yingxi_scroll", 2_800); // 影袭玉简
+
+        // Foundation Establishment - Middle
+        values.put(ImmortalCultivationMod.MODID + ":bingzhui_yu_scroll", 2_500); // 冰锥雨玉简
+        values.put(ImmortalCultivationMod.MODID + ":liufeng_xiejin_scroll", 8_000); // 流风卸劲玉简
+        values.put(ImmortalCultivationMod.MODID + ":muling_shengxi_scroll", 5_000); // 木灵生息玉简
         values.put(ImmortalCultivationMod.MODID + ":wulei_zhengfa_scroll", 3_000); // 五雷正法玉简
-        values.put(ImmortalCultivationMod.MODID + ":liuguang_jianying_scroll", 5_000); // 流光剑影玉简
-        values.put(ImmortalCultivationMod.MODID + ":sifang_jie_scroll", 8_000); // 四方界玉简
-        values.put(ImmortalCultivationMod.MODID + ":gushi_shield_scroll", 2_000); // 固石盾玉简
-        values.put(ImmortalCultivationMod.MODID + ":kongshi_shu_scroll", 1_000); // 控尸术玉简
-        values.put(ImmortalCultivationMod.MODID + ":xuying_ta_scroll", 10_000); // 虚影踏玉简
+        values.put(ImmortalCultivationMod.MODID + ":xuying_ta_scroll", 4_500); // 虚影踏玉简
+
+        // Foundation Establishment - Late
+        values.put(ImmortalCultivationMod.MODID + ":canglang_chong_scroll", 7_000); // 沧浪冲玉简
+        values.put(ImmortalCultivationMod.MODID + ":dingshen_scroll", 1_000); // 定身咒玉简
         values.put(ImmortalCultivationMod.MODID + ":duanliu_kongdun_scroll", 12_000); // 断流空遁玉简
+        values.put(ImmortalCultivationMod.MODID + ":light_beam_attack_scroll", 2_000); // 光球术玉简
+        values.put(ImmortalCultivationMod.MODID + ":sanjian_zhuiming_scroll", 8_000); // 三剑追命玉简
+        values.put(ImmortalCultivationMod.MODID + ":shengxi_baofa_scroll", 9_000); // 生息爆发玉简
+        values.put(ImmortalCultivationMod.MODID + ":sifang_jie_scroll", 8_000); // 四方界玉简
+        values.put(ImmortalCultivationMod.MODID + ":xue_guiyuan_shu_scroll", 10_000); // 血归元术玉简
         values.put(ImmortalCultivationMod.MODID + ":yihen_ci_scroll", 8_000); // 一痕刺玉简
-        values.put(ImmortalCultivationMod.MODID + ":jinhuo_xinliao_scroll", 15_000); // 烬火心燎玉简
+        values.put(ImmortalCultivationMod.MODID + ":basic_breathing_method", 100); // 基础吐纳法
+        values.put(ImmortalCultivationMod.MODID + ":clear_heart_method", 100); // 清心诀
+
+        // Foundation Establishment - Talismans (Tier Two)
+        values.put(ImmortalCultivationMod.MODID + ":bojin_hufu", 6_000); // 薄金护符
+        values.put(ImmortalCultivationMod.MODID + ":chansi_kun_talisman", 6_000); // 缠丝困符
+        values.put(ImmortalCultivationMod.MODID + ":chuanyin_talisman", 4_000); // 传音符
+        values.put(ImmortalCultivationMod.MODID + ":duantu_shenxing_talisman", 3_000); // 短途神行符
+        values.put(ImmortalCultivationMod.MODID + ":fengyan_talisman", 3_000);
+        values.put(ImmortalCultivationMod.MODID + ":xinghuo_talisman", 3_000); // 星火符
+        values.put(ImmortalCultivationMod.MODID + ":xiufu_talisman", 5_000); // 修复符
+        values.put(ImmortalCultivationMod.MODID + ":zhenshi_talisman", 3_000);
+
+        // Golden Core - Early
+        values.put(ImmortalCultivationMod.MODID + ":jinmang_chuansha_scroll", 9_000); // 金芒穿杀玉简
+        values.put(ImmortalCultivationMod.MODID + ":liuguang_jianying_scroll", 10_000); // 流光剑影玉简
+        values.put(ImmortalCultivationMod.MODID + ":wanteng_jiaosha_scroll", 8_000); // 万藤绞杀玉简
+        values.put(ImmortalCultivationMod.MODID + ":xuesha_hushen_scroll", 18_000); // 血煞护身玉简
+        values.put(ImmortalCultivationMod.MODID + ":zhenshan_palm_scroll", 12_000); // 震山掌玉简
+
+        // Golden Core - Middle
+        values.put(ImmortalCultivationMod.MODID + ":baihua_zang_scroll", 13_000); // 百花葬玉简
+        values.put(ImmortalCultivationMod.MODID + ":chiyan_longjuan_scroll", 15_000); // 赤炎龙卷玉简
+        values.put(ImmortalCultivationMod.MODID + ":hanyu_fengdi_scroll", 15_000); // 寒狱封地玉简
+        values.put(ImmortalCultivationMod.MODID + ":jinhuo_xinliao_scroll", 25_000); // 烬火心燎玉简
         values.put(ImmortalCultivationMod.MODID + ":suigui_xingyun_scroll", 18_000); // 随轨行云玉简
+        values.put(ImmortalCultivationMod.MODID + ":tianfeng_zhui_scroll", 18_000); // 天风坠玉简
+        values.put(ImmortalCultivationMod.MODID + ":wanren_chuanxin_scroll", 16_000); // 万刃穿心玉简
+
+        // Golden Core - Late
+        values.put(ImmortalCultivationMod.MODID + ":jingling_fanzhao_scroll", 30_000); // 镜灵返照玉简
+        values.put(ImmortalCultivationMod.MODID + ":shanbeng_yin_scroll", 25_000); // 山崩印玉简
         values.put(ImmortalCultivationMod.MODID + ":shixu_chiliu_scroll", 25_000); // 时序滞流玉简
+        values.put(ImmortalCultivationMod.MODID + ":tianguang_guansha_scroll", 35_000); // 天光贯杀玉简
+        values.put(ImmortalCultivationMod.MODID + ":tianyun_fencheng_scroll", 35_000); // 天陨焚城玉简
+        values.put(ImmortalCultivationMod.MODID + ":wulei_hongding_scroll", 20_000); // 五雷轰顶玉简
+        values.put(ImmortalCultivationMod.MODID + ":blood_demon_jindan_method", 32_000); // 血魔功（金丹）
+        values.put(ImmortalCultivationMod.MODID + ":changqing_jue_method", 32_000); // 长青诀
+        values.put(ImmortalCultivationMod.MODID + ":fentian_life_renewal_method", 52_000); // 焚天续命功
+        values.put(ImmortalCultivationMod.MODID + ":pokong_jue_method", 40_000); // 破空诀
+
+        // Golden Core - Talismans (Tier Three)
+        values.put(ImmortalCultivationMod.MODID + ":baofeng_talisman", 20_000); // 爆风符
+        values.put(ImmortalCultivationMod.MODID + ":biaoji_talisman", 15_000); // 标记符
+        values.put(ImmortalCultivationMod.MODID + ":bixie_anhun_talisman", 30_000); // 避邪安魂符
+        values.put(ImmortalCultivationMod.MODID + ":dunkong_talisman", 28_000); // 遁空符
+        values.put(ImmortalCultivationMod.MODID + ":huabing_talisman", 10_000); // 化兵符
+        values.put(ImmortalCultivationMod.MODID + ":huoyu_fenxie_talisman", 25_000); // 火狱焚邪符
+        values.put(ImmortalCultivationMod.MODID + ":wulei_xiaofa_talisman", 20_000); // 五雷小伐符
+        values.put(ImmortalCultivationMod.MODID + ":zhenrao_talisman", 15_000); // 镇扰符
+
+        // Nascent Soul - Early
+        values.put(ImmortalCultivationMod.MODID + ":yuangang_hujie_scroll", 225_000); // 元罡护界玉简
+
+        // Nascent Soul - Late
+        values.put(ImmortalCultivationMod.MODID + ":blood_demon_yuanying_method", 325_000); // 血魔功（元婴）
+        values.put(ImmortalCultivationMod.MODID + ":gangting_xiaokong_method", 525_000); // 罡霆啸空录
+        values.put(ImmortalCultivationMod.MODID + ":hanlan_ningyuan_method", 525_000); // 寒澜凝渊经
+
+        // Nascent Soul - Talismans (Tier Four)
+        values.put(ImmortalCultivationMod.MODID + ":fengling_talisman", 325_000); // 封灵符
+        values.put(ImmortalCultivationMod.MODID + ":jinguang_huti_talisman", 380_000); // 金光护体符
+        values.put(ImmortalCultivationMod.MODID + ":pozhang_kaishan_talisman", 420_000); // 破障开山符
+
+        // Soul Formation - Early
+        values.put(ImmortalCultivationMod.MODID + ":cuigu_lianshen_method", 48_000); // 淬骨炼神诀
+        values.put(ImmortalCultivationMod.MODID + ":xuanyue_suifeng_method", 65_000); // 玄岳碎锋诀
+
+        // Soul Formation - Late
+        values.put(ImmortalCultivationMod.MODID + ":blood_demon_huashen_method", 500_000); // 血魔功（化神）
+        values.put(ImmortalCultivationMod.MODID + ":dari_bati_method", 950_000); // 大日霸体诀
+        values.put(ImmortalCultivationMod.MODID + ":hanti_bingqin_method", 550_000); // 寒啼冰擒功
+        values.put(ImmortalCultivationMod.MODID + ":reincarnation_true_art_method", 750_000); // 轮回真决
+        values.put(ImmortalCultivationMod.MODID + ":tuntian_demon_art_method", 750_000); // 吞天魔功
+
+        // Soul Formation - Talismans (Tier Five)
+        values.put(ImmortalCultivationMod.MODID + ":qianli_chuanxun_talisman", 550_000); // 千里传讯符
+
+        // Void Refinement - Talismans (Tier Six)
+        values.put(ImmortalCultivationMod.MODID + ":wuyue_bie_talisman", 1_000_000); // 五岳辟厄符
+        values.put(ImmortalCultivationMod.MODID + ":xuanyan_fenjie_talisman", 1_500_000); // 玄焰焚界符
+
+        // Ancient Talisman
+        values.put(ImmortalCultivationMod.MODID + ":jinkong_talisman", 150_000_000); // 禁空符
+
+        values.put(ImmortalCultivationMod.MODID + ":ordinary_yellow_talisman_paper", 10); // 普通黄符纸
+        values.put(ImmortalCultivationMod.MODID + ":lingsang_talisman_paper", 100); // 灵桑符纸
+        values.put(ImmortalCultivationMod.MODID + ":red_veined_mulberry_paper", 1_000); // 赤纹桑皮纸
+        values.put(ImmortalCultivationMod.MODID + ":jade_talisman_paper", 10_000); // 玉笺符纸
+        values.put(ImmortalCultivationMod.MODID + ":celestial_silkworm_talisman_paper", 100_000); // 天蚕灵笺
+        values.put(ImmortalCultivationMod.MODID + ":mundane_cinnabar_ink", 20); // 凡朱墨
+        values.put(ImmortalCultivationMod.MODID + ":spiritual_cinnabar_ink", 200); // 灵朱墨
+        values.put(ImmortalCultivationMod.MODID + ":mysterious_spirit_ink", 2_000); // 玄灵墨
+        values.put(ImmortalCultivationMod.MODID + ":gold_veined_spirit_ink", 20_000); // 金纹灵墨
+        values.put(ImmortalCultivationMod.MODID + ":jade_marrow_talisman_ink", 200_000); // 玉髓符墨
+        values.put(ImmortalCultivationMod.MODID + ":spirit_marrow_treasure_ink", 1_000_000); // 灵髓宝墨
+        values.put(ImmortalCultivationMod.MODID + ":heavenly_spirit_mystic_ink", 5_000_000); // 天灵玄墨
+        values.put(ImmortalCultivationMod.MODID + ":dao_marrow_ink", 20_000_000); // 道髓墨
+
         values.put(ImmortalCultivationMod.MODID + ":enlightenment_pill", 500);
         values.put(ImmortalCultivationMod.MODID + ":breakthrough_pill", 500);
         values.put(ImmortalCultivationMod.MODID + ":body_tempering_pill", 10_000);
         values.put(ImmortalCultivationMod.MODID + ":blood_qi_pill", 1_000);
         values.put(ImmortalCultivationMod.MODID + ":restriction_insight", 5_000);
-        values.put(ImmortalCultivationMod.MODID + ":fog_revealing_mirror", 5_000);
-        values.put(ImmortalCultivationMod.MODID + ":yinyang_compass", 7_000);
+        values.put(ImmortalCultivationMod.MODID + ":fog_revealing_mirror", 7_500);
+        values.put(ImmortalCultivationMod.MODID + ":yinyang_compass", 8_500);
         values.put(ImmortalCultivationMod.MODID + ":zhenpan", 5_000);
         values.put(ImmortalCultivationMod.MODID + ":blank_formation_flag", 3_000);
         values.put(ImmortalCultivationMod.MODID + ":duration_flag", 3_000);
@@ -294,13 +447,11 @@ public final class SystemShopPrices {
         values.put(ImmortalCultivationMod.MODID + ":spirit_gathering_flag", 3_000);
         values.put(ImmortalCultivationMod.MODID + ":haste_flag", 3_000);
         values.put(ImmortalCultivationMod.MODID + ":qi_return_flag", 3_000);
-        values.put(ImmortalCultivationMod.MODID + ":zhenshi_talisman", 1_280);
-        values.put(ImmortalCultivationMod.MODID + ":zhenhun_bell", 2_000);
-        values.put(ImmortalCultivationMod.MODID + ":yinhun_gong", 1_500);
-        values.put(ImmortalCultivationMod.MODID + ":fengyan_talisman", 1_000);
-        values.put(ImmortalCultivationMod.MODID + ":fireball_talisman", 1_000);
+        values.put(ImmortalCultivationMod.MODID + ":zhenhun_bell", 2_600);
+        values.put(ImmortalCultivationMod.MODID + ":yinhun_gong", 2_000);
         values.put(ImmortalCultivationMod.MODID + ":blood", 10);
         values.put(ImmortalCultivationMod.MODID + ":blood_crystal", 100);
+        values.put(ImmortalCultivationMod.MODID + ":ashes", 1);
         values.put(ImmortalCultivationMod.MODID + ":nuomi", 5);
         values.put(ImmortalCultivationMod.MODID + ":nuomi_seed", 5);
         values.put(ImmortalCultivationMod.MODID + ":nuomi_zhou", 20);
@@ -308,8 +459,16 @@ public final class SystemShopPrices {
         values.put(ImmortalCultivationMod.MODID + ":taomu_sword", 500);
         values.put(ImmortalCultivationMod.MODID + ":red_string", 10);
         values.put(ImmortalCultivationMod.MODID + ":copper_coin", 1);
+
+        // Mortal inn food (priced directly in copper coins by mortal NPCs)
+        values.put(ImmortalCultivationMod.MODID + ":steamed_bun", 2);
+        values.put(ImmortalCultivationMod.MODID + ":wine", 4);
+        values.put(ImmortalCultivationMod.MODID + ":noodle_bowl", 5);
+        values.put(ImmortalCultivationMod.MODID + ":braised_pork", 7);
+        values.put(ImmortalCultivationMod.MODID + ":roast_duck", 8);
+
         values.put(ImmortalCultivationMod.MODID + ":bigu_pill", 40);
-        values.put(ImmortalCultivationMod.MODID + ":low_qi_recovery_pill", 80);
+        values.put(ImmortalCultivationMod.MODID + ":qi_recovery_pill", 80);
         values.put(ImmortalCultivationMod.MODID + ":middle_qi_recovery_pill", 600);
         values.put(ImmortalCultivationMod.MODID + ":high_qi_recovery_pill", 1_600);
         values.put(ImmortalCultivationMod.MODID + ":low_yangjian_stone", 80);
@@ -324,13 +483,33 @@ public final class SystemShopPrices {
         values.put(ImmortalCultivationMod.MODID + ":family_token", 5_000);
         values.put(ImmortalCultivationMod.MODID + ":royal_token", 8_000);
         values.put(ImmortalCultivationMod.MODID + ":protective_jade_pendant", 25_000);
+        values.put(ImmortalCultivationMod.MODID + ":black_tortoise_heartguard_mirror", 35_000);
+        values.put(ImmortalCultivationMod.MODID + ":water_avoiding_pearl", 2_000);
+        values.put(ImmortalCultivationMod.MODID + ":soul_anchor_pearl", 25_000);
+        values.put(ImmortalCultivationMod.MODID + ":tribulation_doll", 15_000);
+        values.put(ImmortalCultivationMod.MODID + ":fortune_mirror", 18_000);
+        values.put(ImmortalCultivationMod.MODID + ":precise_fortune_mirror", 40_000);
+        values.put(ImmortalCultivationMod.MODID + ":fortune_guard_coin", 14_000);
+        values.put(ImmortalCultivationMod.MODID + ":fortune_lamp", 45_000);
+        values.put(ImmortalCultivationMod.MODID + ":fortune_mirror_yujian", 20_000);
+        values.put(ImmortalCultivationMod.MODID + ":precise_fortune_mirror_yujian", 65_000);
+        values.put(ImmortalCultivationMod.MODID + ":fortune_guard_coin_yujian", 22_000);
+        values.put(ImmortalCultivationMod.MODID + ":fortune_lamp_yujian", 40_000);
+        values.put(ImmortalCultivationMod.MODID + ":purified_tribulation_doll", 25_000);
+        values.put(ImmortalCultivationMod.MODID + ":tribulation_doll_yujian", 35_000);
+        values.put(ImmortalCultivationMod.MODID + ":purified_tribulation_doll_yujian", 45_000);
+
+        values.put(ImmortalCultivationMod.MODID + ":shield_breaker_ring", 15_000);
+        values.put(ImmortalCultivationMod.MODID + ":blood_fang_pendant", 12_000);
+        values.put(ImmortalCultivationMod.MODID + ":enlightenment_leaf", 50_000);
         values.put(ImmortalCultivationMod.MODID + ":lethal_poison", 50);
         values.put(ImmortalCultivationMod.MODID + ":wanted_order", 10);
         values.put(ImmortalCultivationMod.MODID + ":disguise_mask", 2_000);
-        values.put(ImmortalCultivationMod.MODID + ":corpse_refining_secret", 600_000); // 九幽炼尸诀
+        values.put(ImmortalCultivationMod.MODID + ":corpse_refining_secret", 600_000);
         values.put(ImmortalCultivationMod.MODID + ":copper_coin_sword", 100);
         values.put(ImmortalCultivationMod.MODID + ":coffin", 5_000);
         values.put(ImmortalCultivationMod.MODID + ":flag", 1_000);
+        values.put(ImmortalCultivationMod.MODID + ":sword_case", 10_000);
         values.put(ImmortalCultivationMod.MODID + ":xiujian", 2_500);
         values.put(ImmortalCultivationMod.MODID + ":blindfold", 250);
         values.put(ImmortalCultivationMod.MODID + ":blindfold2", 500);
@@ -344,6 +523,26 @@ public final class SystemShopPrices {
         values.put(ImmortalCultivationMod.MODID + ":heavy_iron_bracer_yujian", 8_000);
         values.put(ImmortalCultivationMod.MODID + ":throwing_knife_yujian", 8_000);
         values.put(ImmortalCultivationMod.MODID + ":flying_needle_yujian", 8_000);
+        values.put(ImmortalCultivationMod.MODID + ":tiegu_shan_yujian", 8_000);
+        values.put(ImmortalCultivationMod.MODID + ":fuchen_yujian", 8_000);
+        values.put(ImmortalCultivationMod.MODID + ":whip_yujian", 8_000);
+        values.put(ImmortalCultivationMod.MODID + ":black_iron_jian_yujian", 32000);
+        values.put(ImmortalCultivationMod.MODID + ":black_iron_greatsword_yujian", 32000);
+        values.put(ImmortalCultivationMod.MODID + ":moon_crescent_halberd_yujian", 32000);
+        values.put(ImmortalCultivationMod.MODID + ":spirit_silk_whip_yujian", 32000);
+        values.put(ImmortalCultivationMod.MODID + ":soul_hook_yujian", 56000);
+        values.put(ImmortalCultivationMod.MODID + ":wind_feather_fan_yujian", 56000);
+        values.put(ImmortalCultivationMod.MODID + ":thunderwood_sword_yujian", 56000);
+        values.put(ImmortalCultivationMod.MODID + ":flame_pattern_dao_yujian", 56000);
+        values.put(ImmortalCultivationMod.MODID + ":earthbreaker_hammer_yujian", 56000);
+        values.put(ImmortalCultivationMod.MODID + ":seven_star_sword_yujian", 180000);
+        values.put(ImmortalCultivationMod.MODID + ":shihunfan_yujian", 8_000);
+        values.put(ImmortalCultivationMod.MODID + ":blood_fang_pendant_yujian", 8_000);
+        values.put(ImmortalCultivationMod.MODID + ":water_avoiding_pearl_yujian", 8_000);
+        values.put(ImmortalCultivationMod.MODID + ":jade_pendant_yujian", 8_000);
+        values.put(ImmortalCultivationMod.MODID + ":shield_breaker_ring_yujian", 8_000);
+        values.put(ImmortalCultivationMod.MODID + ":disguise_mask_yujian", 8_000);
+        values.put(ImmortalCultivationMod.MODID + ":black_tortoise_heartguard_mirror_yujian", 8_000);
         values.put(ImmortalCultivationMod.MODID + ":zhenpan_yujian", 8_000);
         values.put(ImmortalCultivationMod.MODID + ":blank_formation_flag_yujian", 8_000);
         values.put(ImmortalCultivationMod.MODID + ":duration_flag_yujian", 8_000);
@@ -351,6 +550,9 @@ public final class SystemShopPrices {
         values.put(ImmortalCultivationMod.MODID + ":spirit_gathering_flag_yujian", 8_000);
         values.put(ImmortalCultivationMod.MODID + ":haste_flag_yujian", 8_000);
         values.put(ImmortalCultivationMod.MODID + ":qi_return_flag_yujian", 8_000);
+        values.put(ImmortalCultivationMod.MODID + ":sword_case_yujian", 8_000);
+        values.put(ImmortalCultivationMod.MODID + ":zhenhun_bell_yujian", 8_000);
+        values.put(ImmortalCultivationMod.MODID + ":yinhun_gong_yujian", 8_000);
         values.put(ImmortalCultivationMod.MODID + ":dao", 5_000);
         values.put(ImmortalCultivationMod.MODID + ":jingtie_spear", 8_000);
         values.put(ImmortalCultivationMod.MODID + ":throwing_knife", 3_000);
@@ -363,21 +565,12 @@ public final class SystemShopPrices {
         values.put(ImmortalCultivationMod.MODID + ":saber_mold", 4_000);
         values.put(ImmortalCultivationMod.MODID + ":spear_mold", 4_000);
         values.put(ImmortalCultivationMod.MODID + ":weapon_mold", 4_000);
-        values.put(ImmortalCultivationMod.MODID + ":basic_breathing_method", 100); // 基础吐纳法
-        values.put(ImmortalCultivationMod.MODID + ":clear_heart_method", 100); // 清心诀
-        values.put(ImmortalCultivationMod.MODID + ":blood_demon_jindan_method", 12_800); // 血魔功（金丹）
-        values.put(ImmortalCultivationMod.MODID + ":blood_demon_yuanying_method", 325_000); // 血魔功（元婴）
-        values.put(ImmortalCultivationMod.MODID + ":blood_demon_huashen_method", 500_000); // 血魔功（化神）
-        values.put(ImmortalCultivationMod.MODID + ":reincarnation_true_art_method", 750_000); // 轮回真决
-        values.put(ImmortalCultivationMod.MODID + ":tuntian_demon_art_method", 750_000); // 吞天魔功
-        values.put(ImmortalCultivationMod.MODID + ":pokong_jue_method", 22_800); // 破空诀
-        values.put(ImmortalCultivationMod.MODID + ":changqing_jue_method", 12_800); // 长青诀
-        values.put(ImmortalCultivationMod.MODID + ":fentian_life_renewal_method", 32_800); // 焚天续命功
-        values.put(ImmortalCultivationMod.MODID + ":hanti_bingqin_method", 25_000); // 寒啼冰擒功
-        values.put(ImmortalCultivationMod.MODID + ":cuigu_lianshen_method", 48_000); // 淬骨炼神诀
         values.put(ImmortalCultivationMod.MODID + ":lingjiao_scale", 500);
         values.put(ImmortalCultivationMod.MODID + ":shihunfan", 10_000);
-        values.put(ImmortalCultivationMod.MODID + ":yuanhun_bottle", 1000);
+        values.put(ImmortalCultivationMod.MODID + ":yuanhun_bottle", 1_800);
+        values.put(ImmortalCultivationMod.MODID + ":fog_revealing_mirror_yujian", 8_000);
+        values.put(ImmortalCultivationMod.MODID + ":yinyang_compass_yujian", 8_000);
+        values.put(ImmortalCultivationMod.MODID + ":yuanhun_bottle_yujian", 8_000);
         values.put(ImmortalCultivationMod.MODID + ":white_wool_strip", 1);
         values.put(ImmortalCultivationMod.MODID + ":orange_wool_strip", 1);
         values.put(ImmortalCultivationMod.MODID + ":magenta_wool_strip", 1);
@@ -396,28 +589,77 @@ public final class SystemShopPrices {
         values.put(ImmortalCultivationMod.MODID + ":black_wool_strip", 1);
         values.put(ImmortalCultivationMod.MODID + ":neijia_chestplate", 500);
         values.put(ImmortalCultivationMod.MODID + ":zhongyi", 500);
-        values.put(ImmortalCultivationMod.MODID + ":spirit_vein_center", 10000);
+        values.put(ImmortalCultivationMod.MODID + ":spirit_vein_center", 100_000);
+        values.put(ImmortalCultivationMod.MODID + ":qi_pouch", 10_000);
+
 
         values.put(ImmortalCultivationMod.MODID + ":flowing_spirit_crystal", 6000);
         values.put(ImmortalCultivationMod.MODID + ":lingmu_flagpole", 200);
         values.put(ImmortalCultivationMod.MODID + ":patterned_cloth", 500);
-        values.put(ImmortalCultivationMod.MODID + ":ritual_dagger", 3000);
+        values.put(ImmortalCultivationMod.MODID + ":ritual_dagger", 3_000);
         values.put(ImmortalCultivationMod.MODID + ":spirit_guiding_thread", 500);
-        values.put(ImmortalCultivationMod.MODID + ":spirit_map", 1000);
+        values.put(ImmortalCultivationMod.MODID + ":spirit_map", 1_000);
         values.put(ImmortalCultivationMod.MODID + ":spirit_silkworm_silk", 400);
-        values.put(ImmortalCultivationMod.MODID + ":spirit_storage_crystal", 4000);
+        values.put(ImmortalCultivationMod.MODID + ":spirit_storage_crystal", 4_000);
         values.put(ImmortalCultivationMod.MODID + ":zhenwen_jade", 500);
-        values.put(ImmortalCultivationMod.MODID + ":dunwu_stele", 500000);
+        values.put(ImmortalCultivationMod.MODID + ":dunwu_stele", 500_000);
         values.put(ImmortalCultivationMod.MODID + ":lingmu", 300);
         values.put(ImmortalCultivationMod.MODID + ":lingmu_leaves", 10);
         values.put(ImmortalCultivationMod.MODID + ":lingmu_log", 100);
         values.put(ImmortalCultivationMod.MODID + ":restriction_table", 100);
         values.put(ImmortalCultivationMod.MODID + ":spirit_ore", 50);
-        values.put(ImmortalCultivationMod.MODID + ":yuanying_yaodan", 300000);
-        values.put(ImmortalCultivationMod.MODID + ":yanjiao_horn", 100000);
-        values.put(ImmortalCultivationMod.MODID + ":yaoyuan_fist_bone", 300000);
-        values.put(ImmortalCultivationMod.MODID + ":yaoyuan_bone", 20000);
-        values.put(ImmortalCultivationMod.MODID + ":xuesha_hide", 40000);
+        values.put(ImmortalCultivationMod.MODID + ":yuanying_yaodan", 300_000);
+        values.put(ImmortalCultivationMod.MODID + ":huashen_yaodan", 3_000_000);
+        values.put(ImmortalCultivationMod.MODID + ":lianxu_yaodan", 30_000_000);
+        values.put(ImmortalCultivationMod.MODID + ":heti_yaodan", 300_000_000);
+        values.put(ImmortalCultivationMod.MODID + ":dacheng_yaodan", 1_000_000_000);
+        values.put(ImmortalCultivationMod.MODID + ":dujie_yaodan", 1_000_000_000);
+        values.put(ImmortalCultivationMod.MODID + ":yanjiao_horn", 100_000);
+        values.put(ImmortalCultivationMod.MODID + ":yaoyuan_fist_bone", 300_000);
+        values.put(ImmortalCultivationMod.MODID + ":yaoyuan_bone", 20_000);
+        values.put(ImmortalCultivationMod.MODID + ":xuesha_hide", 40_000);
+        values.put(ImmortalCultivationMod.MODID + ":phantom_veil_fur", 60_000);
+        values.put(ImmortalCultivationMod.MODID + ":kongming_stone", 5_000); // 空冥石
+        values.put(ImmortalCultivationMod.MODID + ":lingmu_clasp", 500); // 灵木扣
+        values.put(ImmortalCultivationMod.MODID + ":qi_pouch_yujian", 8_000); // 储物袋炼器玉简
+        // Formula prices are 130% of their matching talisman price.
+        // 一阶符方
+        putTalismanFormulaPrice(values, "qingchen_talisman");
+        putTalismanFormulaPrice(values, "weiguang_talisman");
+        putTalismanFormulaPrice(values, "liansheng_talisman");
+        putTalismanFormulaPrice(values, "fireball_talisman");
+        putTalismanFormulaPrice(values, "fengren_talisman");
+        // 二阶符方
+        putTalismanFormulaPrice(values, "xinghuo_talisman");
+        putTalismanFormulaPrice(values, "bojin_hufu");
+        putTalismanFormulaPrice(values, "chansi_kun_talisman");
+        putTalismanFormulaPrice(values, "duantu_shenxing_talisman");
+        putTalismanFormulaPrice(values, "chuanyin_talisman");
+        putTalismanFormulaPrice(values, "zhenshi_talisman");
+        putTalismanFormulaPrice(values, "fengyan_talisman");
+        putTalismanFormulaPrice(values, "xiufu_talisman");
+        // 三阶符方
+        putTalismanFormulaPrice(values, "bixie_anhun_talisman");
+        putTalismanFormulaPrice(values, "zhenrao_talisman");
+        putTalismanFormulaPrice(values, "baofeng_talisman");
+        putTalismanFormulaPrice(values, "huoyu_fenxie_talisman");
+        putTalismanFormulaPrice(values, "wulei_xiaofa_talisman");
+        putTalismanFormulaPrice(values, "biaoji_talisman");
+        putTalismanFormulaPrice(values, "dunkong_talisman");
+        putTalismanFormulaPrice(values, "huabing_talisman");
+        // 四阶符方
+        putTalismanFormulaPrice(values, "jinguang_huti_talisman");
+        putTalismanFormulaPrice(values, "fengling_talisman");
+        putTalismanFormulaPrice(values, "pozhang_kaishan_talisman");
+        // 五阶符方
+        putTalismanFormulaPrice(values, "qianli_chuanxun_talisman");
+        // 六阶与古符符方
+        putTalismanFormulaPrice(values, "xuanyan_fenjie_talisman");
+        putTalismanFormulaPrice(values, "wuyue_bie_talisman");
+        putTalismanFormulaPrice(values, "jinkong_talisman");
+        values.put(ImmortalCultivationMod.MODID + ":talisman_drawing_table", 1_000); // 画符台
+        values.put(ImmortalCultivationMod.MODID + ":void_stone", 5); // 虚空石
+
 
         return Map.copyOf(values);
     }
@@ -429,6 +671,18 @@ public final class SystemShopPrices {
         for (String path : paths) {
             values.put("minecraft:" + path, price);
         }
+    }
+
+    private static void putTalismanFormulaPrice(
+            Map<String, Integer> values, String talismanPath) {
+        String talismanId = ImmortalCultivationMod.MODID + ":" + talismanPath;
+        Integer talismanPrice = values.get(talismanId);
+        if (talismanPrice == null) {
+            throw new IllegalStateException("Missing talisman price for " + talismanId);
+        }
+        int formulaPrice = Math.toIntExact(
+                (talismanPrice.longValue() * 13L + 9L) / 10L);
+        values.put(talismanId + "_formula", formulaPrice);
     }
 
     private static int fallbackPrice(Item item) {

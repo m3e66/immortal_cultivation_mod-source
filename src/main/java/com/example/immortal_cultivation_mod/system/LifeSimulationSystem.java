@@ -136,6 +136,8 @@ public final class LifeSimulationSystem {
             advanceYears(player, 1);
         } else if (action.equals("advance_5")) {
             advanceYears(player, 5);
+        } else if (action.equals("settle")) {
+            settleLife(player);
         } else if (action.startsWith("choice:")) {
             chooseEvent(player, action.substring("choice:".length()));
         } else if (action.startsWith("activity:")) {
@@ -148,11 +150,14 @@ public final class LifeSimulationSystem {
             buyUpgrade(player, action.substring("upgrade:".length()));
         } else if (action.startsWith("map:")) {
             CompoundTag life = read(player);
-            if (LifeSimulationWorldMap.handleAction(
-                    player,
-                    life,
-                    action.substring("map:".length()),
-                    yearlyRandom(life))) {
+            if (life.getBoolean("Active")
+                    && life.getBoolean("Alive")
+                    && !life.getBoolean("Finished")
+                    && LifeSimulationWorldMap.handleAction(
+                            player,
+                            life,
+                            action.substring("map:".length()),
+                            yearlyRandom(life))) {
                 save(player, life);
             }
         }
@@ -192,6 +197,7 @@ public final class LifeSimulationSystem {
         CompoundTag life = generateBirth(previous, seed);
         life.putInt(ATTEMPTS, attempts);
         save(player, life);
+        com.example.immortal_cultivation_mod.guidance.DaoGuidanceObservations.record(player, "life_started");
     }
 
     private static void rerollBirth(ServerPlayer player) {
@@ -213,6 +219,23 @@ public final class LifeSimulationSystem {
         rerolled.putInt(ATTEMPTS, attempts);
         rerolled.putBoolean("BirthRerolled", true);
         save(player, rerolled);
+    }
+
+    private static void settleLife(ServerPlayer player) {
+        CompoundTag life = read(player);
+        if (!life.contains("Name", Tag.TAG_STRING)
+                || !life.getBoolean("Active")
+                || !life.getBoolean("Alive")
+                || life.getBoolean("Finished")) {
+            return;
+        }
+        finishLife(player, life, "manual_settlement");
+        com.example.immortal_cultivation_mod.guidance.DaoGuidanceObservations.record(player, "life_settled");
+        CompoundTag map = life.getCompound(LifeSimulationWorldMap.ROOT);
+        map.remove(LifeSimulationWorldMap.ACTIVE_JOURNEY);
+        map.remove(LifeSimulationWorldMap.PENDING_ARRIVAL);
+        life.put(LifeSimulationWorldMap.ROOT, map);
+        save(player, life);
     }
 
     private static CompoundTag generateBirth(
@@ -783,6 +806,8 @@ public final class LifeSimulationSystem {
         String questNode = event.getString("QuestNode");
         String nextNode = selected.getString("NextNode");
         life.remove(CURRENT_EVENT);
+        com.example.immortal_cultivation_mod.guidance.DaoGuidanceObservations.record(player, "life_choice");
+        com.example.immortal_cultivation_mod.guidance.DaoGuidanceObservations.record(player, "life_event");
         for (String effect : readStrings(selected.getList("Effects", Tag.TAG_STRING))) {
             if (effect.startsWith("breakthrough:")) {
                 resolveBreakthrough(player, life, effect.substring(13));
@@ -1281,7 +1306,9 @@ public final class LifeSimulationSystem {
         if (life.getBoolean("Finished")) {
             return;
         }
-        if (!"natural_death".equals(cause)
+        boolean manualSettlement = "manual_settlement".equals(cause);
+        if (!manualSettlement
+                && !"natural_death".equals(cause)
                 && hasUpgrade(life, "fate_not_end")
                 && !hasFlag(life, "fate_not_end_used")) {
             life.putBoolean("Alive", true);
@@ -1320,8 +1347,11 @@ public final class LifeSimulationSystem {
                         life.getInt("RetainedRootPotential"),
                         life.getInt("SpiritualRootPotential")));
         life.put(REWARDS, generateInheritanceRewards(player, life));
+
         life.remove(CURRENT_EVENT);
-        addLog(life, "life.immortal_cultivation_mod.log.death");
+        addLog(life, manualSettlement
+                ? "life.immortal_cultivation_mod.log.manual_settlement"
+                : "life.immortal_cultivation_mod.log.death");
     }
 
     private static ListTag generateInheritanceRewards(
@@ -1415,6 +1445,7 @@ public final class LifeSimulationSystem {
             }
         }
         life.putBoolean("RewardClaimed", true);
+        com.example.immortal_cultivation_mod.guidance.DaoGuidanceObservations.record(player, "life_finished");
         life.putBoolean("Active", false);
         save(player, life);
     }
@@ -1933,6 +1964,7 @@ public final class LifeSimulationSystem {
     private static boolean canAdvance(CompoundTag life) {
         return life.getBoolean("Active")
                 && life.getBoolean("Alive")
+                && !life.getBoolean("Finished")
                 && !life.contains(CURRENT_EVENT, Tag.TAG_COMPOUND)
                 && !LifeSimulationWorldMap.blocksYearAdvance(life);
     }

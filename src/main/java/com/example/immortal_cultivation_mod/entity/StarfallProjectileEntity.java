@@ -27,7 +27,8 @@ import org.joml.Vector3f;
 public class StarfallProjectileEntity extends ThrowableItemProjectile {
     public static final double BLAST_RADIUS = 30.0D;
     private static final float IMPACT_DAMAGE = 300.0F;
-    private static final float EXPLOSION_POWER = (float) BLAST_RADIUS;
+    // Terrain damage is deliberately smaller than the spell's combat area.
+    private static final float TERRAIN_EXPLOSION_POWER = 6.0F;
     private static final int MAX_LIFETIME_TICKS = 20 * 8;
     private static final DustParticleOptions GOLD_DUST =
             new DustParticleOptions(new Vector3f(1.0F, 0.72F, 0.12F), 1.4F);
@@ -159,8 +160,8 @@ public class StarfallProjectileEntity extends ThrowableItemProjectile {
             return;
         }
         impacted = true;
-        serverLevel.explode(owner, null, TERRAIN_ONLY_EXPLOSION, center,
-                EXPLOSION_POWER, false, Level.ExplosionInteraction.BLOCK);
+        com.example.immortal_cultivation_mod.spell.SpellDestruction.explode(serverLevel,owner, null, TERRAIN_ONLY_EXPLOSION, center,
+                TERRAIN_EXPLOSION_POWER, false, Level.ExplosionInteraction.BLOCK);
         damageArea(serverLevel, center);
         spawnImpactParticles(serverLevel, center);
         placeStarMark(serverLevel, center);

@@ -1,0 +1,33 @@
+{
+  "name": "Special Flames",
+  "icon": "immortal_cultivation_mod:crimson_flame_seed",
+  "category": "immortal_cultivation_mod:forging",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Recognizing Flames",
+      "text": "Eight special flames have distinct colors, cores, and surrounding effects. These floating essences can be captured in a Flame Vessel; ordinary ground fire cannot.$(br2)Approach an essence, capture it, and compare the filled vessel tooltip with the forging recipe requirements."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Crimson and Earth",
+      "text": "$(bold)Crimson Flame$(): may appear when a Crimson Scale Flame Lizard dies. Its seed can also be forged from a Crimson Scale, Fire Lizard Blood, and spirit stones. Use the seed to awaken a capturable essence.$(br2)$(bold)Earth Flame$(): search underground lava or magma and exposed mountain magma vents."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Wood and Solar",
+      "text": "$(bold)Wood Spirit Flame$(): may form when lightning strikes mature spiritwood.$(br2)$(bold)Solar True Flame$(): may remain after a Golden Core or stronger Metal/Fire-root cultivator dies. Some Daoist temples and ruins also offer opportunities."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Nether and Thunder",
+      "text": "$(bold)Nether Yin Flame$(): may appear from high-level undead, especially flying undead, or in ancient tombs.$(br2)$(bold)Thunder Flame$(): forms where an actual weapon-tribulation strike meets lava or fire. Ordinary weather lightning does not substitute for a weapon trial."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Dragon and Heavenly",
+      "text": "$(bold)Dragon Flame$(): rarely remains after a Crimson Sky Flame Flood Dragon dies. Its horn, a Nascent Soul beast core, and spirit stones can also be refined into a seed.$(br2)$(bold)Heavenly Violet Flame$(): appears extremely rarely after surviving a powerful, successful weapon tribulation. Capture the resulting essence with a vessel."
+    }
+  ]
+}

@@ -1,11 +1,15 @@
 package com.example.immortal_cultivation_mod.spell;
 
+import com.example.immortal_cultivation_mod.config.BlockBreakingSettings;
+
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.attribute.ModAttributes;
 import com.example.immortal_cultivation_mod.block.ModBlocks;
+import com.example.immortal_cultivation_mod.config.ModServerConfig;
 import com.example.immortal_cultivation_mod.entity.CultivatorCorpseEntity;
+import com.example.immortal_cultivation_mod.item.CultivationAccessoryItem;
 import com.example.immortal_cultivation_mod.item.ModItems;
 import com.example.immortal_cultivation_mod.world.YinQiField;
 import java.util.List;
@@ -32,6 +36,7 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.block.AttachedStemBlock;
 import net.minecraft.world.level.block.BambooStalkBlock;
 import net.minecraft.world.level.block.Block;
@@ -77,21 +82,27 @@ public final class UndeadControl {
     public static final String TAG_NPC_SUMMON_OWNER = "icmNpcSummonOwner";
     public static final String TAG_NPC_SUMMON_LEVEL = "icmNpcSummonLevel";
     public static final String TAG_NPC_SUMMON_RELEASED = "icmNpcSummonReleased";
+    private static final String TAG_LIVING_CORPSE_FLIGHT = "icmLivingCorpseFlight";
+    private static final String TAG_LIVING_CORPSE_FLIGHT_HAD_MAYFLY =
+            "icmLivingCorpseFlightHadMayfly";
+    private static final String TAG_LIVING_CORPSE_FLIGHT_ORIGINAL_SPEED =
+            "icmLivingCorpseFlightOriginalSpeed";
     private static final String TAG_CORPSE_INHERITED_MAX_HEALTH = "icmCorpseInheritedMaxHealth";
+    private static final String TAG_DROUGHT_DOMAIN_ENABLED = "icmDroughtDomainEnabled";
     public static final String MODE_NORMAL = "normal";
     public static final String MODE_ATTACK_HOSTILE = "attack_hostile";
     public static final String MODE_DEFENSIVE = "defensive";
     private static final int BELL_COOLDOWN_TICKS = 20 * 1;
     private static final int TICKS_PER_GRUDGE = 1000;
     private static final List<Rank> RANKS = List.of(
-            new Rank(100L, "\u767d\u50f5", CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY, 10.0D),
-            new Rank(500L, "\u9ed1\u50f5", CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_LATE, 30.0D),
-            new Rank(2_500L, "\u8df3\u50f5", CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE, 50.0D),
-            new Rank(12_500L, "\u98de\u50f5", CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE, 200.0D),
-            new Rank(62_500L, "\u6e38\u5c38", CultivationLevels.REALM_YUANYING + CultivationLevels.STAGE_LATE, 1_000.0D),
-            new Rank(312_500L, "\u4f0f\u5c38", CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_LATE, 10_000.0D),
-            new Rank(1_562_500L, "\u4e0d\u5316\u9aa8", CultivationLevels.REALM_DACHENG + CultivationLevels.STAGE_LATE, 1_000_000.0D),
-            new Rank(7_812_500L, "\u65f1\u9b43", CultivationLevels.REALM_DUJIE + CultivationLevels.STAGE_LATE, 5_000_000.0D)
+            new Rank(100L, "white_stiff", "\u767d\u50f5", CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY, 10.0D),
+            new Rank(500L, "black_stiff", "\u9ed1\u50f5", CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_LATE, 30.0D),
+            new Rank(2_500L, "hopping", "\u8df3\u50f5", CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE, 50.0D),
+            new Rank(12_500L, "flying", "\u98de\u50f5", CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE, 200.0D),
+            new Rank(62_500L, "wandering_corpse", "\u6e38\u5c38", CultivationLevels.REALM_YUANYING + CultivationLevels.STAGE_LATE, 1_000.0D),
+            new Rank(312_500L, "hidden_corpse", "\u4f0f\u5c38", CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_LATE, 10_000.0D),
+            new Rank(1_562_500L, "unyielding_bone", "\u4e0d\u5316\u9aa8", CultivationLevels.REALM_DACHENG + CultivationLevels.STAGE_LATE, 1_000_000.0D),
+            new Rank(7_812_500L, "hanba", "\u65f1\u9b43", CultivationLevels.REALM_DUJIE + CultivationLevels.STAGE_LATE, 5_000_000.0D)
     );
 
     private UndeadControl() {
@@ -101,7 +112,34 @@ public final class UndeadControl {
         return entity instanceof Zombie || entity instanceof CultivatorCorpseEntity;
     }
 
+    public static boolean hasUndeadPowers(Entity entity) {
+        return isUndeadServantType(entity)
+                || entity instanceof LivingEntity living
+                && CultivationAccessoryItem.isLivingCorpse(living);
+    }
+
+    public static boolean isDroughtDomainEnabled(LivingEntity entity) {
+        if (!ModServerConfig.droughtZombieDomainEnabled()) {
+            return false;
+        }
+        if (!(entity instanceof ServerPlayer player)) {
+            return true;
+        }
+        CompoundTag tag = player.getPersistentData();
+        return !tag.contains(TAG_DROUGHT_DOMAIN_ENABLED)
+                || tag.getBoolean(TAG_DROUGHT_DOMAIN_ENABLED);
+    }
+
+    public static void setDroughtDomainEnabled(ServerPlayer player, boolean enabled) {
+        player.getPersistentData().putBoolean(TAG_DROUGHT_DOMAIN_ENABLED, enabled);
+    }
+
     public static void tick(LivingEntity entity) {
+        if (entity instanceof ServerPlayer player
+                && CultivationAccessoryItem.isLivingCorpse(player)) {
+            tickLivingCorpsePlayer(player);
+            return;
+        }
         if (!isUndeadServantType(entity)) {
             return;
         }
@@ -140,6 +178,132 @@ public final class UndeadControl {
         }
         clearOwnerTarget(entity);
         tickCommand(entity);
+    }
+
+    public static void initializeLivingCorpsePlayer(ServerPlayer player) {
+        CompoundTag tag = player.getPersistentData();
+        tag.putBoolean(TAG_GRUDGE_ROLLED, true);
+        tag.putBoolean(TAG_HAS_GRUDGE, true);
+        tag.putLong(TAG_GRUDGE, 0L);
+        tag.putLong(TAG_TICKS, 0L);
+        tag.putDouble(TAG_GRUDGE_PROGRESS, 0.0D);
+        tag.remove(TAG_LIVING_CORPSE_FLIGHT);
+        tag.remove(TAG_LIVING_CORPSE_FLIGHT_HAD_MAYFLY);
+        tag.remove(TAG_LIVING_CORPSE_FLIGHT_ORIGINAL_SPEED);
+        setBase(player, ModAttributes.GRUDGE, 0.0D);
+    }
+
+    public static void clearLivingCorpsePlayerAbilities(ServerPlayer player) {
+        if (!player.getPersistentData().getBoolean(TAG_LIVING_CORPSE_FLIGHT)) {
+            return;
+        }
+        CompoundTag tag = player.getPersistentData();
+        boolean hadMayfly = tag.getBoolean(TAG_LIVING_CORPSE_FLIGHT_HAD_MAYFLY);
+        float originalSpeed = tag.contains(TAG_LIVING_CORPSE_FLIGHT_ORIGINAL_SPEED)
+                ? tag.getFloat(TAG_LIVING_CORPSE_FLIGHT_ORIGINAL_SPEED) : 0.05F;
+        tag.remove(TAG_LIVING_CORPSE_FLIGHT);
+        tag.remove(TAG_LIVING_CORPSE_FLIGHT_HAD_MAYFLY);
+        tag.remove(TAG_LIVING_CORPSE_FLIGHT_ORIGINAL_SPEED);
+        player.getAbilities().setFlyingSpeed(originalSpeed);
+        if (!player.isCreative() && !player.isSpectator() && !hadMayfly) {
+            player.getAbilities().flying = false;
+            player.getAbilities().mayfly = false;
+        }
+        player.onUpdateAbilities();
+    }
+
+    public static boolean feedLivingCorpsePlayer(ServerPlayer player, ItemStack stack,
+                                                  long grudgePerItem, boolean shiftAll) {
+        if (!CultivationAccessoryItem.isLivingCorpse(player)
+                || stack.isEmpty() || grudgePerItem <= 0L) {
+            return false;
+        }
+        long current = grudge(player);
+        long maxGrudge = grudgePerItem == 1L ? 1_000L : Long.MAX_VALUE;
+        if (current >= maxGrudge) {
+            return false;
+        }
+        int itemsToUse = shiftAll ? stack.getCount() : 1;
+        if (maxGrudge != Long.MAX_VALUE) {
+            long remainingItems = (maxGrudge - current + grudgePerItem - 1L) / grudgePerItem;
+            itemsToUse = (int) Math.min(itemsToUse, remainingItems);
+        }
+        if (itemsToUse <= 0) {
+            return false;
+        }
+        long added = grudgePerItem * itemsToUse;
+        long next = maxGrudge == Long.MAX_VALUE
+                ? current + added : Math.min(maxGrudge, current + added);
+        if (!addLivingCorpseGrudge(player, next - current)) {
+            return false;
+        }
+        if (!player.getAbilities().instabuild) {
+            stack.shrink(itemsToUse);
+        }
+        return true;
+    }
+
+    public static boolean addLivingCorpseGrudge(ServerPlayer player, long amount) {
+        if (!CultivationAccessoryItem.isLivingCorpse(player) || amount <= 0L) {
+            return false;
+        }
+        long current = grudge(player);
+        long next = current > Long.MAX_VALUE - amount ? Long.MAX_VALUE : current + amount;
+        CompoundTag tag = player.getPersistentData();
+        tag.putLong(TAG_GRUDGE, next);
+        long ticks = Math.max(tag.getLong(TAG_TICKS), next * TICKS_PER_GRUDGE);
+        tag.putLong(TAG_TICKS, ticks);
+        tag.putDouble(TAG_GRUDGE_PROGRESS, Math.max(tag.getDouble(TAG_GRUDGE_PROGRESS), ticks));
+        setBase(player, ModAttributes.GRUDGE, next);
+        applyRank(player);
+        return true;
+    }
+
+    private static void tickLivingCorpsePlayer(ServerPlayer player) {
+        syncGrudgeAttributeIntoData(player);
+        CompoundTag tag = player.getPersistentData();
+        double progress = tag.contains(TAG_GRUDGE_PROGRESS)
+                ? tag.getDouble(TAG_GRUDGE_PROGRESS) : tag.getLong(TAG_TICKS);
+        progress += grudgeGrowthMultiplier(player);
+        tag.putDouble(TAG_GRUDGE_PROGRESS, progress);
+        long ticks = (long) Math.floor(progress);
+        tag.putLong(TAG_TICKS, ticks);
+        long grudge = ticks / TICKS_PER_GRUDGE;
+        tag.putLong(TAG_GRUDGE, grudge);
+        setBase(player, ModAttributes.GRUDGE, grudge);
+        applyRank(player);
+        tickRankPowers(player);
+        if (player.tickCount % 20 == 0) {
+            clearHostileMobTargets(player);
+        }
+        if (grudge >= thresholdFor("飞僵")) {
+            boolean changed = false;
+            if (!tag.getBoolean(TAG_LIVING_CORPSE_FLIGHT)) {
+                tag.putBoolean(TAG_LIVING_CORPSE_FLIGHT, true);
+                tag.putBoolean(TAG_LIVING_CORPSE_FLIGHT_HAD_MAYFLY,
+                        player.getAbilities().mayfly);
+                tag.putFloat(TAG_LIVING_CORPSE_FLIGHT_ORIGINAL_SPEED,
+                        player.getAbilities().getFlyingSpeed());
+            }
+            if (!player.getAbilities().mayfly) {
+                player.getAbilities().mayfly = true;
+                changed = true;
+            }
+            if (changed) {
+                player.onUpdateAbilities();
+            }
+        } else if (tag.getBoolean(TAG_LIVING_CORPSE_FLIGHT)) {
+            clearLivingCorpsePlayerAbilities(player);
+        }
+    }
+
+    private static void clearHostileMobTargets(ServerPlayer player) {
+        AABB searchArea = player.getBoundingBox().inflate(128.0D);
+        for (Mob mob : player.serverLevel().getEntitiesOfClass(
+                Mob.class, searchArea,
+                candidate -> candidate instanceof Enemy && candidate.getTarget() == player)) {
+            mob.setTarget(null);
+        }
     }
 
     public static InteractionResult interactEntity(ServerPlayer player, Entity target, InteractionHand hand) {
@@ -327,6 +491,36 @@ public final class UndeadControl {
         return entity.getPersistentData().getLong(TAG_GRUDGE);
     }
 
+    public static String rankIdForGrudge(long grudge) {
+        return grudge < RANKS.getFirst().threshold()
+                ? "normal"
+                : rankFor(grudge).id();
+    }
+
+    public static long currentRankThreshold(long grudge) {
+        return grudge < RANKS.getFirst().threshold()
+                ? 0L
+                : rankFor(grudge).threshold();
+    }
+
+    public static long nextRankThreshold(long grudge) {
+        for (Rank rank : RANKS) {
+            if (grudge < rank.threshold()) {
+                return rank.threshold();
+            }
+        }
+        return -1L;
+    }
+
+    public static double livingCorpseMaxHealthBonus(LivingEntity entity) {
+        long grudge = grudge(entity);
+        if (!CultivationAccessoryItem.isLivingCorpse(entity)
+                || grudge < RANKS.getFirst().threshold()) {
+            return 0.0D;
+        }
+        return CultivationLevels.getLevelDef(rankFor(grudge).level()).maxHp();
+    }
+
     public static String levelFor(LivingEntity entity) {
         String summonedLevel = entity.getPersistentData().getString(TAG_NPC_SUMMON_LEVEL);
         if (!summonedLevel.isBlank() && CultivationLevels.getRealmIndex(summonedLevel) > 0) {
@@ -363,6 +557,8 @@ public final class UndeadControl {
     }
 
     public static void stunFromRepel(LivingEntity entity, int ticks) {
+        if (com.example.immortal_cultivation_mod.combat.ThoughtControlGuard.resistForDuration(
+                entity, "undead_restraint", null, ticks)) return;
         entity.getPersistentData().putLong(TAG_REPEL_STUN_UNTIL, entity.level().getGameTime() + ticks);
     }
 
@@ -415,6 +611,7 @@ public final class UndeadControl {
     }
 
     private static boolean isRepelStunned(LivingEntity entity) {
+        if (com.example.immortal_cultivation_mod.combat.ThoughtControlGuard.hasProtection(entity)) return false;
         long until = entity.getPersistentData().getLong(TAG_REPEL_STUN_UNTIL);
         if (until <= 0L) {
             return false;
@@ -666,7 +863,7 @@ public final class UndeadControl {
         var level = CultivationLevels.getLevelDef(statLevel);
         if (entity instanceof CultivatorCorpseEntity) {
             setBase(entity, Attributes.MAX_HEALTH, corpseStackedMaxHealth(entity, rank));
-        } else {
+        } else if (!(entity instanceof Player)) {
             setBase(entity, Attributes.MAX_HEALTH, level.maxHp());
         }
         setBase(entity, Attributes.ARMOR, Math.max(0.0D, CultivationLevels.getRealmIndex(statLevel) * 4.0D));
@@ -676,8 +873,10 @@ public final class UndeadControl {
         if (entity.getHealth() > entity.getMaxHealth()) {
             entity.setHealth(entity.getMaxHealth());
         }
-        entity.setCustomName(Component.literal(rank.name()));
-        entity.setCustomNameVisible(true);
+        if (!(entity instanceof Player)) {
+            entity.setCustomName(Component.literal(rank.name()));
+            entity.setCustomNameVisible(true);
+        }
     }
 
     private static double corpseStackedMaxHealth(LivingEntity corpse, Rank currentRank) {
@@ -715,9 +914,10 @@ public final class UndeadControl {
         if (grudge >= thresholdFor("\u4f0f\u5c38")) {
             YinQiField.updateAura(level, entity.getUUID(), entity.blockPosition(), yinAuraRadius(entity), 10, 60);
         }
-        if (grudge >= thresholdFor("\u65f1\u9b43")) {
+        if (grudge >= thresholdFor("\u65f1\u9b43") && isDroughtDomainEnabled(entity)) {
             dryNearbyLand(level, entity);
         }
+        UndeadAbilitySystem.tickUndead(entity);
     }
 
     private static int yinAuraRadius(LivingEntity entity) {
@@ -751,8 +951,8 @@ public final class UndeadControl {
             entity.setNoGravity(true);
             Vec3 toward = target.getEyePosition().subtract(entity.position()).normalize();
             mob.getMoveControl().setWantedPosition(target.getX(), target.getEyeY(), target.getZ(), 1.35D);
-            Vec3 current = entity.getDeltaMovement().scale(0.35D);
-            Vec3 flight = toward.scale(0.34D);
+            Vec3 current = entity.getDeltaMovement().scale(0.20D);
+            Vec3 flight = toward.scale(JindanCreativeFlight.BASE_TRAVEL_SPEED);
             entity.setDeltaMovement(current.add(flight));
             entity.fallDistance = 0.0F;
             entity.hurtMarked = true;
@@ -762,9 +962,14 @@ public final class UndeadControl {
     }
 
     private static void dryNearbyLand(ServerLevel level, LivingEntity entity) {
+        if (!BlockBreakingSettings.enabled(entity,
+                BlockBreakingSettings.Category.UNDEAD_DOMAINS)) return;
+        if (entity.tickCount % 4 != 0) {
+            return;
+        }
         BlockPos center = entity.blockPosition();
         int radius = 100;
-        for (int i = 0; i < 384; i++) {
+        for (int i = 0; i < 512; i++) {
             int x = center.getX() + entity.getRandom().nextInt(201) - 100;
             int z = center.getZ() + entity.getRandom().nextInt(201) - 100;
             int dx = x - center.getX();
@@ -776,29 +981,81 @@ public final class UndeadControl {
             if (!level.isLoaded(column)) {
                 continue;
             }
-            int minY = level.getMinBuildHeight();
-            int maxY = level.getMaxBuildHeight() - 1;
+            int surfaceY = level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z);
+            int minY = Math.max(level.getMinBuildHeight(),
+                    Math.min(center.getY() - 48, surfaceY - 48));
+            int maxY = Math.min(level.getMaxBuildHeight() - 1,
+                    Math.max(center.getY() + 24, surfaceY + 2));
             for (int y = minY; y <= maxY; y++) {
-                dryBlock(level, new BlockPos(x, y, z));
+                dryBlock(level, new BlockPos(x, y, z), entity);
             }
         }
     }
 
-    private static void dryBlock(ServerLevel level, BlockPos pos) {
+    /** Evaporates one stripe per second so the 40-block domain clears water without a one-tick spike. */
+    public static void dryDroughtDomainPulse(ServerLevel level, Vec3 center,
+                                             int radius, long gameTime) {
+        dryDroughtDomainPulse(level, center, radius, gameTime, null);
+    }
+
+    public static void dryDroughtDomainPulse(ServerLevel level, Vec3 center,
+                                             int radius, long gameTime, LivingEntity caster) {
+        if (!BlockBreakingSettings.enabled(caster,
+                BlockBreakingSettings.Category.UNDEAD_DOMAINS)) return;
+        int stripeCount = 4;
+        int stripe = Math.floorMod((int) (gameTime / 20L), stripeCount);
+        int centerX = net.minecraft.util.Mth.floor(center.x);
+        int centerY = net.minecraft.util.Mth.floor(center.y);
+        int centerZ = net.minecraft.util.Mth.floor(center.z);
+        int radiusSquared = radius * radius;
+        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+        for (int dx = -radius + stripe; dx <= radius; dx += stripeCount) {
+            for (int dz = -radius; dz <= radius; dz++) {
+                if (dx * dx + dz * dz > radiusSquared) {
+                    continue;
+                }
+                int x = centerX + dx;
+                int z = centerZ + dz;
+                cursor.set(x, centerY, z);
+                if (!level.isLoaded(cursor)) {
+                    continue;
+                }
+                int surfaceY = level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z);
+                int minY = Math.max(level.getMinBuildHeight(),
+                        Math.min(centerY - radius, surfaceY - radius));
+                int maxY = Math.min(level.getMaxBuildHeight() - 1,
+                        Math.max(centerY + 8, surfaceY + 2));
+                for (int y = minY; y <= maxY; y++) {
+                    cursor.set(x, y, z);
+                    dryBlock(level, cursor, caster);
+                }
+            }
+        }
+    }
+
+    private static void dryBlock(ServerLevel level, BlockPos pos, LivingEntity caster) {
         BlockState state = level.getBlockState(pos);
         if (state.isAir() && state.getFluidState().isEmpty()) {
             return;
         }
         if (state.getFluidState().is(FluidTags.WATER)) {
-            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+            BlockPos fixed = pos.immutable();
+            BlockBreakingSettings.runWithSource(
+                    BlockBreakingSettings.Category.UNDEAD_DOMAINS, caster,
+                    () -> SpellDestruction.eraseNow(level, fixed, caster));
             return;
         }
         if (state.is(Blocks.GRASS_BLOCK)) {
-            level.setBlockAndUpdate(pos, Blocks.DIRT.defaultBlockState());
+            if (caster == null) level.setBlockAndUpdate(pos, Blocks.DIRT.defaultBlockState());
+            else TerrainTransforms.replace(level, pos, Blocks.DIRT.defaultBlockState(), caster,
+                    BlockBreakingSettings.Category.UNDEAD_DOMAINS);
             return;
         }
         if (isPlantBlock(state)) {
-            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+            BlockPos fixed = pos.immutable();
+            BlockBreakingSettings.runWithSource(
+                    BlockBreakingSettings.Category.UNDEAD_DOMAINS, caster,
+                    () -> SpellDestruction.breakBlock(level, fixed, false, caster));
         }
     }
 
@@ -863,7 +1120,8 @@ public final class UndeadControl {
 
     private static boolean hasGrudgeGrowth(LivingEntity entity) {
         CompoundTag tag = entity.getPersistentData();
-        if (entity instanceof CultivatorCorpseEntity) {
+        if (entity instanceof CultivatorCorpseEntity
+                || CultivationAccessoryItem.isLivingCorpse(entity)) {
             tag.putBoolean(TAG_GRUDGE_ROLLED, true);
             tag.putBoolean(TAG_HAS_GRUDGE, true);
             return true;
@@ -887,7 +1145,9 @@ public final class UndeadControl {
             return;
         }
         tag.putBoolean(TAG_GRUDGE_ROLLED, true);
-        tag.putBoolean(TAG_HAS_GRUDGE, attributeGrudge > 0L || entity instanceof CultivatorCorpseEntity);
+        tag.putBoolean(TAG_HAS_GRUDGE, attributeGrudge > 0L
+                || entity instanceof CultivatorCorpseEntity
+                || CultivationAccessoryItem.isLivingCorpse(entity));
         tag.putLong(TAG_GRUDGE, attributeGrudge);
         long ticks = Math.max(0L, attributeGrudge * TICKS_PER_GRUDGE);
         tag.putLong(TAG_TICKS, ticks);
@@ -977,6 +1237,8 @@ public final class UndeadControl {
     }
 
     private static void stopHorizontalMovement(LivingEntity entity) {
+        if (com.example.immortal_cultivation_mod.combat.ThoughtControlGuard.resist(
+                entity, "undead_restraint", null, com.example.immortal_cultivation_mod.combat.ThoughtControlGuard.BASE_DAMAGE)) return;
         Vec3 movement = entity.getDeltaMovement();
         entity.setDeltaMovement(0.0D, entity.onGround() ? 0.0D : Math.min(movement.y, -0.08D), 0.0D);
     }
@@ -1156,7 +1418,10 @@ public final class UndeadControl {
         BlockState state = entity.level().getBlockState(pos);
         if (state.is(ModBlocks.NUOMI_DUST.get())) {
             if (ignoresNuomi(entity)) {
-                entity.level().removeBlock(pos, false);
+                if (entity.level() instanceof ServerLevel server)
+                    BlockBreakingSettings.runWithSource(
+                            BlockBreakingSettings.Category.COMPANIONS, entity,
+                            () -> SpellDestruction.breakBlock(server, pos, false, entity));
                 return false;
             }
             stunFromRepel(entity, 20);
@@ -1166,7 +1431,10 @@ public final class UndeadControl {
         }
         if (state.is(ModBlocks.MODOU_LINE.get())) {
             if (ignoresModouLine(entity)) {
-                entity.level().removeBlock(pos, false);
+                if (entity.level() instanceof ServerLevel server)
+                    BlockBreakingSettings.runWithSource(
+                            BlockBreakingSettings.Category.COMPANIONS, entity,
+                            () -> SpellDestruction.breakBlock(server, pos, false, entity));
                 return false;
             }
             stunFromRepel(entity, 20);
@@ -1217,6 +1485,6 @@ public final class UndeadControl {
         entity.yHeadRotO = yaw;
     }
 
-    private record Rank(long threshold, String name, String level, double damage) {
+    private record Rank(long threshold, String id, String name, String level, double damage) {
     }
 }

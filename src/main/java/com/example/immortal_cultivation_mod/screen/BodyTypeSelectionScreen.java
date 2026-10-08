@@ -3,33 +3,28 @@ package com.example.immortal_cultivation_mod.screen;
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.BodyTypes;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
-import com.example.immortal_cultivation_mod.network.ModPayloads;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
-public class BodyTypeSelectionScreen extends Screen {
+public class BodyTypeSelectionScreen extends EnlightenmentSelectionScreen {
     private static final int WINDOW_W = 260;
-    private static final int WINDOW_H = 188;
+    private static final int WINDOW_H = 170;
     private static final int MAX_REFRESHES = 3;
 
     private final RandomSource random = RandomSource.create();
     private final List<String> roots;
     private final String grade;
-    private String selectedGender;
     private String selectedBodyType;
     private int refreshesLeft = MAX_REFRESHES;
 
-    public BodyTypeSelectionScreen(List<String> roots, String grade, String gender) {
+    public BodyTypeSelectionScreen(List<String> roots, String grade) {
         super(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".body_type_selection"));
         this.roots = SpiritRoots.sanitizeRootList(roots);
         this.grade = SpiritRoots.sanitizeGrade(grade);
-        this.selectedGender = "female".equals(gender) ? "female" : "male";
         rollBodyType();
     }
 
@@ -38,17 +33,6 @@ public class BodyTypeSelectionScreen extends Screen {
         clearWidgets();
         int x = (width - WINDOW_W) / 2;
         int y = (height - WINDOW_H) / 2;
-
-        addRenderableWidget(new SpiritRootSelectionScreen.StyledButton(
-                x + 20, y + 121, 100, 20,
-                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".npc.gender.male"),
-                b -> setGender("male")
-        )).active = !"male".equals(selectedGender);
-        addRenderableWidget(new SpiritRootSelectionScreen.StyledButton(
-                x + WINDOW_W - 120, y + 121, 100, 20,
-                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".npc.gender.female"),
-                b -> setGender("female")
-        )).active = !"female".equals(selectedGender);
 
         addRenderableWidget(new SpiritRootSelectionScreen.StyledButton(
                 x + 20,
@@ -64,7 +48,7 @@ public class BodyTypeSelectionScreen extends Screen {
                 y + WINDOW_H - 32,
                 100,
                 20,
-                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".confirm_button"),
+                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".continue_button"),
                 b -> confirm()
         ));
     }
@@ -82,15 +66,8 @@ public class BodyTypeSelectionScreen extends Screen {
         selectedBodyType = BodyTypes.random(random);
     }
 
-    private void setGender(String gender) {
-        selectedGender = gender;
-        init();
-    }
-
     private void confirm() {
-        PacketDistributor.sendToServer(new ModPayloads.ServerboundCompleteEnlightenmentPayload(
-                roots, grade, selectedBodyType, selectedGender));
-        Minecraft.getInstance().setScreen(null);
+        Minecraft.getInstance().setScreen(new GenderSelectionScreen(roots, grade, selectedBodyType));
     }
 
     @Override

@@ -11,16 +11,19 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ModEffects {
-   public static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(Registries.MOB_EFFECT, "immortal_cultivation_mod");
-   public static final DeferredHolder<MobEffect, MobEffect> BLEEDING = EFFECTS.register(
-      "bleeding", () -> new BleedingEffect(MobEffectCategory.HARMFUL, 9109504)
-   );
-   public static final DeferredHolder<MobEffect, MobEffect> FOG = EFFECTS.register("fog", () -> new FogEffect(MobEffectCategory.HARMFUL, 16777215));
-   public static final DeferredHolder<MobEffect, MobEffect> INVERTED_CONTROL = EFFECTS.register(
-      "inverted_control", () -> new InvertedControlEffect(MobEffectCategory.HARMFUL, 8388736)
-   );
+   public static final DeferredRegister<MobEffect> EFFECTS;
+   public static final DeferredHolder<MobEffect, MobEffect> BLEEDING;
+   public static final DeferredHolder<MobEffect, MobEffect> FOG;
+   public static final DeferredHolder<MobEffect, MobEffect> INVERTED_CONTROL;
 
    public static void register(IEventBus eventBus) {
       EFFECTS.register(eventBus);
+   }
+
+   static {
+      EFFECTS = DeferredRegister.create(Registries.MOB_EFFECT, "immortal_cultivation_mod");
+      BLEEDING = EFFECTS.register("bleeding", () -> new BleedingEffect(MobEffectCategory.HARMFUL, 9109504));
+      FOG = EFFECTS.register("fog", () -> new FogEffect(MobEffectCategory.HARMFUL, 16777215));
+      INVERTED_CONTROL = EFFECTS.register("inverted_control", () -> new InvertedControlEffect(MobEffectCategory.HARMFUL, 8388736));
    }
 }

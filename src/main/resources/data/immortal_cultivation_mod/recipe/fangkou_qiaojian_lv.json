@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "Y Y",
+    "YGY",
+    "L L"
+  ],
+  "key": {
+    "Y": {
+      "item": "immortal_cultivation_mod:yellow_wool_strip"
+    },
+    "G": {
+      "item": "minecraft:gold_nugget"
+    },
+    "L": {
+      "item": "minecraft:leather"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:fangkou_qiaojian_lv",
+    "count": 1
+  }
+}

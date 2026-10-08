@@ -156,7 +156,7 @@ public final class OuterSystemManager {
         event.getEntity().getPersistentData().put(RECENT_DAMAGE, recent);
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.LOWEST)
     public static void onDeath(LivingDeathEvent event) {
         if (event.getEntity().level().isClientSide) {
             return;
@@ -259,7 +259,12 @@ public final class OuterSystemManager {
     }
 
     public static void buyShopItem(ServerPlayer player, String itemId) {
-        SystemShop.buy(player, itemId);
+        buyShopItem(player, itemId, false);
+    }
+
+    public static void buyShopItem(ServerPlayer player, String itemId,
+                                   boolean buyStack) {
+        SystemShop.buy(player, itemId, buyStack);
         refreshOpenScreen(player);
     }
 
@@ -295,6 +300,58 @@ public final class OuterSystemManager {
         ensureBinding(player);
     }
 
+    /**
+     * Returns the system selected in the debug editor, falling back to the
+     * currently bound system when no debug preset has been chosen.
+     */
+    public static OuterSystemType debugSystemType(ServerPlayer player) {
+        CompoundTag state = OuterSystemData.read(player);
+        String debugType = state.getString(OuterSystemData.DEBUG_TYPE);
+        if (!debugType.isBlank()) {
+            return OuterSystemType.byId(debugType);
+        }
+        return OuterSystemData.equipped(player)
+                .map(OuterSystemItem::getType)
+                .orElseGet(() -> OuterSystemType.byId(
+                        state.getString(OuterSystemData.TYPE)));
+    }
+
+    /**
+     * Debug-editor system selection. It is stored even before the player has
+     * the Outer Demon Body, then applied when that body grants its system.
+     */
+    public static void setDebugSystem(ServerPlayer player, OuterSystemType type) {
+        if (type == null) {
+            return;
+        }
+
+        CompoundTag state = OuterSystemData.read(player);
+        String previousType = OuterSystemData.equipped(player)
+                .map(OuterSystemItem::getType)
+                .map(OuterSystemType::id)
+                .orElse(state.getString(OuterSystemData.TYPE));
+        state.putString(OuterSystemData.DEBUG_TYPE, type.id());
+        state.putString(OuterSystemData.TYPE, type.id());
+        state.putBoolean(OuterSystemData.DESTROYED, false);
+        if (!previousType.isBlank() && !previousType.equals(type.id())) {
+            state.putString(OuterSystemData.PREVIOUS_TYPE, previousType);
+        }
+
+        boolean outerBody = BodyTypes.OUTER_DEMON_BODY.equals(
+                ModAttachments.getData(player).bodyType());
+        if (outerBody) {
+            closeScreen(player);
+            OuterSystemData.ensureSlot(player);
+            OuterSystemData.removeEquipped(player);
+            if (OuterSystemData.equip(player, OuterSystemItem.create(type))) {
+                state.putBoolean(OuterSystemData.EVER_BOUND, true);
+                state.putBoolean(OuterSystemData.BOOT_SHOWN, true);
+            }
+        }
+        OuterSystemData.save(player, state);
+        sync(player);
+    }
+
     private static void ensureBinding(ServerPlayer player) {
         CompoundTag state = OuterSystemData.read(player);
         boolean outerBody = BodyTypes.OUTER_DEMON_BODY.equals(
@@ -312,9 +369,11 @@ public final class OuterSystemManager {
             return;
         }
         if (outerBody && !state.getBoolean(OuterSystemData.EVER_BOUND)) {
-            OuterSystemType type = rerollSystem(
-                    player.getRandom(),
-                    state.getString(OuterSystemData.PREVIOUS_TYPE));
+            OuterSystemType type = state.getString(OuterSystemData.DEBUG_TYPE).isBlank()
+                    ? rerollSystem(player.getRandom(),
+                    state.getString(OuterSystemData.PREVIOUS_TYPE))
+                    : OuterSystemType.byId(
+                    state.getString(OuterSystemData.DEBUG_TYPE));
             OuterSystemData.ensureSlot(player);
             if (!OuterSystemData.equip(
                     player, OuterSystemItem.create(type))) {

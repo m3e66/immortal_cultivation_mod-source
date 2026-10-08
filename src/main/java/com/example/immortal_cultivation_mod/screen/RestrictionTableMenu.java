@@ -57,7 +57,7 @@ public class RestrictionTableMenu extends AbstractContainerMenu {
         addSlot(new Slot(container, RestrictionTableBlockEntity.WEAPON_SLOT, WEAPON_X, WEAPON_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return WeaponRestrictionSystem.isWeapon(stack) && !active();
+                return WeaponRestrictionSystem.isEquipment(stack) && !active();
             }
 
             @Override
@@ -119,7 +119,7 @@ public class RestrictionTableMenu extends AbstractContainerMenu {
             if (active() || !moveItemStackTo(stack, 1, slots.size(), true)) {
                 return ItemStack.EMPTY;
             }
-        } else if (WeaponRestrictionSystem.isWeapon(stack)) {
+        } else if (WeaponRestrictionSystem.isEquipment(stack)) {
             if (!moveItemStackTo(stack, 0, 1, false)) {
                 return ItemStack.EMPTY;
             }

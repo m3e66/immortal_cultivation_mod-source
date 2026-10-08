@@ -1,0 +1,18 @@
+{
+  "name": "获取布阵工具",
+  "icon": "immortal_cultivation_mod:spirit_stone",
+  "category": "immortal_cultivation_mod:getting_started",
+  "sortnum": -1,
+  "pages": [
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortal_cultivation_mod:magic_ritual_guide_book",
+      "text": "使用一本书与一枚下品灵石进行无序合成即可获得本指南，无需探索任何结构。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortal_cultivation_mod:ritual_dagger",
+      "text": "使用一枚阵纹玉、一块铁锭与一根木棍即可合成仪式匕首。阵修也会出售它与其他布阵物资。"
+    }
+  ]
+}

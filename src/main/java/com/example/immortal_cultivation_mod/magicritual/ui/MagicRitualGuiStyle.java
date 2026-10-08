@@ -6,27 +6,24 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 
 final class MagicRitualGuiStyle {
-    static final int TEXT_COLOR = 0xFF30362F;
+   static final int TEXT_COLOR = -13617617;
 
-    private MagicRitualGuiStyle() {
-    }
+   private MagicRitualGuiStyle() {
+   }
 
-    static void drawWindow(GuiGraphics graphics, int x, int y, int width, int height) {
-        CultivationGuiTextures.drawLandscape(graphics, x, y, width, height);
-        CultivationGuiTextures.drawInnerBox(graphics, x + 14, y + 40, width - 28, height - 54);
-    }
+   static void drawWindow(GuiGraphics graphics, int x, int y, int width, int height) {
+      CultivationGuiTextures.drawLandscape(graphics, x, y, width, height);
+      CultivationGuiTextures.drawInnerBox(graphics, x + 14, y + 40, width - 28, height - 54);
+   }
 
-    static final class RitualButton extends Button {
-        RitualButton(int x, int y, int width, int height, Component message, OnPress onPress) {
-            super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
-        }
+   static final class RitualButton extends Button {
+      RitualButton(int x, int y, int width, int height, Component message, Button.OnPress onPress) {
+         super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
+      }
 
-        @Override
-        protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-            CultivationGuiTextures.drawButton(
-                    graphics, getX(), getY(), width, height, active, isHoveredOrFocused());
-            CultivationGuiTextures.drawButtonText(
-                    graphics, getMessage(), getX(), getY(), width, height, active);
-        }
-    }
+      protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+         CultivationGuiTextures.drawButton(graphics, this.getX(), this.getY(), this.width, this.height, this.active, this.isHoveredOrFocused());
+         CultivationGuiTextures.drawButtonText(graphics, this.getMessage(), this.getX(), this.getY(), this.width, this.height, this.active);
+      }
+   }
 }

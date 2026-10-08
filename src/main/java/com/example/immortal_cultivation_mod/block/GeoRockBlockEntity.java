@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.Animation;
 import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.animation.PlayState;
@@ -20,10 +21,10 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 public class GeoRockBlockEntity extends BlockEntity implements GeoBlockEntity {
     private static final String STELE_SPELL_TAG = "SteleSpell";
     private static final String QINGTONG_DING_MODEL = "qingtong_yinhuo_ding";
-    private static final RawAnimation QINGTONG_DING_IDLE =
-            RawAnimation.begin().thenLoop("idle");
-    private static final RawAnimation QINGTONG_DING_IGNITE =
-            RawAnimation.begin().thenLoop("ignite");
+    private static final String CU_TIE_DING_MODEL = "cu_tie_xiaoding";
+    private static final String SANYANG_DING_MODEL = "chi_jin_sanyang_ding";
+    private String dingAnimationMode = "";
+    private RawAnimation dingAnimation = RawAnimation.begin().thenLoop("idle");
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private String steleSpellId = "";
 
@@ -76,15 +77,35 @@ public class GeoRockBlockEntity extends BlockEntity implements GeoBlockEntity {
                 "qingtong_ding",
                 0,
                 state -> {
-                    if (!QINGTONG_DING_MODEL.equals(modelName())) {
+                    String model = modelName();
+                    if (!QINGTONG_DING_MODEL.equals(model) && !CU_TIE_DING_MODEL.equals(model)
+                            && !SANYANG_DING_MODEL.equals(model)) {
                         return PlayState.STOP;
                     }
-                    return state.setAndContinue(
-                            this instanceof DingBlockEntity ding
-                                    && ding.hasFireBelow()
-                                    ? QINGTONG_DING_IGNITE
-                                    : QINGTONG_DING_IDLE);
+                    return state.setAndContinue(updateDingAnimation());
                 }));
+    }
+
+    RawAnimation updateDingAnimation() {
+        String desired = "idle";
+        if (this instanceof DingBlockEntity ding) {
+            if (ding.hasLid() && ding.isLidOpen()) desired = "open";
+            else if (ding.isForging()) desired = "forge";
+            else if (ding.isFinishingAnimation()) desired = "finish";
+            else if (ding.hasFireBelow()) desired = "ignite";
+        }
+        if (!desired.equals(dingAnimationMode)) {
+            RawAnimation next = RawAnimation.begin();
+            // thenPlay uses the JSON loop type; both lid clips hold their last frame.
+            // Closing must finish so the queued heat/forge animation can run.
+            if (dingAnimationMode.equals("open")) next.then("close", Animation.LoopType.PLAY_ONCE);
+            if (desired.equals("open")) next.thenPlayAndHold("open");
+            else if (desired.equals("finish")) next.thenPlay("finish");
+            else next.thenLoop(desired);
+            dingAnimation = next;
+            dingAnimationMode = desired;
+        }
+        return dingAnimation;
     }
 
     @Override

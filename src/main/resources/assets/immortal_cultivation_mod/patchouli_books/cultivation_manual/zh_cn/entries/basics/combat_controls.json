@@ -1,0 +1,18 @@
+{
+  "name": "战斗操作",
+  "icon": "immortal_cultivation_mod:dao",
+  "category": "immortal_cultivation_mod:basics",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "普攻与重击",
+      "text": "使用战斗状态快捷键进入战斗。轻按攻击键进行普通攻击；按住攻击键蓄力重击。同时按住攻击键与使用键，可用战斗武器格挡。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "连击",
+      "text": "手持战斗系统支持的武器时，快速双击左键触发连击：三秒内自动进行十次普通攻击。持续瞄准敌人，每次攻击都会沿当前朝向出招。$(br2)连击沿用普通攻击的武器、弹药与灵气规则。切换武器、格挡、准备法术、退出战斗或无法行动时，连击中止。"
+    }
+  ]
+}

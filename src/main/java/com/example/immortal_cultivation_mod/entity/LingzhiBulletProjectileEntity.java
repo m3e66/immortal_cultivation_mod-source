@@ -65,6 +65,7 @@ public class LingzhiBulletProjectileEntity extends ThrowableItemProjectile {
         super.onHit(result);
         if (!level().isClientSide) {
             if (level() instanceof ServerLevel serverLevel) {
+                com.example.immortal_cultivation_mod.network.SpellRibbonPayload.send(serverLevel,"yaoguang_shan",result.getLocation(),getDeltaMovement(),-1,8,.14F);
                 SpellImpactParticles.wood(serverLevel, result.getLocation());
             }
             discard();
@@ -104,7 +105,7 @@ public class LingzhiBulletProjectileEntity extends ThrowableItemProjectile {
     private void breakBlock(BlockPos pos) {
         var state = level().getBlockState(pos);
         if (!state.isAir() && state.getDestroySpeed(level(), pos) >= 0.0F) {
-            level().destroyBlock(pos, true, getOwner());
+            com.example.immortal_cultivation_mod.spell.SpellDestruction.breakBlock(level(),pos, true, getOwner());
         }
     }
 

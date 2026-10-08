@@ -2,7 +2,7 @@ package com.example.immortal_cultivation_mod.magicritual.block.custom;
 
 import com.example.immortal_cultivation_mod.magicritual.item.ModItems;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup.Provider;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Containers;
@@ -10,6 +10,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector3f;
 
@@ -27,14 +28,14 @@ public class SpiritVeinCenterBlockEntity extends BlockEntity {
    private int storedHighSpiritStones = 0;
 
    public SpiritVeinCenterBlockEntity(BlockPos pos, BlockState state) {
-      super(ModBlockEntities.SPIRIT_VEIN_CENTER_BE.get(), pos, state);
+      super((BlockEntityType)ModBlockEntities.SPIRIT_VEIN_CENTER_BE.get(), pos, state);
    }
 
    public static void tick(Level level, BlockPos pos, BlockState state, SpiritVeinCenterBlockEntity be) {
       if (level.isClientSide) {
          be.spawnParticles(level, pos);
       } else {
-         be.tickCounter++;
+         ++be.tickCounter;
          if (be.tickCounter >= 1200) {
             be.tickCounter = 0;
             Item generatedSpiritStone = be.getGeneratedSpiritStone(level);
@@ -46,15 +47,16 @@ public class SpiritVeinCenterBlockEntity extends BlockEntity {
             }
          }
       }
+
    }
 
    private void spawnParticles(Level level, BlockPos pos) {
-      if (level.getGameTime() % 2L == 0L
-         && level.getNearestPlayer((double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, 32.0, false) != null) {
-         for (int i = 0; i < 10; i++) {
-            level.addParticle(VEIN_PARTICLE, (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, 0.0, 0.0, 0.0);
+      if (level.getGameTime() % 2L == 0L && level.getNearestPlayer((double)pos.getX() + (double)0.5F, (double)pos.getY() + (double)0.5F, (double)pos.getZ() + (double)0.5F, (double)32.0F, false) != null) {
+         for(int i = 0; i < 10; ++i) {
+            level.addParticle(VEIN_PARTICLE, (double)pos.getX() + (double)0.5F, (double)pos.getY() + (double)0.5F, (double)pos.getZ() + (double)0.5F, (double)0.0F, (double)0.0F, (double)0.0F);
          }
       }
+
    }
 
    public boolean releaseStoredSpiritStones() {
@@ -87,27 +89,23 @@ public class SpiritVeinCenterBlockEntity extends BlockEntity {
 
    private void storeSpiritStone(Item item) {
       if (item == ModItems.HIGH_SPIRIT_STONE.get()) {
-         this.storedHighSpiritStones++;
+         ++this.storedHighSpiritStones;
       } else if (item == ModItems.MEDIUM_SPIRIT_STONE.get()) {
-         this.storedMediumSpiritStones++;
+         ++this.storedMediumSpiritStones;
       } else {
-         this.storedSpiritStones++;
+         ++this.storedSpiritStones;
       }
+
    }
 
    private void dropSpiritStones(Item item, int count) {
       if (this.level != null && count > 0) {
-         Containers.dropItemStack(
-            this.level,
-            (double)this.worldPosition.getX() + 0.5,
-            (double)this.worldPosition.getY() + 1.0,
-            (double)this.worldPosition.getZ() + 0.5,
-            new ItemStack(item, count)
-         );
+         Containers.dropItemStack(this.level, (double)this.worldPosition.getX() + (double)0.5F, (double)this.worldPosition.getY() + (double)1.0F, (double)this.worldPosition.getZ() + (double)0.5F, new ItemStack(item, count));
       }
+
    }
 
-   protected void saveAdditional(CompoundTag tag, Provider registries) {
+   protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
       super.saveAdditional(tag, registries);
       tag.putInt("tick_counter", this.tickCounter);
       tag.putInt("stored_spirit_stones", this.storedSpiritStones);
@@ -115,7 +113,7 @@ public class SpiritVeinCenterBlockEntity extends BlockEntity {
       tag.putInt("stored_high_spirit_stones", this.storedHighSpiritStones);
    }
 
-   protected void loadAdditional(CompoundTag tag, Provider registries) {
+   protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
       super.loadAdditional(tag, registries);
       this.tickCounter = tag.getInt("tick_counter");
       this.storedSpiritStones = tag.getInt("stored_spirit_stones");

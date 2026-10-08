@@ -2,16 +2,19 @@ package com.example.immortal_cultivation_mod.client;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.network.OuterSystemPayloads;
+import com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent;
 import com.example.immortal_cultivation_mod.screen.SystemGuiTextures;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+import top.theillusivec4.curios.common.inventory.CurioSlot;
 
 public final class InventorySystemTab {
     private static final ResourceLocation SYSTEM_ICON =
@@ -37,6 +40,33 @@ public final class InventorySystemTab {
                 label);
         button.setTooltip(Tooltip.create(label));
         event.addListener(button);
+    }
+
+    /** Points at both vanilla armor and the real Curios clothing/accessory slots. */
+    public static void onScreenRender(ScreenEvent.Render.Post event) {
+        if (!DaoGuidanceClient.isCurrentAction(
+                DaoGuidanceContent.EQUIP_ITEM)
+                || !(event.getScreen()
+                instanceof AbstractContainerScreen<?> screen)) {
+            return;
+        }
+        int pulse = 145 + (int) (Math.sin(
+                System.currentTimeMillis() / 180.0D) * 65.0D);
+        int color = (Math.max(70, Math.min(230, pulse)) << 24)
+                | 0xF0C66B;
+        for (int index = 0; index < screen.getMenu().slots.size(); index++) {
+            var slot = screen.getMenu().slots.get(index);
+            boolean vanillaArmor = screen instanceof InventoryScreen
+                    && index >= 5 && index <= 8;
+            if (!vanillaArmor && !(slot instanceof CurioSlot)
+                    || !slot.isActive()) {
+                continue;
+            }
+            event.getGuiGraphics().renderOutline(
+                    screen.getGuiLeft() + slot.x - 2,
+                    screen.getGuiTop() + slot.y - 2,
+                    20, 20, color);
+        }
     }
 
     private static final class SystemTabButton extends AbstractButton {

@@ -1,0 +1,32 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.sword_sheath_empty",
+        "texture_width": 64,
+        "texture_height": 64,
+        "visible_bounds_width": 3,
+        "visible_bounds_height": 4,
+        "visible_bounds_offset": [0, 1.25, 0]
+      },
+      "bones": [
+        {"name": "bipedBody", "pivot": [0, 24, 0]},
+        {"name": "armorBody", "parent": "bipedBody", "pivot": [0, 24, 0]},
+        {
+          "name": "sheath",
+          "parent": "armorBody",
+          "pivot": [0, 15, 4],
+          "rotation": [0, 0, -27.5],
+          "cubes": [
+            {"origin": [-1.5, 7, 3], "size": [3, 18, 2.2], "uv": [0, 0]},
+            {"origin": [-1.8, 23.5, 2.8], "size": [3.6, 2, 2.6], "uv": [0, 22]},
+            {"origin": [-1.7, 5.8, 2.9], "size": [3.4, 1.8, 2.4], "uv": [14, 22]},
+            {"origin": [-1.75, 15, 2.85], "size": [3.5, 1, 2.5], "uv": [26, 22]},
+            {"origin": [-1.75, 19, 2.85], "size": [3.5, 1, 2.5], "uv": [26, 28]}
+          ]
+        }
+      ]
+    }
+  ]
+}

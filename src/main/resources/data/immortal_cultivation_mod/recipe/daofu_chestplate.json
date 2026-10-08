@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "W W",
+    "WBW",
+    "WWW"
+  ],
+  "key": {
+    "W": {
+      "item": "immortal_cultivation_mod:white_wool_strip"
+    },
+    "B": {
+      "item": "immortal_cultivation_mod:blue_wool_strip"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:daofu_chestplate",
+    "count": 1
+  }
+}

@@ -1,30 +1,30 @@
 package com.example.immortal_cultivation_mod.client.model;
 
-import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.block.GeoRockBlockEntity;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.model.GeoModel;
 
 public class GeoRockModel extends GeoModel<GeoRockBlockEntity> {
-    @Override
-    public ResourceLocation getModelResource(GeoRockBlockEntity animatable) {
-        return ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID,
-                "geo/block/" + animatable.modelName() + ".geo.json");
-    }
+   public ResourceLocation getModelResource(GeoRockBlockEntity animatable) {
+      String modelName = animatable.modelName().endsWith("_spell_scroll_block") ? "realm_spell_scroll_block" : animatable.modelName();
+      return ResourceLocation.fromNamespaceAndPath("immortal_cultivation_mod", "geo/block/" + modelName + ".geo.json");
+   }
 
-    @Override
-    public ResourceLocation getTextureResource(GeoRockBlockEntity animatable) {
-        return ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID,
-                "textures/block/" + animatable.modelName() + ".png");
-    }
+   public ResourceLocation getTextureResource(GeoRockBlockEntity animatable) {
+      String textureName = animatable.modelName().endsWith("_spell_scroll_block") ? "zhuji_spell_scroll_block" : animatable.modelName();
+      return ResourceLocation.fromNamespaceAndPath("immortal_cultivation_mod", "textures/block/" + textureName + ".png");
+   }
 
-    @Override
-    public ResourceLocation getAnimationResource(GeoRockBlockEntity animatable) {
-        String animation = "qingtong_yinhuo_ding".equals(animatable.modelName())
-                ? "qingtong_yinhuo_ding"
-                : "geo_rock";
-        return ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID,
-                "animations/block/" + animation + ".animation.json");
-    }
+   public ResourceLocation getAnimationResource(GeoRockBlockEntity animatable) {
+      String var10000;
+      switch (animatable.modelName()) {
+         case "qingtong_yinhuo_ding" -> var10000 = "qingtong_yinhuo_ding";
+         case "cu_tie_xiaoding" -> var10000 = "cu_tie_xiaoding";
+         case "chi_jin_sanyang_ding" -> var10000 = "chi_jin_sanyang_ding";
+         default -> var10000 = "geo_rock";
+      }
 
+      String animation = var10000;
+      return ResourceLocation.fromNamespaceAndPath("immortal_cultivation_mod", "animations/block/" + animation + ".animation.json");
+   }
 }

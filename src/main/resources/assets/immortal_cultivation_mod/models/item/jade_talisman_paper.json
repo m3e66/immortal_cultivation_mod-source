@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": { "layer0": "immortal_cultivation_mod:item/jade_talisman_paper" }
+}
