@@ -1,0 +1,18 @@
+{
+  "name": "注灵催火",
+  "icon": "immortal_cultivation_mod:dao",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "灵材入鼎，须以灵气为引，催动鼎火升温。初启炉时，需耗灵气一百，此后每息亦需持续供灵。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "灵火每次催动，皆可令鼎温骤升，然热气亦不断散失。故炼器之人须观火候，适时催火，不可任其忽冷忽热。"
+    }
+  ]
+}

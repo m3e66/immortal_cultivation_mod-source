@@ -1,0 +1,33 @@
+{
+  "name": "灵石矿石",
+  "icon": "immortal_cultivation_mod:spirit_ore",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 8,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "灵石矿石",
+      "text": "$(bold)起始高度：$()Y −100 至 0$(br2)$(bold)尝试频率：$()1/4 区块"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《灵矿录》记载",
+      "text": "天地灵气流转不息，部分沉入大地，历经岁月，渐凝成灵石矿脉。灵脉不同于寻常矿物，往往成片潜藏于岩层深处，大小不一，灵气浓郁者可孕出灵脉核心。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《灵矿录》记载",
+      "text": "凡灵脉所在，地表草木常受其滋养。传闻灵气充盈之地，灵木往往伴脉而生。故寻矿者不必一味掘地，可先察山林灵木之踪，再循地脉深入。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻脉",
+      "text": "主世界各地深层均有机会孕育灵脉。灵脉中心可位于 Y −100 至 0，但矿石仅生成于 Y 0 以下的天然岩层之中。单条灵脉规模约二百至二百五十块矿石，宽广可达十五格左右。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻脉",
+      "text": "若灵脉成功形成，附近适宜地表处于灵木林时，可伴生三至七株灵木树苗；其他生物群系不会伴生树苗。古老废弃灵矿的廊道岩壁上，亦可能发现裸露的灵石矿石。"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Dark Profound Iron",
+  "icon": "immortal_cultivation_mod:moxuan_iron",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Dark Profound Iron",
+      "text": "$(bold)Starting height: $()Y −64 to −8$(br2)$(bold)Attempt frequency: $()1/28 chunks"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Dark Profound Iron lies buried beneath the earth, untouched by sunlight or moonlight. Over ages, it absorbs dense subterranean energy, developing a heavy, dark metallic structure. Its deposits are concealed deep underground, making excavation both difficult and dangerous."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Found across all Overworld biomes, deep underground between Y −64 and −8."
+    }
+  ]
+}

@@ -73,8 +73,7 @@ public final class SpiritSealSystem {
         if (!player.hasEffect(ModEffects.SPIRIT_SEAL) || amount <= 0) return;
         var data = ModAttachments.getData(player);
         int maxQi = Math.max(1,
-                CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi()
-                        + data.maxQiBonus());
+                data.maxQi());
         if (amount * 4 >= maxQi) player.removeEffect(ModEffects.SPIRIT_SEAL);
         else if (player.level() instanceof ServerLevel level) {
             emitSeal(level, player, true);

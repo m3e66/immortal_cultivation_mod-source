@@ -1,0 +1,18 @@
+{
+  "name": "养神丹",
+  "icon": "immortal_cultivation_mod:yangshen_pill",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "养神丹不养血肉，专滋神思。其药力清宁，可温养识念，补益因施展神识之术而消耗的念头。神思疲惫之时，此丹可助修士恢复心神。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹效",
+      "text": "十息内恢复念头上限的百分之五。"
+    }
+  ]
+}

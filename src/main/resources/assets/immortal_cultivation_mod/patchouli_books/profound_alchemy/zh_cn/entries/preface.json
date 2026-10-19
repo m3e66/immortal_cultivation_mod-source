@@ -1,0 +1,13 @@
+{
+  "name": "序言",
+  "icon": "minecraft:book",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "丹药指南",
+      "text": "天地为炉，阴阳为火，草木为药，灵气为引。世间灵草万千，药性各异，或补气血，或养神魂，或固根基，或助破境。然丹道玄妙，非将灵药投入鼎中便可成丹。须识百草之性，辨五行之理，掌火候之变，方可化草木精华为一粒灵丹。"
+    }
+  ]
+}

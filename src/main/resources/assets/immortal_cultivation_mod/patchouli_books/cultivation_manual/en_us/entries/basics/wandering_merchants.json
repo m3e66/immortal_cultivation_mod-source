@@ -1,0 +1,23 @@
+{
+  "name": "Wandering Merchants",
+  "icon": "immortal_cultivation_mod:fireball_scroll",
+  "category": "immortal_cultivation_mod:basics",
+  "sortnum": 12,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Spells on the Road",
+      "text": "Spell Merchants appear rarely across the Overworld. Recognize their violet robes, speak to them and open Trade.$(br2)Each carries twelve distinct spell scrolls. Stock stays within the merchant's realm, and stronger merchants favor more advanced spells. Prices follow the same values as the System Shop."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Buy, Then Comprehend",
+      "text": "Each offer is a real scroll in the merchant's inventory. Buying removes it; returning or reloading does not refill sold stock. Merchants replenish at the next in-game day and update stock when their realm changes.$(br2)A purchased scroll uses its normal learning process and requirements. It does not immediately teach a spell."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Two Trading Paths",
+      "text": "Recipe Merchants carry alchemy, talisman and forging recipes. Spell Merchants carry spell-learning scrolls. Both share ordinary NPC interaction, real inventory, realm-based stock and daily restocking.$(br2)For creative building or testing, both have dedicated spawn eggs."
+    }
+  ]
+}

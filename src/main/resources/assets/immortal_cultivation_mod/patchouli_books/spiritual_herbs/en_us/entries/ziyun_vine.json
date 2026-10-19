@@ -1,0 +1,23 @@
+{
+  "name": "Violet Cloud Vine",
+  "icon": "immortal_cultivation_mod:ziyun_vine",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 7,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Violet Cloud Vine",
+      "text": "$(bold)Spawn attempt frequency: $()1/5"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Violet Cloud Vine grows in humid forests and shadowed caverns. Faint purple markings run along its twisting stems, giving it an unusual appearance. In areas rich with spiritual energy, the vine is said to release a subtle violet haze resembling drifting clouds."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Jungles, bamboo jungles, dark forests, lush caves, and dripstone caves."
+    }
+  ]
+}

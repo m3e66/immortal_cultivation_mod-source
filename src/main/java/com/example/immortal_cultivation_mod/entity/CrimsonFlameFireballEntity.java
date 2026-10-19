@@ -17,6 +17,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 public class CrimsonFlameFireballEntity extends ThrowableItemProjectile {
+    // Visuals use synchronized BeastAttackVfx; server combat and sounds remain unchanged.
     private static final double EXPLOSION_RADIUS = 2.6D;
     private static final float CENTER_DAMAGE = 150.0F;
     private static final int MAX_LIFETIME = 120;
@@ -47,18 +48,7 @@ public class CrimsonFlameFireballEntity extends ThrowableItemProjectile {
         }
         if (level().isClientSide) {
             Vec3 movement = getDeltaMovement();
-            level().addParticle(ParticleTypes.FLAME,
-                    getX(), getY(), getZ(),
-                    -movement.x * 0.05D, -movement.y * 0.05D, -movement.z * 0.05D);
-            level().addParticle(ParticleTypes.SMOKE,
-                    getX() - movement.x * 0.15D,
-                    getY() - movement.y * 0.15D,
-                    getZ() - movement.z * 0.15D,
-                    0.0D, 0.0D, 0.0D);
-            if (tickCount % 3 == 0) {
-                level().addParticle(ParticleTypes.LAVA,
-                        getX(), getY(), getZ(), 0.0D, 0.0D, 0.0D);
-            }
+
         }
     }
 
@@ -112,12 +102,7 @@ public class CrimsonFlameFireballEntity extends ThrowableItemProjectile {
                     2.4D, 1.8D, 24, 6.0F);
         }
 
-        serverLevel.sendParticles(ParticleTypes.EXPLOSION_EMITTER,
-                center.x, center.y, center.z, 1, 0.0D, 0.0D, 0.0D, 0.0D);
-        serverLevel.sendParticles(ParticleTypes.FLAME,
-                center.x, center.y, center.z, 48, 0.85D, 0.85D, 0.85D, 0.12D);
-        serverLevel.sendParticles(ParticleTypes.LAVA,
-                center.x, center.y, center.z, 18, 0.65D, 0.65D, 0.65D, 0.08D);
+        {}
         serverLevel.playSound(null, blockPosition(), SoundEvents.GENERIC_EXPLODE.value(),
                 SoundSource.HOSTILE, 0.9F, 1.25F);
         discard();

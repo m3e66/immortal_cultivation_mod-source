@@ -25,6 +25,7 @@ import net.minecraft.world.phys.Vec3;
 
 /** A real falling spatial-crystal projectile used by 空冥甲虫. */
 public final class KongmingCrystalProjectileEntity extends ThrowableItemProjectile {
+    // Visuals use synchronized BeastAttackVfx; server combat and sounds remain unchanged.
     private static final float DIRECT_DAMAGE = 85.0F;
     private static final float SPLASH_DAMAGE = 55.0F;
     private static final double SPLASH_RADIUS = 1.65D;
@@ -61,15 +62,7 @@ public final class KongmingCrystalProjectileEntity extends ThrowableItemProjecti
 
         super.tick();
         if (level().isClientSide) {
-            level().addParticle(ModParticles.METHOD_QI_DARK.get(),
-                    getX(), getY(), getZ(), 0.0D, -0.015D, 0.0D);
-            if ((tickCount & 1) == 0) {
-                level().addParticle(ParticleTypes.PORTAL,
-                        getX(), getY(), getZ(),
-                        (random.nextDouble() - 0.5D) * 0.08D,
-                        0.01D,
-                        (random.nextDouble() - 0.5D) * 0.08D);
-            }
+
         } else if (tickCount > 100) {
             discard();
         }
@@ -171,22 +164,10 @@ public final class KongmingCrystalProjectileEntity extends ThrowableItemProjecti
     }
 
     private void blockedImpact(ServerLevel level, Vec3 impact) {
-        level.sendParticles(ParticleTypes.REVERSE_PORTAL,
-                impact.x, impact.y, impact.z,
-                10, 0.2D, 0.2D, 0.2D, 0.05D);
         level.playSound(null, blockPosition(), SoundEvents.RESPAWN_ANCHOR_DEPLETE.value(),
                 SoundSource.HOSTILE, 0.45F, 1.65F);
     }
 
     private void impactParticles(ServerLevel level, Vec3 impact) {
-        level.sendParticles(ModParticles.METHOD_QI_DARK.get(),
-                impact.x, impact.y, impact.z,
-                24, 0.65D, 0.35D, 0.65D, 0.055D);
-        level.sendParticles(ParticleTypes.PORTAL,
-                impact.x, impact.y, impact.z,
-                30, 0.75D, 0.45D, 0.75D, 0.18D);
-        level.sendParticles(ParticleTypes.END_ROD,
-                impact.x, impact.y, impact.z,
-                8, 0.35D, 0.25D, 0.35D, 0.045D);
     }
 }

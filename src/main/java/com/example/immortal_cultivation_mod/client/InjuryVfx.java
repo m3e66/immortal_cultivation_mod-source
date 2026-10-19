@@ -120,7 +120,7 @@ public final class InjuryVfx {
             }
         }
         var data = ClientData.cultivationData;
-        long max = Math.max(1L, (long) CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
+        long max = Math.max(1L, (long) data.maxQi());
         if (max > 1 && data.qi() < max * .15 && ClientData.combatActive()) wound(mc.player).weak = now + 6;
     }
     @SubscribeEvent public static void render(RenderLevelStageEvent event) {

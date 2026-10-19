@@ -1,0 +1,18 @@
+{
+  "name": "Crimson Flame Pill",
+  "icon": "immortal_cultivation_mod:chiyan_pill",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Scripture Account",
+      "text": "The Crimson Flame Pill temporarily strengthens the fire essence circulating through the body. It increases the power of fire-based attacks while offering minor protection against freezing damage."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Effect",
+      "text": "+5% fire damage and 2% freezing-damage reduction for 60 seconds."
+    }
+  ]
+}

@@ -6,6 +6,7 @@ import com.example.immortal_cultivation_mod.attribute.ModAttributes;
 import com.example.immortal_cultivation_mod.config.BlockBreakingSettings;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
 import com.example.immortal_cultivation_mod.spell.UndeadAbilitySystem;
+import com.example.immortal_cultivation_mod.spell.ShieldDisplay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import java.io.IOException;
@@ -32,8 +33,11 @@ public class ClientData {
     private static boolean wheelSelectionLoaded = false;
     private static boolean wheelSelectionFileExists = false;
     private static String wheelSelectionStorageKey = "";
+    private static String wheelAvailabilityStorageKey = "";
+    private static Set<String> availableWheelSpells = Set.of();
     private static float shieldAmount = 0.0F;
     private static float shieldMax = 0.0F;
+    private static List<ShieldDisplay.Layer> shieldLayers=List.of();
     private static boolean yuqiControlAllMode = false;
     private static boolean yinYangCompassQiMode = false;
     private static boolean autoChannelWeaponQi = false;
@@ -47,6 +51,7 @@ public class ClientData {
     private static boolean chinesePoemDescriptions = false;
     private static boolean formationPlateQiFirst = false;
     private static boolean showQiUseParticles = true;
+    private static boolean flyingSwordAutoRecall = true;
     private static boolean showSpiritualSenseQiCurrents = true;
     private static boolean droughtZombieDomainEnabled = true;
     private static boolean clientTogglesLoaded = false;
@@ -271,13 +276,23 @@ public class ClientData {
     }
 
     public static void updateShield(float amount, float max) {
+        updateShield(amount,max,List.of());
+    }
+
+    public static void updateShield(float amount,float max,List<ShieldDisplay.Layer> layers) {
+        shieldLayers=List.copyOf(layers);
+        if(!shieldLayers.isEmpty()){amount=ShieldDisplay.total(shieldLayers,false);max=ShieldDisplay.total(shieldLayers,true);}
+        if(!Float.isFinite(amount)||!Float.isFinite(max)){amount=0;max=0;}
         shieldAmount = Math.max(0.0F, amount);
         shieldMax = Math.max(0.0F, max);
         if (shieldAmount <= 0.0F || shieldMax <= 0.0F) {
             shieldAmount = 0.0F;
             shieldMax = 0.0F;
+            shieldLayers=List.of();
         }
     }
+
+    public static List<ShieldDisplay.Layer> shieldLayers(){return shieldLayers;}
 
     public static float shieldAmount() {
         return shieldAmount;
@@ -434,6 +449,8 @@ public class ClientData {
         ensureClientTogglesLoaded();
         return showQiUseParticles;
     }
+    public static boolean flyingSwordAutoRecall(){ensureClientTogglesLoaded();return flyingSwordAutoRecall;}
+    public static void setFlyingSwordAutoRecall(boolean enabled){ensureClientTogglesLoaded();flyingSwordAutoRecall=enabled;saveClientToggles();}
 
     public static void setShowQiUseParticles(boolean enabled) {
         ensureClientTogglesLoaded();
@@ -477,6 +494,8 @@ public class ClientData {
             return;
         }
         synchronized (SELECTED_WHEEL_SPELLS) {
+            if (wheelSelectionStorageKey.equals(wheelAvailabilityStorageKey)
+                    && !availableWheelSpells.contains(normalized)) return;
             if (!SELECTED_WHEEL_SPELLS.remove(normalized) && SELECTED_WHEEL_SPELLS.size() < MAX_WHEEL_SPELLS) {
                 SELECTED_WHEEL_SPELLS.add(normalized);
             }
@@ -558,24 +577,30 @@ public class ClientData {
                     known.add(spellId);
                 }
             }
-            SELECTED_WHEEL_SPELLS.removeIf(spell -> !known.contains(spell)
-                    && !UndeadAbilitySystem.isPlayerAbility(spell));
+            known.removeIf(spell -> !isValidWheelId(spell));
+            // Undead slots deliberately survive temporary grudge loss; method grants do not.
+            var retained = new LinkedHashSet<>(known);
+            retained.addAll(UndeadAbilitySystem.playerAbilityIds());
+            availableWheelSpells = Set.copyOf(retained);
+            wheelAvailabilityStorageKey = wheelSelectionStorageKey;
+            boolean changed = SELECTED_WHEEL_SPELLS.removeIf(spell -> !availableWheelSpells.contains(spell));
             if (!wheelSelectionFileExists && SELECTED_WHEEL_SPELLS.isEmpty()) {
                 for (String spell : knownSpells) {
                     if (SELECTED_WHEEL_SPELLS.size() >= MAX_WHEEL_SPELLS) {
                         break;
                     }
                     String normalized = ModSpells.normalizeId(spell);
-                    if (ModSpells.get(normalized) != null) {
-                        SELECTED_WHEEL_SPELLS.add(normalized);
+                    if (known.contains(normalized)) {
+                        changed |= SELECTED_WHEEL_SPELLS.add(normalized);
                     }
                 }
                 for (String spellId : ModSpells.innateSpellIds()) {
                     if (SELECTED_WHEEL_SPELLS.size() < MAX_WHEEL_SPELLS && known.contains(spellId)) {
-                        SELECTED_WHEEL_SPELLS.add(spellId);
+                        changed |= SELECTED_WHEEL_SPELLS.add(spellId);
                     }
                 }
             }
+            if (changed) saveWheelSelection();
         }
     }
 
@@ -616,6 +641,11 @@ public class ClientData {
                 }
             }
             wheelSelectionLoaded = true;
+            // A reload must not resurrect slots discarded by the latest authoritative data.
+            if (storageKey.equals(wheelAvailabilityStorageKey)
+                    && SELECTED_WHEEL_SPELLS.removeIf(spell -> !availableWheelSpells.contains(spell))) {
+                saveWheelSelection();
+            }
             if (migrateLegacy) {
                 saveWheelSelection();
             }
@@ -708,6 +738,7 @@ public class ClientData {
                         properties.getProperty("formationPlateQiFirst", "false"));
                 showQiUseParticles = Boolean.parseBoolean(
                         properties.getProperty("showQiUseParticles", "true"));
+                flyingSwordAutoRecall=Boolean.parseBoolean(properties.getProperty("flyingSwordAutoRecall","true"));
                 showSpiritualSenseQiCurrents = Boolean.parseBoolean(
                         properties.getProperty(
                                 "showSpiritualSenseQiCurrents", "true"));
@@ -735,6 +766,7 @@ public class ClientData {
         properties.setProperty("chinesePoemDescriptions", Boolean.toString(chinesePoemDescriptions));
         properties.setProperty("formationPlateQiFirst", Boolean.toString(formationPlateQiFirst));
         properties.setProperty("showQiUseParticles", Boolean.toString(showQiUseParticles));
+        properties.setProperty("flyingSwordAutoRecall",Boolean.toString(flyingSwordAutoRecall));
         properties.setProperty("showSpiritualSenseQiCurrents",
                 Boolean.toString(showSpiritualSenseQiCurrents));
         properties.setProperty("droughtZombieDomainEnabled",

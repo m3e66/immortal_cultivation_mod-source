@@ -69,7 +69,7 @@ public final class WindStep {
         }
 
         var data = ModAttachments.getData(player);
-        if (!ServerEvents.spendSustainedQiOrBlood(player, data, QI_PER_SECOND)) {
+        if (!ServerEvents.spendSustainedSpellQiOrBlood(player, data, QI_PER_SECOND, ModSpells.WIND_STEP)) {
             stop(player);
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return;

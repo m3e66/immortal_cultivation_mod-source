@@ -1,0 +1,18 @@
+{
+  "name": "聚灵丹",
+  "icon": "immortal_cultivation_mod:juling_pill",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "聚灵丹善引四方游离灵气，使修士吐纳之效暂时增强。丹力流经经脉，可助丹田聚气，亦能缓缓补益灵力。修行闭关之时，常被视为辅助精进之物。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹效",
+      "text": "一百二十息内，修为获取提升百分之十；另于二十息内恢复灵气上限的百分之二。"
+    }
+  ]
+}

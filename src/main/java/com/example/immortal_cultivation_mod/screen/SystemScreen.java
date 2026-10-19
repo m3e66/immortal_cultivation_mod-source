@@ -1,6 +1,8 @@
 package com.example.immortal_cultivation_mod.screen;
 
 import com.example.immortal_cultivation_mod.network.OuterSystemPayloads;
+import com.example.immortal_cultivation_mod.network.ShopCatalogPayloads;
+import com.example.immortal_cultivation_mod.client.OuterSystemClient;
 import com.example.immortal_cultivation_mod.system.OuterSystemType;
 import com.example.immortal_cultivation_mod.system.SystemShop;
 import java.util.ArrayList;
@@ -8,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -16,6 +19,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -47,6 +51,7 @@ public class SystemScreen extends Screen {
     private CompoundTag state;
     private final List<ShopEntry> catalog = new ArrayList<>();
     private final Map<String, ShopEntry> catalogById = new HashMap<>();
+    private boolean catalogReady;
     private SystemGuiButton claimButton;
     private SystemGuiButton shopActionButton;
     private SystemGuiButton buyModeButton;
@@ -70,6 +75,7 @@ public class SystemScreen extends Screen {
         super(Component.translatable(
                 "screen.immortal_cultivation_mod.system.title"));
         this.state = state.copy();
+        catalogReady = !state.hasUUID("ShopCatalogId");
         this.windowState = new SystemWindowState(
                 baseWindowWidth(), baseWindowHeight());
         loadCatalog();
@@ -77,16 +83,62 @@ public class SystemScreen extends Screen {
 
     public void updateState(CompoundTag updated) {
         CompoundTag merged = updated.copy();
-        if (!merged.contains("ShopCatalog", Tag.TAG_LIST)
-                && state.contains("ShopCatalog", Tag.TAG_LIST)) {
-            merged.put(
-                    "ShopCatalog",
-                    state.getList("ShopCatalog", Tag.TAG_COMPOUND).copy());
+        boolean sameCatalog = state.hasUUID("ShopCatalogId") && updated.hasUUID("ShopCatalogId")
+                && state.getUUID("ShopCatalogId").equals(updated.getUUID("ShopCatalogId"));
+        if (updated.hasUUID("ShopCatalogId")) {
+            if (sameCatalog) {
+                // Client-owned stock tables do not travel in metadata or get copied every tick.
+                merged.put("ShopPurchases", state.getCompound("ShopPurchases"));
+                merged.put("ShopUniqueBought", state.getList("ShopUniqueBought", Tag.TAG_STRING));
+            } else {
+                catalog.clear(); catalogById.clear(); selectedIndex = -1; catalogReady = false;
+            }
         }
         state = merged;
-        loadCatalog();
+        if (updated.contains("ShopCatalog", Tag.TAG_LIST)) loadCatalog();
         clampSelection();
         updateButtons();
+    }
+
+    public boolean acceptsShopTransfer(UUID id) {
+        return isShop() && state.hasUUID("ShopCatalogId") && state.getUUID("ShopCatalogId").equals(id);
+    }
+
+    public void installShopCatalog(List<ShopCatalogPayloads.Entry> entries) {
+        if (!isShop()) return;
+        catalog.clear(); catalogById.clear();
+        CompoundTag purchases = new CompoundTag(); ListTag unique = new ListTag();
+        for (var encoded : entries) {
+            Item item = BuiltInRegistries.ITEM.byId(encoded.itemId());
+            if (item == null || item == Items.AIR) continue;
+            String id = BuiltInRegistries.ITEM.getKey(item).toString();
+            ShopEntry entry = new ShopEntry(id, item, encoded.price(), SystemShop.StockTier.values()[encoded.rarity()].id(),
+                    SystemShop.Category.values()[encoded.category()].id());
+            catalog.add(entry); catalogById.put(id, entry);
+            if (encoded.purchased() > 0) purchases.putInt(id, encoded.purchased());
+            if (encoded.uniqueBought()) unique.add(StringTag.valueOf(id));
+        }
+        state.put("ShopPurchases", purchases); state.put("ShopUniqueBought", unique);
+        catalogReady = true; clampSelection(); updateButtons();
+    }
+
+    public void applyShopStock(List<ShopCatalogPayloads.Stock> updates) {
+        if (!catalogReady || !isShop()) return;
+        CompoundTag purchases = state.getCompound("ShopPurchases");
+        ListTag unique = state.getList("ShopUniqueBought", Tag.TAG_STRING);
+        for (var update : updates) {
+            Item item = BuiltInRegistries.ITEM.byId(update.itemId());
+            if (item == null || item == Items.AIR) continue;
+            String id = BuiltInRegistries.ITEM.getKey(item).toString();
+            if (!catalogById.containsKey(id)) continue;
+            if (update.purchased() == 0) purchases.remove(id); else purchases.putInt(id, update.purchased());
+            if (update.uniqueBought()) {
+                if (!containsString(unique,id)) unique.add(StringTag.valueOf(id));
+            } else {
+                for (int i=unique.size()-1;i>=0;i--) if (unique.getString(i).equals(id)) unique.remove(i);
+            }
+        }
+        state.put("ShopPurchases",purchases); state.put("ShopUniqueBought",unique); updateButtons();
     }
 
     @Override
@@ -452,6 +504,12 @@ public class SystemScreen extends Screen {
         int panelH = SHOP_ROWS * SHOP_ROW_H + 2;
         SystemGuiTextures.drawInsetPanel(
                 graphics, panelX, panelY, panelW, panelH);
+
+        if (!catalogReady) {
+            graphics.drawString(font, Component.translatable("screen.immortal_cultivation_mod.system.shop.loading"),
+                    panelX+8,panelY+8,0xFF202020,false);
+            return;
+        }
 
         switch (shopMode) {
             case BUY -> renderBuyRows(
@@ -1656,7 +1714,8 @@ public class SystemScreen extends Screen {
 
     @Override
     public void removed() {
-        if (minecraft != null && minecraft.player != null) {
+        if (!OuterSystemClient.isTransitioning()) OuterSystemClient.clearShopCatalog();
+        if (!OuterSystemClient.isTransitioning() && minecraft != null && minecraft.player != null) {
             PacketDistributor.sendToServer(
                     new OuterSystemPayloads.ServerboundClose());
         }

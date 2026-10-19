@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod.magicritual.worldgen.custom;
 
 import com.example.immortal_cultivation_mod.magicritual.block.ModBlocks;
+import com.example.immortal_cultivation_mod.worldgen.SpiritWoodBiomes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
@@ -63,6 +64,8 @@ public class SpiritOreVeinFeature extends Feature<NoneFeatureConfiguration> {
          int z = origin.getZ() + random.nextInt(25) - 12;
          int y = level.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, x, z);
          BlockPos plantPos = new BlockPos(x, y, z);
+         // Test each surface candidate: a vein can straddle a grove boundary.
+         if (!SpiritWoodBiomes.allowsNaturalTrees(level, plantPos)) continue;
          BlockState ground = level.getBlockState(plantPos.below());
          boolean validGround = ground.is(Blocks.GRASS_BLOCK) || ground.is(Blocks.DIRT) || ground.is(Blocks.COARSE_DIRT) || ground.is(Blocks.PODZOL) || ground.is(Blocks.ROOTED_DIRT) || ground.is(Blocks.MOSS_BLOCK) || ground.is(Blocks.MUD);
          if (validGround && level.getBlockState(plantPos).isAir() && lingmu.canSurvive(level, plantPos)) {

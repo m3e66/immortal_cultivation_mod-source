@@ -1,0 +1,43 @@
+{
+  "name": "Realm Temperatures",
+  "icon": "immortal_cultivation_mod:thunder_flame_seed",
+  "category": "immortal_cultivation_mod:volume_4",
+  "sortnum": -1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Realm Temperatures",
+      "text": "Higher-grade weapons demand greater temperatures. A flame powerful enough for one realm may be insufficient for the next. Mastery lies in selecting the appropriate fire rather than simply pursuing the hottest flame available."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Rule Reference",
+      "text": "Foundation Establishment / 4,500°C / Crimson Flame"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Rule Reference",
+      "text": "Golden Core / 6,500°C / Azurewood Spirit Flame"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Rule Reference",
+      "text": "Nascent Soul / 8,500°C / Thunderflame"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Rule Reference",
+      "text": "Spirit Transformation / 10,500°C / Violet Firmament Heavenly Flame"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Rule Reference",
+      "text": "Void Refinement and Beyond / 12,000°C / Violet Firmament Heavenly Flame"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Refining Note",
+      "text": "These temperatures apply to weapon reforging and are determined by the realm of the original weapon, not the cultivator's own realm. Basic weapon recipes have their own target temperatures. Forging does not directly require the player to have reached the weapon's realm."
+    }
+  ]
+}

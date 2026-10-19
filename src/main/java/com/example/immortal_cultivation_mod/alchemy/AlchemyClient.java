@@ -5,6 +5,9 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
+import com.example.immortal_cultivation_mod.client.ClientData;
+import com.example.immortal_cultivation_mod.item.FateAlchemyFormulaItem;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -34,6 +37,16 @@ public final class AlchemyClient {
         }
         @Override protected void renderLabels(GuiGraphics g,int mx,int my){
             g.drawString(font,title,8,8,0x332819,false);
+            var stats = ClientData.cultivationData;
+            var skill = Component.translatable("screen.immortal_cultivation_mod.ding.alchemy_proficiency",
+                    CultivationMethods.methodProficiencyLevel(stats, FateAlchemyFormulaItem.PROFICIENCY),
+                    stats == null ? 0 : stats.methodProficiency(FateAlchemyFormulaItem.PROFICIENCY));
+            g.pose().pushPose();
+            g.pose().translate(8, 20, 0);
+            float skillScale = Math.min(1, 160F / Math.max(1, font.width(skill)));
+            g.pose().scale(skillScale, skillScale, 1);
+            g.drawString(font, skill, 0, 0, 0x665841, false);
+            g.pose().popPose();
             var formula=AlchemyChemistry.formula(menu.formulaId);
             int y=106;
             for(var entry:formula.required().entrySet()){

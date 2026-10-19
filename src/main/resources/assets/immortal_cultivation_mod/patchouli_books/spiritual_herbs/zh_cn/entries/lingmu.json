@@ -1,0 +1,23 @@
+{
+  "name": "灵木树",
+  "icon": "immortal_cultivation_mod:lingmu",
+  "category": "immortal_cultivation_mod:volume_5",
+  "sortnum": 14,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "灵木树",
+      "text": "$(bold)自然生境：$()灵木林。每区块尝试生成六株，另有20%概率增加两次尝试，须有合适的土壤及空间。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《百草录》记载",
+      "text": "灵木久沐天地灵气，枝干蕴木灵之息，叶脉隐有微光。灵气凝聚之地自成灵木林；自然灵木及灵脉伴生树苗仅在此林中生长。采得树苗亦可自行栽培。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻木",
+      "text": "在主世界新生成的温带森林地带寻找灵木林。可用 /locate biome immortal_cultivation_mod:spiritwood_grove 定位。"
+    }
+  ]
+}

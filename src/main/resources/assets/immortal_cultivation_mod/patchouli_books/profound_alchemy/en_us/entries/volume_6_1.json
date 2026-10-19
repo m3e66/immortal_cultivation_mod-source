@@ -1,0 +1,18 @@
+{
+  "name": "Dao-Awakening Pill",
+  "icon": "immortal_cultivation_mod:enlightenment_pill",
+  "category": "immortal_cultivation_mod:volume_6",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Scripture Account",
+      "text": "The Dao-Awakening Pill allows a mortal to awaken or select their spiritual roots, opening the path of cultivation. Rarely, a successful awakening may also be accompanied by a mysterious opportunity."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Effect",
+      "text": "Awakens or selects spiritual roots. A successful use has a 1-in-1,000 chance to grant a Mysterious Ring."
+    }
+  ]
+}

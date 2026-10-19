@@ -10,6 +10,21 @@
     },
     {
       "type": "patchouli:text",
+      "title": "Realm and Comprehension",
+      "text": "To comprehend a spell or study a method, weigh its realm against your own. For spells, use the required realm; for methods, use the realm of its cultivation limit.$(br2)Equal realms yield a Foundation puzzle. Each major realm above the learner raises the puzzle by one tier. Early, middle, and late stages do not count as major realm gaps."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Study Across Realms",
+      "text": "When the teaching stands above your realm, puzzle tiers follow this order:$(br2)One realm: Golden Core.$(br)Two: Nascent Soul.$(br)Three: Spirit Transformation.$(br)Four: Void Refining.$(br)Five: Body Integration.$(br)Six: Great Ascension.$(br)Seven or more: Tribulation Crossing.$(br2)Teachings below your realm use Qi Refining difficulty. These are the lowest and highest puzzle tiers."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "A Golden Core Example",
+      "text": "A Golden Core cultivator studying Golden Core teachings faces a Foundation puzzle. Nascent Soul teachings yield a Golden Core puzzle; Spirit Transformation teachings yield a Nascent Soul puzzle. All realms follow this pattern.$(br2)Puzzle tier governs the board and its mechanisms. Talent and assistance still affect the challenge; the spell keeps its elements. Comprehension difficulty does not replace learning or casting requirements."
+    },
+    {
+      "type": "patchouli:text",
       "text": "$(br)Press I to choose up to 8 learned spells for the spell wheel. Your selection is saved after closing the world."
     }
   ]

@@ -11,7 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
-public final class VaultGuardianRenderer extends GeoEntityRenderer<VaultGuardianEntity> {
+public final class VaultGuardianRenderer extends BeastGeoRenderer<VaultGuardianEntity> {
    private static final float MODEL_SCALE = 2.301F;
 
    public VaultGuardianRenderer(EntityRendererProvider.Context context) {

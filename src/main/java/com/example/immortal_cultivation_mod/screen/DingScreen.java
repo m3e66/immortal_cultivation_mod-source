@@ -6,6 +6,7 @@ import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
 import com.example.immortal_cultivation_mod.client.DaoGuidanceClient;
 import com.example.immortal_cultivation_mod.client.ForgingVisualState;
+import com.example.immortal_cultivation_mod.client.ClientData;
 import com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -367,6 +368,8 @@ public class DingScreen extends AbstractContainerScreen<DingMenu> {
                                         1.0F,
                                         menu.progress()
                                                 / (float) menu.maxProgress())));
+        graphics.drawString(font, menu.craftProficiencyLabel(ClientData.cultivationData),
+                35, 147, MUTED_INK, false);
         graphics.drawString(
                 font,
                 Component.translatable(

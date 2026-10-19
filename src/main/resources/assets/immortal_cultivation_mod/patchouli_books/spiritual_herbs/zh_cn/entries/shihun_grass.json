@@ -1,0 +1,23 @@
+{
+  "name": "噬魂草",
+  "icon": "immortal_cultivation_mod:shihun_grass",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 8,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "噬魂草",
+      "text": "$(bold)生成尝试频率：$()1/5"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《百草录》记载",
+      "text": "噬魂草生于阴气沉积之地，草叶幽暗，灵息诡异。传闻此草喜吸纳游离阴灵之气，凡神识不稳者，不宜轻易触碰。其踪迹多现于死寂沼泽与幽冥深处，为阴属性灵植之一。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻药",
+      "text": "沼泽、红树林沼泽、暗林、灵魂沙峡谷及深暗之域。"
+    }
+  ]
+}

@@ -35,6 +35,10 @@ public class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS =
             DeferredRegister.createBlocks(ImmortalCultivationMod.MODID);
 
+    public static final DeferredBlock<SealedCradleBottleBlock> SEALED_CRADLE_BOTTLE=registerBlock("sealed_cradle_bottle",
+            ()->new SealedCradleBottleBlock(BlockBehaviour.Properties.of().strength(.6F).sound(SoundType.GLASS)
+                    .pushReaction(PushReaction.DESTROY).noOcclusion().isViewBlocking((s,l,p)->false).isSuffocating((s,l,p)->false)));
+
     public static final DeferredBlock<FortuneLampBlock> FORTUNE_LAMP = BLOCKS.register("fortune_lamp",
             () -> new FortuneLampBlock(BlockBehaviour.Properties.of().strength(2.0F).lightLevel(
                     state -> state.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT) ? 12 : 0)));
@@ -229,16 +233,6 @@ public class ModBlocks {
                     .sound(SoundType.DEEPSLATE)
                     .requiresCorrectToolForDrops()));
 
-    public static final DeferredBlock<Block> SPRUCE_PLANK_PANEL = registerBlock(
-            "spruce_plank_panel", () -> new SprucePlankPanelBlock(
-                    BlockBehaviour.Properties.of()
-                            .mapColor(MapColor.PODZOL)
-                            .instrument(NoteBlockInstrument.BASS)
-                            .strength(2.0F, 3.0F)
-                            .sound(SoundType.WOOD)
-                            .noOcclusion()
-                            .ignitedByLava()));
-
     public static final DeferredBlock<Block> OAK_PLANK_WALL =
             registerPlankWall("oak_plank_wall", true);
     public static final DeferredBlock<Block> SPRUCE_PLANK_WALL =
@@ -370,7 +364,6 @@ public class ModBlocks {
         FireBlock fire = (FireBlock) Blocks.FIRE;
         fire.setFlammable(LINGMU_LOG.get(), 5, 5);
         fire.setFlammable(LINGMU_LEAVES.get(), 30, 60);
-        fire.setFlammable(SPRUCE_PLANK_PANEL.get(), 5, 20);
         fire.setFlammable(OAK_PLANK_WALL.get(), 5, 20);
         fire.setFlammable(SPRUCE_PLANK_WALL.get(), 5, 20);
         fire.setFlammable(BIRCH_PLANK_WALL.get(), 5, 20);

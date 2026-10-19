@@ -12,7 +12,7 @@ public class ScaledFireballRenderer extends ThrownItemRenderer<FireballProjectil
    }
 
    public void render(FireballProjectileEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
-      float scale = 1.35F + (entity.chargeScale() - 1.0F) * 1.65F;
+      float scale = (1.35F + (entity.chargeScale() - 1.0F) * 1.65F) * com.example.immortal_cultivation_mod.client.SpellProjectileVisuals.SCALE;
       poseStack.pushPose();
       poseStack.scale(scale, scale, scale);
       super.render(entity, entityYaw, partialTick, poseStack, buffer, packedLight);

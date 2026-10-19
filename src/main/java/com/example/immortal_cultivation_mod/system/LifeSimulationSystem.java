@@ -34,7 +34,7 @@ public final class LifeSimulationSystem {
     private static final String REWARDS = "InheritanceRewards";
     private static final String ENDINGS = "EndingCollection";
     public static final int MAX_ATTEMPTS = 3;
-    private static final int ATTEMPT_INTERVAL_DAYS = 1;
+    private static final int ATTEMPT_INTERVAL_DAYS = 4;
     private static final int MAX_HISTORY = 240;
     private static final int YEARLY_ACTIONS = 3;
     private static final int INHERITED_SPELL_PROFICIENCY = 100;
@@ -91,6 +91,13 @@ public final class LifeSimulationSystem {
         CompoundTag life = outer.getCompound(ROOT).copy();
         long day = currentDay(player);
         boolean changed = false;
+        if (life.getBoolean("Active") && !life.getString("Name").isBlank()
+                && !life.hasUUID("SimulationId")) {
+            // Existing saves predate annual request tokens. Persist the identity before
+            // sending it to the editor, rather than inventing a different token per read.
+            life.putUUID("SimulationId", UUID.randomUUID());
+            changed = true;
+        }
         if (!life.contains(LAST_ATTEMPT_DAY)) {
             life.putLong(LAST_ATTEMPT_DAY, day);
             life.putInt(ATTEMPTS, Math.max(1, life.getInt(ATTEMPTS)));
@@ -138,12 +145,31 @@ public final class LifeSimulationSystem {
             advanceYears(player, 5);
         } else if (action.equals("settle")) {
             settleLife(player);
+        } else if (action.startsWith("battle:")) {
+            CompoundTag life = read(player);
+            if (life.getBoolean("Finished") || !life.getBoolean("Alive") && !(life.getBoolean("CombatDead") && LifeSimulationBattle.active(life))) return;
+            if (action.substring(7).equals("continue")) LifeSimulationStories.finishBattle(life);
+            else LifeSimulationBattle.handle(life, action.substring(7), player.getRandom());
+            if (life.getInt("Health") <= 0 && !LifeSimulationBattle.active(life)) finishLife(player, life, life.getBoolean("CombatDead") ? "third_knockout" : "event_death");
+            save(player, life);
+        } else if (action.startsWith("story:")) {
+            CompoundTag life = read(player);
+            if (!life.getBoolean("Alive") || life.getBoolean("Finished")) return;
+            LifeSimulationStories.choose(life, action.substring(6), player.getRandom());
+            if (life.getInt("Health") <= 0) finishLife(player, life, "event_death");
+            save(player, life);
         } else if (action.startsWith("choice:")) {
-            chooseEvent(player, action.substring("choice:".length()));
+            // Authored identifiers are opaque and case-sensitive. Normalize the
+            // command name above, but never rewrite a saved choice's identity.
+            chooseEvent(player, rawAction.trim().substring("choice:".length()));
         } else if (action.startsWith("activity:")) {
             performActivity(player, action.substring("activity:".length()));
+        } else if (action.startsWith("routine:")) {
+            routineAction(player, action.substring(8));
         } else if (action.startsWith("relationship:")) {
             relationshipAction(player, action.substring("relationship:".length()));
+        } else if (action.startsWith("inherit_select:")) {
+            selectInheritance(player, action.substring("inherit_select:".length()));
         } else if (action.startsWith("inherit:")) {
             claimInheritance(player, action.substring("inherit:".length()));
         } else if (action.startsWith("upgrade:")) {
@@ -153,6 +179,7 @@ public final class LifeSimulationSystem {
             if (life.getBoolean("Active")
                     && life.getBoolean("Alive")
                     && !life.getBoolean("Finished")
+                    && !LifeSimulationBattle.active(life) && !life.contains("Story")
                     && LifeSimulationWorldMap.handleAction(
                             player,
                             life,
@@ -168,7 +195,24 @@ public final class LifeSimulationSystem {
         ensureDay(player);
         CompoundTag life = read(player);
         CompoundTag client = life.copy();
-        trimHistory(client, 120);
+        filterObservedRelationships(client);
+        for (var tag : client.getList("Memories", Tag.TAG_COMPOUND)) filterObservedRelationships((CompoundTag)tag);
+        client.remove("Seed");
+        client.getCompound("Story").remove("Definition");
+        // Send the entire bounded history, including settled lives.
+        ListTag rewards = client.getList(REWARDS, Tag.TAG_COMPOUND);
+        for (int i = 0; i < rewards.size(); i++) {
+            CompoundTag reward = rewards.getCompound(i);
+            reward.put("Preview", inheritancePreview(player, life, reward));
+            ListTag options = LifeSimulationInheritance.options(life, reward.getString("Id"));
+            reward.putInt("ChoiceCount", options.size());
+            reward.putInt("ChoiceIndex", LifeSimulationInheritance.optionIndex(options, reward));
+            for (var option : options) {
+                CompoundTag choice = (CompoundTag) option;
+                choice.put("Preview", inheritancePreview(player, life, choice));
+            }
+            reward.put("Choices", options);
+        }
         client.putLong(
                 "CultivationProgressRequired",
                 cultivationRequired(life.getInt("Realm")));
@@ -181,6 +225,18 @@ public final class LifeSimulationSystem {
                 Math.max(0L, ATTEMPT_INTERVAL_DAYS
                         - (currentDay(player) - life.getLong(LAST_ATTEMPT_DAY))));
         result.put("LifeSimulation", client);
+    }
+
+    private static void filterObservedRelationships(CompoundTag client) {
+        ListTag people = client.getList(RELATIONSHIPS, Tag.TAG_COMPOUND), visible = new ListTag();
+        for (int index = 0; index < people.size(); index++) {
+            CompoundTag person = people.getCompound(index);
+            if (person.contains("Observed") && !person.getBoolean("Observed")) continue;
+            CompoundTag entry = person.copy();
+            entry.putInt("ServerIndex", index);
+            visible.add(entry);
+        }
+        client.put(RELATIONSHIPS, visible);
     }
 
     private static void startLife(ServerPlayer player) {
@@ -229,6 +285,8 @@ public final class LifeSimulationSystem {
                 || life.getBoolean("Finished")) {
             return;
         }
+        if (LifeSimulationBattle.active(life) || life.getCompound("Story").contains("PendingRoll")) return;
+        if (life.contains("Story")) LifeSimulationStories.complete(life, "withdraw");
         finishLife(player, life, "manual_settlement");
         com.example.immortal_cultivation_mod.guidance.DaoGuidanceObservations.record(player, "life_settled");
         CompoundTag map = life.getCompound(LifeSimulationWorldMap.ROOT);
@@ -280,11 +338,9 @@ public final class LifeSimulationSystem {
         life.putString("Mother", pick(random, SURNAMES) + pick(random, FEMALE_NAMES));
         life.putBoolean("HasSibling", random.nextFloat() < 0.58F);
         if (life.getBoolean("HasSibling")) {
-            life.putString(
-                    "Sibling",
-                    surname + pick(
-                            random,
-                            random.nextBoolean() ? MALE_NAMES : FEMALE_NAMES));
+            String siblingGender=random.nextBoolean()?"male":"female";
+            life.putString("SiblingGender",siblingGender);
+            life.putString("Sibling",surname+pick(random,siblingGender.equals("male")?MALE_NAMES:FEMALE_NAMES));
         }
         life.putInt("Age", 0);
         life.putInt("Health", health);
@@ -328,11 +384,27 @@ public final class LifeSimulationSystem {
         life.remove(REWARDS);
         LifeSimulationWorldMap.initialize(life);
         addLog(life, "life.immortal_cultivation_mod.log.birth");
+        normalizeLifeState(life);
         return life;
     }
 
     private static CompoundTag copyMeta(CompoundTag source) {
         CompoundTag result = new CompoundTag();
+        ListTag memories = source.getList("Memories", Tag.TAG_COMPOUND).copy();
+        if (source.getBoolean("Finished") && source.hasUUID("SimulationId")) {
+            CompoundTag memory = new CompoundTag();
+            for (String key : new String[]{"SimulationId", "Name", "Age", "HighestRealm",
+                    "Ending", "Score", HISTORY, "RewardClaimed", "InheritanceReceipt", "StoryJournal", "DiceHistory", "Relationships", "NpcMemorials"}) {
+                if (source.contains(key)) {
+                    memory.put(key, source.get(key).copy());
+                }
+            }
+            memories.add(memory);
+            while (memories.size() > 5) {
+                memories.remove(0);
+            }
+        }
+        result.put("Memories", memories);
         result.putInt(ATTEMPTS, source.getInt(ATTEMPTS));
         result.putLong(LAST_ATTEMPT_DAY, source.getLong(LAST_ATTEMPT_DAY));
         result.putInt(INSIGHT, source.getInt(INSIGHT));
@@ -353,14 +425,14 @@ public final class LifeSimulationSystem {
                 random.nextInt(22, 39),
                 random.nextInt(70, 96),
                 "steady",
-                "family_trade"));
+                "family_trade", "male"));
         list.add(person(
                 life.getString("Mother"),
                 "mother",
                 random.nextInt(20, 37),
                 random.nextInt(78, 100),
                 "kind",
-                "family_trade"));
+                "family_trade", "female"));
         if (life.getBoolean("HasSibling")) {
             list.add(person(
                     life.getString("Sibling"),
@@ -368,7 +440,7 @@ public final class LifeSimulationSystem {
                     0,
                     random.nextInt(58, 90),
                     random.nextBoolean() ? "cheerful" : "proud",
-                    "child"));
+                    "child", life.getString("SiblingGender")));
         }
         return list;
     }
@@ -379,11 +451,12 @@ public final class LifeSimulationSystem {
             int age,
             int affinity,
             String personality,
-            String occupation) {
+            String occupation, String gender) {
         CompoundTag person = new CompoundTag();
         person.putUUID("Id", UUID.randomUUID());
         person.putString("Name", name);
         person.putString("Relation", relation);
+        person.putString("Gender",gender);
         person.putInt("Age", age);
         person.putInt("Health", 65 + Math.floorMod(name.hashCode(), 31));
         person.putInt("Affinity", affinity);
@@ -416,8 +489,17 @@ public final class LifeSimulationSystem {
             ServerPlayer player, CompoundTag life) {
         int age = life.getInt("Age") + 1;
         life.putInt("Age", age);
+        LifeCardInjuries.advanceYear(life);
         life.putInt("AnnualActionPoints", YEARLY_ACTIONS);
+        life.putBoolean("SeclusionThisYear", false);
+        life.putInt("RoutineCursor", 0);
+        if (life.getBoolean("FutureActionDebt")) {
+            life.putInt("AnnualActionPoints", YEARLY_ACTIONS - 1);
+            life.putBoolean("FutureActionDebt", false);
+        }
+        life.putInt("TrainingStrain", Math.max(0, life.getInt("TrainingStrain") - 3));
         RandomSource random = yearlyRandom(life);
+        LifeSimulationStories.advanceYear(life);
         LifeSimulationWorldMap.advanceYear(life, random);
 
         applyIncomeAndExpenses(life, random);
@@ -435,10 +517,7 @@ public final class LifeSimulationSystem {
             finishLife(player, life, "natural_death");
             return true;
         }
-        if (life.getInt("Mentality") <= 0 && random.nextFloat() < 0.20F) {
-            finishLife(player, life, "broken_heart");
-            return true;
-        }
+        if (life.getInt("Mentality") <= 0) life.putInt("TrainingStrain", Math.min(100, life.getInt("TrainingStrain") + 8));
         if (!hasFlag(life, "root_tested") && age >= 10) {
             setRootTestEvent(life);
             return true;
@@ -448,7 +527,10 @@ public final class LifeSimulationSystem {
             return true;
         }
 
+        if (age % 2 == 0 && random.nextFloat() < LifeSimulationTuning.get("crisis_chance")
+                && LifeSimulationStories.select(life, player.server.getResourceManager(), "danger", random)) return true;
         if (random.nextFloat() < 0.52F) {
+            if (LifeSimulationStories.select(life, player.server.getResourceManager(), "adventure", random)) return true;
             LifeSimulationEvents.Definition event = LifeSimulationEvents.select(
                     player.server.getResourceManager(), life, random);
             if (event != null) {
@@ -484,25 +566,63 @@ public final class LifeSimulationSystem {
             CompoundTag life, RandomSource random) {
         ListTag relationships = life.getList(RELATIONSHIPS, Tag.TAG_COMPOUND);
         boolean important = false;
+        int yearlyGrief = 0;
         for (int i = 0; i < relationships.size(); i++) {
             CompoundTag person = relationships.getCompound(i);
             if (!person.getBoolean("Alive")) {
                 continue;
             }
             person.putInt("Age", person.getInt("Age") + 1);
+            if (person.getInt("Age") >= 16 && person.getString("Occupation").equals("child")) person.putString("Occupation", "laborer");
+            if (person.getInt("Age") >= 18 && person.getString("Occupation").equals("sect_disciple") && person.getInt("Realm") == 0) person.putInt("Realm", 1);
+            if (person.getInt("Realm") > 0 && person.getBoolean("Alive")) {
+                if (person.getString("ActiveMethod").isBlank()) {
+                    var method = CultivationMethods.allMethods().stream()
+                            .filter(m -> CultivationLevels.getStageIndex(m.limitLevel()) >= person.getInt("Realm"))
+                            .min(java.util.Comparator.comparingInt(m -> CultivationLevels.getStageIndex(m.limitLevel())));
+                    method.ifPresent(m -> person.putString("ActiveMethod", m.id()));
+                    person.putInt("SpiritualRootPotential", 50); person.putInt("Comprehension", 50); person.putString("Sect", "none");
+                }
+                LifeSimulationBalance.train(person, .35);
+                int npcRealm = person.getInt("Realm");
+                if (npcRealm < 27 && person.getLong("CultivationProgress") >= cultivationLevel(npcRealm).qiNeeded() && LifeSimulationBalance.supported(person, npcRealm + 1)) {
+                    person.putInt("Realm", npcRealm + 1); person.putLong("CultivationProgress", 0);
+                }
+            }
             person.putInt("Affinity", Mth.clamp(
-                    person.getInt("Affinity") - (random.nextFloat() < 0.22F ? 1 : 0),
+                    person.getInt("Affinity") - (person.getInt("Affinity") > 0 && random.nextFloat() < 0.22F ? 1 : 0),
                     -100,
                     100));
-            int deathAge = person.getInt("Realm") > 0 ? 120 : 68;
+            int deathAge = person.getInt("Realm") > 0 ? cultivationLevel(person.getInt("Realm")).maxAge() : 78;
             if (person.getInt("Age") > deathAge
                     && random.nextFloat() < 0.08F) {
                 person.putBoolean("Alive", false);
-                life.putInt("Mentality", clampAttribute(
-                        life.getInt("Mentality") - 16));
+                person.putBoolean("Available", false);
+                person.putInt("DeathYear", life.getInt("Age"));
+                person.putString("DeathCause", "natural_death");
+                int grief = person.getInt("Affinity") <= 0 ? 0 : Math.min(8, person.getInt("Affinity") / 15);
+                int allowedGrief = Math.min(grief, Math.max(0, 12 - yearlyGrief));
+                yearlyGrief += allowedGrief;
+                life.putInt("Mentality", clampAttribute(life.getInt("Mentality") - allowedGrief));
                 addLog(life, "life.immortal_cultivation_mod.log.relationship_death");
                 important = true;
             }
+        }
+        if (relationships.size() >= 80) {
+            CompoundTag memorials = life.getCompound("NpcMemorials");
+            for (int i = relationships.size() - 1; i >= 0 && relationships.size() >= 70; i--) {
+                CompoundTag old = relationships.getCompound(i);
+                if (!old.getBoolean("Alive") && old.hasUUID("Id") && !old.getBoolean("Friend")
+                        && !List.of("father", "mother", "child", "dao_companion").contains(old.getString("Relation"))) {
+                    memorials.put(old.getUUID("Id").toString(), old.copy()); relationships.remove(i);
+                }
+            }
+            life.put("NpcMemorials", memorials);
+        }
+        if (life.getInt("Age") % 12 == 0 && life.getInt("Age") >= 24 && relationships.size() < 80) {
+            CompoundTag successor = person(pick(random, SURNAMES) + pick(random, MALE_NAMES), "acquaintance", 18, 10, "steady", "sect_disciple", "male");
+            successor.putInt("BirthYear", life.getInt("Age") - 18);
+            relationships.add(successor);
         }
         if (life.getInt("Age") >= 18
                 && hasLivingRelation(relationships, "dao_companion")
@@ -518,7 +638,7 @@ public final class LifeSimulationSystem {
                     0,
                     78,
                     random.nextBoolean() ? "cheerful" : "steady",
-                    "child"));
+                    "child", male ? "male" : "female"));
             addLog(life, "life.immortal_cultivation_mod.log.child_birth");
             important = true;
         }
@@ -545,12 +665,7 @@ public final class LifeSimulationSystem {
         if (life.getInt("Realm") <= 0) {
             return;
         }
-        int basisPoints = 90 + life.getInt("Comprehension") * 2
-                + random.nextInt(80);
-        if ("sect_disciple".equals(life.getString("Occupation"))) {
-            basisPoints += 120;
-        }
-        addCultivationBasisPoints(life, basisPoints);
+        LifeSimulationBalance.train(life, LifeSimulationTuning.get("passive_training"));
     }
 
     private static boolean applyEvent(
@@ -790,6 +905,12 @@ public final class LifeSimulationSystem {
             return;
         }
         CompoundTag event = life.getCompound(CURRENT_EVENT).copy();
+        if (event.getBoolean("Story")) {
+            LifeSimulationStories.choose(life, choiceId, player.getRandom());
+            if (life.getInt("Health") <= 0) finishLife(player, life, "event_death");
+            save(player, life);
+            return;
+        }
         ListTag choices = event.getList("Choices", Tag.TAG_COMPOUND);
         CompoundTag selected = null;
         for (int i = 0; i < choices.size(); i++) {
@@ -833,6 +954,9 @@ public final class LifeSimulationSystem {
                 }
             }
         }
+        boolean cultivationDecision = readStrings(selected.getList("Effects", Tag.TAG_STRING)).stream()
+                .anyMatch(effect -> effect.startsWith("breakthrough:") || effect.startsWith("root_test:"));
+        if (!cultivationDecision && nextNode.isBlank()) LifeSimulationBalance.rewardEncounter(life);
         if (life.getInt("Health") <= 0) {
             finishLife(player, life, "event_death");
         }
@@ -893,6 +1017,27 @@ public final class LifeSimulationSystem {
             return;
         }
         RandomSource random = yearlyRandom(life);
+        if (!LifeSimulationBalance.supported(life, life.getInt("Realm") + 1)) {
+            addLog(life, "life.balance.method_limit");
+            return;
+        }
+        if (life.getInt("Realm") >= 6 && life.getInt("Realm") % 3 == 0) {
+            if (life.contains("LastTribulationAttemptYear")
+                    && life.getInt("LastTribulationAttemptYear") >= life.getInt("Age")) {
+                addLog(life, "life.balance.tribulation_retry");
+                return;
+            }
+            CompoundTag tribulation = LifeSimulationStories.breakthroughTrial(player.server.getResourceManager());
+            if (tribulation != null && LifeSimulationStories.start(life, tribulation)) {
+                // Explicit major breakthroughs require this encounter even after an
+                // earlier withdrawal or another crisis. Random-event cooldowns never
+                // turn the required trial into an ordinary percentage roll.
+                life.putInt("LastTribulationAttemptYear", life.getInt("Age"));
+            } else {
+                addLog(life, "life.balance.tribulation_unavailable");
+            }
+            return;
+        }
         float chance = 0.18F
                 + life.getInt("Comprehension") * 0.0035F
                 + life.getInt("Health") * 0.0015F
@@ -909,7 +1054,6 @@ public final class LifeSimulationSystem {
                     life.getInt("MaximumLifespan"), cultivationLevel(realm).maxAge()));
             discoverCoreSpells(life, realm);
             discoverSpell(life, random);
-            ensureMethodForRealm(life, random);
             grantBreakthroughSupplies(life, realm);
             addLog(life, "life.immortal_cultivation_mod.log.breakthrough_success");
         } else {
@@ -965,7 +1109,7 @@ public final class LifeSimulationSystem {
     }
 
     private static void learnSpell(CompoundTag life, String spellId) {
-        if (spellId == null || spellId.isBlank() || ModSpells.get(spellId) == null) {
+        if (spellId == null || spellId.isBlank() || !LifeSimulationInheritance.canLearnSpell(life, spellId)) {
             return;
         }
         ListTag known = life.getList(DISCOVERED_SPELLS, Tag.TAG_STRING);
@@ -989,7 +1133,9 @@ public final class LifeSimulationSystem {
         CultivationMethods.MethodDef activeMethod = CultivationMethods.get(active);
         if (activeMethod == null
                 || CultivationLevels.getStageIndex(activeMethod.limitLevel())
-                        < CultivationLevels.getStageIndex(method.limitLevel())) {
+                        < CultivationLevels.getStageIndex(method.limitLevel())
+                || activeMethod.limitLevel().equals(method.limitLevel())
+                        && LifeStoryLoot.methodTier(activeMethod.tier()) < LifeStoryLoot.methodTier(method.tier())) {
             life.putString(ACTIVE_METHOD, methodId);
         }
     }
@@ -1051,10 +1197,12 @@ public final class LifeSimulationSystem {
     private static void performActivity(
             ServerPlayer player, String activity) {
         CompoundTag life = read(player);
-        if (!canAct(life)) {
+        if (!activityUnavailable(life, activity).isBlank()) {
             return;
         }
         RandomSource random = yearlyRandom(life);
+        int cost = "seclusion".equals(activity) ? 2 : 1;
+        if (life.getInt("AnnualActionPoints") < cost || "seclusion".equals(activity) && life.getBoolean("SeclusionThisYear")) return;
         boolean valid = true;
         switch (activity) {
             case "study" -> {
@@ -1069,7 +1217,7 @@ public final class LifeSimulationSystem {
                 addAttribute(life, "Mentality", 5);
                 improveAllRelationships(life, 3);
             }
-            case "explore" -> valid = setRandomQuestEvent(
+            case "explore" -> valid = LifeSimulationStories.select(life, player.server.getResourceManager(), "adventure", random) || setRandomQuestEvent(
                     player,
                     life,
                     random,
@@ -1094,16 +1242,32 @@ public final class LifeSimulationSystem {
                 maybeAddFriend(life, random);
             }
             case "rest" -> {
-                addAttribute(life, "Health", 6);
-                addAttribute(life, "Mentality", 6);
+                addAttribute(life, "Health", 4);
+                addAttribute(life, "Mentality", 4);
+                life.putInt("TrainingStrain", Math.max(0, life.getInt("TrainingStrain") - 8));
+            }
+            case "consolidate" -> {
+                life.putInt("CultivationStability", Math.min(100, life.getInt("CultivationStability") + 6));
+                life.putInt("TrainingStrain", Math.max(0, life.getInt("TrainingStrain") - 4));
+            }
+            case "keep_oath" -> {
+                CompoundTag oath = life.getCompound("SpiritualOath");
+                if (!oath.getBoolean("Accepted") || oath.getBoolean("Fulfilled") || life.getLong("Wealth") < 100L) valid = false;
+                else {
+                    life.putLong("Wealth", life.getLong("Wealth") - 100L);
+                    oath.putBoolean("Fulfilled", true); oath.putBoolean("Broken", false);
+                }
+            }
+            case "breathing" -> {
+                valid = life.getInt("Realm") > 0;
+                if (valid) LifeSimulationBalance.train(life, LifeSimulationTuning.get("breathing_training"));
             }
             case "cultivate" -> {
                 if (life.getInt("Realm") <= 0) {
                     valid = false;
                 } else {
-                    int gain = 650 + life.getInt("Comprehension") * 8
-                            + random.nextInt(300);
-                    addCultivationBasisPoints(life, gain);
+                    LifeSimulationBalance.train(life, LifeSimulationTuning.get("cultivate_training"));
+                    life.putInt("TrainingStrain", Math.min(100, life.getInt("TrainingStrain") + 6));
                     addAttribute(life, "Mentality", -2);
                     life.putInt("CultivationStability", Mth.clamp(
                             life.getInt("CultivationStability") + 2, 0, 100));
@@ -1122,7 +1286,7 @@ public final class LifeSimulationSystem {
                 if ("none".equals(life.getString("Sect"))) {
                     valid = false;
                 } else {
-                    valid = setRandomQuestEvent(
+                    valid = LifeSimulationStories.select(life, player.server.getResourceManager(), "sect", random) || setRandomQuestEvent(
                             player,
                             life,
                             random,
@@ -1133,8 +1297,9 @@ public final class LifeSimulationSystem {
                 if (life.getInt("Realm") <= 0) {
                     valid = false;
                 } else {
-                    addCultivationBasisPoints(
-                            life, 1100 + life.getInt("Comprehension") * 10);
+                    LifeSimulationBalance.train(life, LifeSimulationTuning.get("seclusion_training"));
+                    life.putBoolean("SeclusionThisYear", true);
+                    life.putInt("TrainingStrain", Math.min(100, life.getInt("TrainingStrain") + 12));
                     addAttribute(life, "Mentality", -5);
                     improveAllRelationships(life, -3);
                 }
@@ -1145,7 +1310,7 @@ public final class LifeSimulationSystem {
             return;
         }
         life.putInt("AnnualActionPoints",
-                life.getInt("AnnualActionPoints") - 1);
+                life.getInt("AnnualActionPoints") - cost);
         addLog(life, "life.immortal_cultivation_mod.activity." + activity);
         if (life.getInt("Health") <= 0) {
             finishLife(player, life, "activity_death");
@@ -1154,6 +1319,76 @@ public final class LifeSimulationSystem {
             setBreakthroughEvent(life);
         }
         save(player, life);
+    }
+
+    public static final List<String> ACTIVITIES = List.of("study", "exercise", "family", "explore", "work", "socialize", "rest", "cultivate", "practice", "sect_mission", "seclusion", "breathing", "consolidate", "keep_oath");
+    public static final List<String> ROUTINE_CONDITIONS = List.of("none", "any", "health", "strain", "stability");
+
+    /** Shared manual/planner validation; returns a localized reason suffix or an empty string. */
+    public static String activityUnavailable(CompoundTag life,String activity) {
+        if (!ACTIVITIES.contains(activity)) return "requirements";
+        if (!life.getBoolean("Active") || !life.getBoolean("Alive") || life.getBoolean("Finished")) return "finished";
+        if (life.contains(CURRENT_EVENT,Tag.TAG_COMPOUND) || life.contains("Story",Tag.TAG_COMPOUND) || LifeSimulationBattle.active(life)) return "encounter";
+        if (LifeSimulationWorldMap.blocksActivities(life) || LifeSimulationWorldMap.blocksYearAdvance(life)) return "journey";
+        if (life.getInt("AnnualActionPoints")<=0) return "no_actions";
+        if (activity.equals("work") && life.getInt("Age")<12) return "work_age";
+        if (activity.equals("sect_mission") && (life.getString("Sect").isBlank() || life.getString("Sect").equals("none"))) return "sect";
+        if (activity.equals("keep_oath") && (!life.getCompound("SpiritualOath").getBoolean("Accepted") || life.getCompound("SpiritualOath").getBoolean("Fulfilled") || life.getLong("Wealth")<100)) return "oath";
+        if (List.of("cultivate","breathing","seclusion","practice").contains(activity) && life.getInt("Realm")<=0) return "awakening";
+        if (activity.equals("seclusion") && life.getBoolean("SeclusionThisYear")) return "seclusion_once";
+        if (activity.equals("seclusion") && life.getInt("AnnualActionPoints")<2) return "seclusion_actions";
+        if (List.of("cultivate","breathing","seclusion").contains(activity) && life.getString(ACTIVE_METHOD).isBlank()) return "method";
+        return "";
+    }
+
+    public static boolean canRunPlannedYear(CompoundTag life) { return canAdvance(life) && life.hasUUID("SimulationId"); }
+
+    /** One bounded annual routine. Every external decision stops this operation. */
+    private static void routineAction(ServerPlayer player, String payload) {
+        CompoundTag life = read(player);
+        String[] fields = payload.split(":");
+        if (fields.length == 4 && fields[0].equals("slot")) {
+            int slot;
+            try { slot = Integer.parseInt(fields[1]); } catch (NumberFormatException e) { return; }
+            if (slot < 0 || slot >= 3 || !ACTIVITIES.contains(fields[2]) || !ROUTINE_CONDITIONS.contains(fields[3])) return;
+            CompoundTag routine = life.getCompound("Routine");
+            CompoundTag entry = new CompoundTag(); entry.putString("Action", fields[2]); entry.putString("Condition", fields[3]);
+            routine.put(Integer.toString(slot), entry); life.put("Routine", routine); save(player, life); return;
+        }
+        boolean requestedRun = payload.equals("run");
+        if (fields.length == 3 && fields[0].equals("run") && life.hasUUID("SimulationId")) {
+            try {
+                requestedRun = life.getUUID("SimulationId").equals(java.util.UUID.fromString(fields[1])) && life.getInt("Age") == Integer.parseInt(fields[2]);
+            } catch (IllegalArgumentException e) { return; }
+        }
+        if (!requestedRun || !canAdvance(life)) return;
+        for (int slot = life.getInt("RoutineCursor"); slot < 3 && canAct(life); slot++) {
+            CompoundTag entry = life.getCompound("Routine").getCompound(Integer.toString(slot));
+            String activity = entry.getString("Action"); if (activity.isBlank()) activity = "rest";
+            boolean ready = switch (entry.getString("Condition")) {
+                case "health" -> life.getInt("Health") < 60;
+                case "strain" -> life.getInt("TrainingStrain") > 50;
+                case "stability" -> life.getInt("CultivationStability") < 60;
+                default -> true;
+            };
+            if (!ready) {
+                life.putInt("RoutineCursor", slot + 1);
+                save(player, life);
+                continue;
+            }
+            if (life.getInt("Health") < 30 || life.getInt("TrainingStrain") > 85) activity = "rest";
+            if (activity.equals("seclusion") && (life.getInt("AnnualActionPoints") < 2 || life.getBoolean("SeclusionThisYear"))) activity = "rest";
+            if (List.of("cultivate", "breathing", "seclusion", "practice").contains(activity) && life.getInt("Realm") <= 0) activity = "study";
+            if (activity.equals("sect_mission") && "none".equals(life.getString("Sect"))) activity = "work";
+            if (activity.equals("work") && life.getInt("Age") < 12) activity = "study";
+            if (!activityUnavailable(life,activity).isBlank()) activity = "rest";
+            life.putInt("RoutineCursor", slot + 1); save(player, life);
+            performActivity(player, activity); life = read(player);
+            if (!canAdvance(life)) return;
+        }
+        if (canAdvance(life) && (life.getInt("RoutineCursor") >= 3 || life.getInt("AnnualActionPoints") == 0)) {
+            advanceOneYear(player, life); save(player, life);
+        }
     }
 
     private static boolean setRandomQuestEvent(
@@ -1248,16 +1483,14 @@ public final class LifeSimulationSystem {
         life.put(QUEST_PROGRESS, progress);
     }
 
+    public static boolean isParent(CompoundTag person) {
+        return "father".equals(person.getString("Relation")) || "mother".equals(person.getString("Relation"));
+    }
+
     private static void relationshipAction(
             ServerPlayer player, String payload) {
         String[] parts = payload.split(":", 2);
         if (parts.length != 2) {
-            return;
-        }
-        int index;
-        try {
-            index = Integer.parseInt(parts[0]);
-        } catch (NumberFormatException ignored) {
             return;
         }
         CompoundTag life = read(player);
@@ -1265,14 +1498,43 @@ public final class LifeSimulationSystem {
             return;
         }
         ListTag relationships = life.getList(RELATIONSHIPS, Tag.TAG_COMPOUND);
+        int index = -1;
+        try {
+            index = Integer.parseInt(parts[0]);
+        } catch (NumberFormatException numeric) {
+            try {
+                UUID identity = UUID.fromString(parts[0]);
+                for (int candidate = 0; candidate < relationships.size(); candidate++) {
+                    CompoundTag person = relationships.getCompound(candidate);
+                    if (person.hasUUID("Id") && person.getUUID("Id").equals(identity)) { index = candidate; break; }
+                }
+            } catch (IllegalArgumentException malformed) { return; }
+        }
         if (index < 0 || index >= relationships.size()) {
             return;
         }
         CompoundTag person = relationships.getCompound(index);
-        if (!person.getBoolean("Alive")) {
+        if (!person.getBoolean("Alive") || person.getBoolean("Captive")
+                || person.contains("Observed") && !person.getBoolean("Observed")) {
             return;
         }
         switch (parts[1]) {
+            case "friend" -> {
+                if (isParent(person) || person.getInt("Affinity") < 30) return;
+                person.putBoolean("Friend", true); person.putBoolean("Nemesis", false);
+                person.putInt("Trust", Math.max(40, person.getInt("Trust")));
+            }
+            case "breakup" -> {
+                person.putBoolean("Friend", false); person.putBoolean("Protector", false);
+            }
+            case "protector" -> {
+                if (!person.getBoolean("Friend") || person.getInt("Trust") < 40 || person.getInt("Age") < 16) return;
+                person.putBoolean("Protector", !person.getBoolean("Protector"));
+            }
+            case "nemesis" -> {
+                person.putBoolean("Nemesis", true); person.putBoolean("Friend", false); person.putBoolean("Protector", false);
+                person.putInt("Affinity", -50); person.putString("Grievance", "declared_enmity");
+            }
             case "talk" -> person.putInt("Affinity", Mth.clamp(
                     person.getInt("Affinity") + 4, -100, 100));
             case "gift" -> {
@@ -1294,6 +1556,7 @@ public final class LifeSimulationSystem {
             }
         }
         relationships.set(index, person);
+        if (!person.getBoolean("Nemesis") && !parts[1].equals("breakup")) person.putInt("Trust", Math.min(100, person.getInt("Trust") + 3));
         life.put(RELATIONSHIPS, relationships);
         life.putInt("AnnualActionPoints",
                 life.getInt("AnnualActionPoints") - 1);
@@ -1309,6 +1572,7 @@ public final class LifeSimulationSystem {
         boolean manualSettlement = "manual_settlement".equals(cause);
         if (!manualSettlement
                 && !"natural_death".equals(cause)
+                && !life.getBoolean("CombatDead")
                 && hasUpgrade(life, "fate_not_end")
                 && !hasFlag(life, "fate_not_end_used")) {
             life.putBoolean("Alive", true);
@@ -1326,14 +1590,9 @@ public final class LifeSimulationSystem {
         life.putString("DeathCause", cause);
         String ending = ending(life, cause);
         life.putString("Ending", ending);
-        long score = Math.max(0L,
-                life.getInt("Age") * 20L
-                        + life.getInt("HighestRealm") * 1100L
-                        + life.getLong("Wealth") / 5L
-                        + Math.max(0, life.getInt("Reputation")) * 18L
-                        + Math.max(0, life.getInt("Morality")) * 10L);
+        long score = LifeSimulationBalance.score(life);
         life.putLong("Score", score);
-        int insight = Mth.clamp((int) (score / 650L) + 8, 8, 160);
+        int insight = Mth.clamp((int) (score / LifeSimulationTuning.get("insight_divisor")) + 8, 8, Math.max(8,(int)LifeSimulationTuning.get("insight_cap")));
         life.putInt("InsightEarned", insight);
         life.putInt(INSIGHT, life.getInt(INSIGHT) + insight);
         ListTag endings = life.getList(ENDINGS, Tag.TAG_STRING);
@@ -1346,7 +1605,8 @@ public final class LifeSimulationSystem {
                 Math.max(
                         life.getInt("RetainedRootPotential"),
                         life.getInt("SpiritualRootPotential")));
-        life.put(REWARDS, generateInheritanceRewards(player, life));
+        life.put(REWARDS, LifeSimulationInheritance.generate(life));
+        life.putInt("InheritanceSourceVersion", LifeSimulationInheritance.VERSION);
 
         life.remove(CURRENT_EVENT);
         addLog(life, manualSettlement
@@ -1354,66 +1614,30 @@ public final class LifeSimulationSystem {
                 : "life.immortal_cultivation_mod.log.death");
     }
 
-    private static ListTag generateInheritanceRewards(
-            ServerPlayer player, CompoundTag life) {
-        RandomSource random = RandomSource.create(
-                life.getLong("Seed") ^ life.getLong("Score") ^ 0xA54FF53A5F1D36F1L);
-        ListTag rewards = new ListTag();
-        CompoundTag progress = new CompoundTag();
-        progress.putString("Id", "progress");
-        progress.putInt("Percent", random.nextInt(2, 9));
-        rewards.add(progress);
-
-        CompoundTag spell = new CompoundTag();
-        spell.putString("Id", "spell");
-        String spellId = eligibleRewardSpell(player, life, random);
-        spell.putString("Spell", spellId);
-        if (spellId.isBlank()) {
-            spell.putString("Id", "materials_bonus");
-            spell.putInt("Bundle", 2);
+    private static void selectInheritance(ServerPlayer player, String selection) {
+        CompoundTag life = read(player);
+        if (!life.getBoolean("Finished") || life.getBoolean("RewardClaimed") || life.contains("PendingInheritance")) return;
+        String[] parts = selection.split(":", -1);
+        if (parts.length != 2) return;
+        ListTag options = LifeSimulationInheritance.options(life, parts[0]);
+        if (options.isEmpty()) return;
+        int requested = -1;
+        boolean cycle = parts[1].equals("next") || parts[1].equals("previous");
+        if (!cycle) {
+            try { requested = Integer.parseInt(parts[1]); }
+            catch (NumberFormatException ignored) { return; }
+            if (requested < 0 || requested >= options.size()) return;
         }
-        rewards.add(spell);
-
-        CompoundTag materials = new CompoundTag();
-        materials.putString("Id", "materials");
-        materials.putInt("Bundle", 1);
-        rewards.add(materials);
-
-        if (hasUpgrade(life, "inheritance_expansion")) {
-            CompoundTag blessing = new CompoundTag();
-            blessing.putString("Id", "blessing");
-            blessing.putString("Blessing", "fortune");
-            rewards.add(blessing);
+        ListTag rewards = life.getList(REWARDS, Tag.TAG_COMPOUND);
+        for (int i = 0; i < rewards.size(); i++) {
+            CompoundTag reward = rewards.getCompound(i);
+            if (!reward.getString("Id").equals(parts[0])) continue;
+            int index = LifeSimulationInheritance.optionIndex(options, reward);
+            int next = cycle ? Math.floorMod(index + (parts[1].equals("next") ? 1 : -1), options.size()) : requested;
+            rewards.set(i, options.getCompound(next).copy());
+            save(player, life);
+            return;
         }
-        return rewards;
-    }
-
-    private static String eligibleRewardSpell(
-            ServerPlayer player, CompoundTag life, RandomSource random) {
-        int realStage = CultivationLevels.getStageIndex(
-                ModAttachments.getData(player).cultivationLevel());
-        List<String> discovered = readStrings(
-                life.getList("DiscoveredSpells", Tag.TAG_STRING));
-        List<String> eligible = discovered.stream()
-                .filter(id -> {
-                    ModSpells.SpellDef spell = ModSpells.get(id);
-                    return spell != null
-                            && CultivationLevels.getStageIndex(spell.requiredLevel())
-                                    <= realStage;
-                })
-                .toList();
-        if (eligible.isEmpty()) {
-            eligible = ModSpells.all().stream()
-                    .filter(spell -> !ModSpells.innateSpellIds().contains(spell.id()))
-                    .filter(spell -> {
-                        int required = CultivationLevels.getStageIndex(
-                                spell.requiredLevel());
-                        return required > 0 && required <= realStage;
-                    })
-                    .map(ModSpells.SpellDef::id)
-                    .toList();
-        }
-        return eligible.isEmpty() ? "" : eligible.get(random.nextInt(eligible.size()));
     }
 
     private static void claimInheritance(
@@ -1431,116 +1655,170 @@ public final class LifeSimulationSystem {
                 break;
             }
         }
-        if (selected == null) {
+        CompoundTag pending = life.getCompound("PendingInheritance");
+        if ("none".equals(rewardId) && pending.isEmpty()) {
+            boolean available = rewards.stream().anyMatch(t -> !"none".equals(inheritancePreview(player, life, (CompoundTag)t).getString("Kind")));
+            if (available) return;
+            selected = new CompoundTag();
+            selected.putString("Id", "none");
+        }
+        if (selected == null && pending.isEmpty()) {
             return;
         }
-        switch (rewardId) {
-            case "progress" -> grantProgress(player, selected.getInt("Percent"));
-            case "spell" -> grantSpell(player, selected.getString("Spell"));
-            case "materials", "materials_bonus" ->
-                    grantMaterials(player, selected.getInt("Bundle"));
-            case "blessing" -> grantBlessing(player);
-            default -> {
+        if (pending.isEmpty()) {
+            CompoundTag previous = life.copy();
+            pending.putString("RewardId", selected.getString("Id"));
+            pending.put("Selected", selected.copy());
+            CompoundTag preview = inheritancePreview(player, life, selected);
+            if ("none".equals(preview.getString("Kind")) && !"none".equals(rewardId)) return;
+            pending.put("Receipt", preview);
+            life.putUUID("ClaimId", UUID.randomUUID());
+            life.put("PendingInheritance", pending);
+            life.putString("ClaimTransaction", "pending");
+            save(player, life);
+            if (!LifeInheritanceDelivery.checkpoint(player)) {
+                save(player, previous);
+                player.displayClientMessage(Component.translatable("life.expansion.inherit.save_failed"), false);
                 return;
             }
         }
+        // Retrying any visible claim cannot change a reserved choice or reroll its receipt.
+        CompoundTag receipt = pending.getCompound("Receipt").copy();
+        CompoundTag beforeDelivery = player.saveWithoutId(new CompoundTag());
+        if (!deliverReceipt(player, receipt)) {
+            player.displayClientMessage(Component.translatable("life.expansion.inherit.space"), false);
+            return;
+        }
+        life.put("InheritanceReceipt", receipt);
         life.putBoolean("RewardClaimed", true);
-        com.example.immortal_cultivation_mod.guidance.DaoGuidanceObservations.record(player, "life_finished");
+        life.putString("ClaimTransaction", "delivered");
+        life.remove("PendingInheritance");
         life.putBoolean("Active", false);
         save(player, life);
-    }
-
-    private static void grantProgress(ServerPlayer player, int percent) {
-        var data = ModAttachments.getData(player);
-        long required = Math.max(1L,
-                CultivationLevels.getTotalQiNeeded(data.cultivationLevel()));
-        long gain = Math.max(1L, required * Mth.clamp(percent, 2, 8) / 100L);
-        long updatedProgress = Math.min(
-                required, data.cultivationProgress() + gain);
-        if (updatedProgress <= data.cultivationProgress()) {
-            grantMaterials(player, 1);
-            return;
-        }
-        ModAttachments.setData(
-                player, data.withCultivationProgress(updatedProgress));
-        ServerEvents.syncPlayerData(player);
-        player.displayClientMessage(
-                Component.translatable(
-                        "message.immortal_cultivation_mod.life.inheritance.progress",
-                        updatedProgress - data.cultivationProgress()),
-                false);
-    }
-
-    private static void grantSpell(ServerPlayer player, String spellId) {
-        ModSpells.SpellDef spell = ModSpells.get(spellId);
-        if (spell == null) {
-            grantMaterials(player, 2);
-            return;
-        }
-        var data = ModAttachments.getData(player);
-        if (data.knownSpells().contains(spellId)) {
-            int previous = data.spellProficiency(spellId);
-            var updated = data.withAddedSpellProficiency(
-                    spellId, INHERITED_SPELL_PROFICIENCY);
-            ModAttachments.setData(player, updated);
+        if (!LifeInheritanceDelivery.checkpoint(player)) {
+            player.load(beforeDelivery);
             ServerEvents.syncPlayerData(player);
-            player.displayClientMessage(
-                    Component.translatable(
-                            "message.immortal_cultivation_mod.life.inheritance.proficiency",
-                            spell.name(),
-                            updated.spellProficiency(spellId) - previous),
-                    false);
+            player.displayClientMessage(Component.translatable("life.expansion.inherit.save_failed"), false);
             return;
         }
-        ArrayList<String> known = new ArrayList<>(data.knownSpells());
-        known.add(spellId);
-        ModAttachments.setData(player, data.withKnownSpells(List.copyOf(known)));
+        player.getInventory().setChanged();
         ServerEvents.syncPlayerData(player);
-        player.displayClientMessage(
-                Component.translatable(
-                        "message.immortal_cultivation_mod.life.inheritance.spell",
-                        spell.name()),
-                false);
+        com.example.immortal_cultivation_mod.guidance.DaoGuidanceObservations.record(player, "life_finished");
     }
 
-    private static void grantMaterials(ServerPlayer player, int bundle) {
-        int realm = CultivationLevels.getRealmIndex(
-                ModAttachments.getData(player).cultivationLevel());
-        Item item;
-        int count;
-        if (realm >= 5) {
-            item = com.example.immortal_cultivation_mod.magicritual.item.ModItems
-                    .HIGH_SPIRIT_STONE.get();
-            count = 2 + bundle * 2;
-        } else if (realm >= 2) {
-            item = com.example.immortal_cultivation_mod.magicritual.item.ModItems
-                    .MEDIUM_SPIRIT_STONE.get();
-            count = 4 + bundle * 3;
-        } else {
-            item = com.example.immortal_cultivation_mod.magicritual.item.ModItems
-                    .SPIRIT_STONE.get();
-            count = 12 + bundle * 6;
+    private static boolean deliverReceipt(ServerPlayer player, CompoundTag receipt) {
+        var data = ModAttachments.getData(player);
+        switch (receipt.getString("Kind")) {
+            case "materials" -> {
+                var id = net.minecraft.resources.ResourceLocation.tryParse(receipt.getString("Item"));
+                var registry = net.minecraft.core.registries.BuiltInRegistries.ITEM;
+                int count = receipt.getInt("Count");
+                if (id == null || !registry.containsKey(id) || count < 1 || count > 4096) return false;
+                ItemStack reward = new ItemStack(registry.get(id), count);
+                int space = 0;
+                for (ItemStack stack : player.getInventory().items) {
+                    if (stack.isEmpty()) space += reward.getMaxStackSize();
+                    else if (ItemStack.isSameItemSameComponents(stack, reward)) space += Math.max(0, stack.getMaxStackSize() - stack.getCount());
+                }
+                if (space < count) return false;
+                int remaining = count;
+                for (ItemStack stack : player.getInventory().items) {
+                    if (remaining == 0) break;
+                    if (!stack.isEmpty() && ItemStack.isSameItemSameComponents(stack, reward)) {
+                        int amount = Math.min(remaining, Math.max(0, stack.getMaxStackSize() - stack.getCount()));
+                        stack.grow(amount); remaining -= amount;
+                    }
+                }
+                for (int slot = 0; remaining > 0 && slot < player.getInventory().items.size(); slot++) {
+                    if (player.getInventory().items.get(slot).isEmpty()) {
+                        int amount = Math.min(remaining, reward.getMaxStackSize());
+                        player.getInventory().items.set(slot, reward.copyWithCount(amount)); remaining -= amount;
+                    }
+                }
+            }
+            case "progress" -> {
+                long gain = receipt.getLong("Gain");
+                var carried = LifeSimulationInheritance.carry(data.cultivationLevel(), data.cultivationProgress(), gain);
+                if (gain <= 0 || carried.gained() != gain) return false;
+                int stages = Math.max(0, CultivationLevels.getStageIndex(carried.level()) - CultivationLevels.getStageIndex(data.cultivationLevel()));
+                ModAttachments.setData(player, data.withCultivationLevel(carried.level())
+                        .withCultivationProgress(carried.progress()).withAddedSkillPoints(stages * 10));
+            }
+            case "proficiency" -> {
+                String spell = receipt.getString("Spell");
+                int gain = receipt.getInt("Gain");
+                if (!data.knownSpells().contains(spell) || gain < 0
+                        || data.withAddedSpellProficiency(spell, gain).spellProficiency(spell) - data.spellProficiency(spell) != gain) return false;
+                ModAttachments.setData(player, data.withAddedSpellProficiency(spell, gain));
+            }
+            case "spell" -> {
+                String spell = receipt.getString("Spell");
+                if (ModSpells.get(spell) == null) return false;
+                ArrayList<String> known = new ArrayList<>(data.knownSpells());
+                if (!known.contains(spell)) known.add(spell);
+                ModAttachments.setData(player, data.withKnownSpells(List.copyOf(known)));
+            }
+            case "none" -> { /* A life with no eligible inheritance may still finish. */ }
+            case "blessing" -> player.getPersistentData().putLong("LifeSimulationBlessingUntil",
+                    player.serverLevel().getGameTime() + receipt.getInt("Minutes") * 1200L);
+            default -> { return false; }
         }
-        ItemStack stack = new ItemStack(item, count);
-        Component itemName = stack.getHoverName().copy();
-        if (!player.getInventory().add(stack)) {
-            player.drop(stack, false);
-        }
-        player.displayClientMessage(
-                Component.translatable(
-                        "message.immortal_cultivation_mod.life.inheritance.materials",
-                        itemName,
-                        count),
-                false);
+        return true;
     }
 
-    private static void grantBlessing(ServerPlayer player) {
-        CompoundTag data = player.getPersistentData();
-        data.putLong(
-                "LifeSimulationBlessingUntil",
-                player.serverLevel().getGameTime() + 24_000L);
-        player.displayClientMessage(Component.translatable(
-                "message.immortal_cultivation_mod.life.blessing"), true);
+    /** Source quantities come from the simulated life; only the final real-world stage limits cultivation delivery. */
+    static CompoundTag inheritancePreview(ServerPlayer player, CompoundTag reward) {
+        return inheritancePreview(player, read(player), reward);
+    }
+
+    private static CompoundTag inheritancePreview(ServerPlayer player, CompoundTag life, CompoundTag reward) {
+        CompoundTag preview = new CompoundTag();
+        String id = reward.getString("Id");
+        preview.putString("Id", id);
+        preview.putString("Kind", "none");
+        preview.putString("Reason", switch (id) {
+            case "progress" -> "no_cultivation";
+            case "spell" -> "no_spell";
+            case "materials" -> "no_items";
+            default -> "empty";
+        });
+        if (!LifeSimulationInheritance.validSource(life, reward)) return preview;
+        var data = ModAttachments.getData(player);
+        switch (id) {
+            case "progress" -> {
+                long gain = LifeSimulationInheritance.progressGain(reward);
+                var carried = LifeSimulationInheritance.carry(data.cultivationLevel(), data.cultivationProgress(), gain);
+                long actual = carried.gained();
+                if (actual > 0L) {
+                    preview.putString("Kind", "progress");
+                    preview.putLong("Gain", actual);
+                    preview.putLong("SourceCultivation", reward.getLong("SourceCultivation"));
+                    preview.putString("DestinationLevel", carried.level());
+                    preview.putLong("DestinationProgress", carried.progress());
+                } else {
+                    if (gain > 0) preview.putString("Reason", "full_progress");
+                }
+            }
+            case "spell" -> {
+                String spell = reward.getString("Spell");
+                boolean known = data.knownSpells().contains(spell);
+                preview.putString("Kind", known ? "proficiency" : "spell");
+                preview.putString("Spell", spell);
+                preview.putInt("Gain", known ? (int)Math.max(0L, Math.min(INHERITED_SPELL_PROFICIENCY,
+                        (long)Integer.MAX_VALUE - data.spellProficiency(spell))) : 0);
+            }
+            case "materials" -> {
+                preview.putString("Kind", "materials");
+                preview.putString("Item", reward.getString("Item"));
+                preview.putInt("Count", reward.getInt("Count"));
+            }
+            case "blessing" -> {
+                preview.putString("Kind", "blessing");
+                preview.putInt("Minutes", 20);
+            }
+            default -> { }
+        }
+        return preview;
     }
 
     private static void buyUpgrade(ServerPlayer player, String id) {
@@ -1635,6 +1913,10 @@ public final class LifeSimulationSystem {
             return;
         }
         String effect = rawEffect.trim();
+        if (effect.startsWith("story_loot:")) {
+            LifeStoryLoot.grant(life, effect.substring("story_loot:".length()));
+            return;
+        }
         if (LifeSimulationWorldMap.applyEventEffect(life, effect)) {
             return;
         }
@@ -1765,7 +2047,7 @@ public final class LifeSimulationSystem {
                 life.getInt("Age") + random.nextInt(-2, 3),
                 45,
                 random.nextBoolean() ? "cheerful" : "steady",
-                "traveler"));
+                "traveler", gender));
         life.put(RELATIONSHIPS, relationships);
     }
 
@@ -1780,7 +2062,7 @@ public final class LifeSimulationSystem {
                 Math.max(8, life.getInt("Age") + random.nextInt(-4, 8)),
                 38,
                 "mysterious",
-                "cultivator"));
+                "cultivator", "male"));
         life.put(RELATIONSHIPS, relationships);
     }
 
@@ -1788,7 +2070,8 @@ public final class LifeSimulationSystem {
         ListTag relationships = life.getList(RELATIONSHIPS, Tag.TAG_COMPOUND);
         for (int i = 0; i < relationships.size(); i++) {
             CompoundTag person = relationships.getCompound(i);
-            if (person.getBoolean("Alive")) {
+            if (person.getBoolean("Alive") && !person.getBoolean("Captive")
+                    && (!person.contains("Observed") || person.getBoolean("Observed"))) {
                 person.putInt("Affinity", Mth.clamp(
                         person.getInt("Affinity") + amount, -100, 100));
             }
@@ -1866,8 +2149,7 @@ public final class LifeSimulationSystem {
             return;
         }
         long required = cultivationRequired(life.getInt("Realm"));
-        long magnitude = Math.max(1L,
-                required * Math.abs((long) basisPoints) / 10_000L);
+        long magnitude = Math.max(1L, (long) (LifeSimulationBalance.gain(life, 1) * Math.abs((long) basisPoints) / 650.0));
         long delta = basisPoints < 0 ? -magnitude : magnitude;
         life.putLong(
                 "CultivationProgress",
@@ -1930,6 +2212,12 @@ public final class LifeSimulationSystem {
     }
 
     private static void normalizeLifeState(CompoundTag life) {
+        LifeSimulationBalance.normalize(life);
+        LifeSimulationSprites.normalize(life);
+        LifeCardBattle.migrateSpellDeck(life);
+        CompoundTag savedBattle=life.getCompound("Battle");
+        if(!savedBattle.isEmpty()&&!savedBattle.getBoolean("LegacyCompatibility")&&!LifeCardBattle.enabled(savedBattle)&&!LifeSimulationBattle.pending(savedBattle)
+                &&savedBattle.getString("Result").isBlank())LifeCardBattle.initialize(life);
         if (!life.contains(SIMULATION_INVENTORY, Tag.TAG_LIST)) {
             life.put(SIMULATION_INVENTORY, new ListTag());
         }
@@ -1952,6 +2240,9 @@ public final class LifeSimulationSystem {
                     Math.min(required, required * legacy / 10_000L));
             life.putBoolean("UsesExactProgress", true);
         }
+        if (life.getInt("Realm") == 0 || "none".equals(life.getString("SpiritualRoot"))) {
+            life.put(DISCOVERED_SPELLS, new ListTag());
+        }
         if (life.getInt("Realm") > 0 && life.getString(ACTIVE_METHOD).isBlank()) {
             learnMethod(life, CultivationMethods.BASIC_BREATHING);
             discoverCoreSpells(life, life.getInt("Realm"));
@@ -1959,6 +2250,7 @@ public final class LifeSimulationSystem {
         if (life.getBoolean("Active")) {
             LifeSimulationWorldMap.normalize(life);
         }
+        LifeSimulationInheritance.normalize(life);
     }
 
     private static boolean canAdvance(CompoundTag life) {
@@ -1966,6 +2258,8 @@ public final class LifeSimulationSystem {
                 && life.getBoolean("Alive")
                 && !life.getBoolean("Finished")
                 && !life.contains(CURRENT_EVENT, Tag.TAG_COMPOUND)
+                && !LifeSimulationBattle.active(life)
+                && !life.contains("Story", Tag.TAG_COMPOUND)
                 && !LifeSimulationWorldMap.blocksYearAdvance(life);
     }
 
@@ -1981,8 +2275,21 @@ public final class LifeSimulationSystem {
     }
 
     private static CompoundTag read(ServerPlayer player) {
-        CompoundTag life = OuterSystemData.read(player).getCompound(ROOT).copy();
+        CompoundTag stored = OuterSystemData.read(player).getCompound(ROOT).copy();
+        CompoundTag life = stored.copy();
+        LifeSimulationStories.normalizeCastGenders(life, player.server.getResourceManager());
         normalizeLifeState(life);
+        LifeSimulationStories.upgradePendingDefinition(life, player.server.getResourceManager());
+        if (!stored.getString("Name").isBlank() && !stored.equals(life)) {
+            // Legacy NPC identities and pending-story revisions must be stable between
+            // the client snapshot and its subsequent UUID action. Retain fresh outer
+            // fields, and do not overwrite a life changed by a reentrant observer.
+            CompoundTag outer = OuterSystemData.read(player);
+            if (outer.getCompound(ROOT).equals(stored)) {
+                outer.put(ROOT, life);
+                OuterSystemData.save(player, outer);
+            }
+        }
         return life;
     }
 
@@ -2028,14 +2335,6 @@ public final class LifeSimulationSystem {
         entry.putString("Key", translationKey);
         history.add(entry);
         while (history.size() > MAX_HISTORY) {
-            history.remove(0);
-        }
-        life.put(HISTORY, history);
-    }
-
-    private static void trimHistory(CompoundTag life, int maximum) {
-        ListTag history = life.getList(HISTORY, Tag.TAG_COMPOUND).copy();
-        while (history.size() > maximum) {
             history.remove(0);
         }
         life.put(HISTORY, history);

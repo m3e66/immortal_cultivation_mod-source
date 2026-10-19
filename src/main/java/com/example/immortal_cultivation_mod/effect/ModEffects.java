@@ -23,6 +23,9 @@ public class ModEffects {
     public static final DeferredHolder<MobEffect, MobEffect> QI_GATHERING =
             MOB_EFFECTS.register("qi_gathering", QiGatheringEffect::new);
 
+    public static final DeferredHolder<MobEffect, MobEffect> HUTI_QI =
+            MOB_EFFECTS.register("huti_qi", () -> new MobEffect(net.minecraft.world.effect.MobEffectCategory.BENEFICIAL, 0xBFEFFF) {});
+
     public static final DeferredHolder<MobEffect, MobEffect> WIND_STEP =
             MOB_EFFECTS.register("wind_step", WindStepEffect::new);
 
@@ -73,6 +76,9 @@ public class ModEffects {
 
     public static final DeferredHolder<MobEffect, MobEffect> TECHNIQUE_SLOW =
             MOB_EFFECTS.register("technique_slow", TechniqueSlowEffect::new);
+
+    public static final DeferredHolder<MobEffect, MobEffect> BONE_BELL =
+            MOB_EFFECTS.register("bone_bell", BoneBellEffect::new);
 
     public static final DeferredHolder<MobEffect, MobEffect> MULING_SHENGXI =
             MOB_EFFECTS.register("muling_shengxi", () -> new CultivationHealingEffect(

@@ -1,0 +1,23 @@
+{
+  "name": "Crimson Copper Essence",
+  "icon": "immortal_cultivation_mod:chitong_sui",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Crimson Copper Essence",
+      "text": "$(bold)Starting height: $()Y −32 to 64$(br2)$(bold)Attempt frequency: $()1/24 chunks"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Crimson Copper Essence is formed within scorching earth veins, refined by centuries of subterranean heat. Its crimson surface conceals a faint golden glow, carrying the essence of fire and metal. Small deposits can be discovered across red wastelands and the volcanic regions of the Nether."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Search all badlands variants, Nether wastes, and basalt deltas, usually around Y −32 to 64."
+    }
+  ]
+}

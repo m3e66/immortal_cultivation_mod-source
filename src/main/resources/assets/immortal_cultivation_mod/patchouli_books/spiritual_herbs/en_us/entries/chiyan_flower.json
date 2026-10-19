@@ -1,0 +1,23 @@
+{
+  "name": "Crimson Flame Flower",
+  "icon": "immortal_cultivation_mod:chiyan_flower",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Crimson Flame Flower",
+      "text": "$(bold)Spawn attempt frequency: $()1/5"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "The Crimson Flame Flower thrives in scorched landscapes infused with fire energy. Its brilliant red petals resemble tongues of flame, while its center holds concentrated warmth. It flourishes in deserts and volcanic regions, where other plants struggle to survive."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "All badlands variants, deserts, Nether wastes, and basalt deltas."
+    }
+  ]
+}

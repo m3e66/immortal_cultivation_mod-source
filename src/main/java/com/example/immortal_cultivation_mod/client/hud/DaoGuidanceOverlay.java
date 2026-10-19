@@ -1,5 +1,7 @@
 package com.example.immortal_cultivation_mod.client.hud;
 
+import com.example.immortal_cultivation_mod.client.hud.HudLayout;
+import com.example.immortal_cultivation_mod.config.HudElement;
 import com.example.immortal_cultivation_mod.client.DaoGuidanceClient;
 import com.example.immortal_cultivation_mod.client.ModKeyMappings;
 import com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent;
@@ -40,6 +42,8 @@ public final class DaoGuidanceOverlay implements LayeredDraw.Layer {
             int y = 34;
             boolean caveObjective = "find_enlightenment_pill".equals(objective.action());
             int height = objective.target() <= 1 && !caveObjective ? 49 : 61;
+            var position = HudLayout.place(graphics, HudElement.GUIDANCE, x, y, 224, height);
+            x = position.x(); y = position.y();
             graphics.fill(x, y, x + 224, y + height, -1609032165);
             graphics.renderOutline(x, y, 224, height, -1147438013);
             Component title = Component.translatable("hud.immortal_cultivation_mod.dao_guidance.title", new Object[]{Component.translatable(DaoGuidanceContent.chapterKey(tracked, "name"))});
@@ -85,6 +89,8 @@ public final class DaoGuidanceOverlay implements LayeredDraw.Layer {
             String chapterId = DaoGuidanceClient.noticeId();
             int centerX = graphics.guiWidth() / 2;
             int y = Math.max(48, graphics.guiHeight() / 4);
+            var position = HudLayout.place(graphics, HudElement.GUIDANCE_COMPLETE, centerX - 154, y - 9, 308, 53);
+            centerX = position.x() + 154; y = position.y() + 9;
             graphics.fill(centerX - 154, y - 9, centerX + 154, y + 44, alpha << 24 | 1515545);
             Component heading = Component.translatable("hud.immortal_cultivation_mod.dao_guidance.complete");
             graphics.drawCenteredString(minecraft.font, heading, centerX, y, alpha << 24 | 16046469);
@@ -101,12 +107,19 @@ public final class DaoGuidanceOverlay implements LayeredDraw.Layer {
             String var10000 = "hint".equals(kind) ? "hint." : "unlock.";
             String messageKey = "guidance.immortal_cultivation_mod." + var10000 + id;
             Component message = "hint".equals(kind) && "qi_insufficient".equals(id) ? Component.translatable(messageKey, new Object[]{((KeyMapping)ModKeyMappings.OPEN_DAO_GUIDANCE.get()).getTranslatedKeyMessage()}) : Component.translatable(messageKey);
+            // Unlocks share one translated template. New chapters only need their own name.
+            if (!"hint".equals(kind)) {
+               message = Component.translatable("guidance.immortal_cultivation_mod.unlock_chapter",
+                     Component.translatable(DaoGuidanceContent.chapterKey(id, "name")));
+            }
             int width = Math.min(300, minecraft.font.width(message) + 24);
             int x = (graphics.guiWidth() - width) / 2;
             int y = graphics.guiHeight() - 78;
+            var position = HudLayout.place(graphics, HudElement.GUIDANCE_NOTICE, x, y, width, 27);
+            x = position.x(); y = position.y();
             graphics.fill(x, y, x + width, y + 27, alpha << 24 | 1515545);
             graphics.renderOutline(x, y, width, 27, alpha << 24 | 10189891);
-            graphics.drawCenteredString(minecraft.font, message, graphics.guiWidth() / 2, y + 9, alpha << 24 | 15854816);
+            graphics.drawCenteredString(minecraft.font, message, x + width / 2, y + 9, alpha << 24 | 15854816);
          }
       }
    }

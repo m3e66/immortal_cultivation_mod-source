@@ -161,14 +161,19 @@ public final class LuckSystem {
         fate.remove("Alchemy");
         UtilityTalismanItem.copyLuckWard(event.getOriginal(), event.getEntity());
     }
+    /** Players can finish mobs regardless of Luck; player victims retain combat rescue. */
+    public static boolean rescueMatchupAllowed(LivingEntity victim, LivingEntity attacker) {
+        return victim != attacker && hasLuck(victim) && hasLuck(attacker)
+                && (!(attacker instanceof Player) || victim instanceof Player);
+    }
+
     // Equipment and revival effects get the first chance; Luck is the fallback.
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void miracle(LivingDeathEvent event) {
         LivingEntity victim = event.getEntity();
         if (event.isCanceled() || !(victim.level() instanceof ServerLevel level)
-                || !hasLuck(victim)
                 || !(event.getSource().getEntity() instanceof LivingEntity attacker)
-                || !hasLuck(attacker) || attacker == victim) return;
+                || !rescueMatchupAllowed(victim, attacker)) return;
         int victimLuck = luck(victim), attackerLuck = luck(attacker);
         if (!LuckRules.rescueEligible(victimLuck, attackerLuck)) {
             DebugEyeDiagnostics.note(victim, "rescue_blocked", victimLuck, attackerLuck);

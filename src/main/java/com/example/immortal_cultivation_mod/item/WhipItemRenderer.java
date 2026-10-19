@@ -37,7 +37,7 @@ public class WhipItemRenderer extends GeoItemRenderer<WhipItem> {
     private boolean icon;
     private static final class Motion {
         WhipRope rope=new WhipRope();long itemId=Long.MAX_VALUE;int slot=-1;AnimationProcessor.QueuedAnimation animation;
-        double strike=-100,lastSeen,deployment,releaseFrom;
+        double strike=-100,lastSeen;
         long collisionTick=Long.MIN_VALUE;
         WhipRope.Contact contacts=WhipRope.AIR;
     }
@@ -63,7 +63,7 @@ public class WhipItemRenderer extends GeoItemRenderer<WhipItem> {
             // Durability/Qi updates replace client ItemStacks. Keep momentum for the same item ID.
             if(differentItem || motion.slot!=slot || time-motion.lastSeen>.25){
                 motion.rope=new WhipRope();motion.collisionTick=Long.MIN_VALUE;
-                motion.strike=-100;motion.deployment=0;motion.releaseFrom=0;motion.animation=null;
+                motion.strike=-100;motion.animation=null;
             }
             motion.itemId=id;motion.slot=slot;motion.lastSeen=time;
         }
@@ -91,11 +91,10 @@ public class WhipItemRenderer extends GeoItemRenderer<WhipItem> {
             // not the trigger edge, or that first transition would swallow the handle flick.
             if(animation!=motion.animation && animation!=null
                     && animation.animation().name().equals("animation.whip.attack")) {
-                motion.releaseFrom=motion.deployment;motion.strike=time;
+                motion.strike=time;
             }
             motion.animation=animation;
             double t=time-motion.strike;
-            motion.deployment=WhipHeldPose.deployment(t,motion.releaseFrom);
             float swing=t<0 || t>.65?0:t<.12?(float)-Math.sin(t/.12*Math.PI/2):t<.25?
                     (float)(-1+2.15*smooth((t-.12)/.13)):(float)(1.15*Math.exp(-(t-.25)*10)*Math.cos((t-.25)*12));
             float x=bone.getRotX(),z=bone.getRotZ();
@@ -120,29 +119,31 @@ public class WhipItemRenderer extends GeoItemRenderer<WhipItem> {
                         authored.add(new Vec3(part.getPivotX()/16D,part.getPivotY()/16D,part.getPivotZ()/16D));
                     localCoil=WhipHeldPose.coil(authored);coilBone=bone;
                 }
-                Vec3[] coil=new Vec3[WhipRope.SEGMENTS+1];
-                for(int i=0;i<coil.length;i++) {
-                    Vec3 p=localCoil[i];
-                    Vector3f transformed=pose.last().pose().transformPosition(new Vector3f((float)p.x,(float)p.y,(float)p.z));
-                    coil[i]=new Vec3(transformed.x,transformed.y,transformed.z).add(camera);
-                }
                 Vector3f axis=pose.last().pose().transformDirection(new Vector3f(0,1,0)).normalize();
                 Vec3 direction=new Vec3(axis.x,axis.y,axis.z);
-                boolean stored=motion.deployment<=0;
-                if(stored || !motion.rope.initialized())motion.rope.hold(time,coil);
-                if(!stored && motion.collisionTick!=world.getGameTime()) {
+                if(!motion.rope.initialized()) {
+                    Vec3[] coil=new Vec3[WhipRope.SEGMENTS+1];
+                    for(int i=0;i<coil.length;i++) {
+                        Vec3 p=localCoil[i];
+                        Vector3f transformed=pose.last().pose().transformPosition(new Vector3f((float)p.x,(float)p.y,(float)p.z));
+                        coil[i]=new Vec3(transformed.x,transformed.y,transformed.z).add(camera);
+                    }
+                    // Seed once on equip; gravity and collisions stay active even without an attack.
+                    motion.rope.hold(time,coil);
+                }
+                if(motion.collisionTick!=world.getGameTime()) {
                     AABB bounds=new AABB(anchor,anchor).inflate(.6);
                     if(motion.rope.initialized())for(int i=0;i<=WhipRope.SEGMENTS;i++)bounds=bounds.minmax(new AABB(motion.rope.point(i),motion.rope.predictedPoint(i)).inflate(.6));
                     var boxes=new ArrayList<AABB>();
                     for(var shape:world.getBlockCollisions(holder,bounds))boxes.addAll(shape.toAabbs());
                     motion.contacts=new WhipContacts(boxes);motion.collisionTick=world.getGameTime();
                 }
-                if(!stored)motion.rope.advance(time,anchor,direction,motion.contacts);
+                motion.rope.advance(time,anchor,direction,motion.contacts);
                 Vec3 shift=anchor.subtract(motion.rope.point(0));
-                Vec3[] displayed=new Vec3[coil.length];
-                for(int i=0;i<displayed.length;i++)displayed[i]=coil[i].lerp(
-                        motion.rope.point(i).add(shift.scale(Math.exp(-i*.7))),motion.deployment);
+                Vec3[] displayed=new Vec3[WhipRope.SEGMENTS+1];
+                for(int i=0;i<displayed.length;i++)displayed[i]=motion.rope.point(i).add(shift.scale(Math.exp(-i*.7)));
                 WhipMesh.render(motion.rope,displayed,camera,new PoseStack(),buffer,light,overlay,color);
+                com.example.immortal_cultivation_mod.client.qi.QiCoatingRenderer.physicsWhip(holder,displayed,camera,source,time);
                 return;
             }
         }

@@ -6,7 +6,7 @@ import static com.example.immortal_cultivation_mod.alchemy.AlchemyChemistry.Elem
 import static com.example.immortal_cultivation_mod.alchemy.AlchemyChemistry.Trait.*;
 
 public final class AlchemyChemistry {
-    public enum Element { METAL, WOOD, WATER, FIRE, EARTH, THUNDER, ICE, WIND, LIGHT, DARK }
+    public enum Element { METAL, WOOD, WATER, FIRE, EARTH, THUNDER, ICE, WIND, YANG, YIN }
     public enum Trait { HARMONIZE, PURIFY, LOCK_QI, CATALYZE, KINDLE, CONDENSE_WATER }
     public enum Effect {
         HEALTH, QI, CULTIVATION, SENSE, ATTACK, DEFENSE, SPEED, DURATION,
@@ -45,12 +45,12 @@ public final class AlchemyChemistry {
         plant("shihun_grass", Map.of(METAL,50., WATER,40.), Map.of(SENSE,30., TOXICITY,20.),110,45);
         plant("jiuye_xianlan", Map.of(WOOD,90., WATER,50., EARTH,20.), Map.of(CULTIVATION,40., QI,100., STABILITY,25.),120,95,HARMONIZE,LOCK_QI);
         plant("jinwen_fruit", Map.of(METAL,60., WOOD,40.), Map.of(QI,25., CULTIVATION,10.),105,85,LOCK_QI);
-        plant("fugu_tai", Map.of(WOOD,45., EARTH,25., DARK,20.), Map.of(ATTACK,12., TOXICITY,25.),110,45,CATALYZE);
+        plant("fugu_tai", Map.of(WOOD,45., EARTH,25., YIN,20.), Map.of(ATTACK,12., TOXICITY,25.),110,45,CATALYZE);
         plant("huanxia_si", Map.of(WIND,45., WOOD,35., WATER,20.), Map.of(SENSE,20., DURATION,15., CLEAR_MIND,15.),100,80,HARMONIZE);
         plant("lingquan_leaf", Map.of(WATER,65., WOOD,30.), Map.of(QI,20.),100,90,PURIFY);
         plant("ningling_flower", Map.of(WOOD,55., WATER,35.), Map.of(QI_MULTIPLIER,25.),100,90);
         plant("harmonizing_herb", Map.of(EARTH,40., WOOD,20.), Map.of(STABILITY,30., DETOX,30.),100,95,HARMONIZE);
-        plant("catalyst_blossom", Map.of(WIND,35., LIGHT,25.), Map.of(DURATION,10.),100,75,CATALYZE);
+        plant("catalyst_blossom", Map.of(WIND,35., YANG,25.), Map.of(DURATION,10.),100,75,CATALYZE);
         formula("qingling", Map.of("qingling_grass",2,"ninglu_zhi",1),Map.of(QI,new Dose(3,200),CULTIVATION,new Dose(.1,0)),5,0);
         formula("huichun", Map.of("ninglu_zhi",2,"ziyun_vine",1),Map.of(HEALTH,new Dose(6,120)),5,0);
         formula("chiyan", Map.of("chiyan_flower",2,"qingling_grass",1),Map.of(FIRE_DAMAGE,new Dose(5,1200),COLD_RESIST,new Dose(2,1200)),5,5);
@@ -67,6 +67,7 @@ public final class AlchemyChemistry {
         formula("tiegu", Map.of("ziyun_vine",2,"xuanbing_lotus",1),Map.of(IRON_BONES,new Dose(100,900)),5,0);
         formula("bixie", Map.of("shihun_grass",2,"qingling_grass",1),Map.of(WITHER_SHIELD,new Dose(100,1200)),5,15,50);
         formula("ningqi", Map.of("qingling_grass",2,"xuanbing_lotus",1,"ninglu_zhi",1),Map.of(NEXT_QI_SPELL,new Dose(10,1200)),5,0);
+        formula("qingdu", Map.of("harmonizing_herb",3,"lingquan_leaf",2,"xuanbing_lotus",1),Map.of(DETOX,new Dose(100,0)),5,50,100);
     }
     private static void plant(String id, Map<Element,Double> elements, Map<Effect,Double> effects,
                               double strength, double stability, Trait... traits) {
@@ -147,7 +148,7 @@ public final class AlchemyChemistry {
         return new Batch(formula.id,formula.yield,elements,effects,round(stability),round(conflict),quality,failed);
     }
     public static double conflict(Map<Element,Double> e) {
-        return opposing(e,WATER,FIRE)+opposing(e,ICE,FIRE)+opposing(e,LIGHT,DARK)
+        return opposing(e,WATER,FIRE)+opposing(e,ICE,FIRE)+opposing(e,YANG,YIN)
                 +.45*opposing(e,METAL,WOOD)+.45*opposing(e,EARTH,WATER)+.4*opposing(e,THUNDER,EARTH);
     }
     public static double compatible(Map<Element,Double> e) {

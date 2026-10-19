@@ -1,0 +1,18 @@
+{
+  "name": "破障丹",
+  "icon": "immortal_cultivation_mod:pozhang_pill",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "破障丹药力锋锐，能将一时气血之势汇于下一击。服丹之后，若以近身兵刃命中敌身，可令此击威力骤增。然药力仅供一击，三十息后便自行消散。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹效",
+      "text": "三十息内，下一次成功命中的近战攻击额外造成百分之二十五伤害。"
+    }
+  ]
+}

@@ -60,11 +60,12 @@ public final class HigherWeaponCombat {
     }
     static boolean boss(LivingEntity target) {
         var id=net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(target.getType());
-        return target instanceof EnderDragon || target instanceof WitherBoss
+        return target instanceof com.example.immortal_cultivation_mod.entity.VaultGuardianEntity guardian && guardian.beastRealm() >= 3
+                || target instanceof EnderDragon || target instanceof WitherBoss
                 || target.getType().is(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE,
                         net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("c","bosses")))
                 || id.getNamespace().equals("immortal_cultivation_mod") && Set.of("blood_ape_demon_general",
-                        "jindan_vault_guardian","crimson_sky_flame_flood_dragon").contains(id.getPath());
+                        "crimson_sky_flame_flood_dragon").contains(id.getPath());
     }
     private static boolean visible(ServerPlayer player,LivingEntity target) {
         return player.hasLineOfSight(target);
@@ -109,7 +110,7 @@ public final class HigherWeaponCombat {
         if(target instanceof Mob mob)mob.getNavigation().stop();
         return true;
     }
-    private static void clearControl(LivingEntity target) {
+    public static void clearControl(LivingEntity target) {
         CONTROLS.remove(target);modifier(target,Attributes.MOVEMENT_SPEED,"higher_weapon_control",0);
         SilkBind silk=SILK_BINDS.remove(target);
         if(silk!=null)finishSilkBinding(silk);
@@ -130,6 +131,7 @@ public final class HigherWeaponCombat {
         }
     }
     public static void cast(ServerPlayer p,ItemStack stack,HigherWeaponItem item,boolean charged) {
+        if(!WeaponBinding.checkUse(stack,p))return;
         var spec=item.spec;LivingEntity target;
         WeaponSkillAttack attack=WeaponSkillAttack.capture(stack);
         switch(spec) {

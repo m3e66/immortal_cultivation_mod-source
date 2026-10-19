@@ -221,7 +221,7 @@ public final class SolarTechniques {
         player.getPersistentData().putBoolean(DariBatiJue.LEAP_AIRBORNE, false);
         player.getPersistentData().putFloat(DariBatiJue.LEAP_CHARGE, charge);
         emitRing(player.serverLevel(), player.position().add(0.0D, 0.12D, 0.0D),
-                1.25D, 30, ModParticles.METHOD_QI_LIGHT.get());
+                1.25D, 30, ModParticles.METHOD_QI_YANG.get());
         player.serverLevel().playSound(null, player.blockPosition(), SoundEvents.TRIDENT_RIPTIDE_2.value(),
                 SoundSource.PLAYERS, 1.0F, 1.45F);
         return true;
@@ -274,7 +274,7 @@ public final class SolarTechniques {
         Vec3 center = player.getEyePosition().add(player.getLookAngle().scale(0.70D)).add(0.0D, 0.48D, 0.0D);
         if (player.tickCount % 2 == 0) {
             emitSphere(level, center, 0.42D + solar / 260.0D,
-                    ModParticles.METHOD_QI_LIGHT.get(), GOLD, player.tickCount * 0.08D);
+                    ModParticles.METHOD_QI_YANG.get(), GOLD, player.tickCount * 0.08D);
         }
         level.sendParticles(ParticleTypes.FLAME, center.x, center.y, center.z,
                 3, 0.20D, 0.20D, 0.20D, 0.01D);
@@ -310,7 +310,7 @@ public final class SolarTechniques {
         if (projectile.tickCount % 2 != 0) return;
         Vec3 center = projectile.position();
         emitSphere(level, center, SpellCharge.isFull(projectile.chargeScale()) ? 1.15D : 0.82D,
-                ModParticles.METHOD_QI_LIGHT.get(), GOLD, projectile.tickCount * 0.13D);
+                ModParticles.METHOD_QI_YANG.get(), GOLD, projectile.tickCount * 0.13D);
         level.sendParticles(ParticleTypes.FLAME, center.x, center.y, center.z,
                 5, 0.24D, 0.24D, 0.24D, 0.02D);
     }
@@ -332,7 +332,7 @@ public final class SolarTechniques {
         for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class,
                 new AABB(impact, impact).inflate(radius),
                 living -> living != caster && NpcProfile.isCombatEnemy(caster, living))) {
-            if (target.hurt(caster.damageSources().indirectMagic(caster, caster), damage)) {
+            if (target.hurt(com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.spellSource(caster.damageSources().indirectMagic(caster, caster), ModSpells.RILUN), damage)) {
                 target.igniteForSeconds(4.0F + solar / 25.0F);
                 Vec3 away = target.position().subtract(impact);
                 target.knockback(0.55D + solar / 150.0D, -away.x, -away.z);
@@ -340,7 +340,7 @@ public final class SolarTechniques {
         }
         SpellImpactParticles.fireExplosion(level, impact, radius);
         emitRing(level, impact.add(0.0D, 0.12D, 0.0D), radius, 80,
-                ModParticles.METHOD_QI_LIGHT.get());
+                ModParticles.METHOD_QI_YANG.get());
         meltSnowAndIce(level, caster, BlockPos.containing(impact), (int) Math.ceil(radius));
         level.playSound(null, BlockPos.containing(impact), SoundEvents.GENERIC_EXPLODE.value(),
                 caster instanceof ServerPlayer ? SoundSource.PLAYERS : SoundSource.HOSTILE,
@@ -358,6 +358,10 @@ public final class SolarTechniques {
     }
 
     public static float solarPowerFor(LivingEntity caster) {
+        if(caster instanceof net.minecraft.world.entity.PathfinderMob mob&&mob instanceof com.example.immortal_cultivation_mod.entity.CultivationNpc) {
+            var profile=mob.getPersistentData().getCompound("ImmortalCultivationNpc");
+            if(profile.contains("SolarPower"))return Mth.clamp(profile.getFloat("SolarPower"),0,100);
+        }
         return caster instanceof ServerPlayer player
                 ? Mth.clamp(
                         CultivationMethods.solarPower(
@@ -445,7 +449,7 @@ public final class SolarTechniques {
                     center,
                     radius,
                     WHITE_GOLD,
-                    ModParticles.METHOD_QI_LIGHT.get(),
+                    ModParticles.METHOD_QI_YANG.get(),
                     projectile.tickCount * 0.31D);
             emitSolarCore(
                     level,
@@ -540,7 +544,7 @@ public final class SolarTechniques {
             float falloff = Mth.lerp(
                     (float) (distance / RIYUN_RADIUS), 1.0F, 0.65F);
             if (!target.hurt(
-                    caster.damageSources().indirectMagic(caster, caster),
+                    com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.spellSource(caster.damageSources().indirectMagic(caster, caster), ModSpells.DARI_ZHEN),
                     damage * falloff)) {
                 continue;
             }
@@ -632,7 +636,7 @@ public final class SolarTechniques {
                 radial = radial.normalize();
             }
             target.hurt(
-                    caster.damageSources().indirectMagic(caster, caster),
+                    com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.spellSource(caster.damageSources().indirectMagic(caster, caster), ModSpells.DARI_ZHEN),
                     damage);
             target.setDeltaMovement(
                     target.getDeltaMovement().scale(0.2D)
@@ -701,7 +705,7 @@ public final class SolarTechniques {
                 continue;
             }
             target.hurt(
-                    caster.damageSources().indirectMagic(caster, caster),
+                    com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.spellSource(caster.damageSources().indirectMagic(caster, caster), ModSpells.DARI_ZHEN),
                     damage);
             target.igniteForSeconds(2.0F);
         }
@@ -743,7 +747,7 @@ public final class SolarTechniques {
                 0.035D);
         emitOrbitRing(
                 level,
-                ModParticles.METHOD_QI_LIGHT.get(),
+                ModParticles.METHOD_QI_YANG.get(),
                 center,
                 look,
                 radius * 1.25D,
@@ -893,7 +897,7 @@ public final class SolarTechniques {
                 1.15D,
                 0.18D);
         level.sendParticles(
-                ModParticles.METHOD_QI_LIGHT.get(),
+                ModParticles.METHOD_QI_YANG.get(),
                 center.x,
                 center.y + 0.35D,
                 center.z,
@@ -937,7 +941,7 @@ public final class SolarTechniques {
         SpellImpactParticles.shockRing(
                 level,
                 center.add(0.0D, 0.16D, 0.0D),
-                ModParticles.METHOD_QI_LIGHT.get(),
+                ModParticles.METHOD_QI_YANG.get(),
                 RIYUN_RADIUS,
                 SpellCharge.isFull(chargeScale) ? 120 : 96,
                 0.58D);
@@ -959,7 +963,7 @@ public final class SolarTechniques {
                     level,
                     ray % 3 == 0
                             ? WHITE_GOLD
-                            : ModParticles.METHOD_QI_LIGHT.get(),
+                            : ModParticles.METHOD_QI_YANG.get(),
                     source,
                     new Vec3(0.0D, 0.54D + ray % 5 * 0.10D, 0.0D));
         }
@@ -985,7 +989,7 @@ public final class SolarTechniques {
             directed(
                     level,
                     pointIndex % 4 == 0
-                            ? ModParticles.METHOD_QI_LIGHT.get()
+                            ? ModParticles.METHOD_QI_YANG.get()
                             : ModParticles.SOLAR_EMBER.get(),
                     source,
                     direction.scale(-(0.16D + age * 0.035D)));
@@ -1254,7 +1258,7 @@ public final class SolarTechniques {
                         (pointIndex + layerIndex) % 3 == 0
                                 ? WHITE_GOLD
                                 : (pointIndex + layerIndex) % 3 == 1
-                                        ? ModParticles.METHOD_QI_LIGHT.get()
+                                        ? ModParticles.METHOD_QI_YANG.get()
                                         : ModParticles.SOLAR_EMBER.get(),
                         point.x,
                         point.y,
@@ -1305,7 +1309,7 @@ public final class SolarTechniques {
                         Math.sin(angle) * distance);
                 level.sendParticles(
                         ray % 2 == 0
-                                ? ModParticles.METHOD_QI_LIGHT.get()
+                                ? ModParticles.METHOD_QI_YANG.get()
                                 : GOLD,
                         point.x,
                         point.y,
@@ -1444,7 +1448,7 @@ public final class SolarTechniques {
             double angle = Math.PI * 2.0D * i / points + rotation;
             Vec3 point = center.add(right.scale(Math.cos(angle) * radius))
                     .add(up.scale(Math.sin(angle) * radius));
-            level.sendParticles(i % 3 == 0 ? WHITE_GOLD : ModParticles.METHOD_QI_LIGHT.get(),
+            level.sendParticles(i % 3 == 0 ? WHITE_GOLD : ModParticles.METHOD_QI_YANG.get(),
                     point.x, point.y, point.z, 1, 0, 0, 0, 0);
         }
     }

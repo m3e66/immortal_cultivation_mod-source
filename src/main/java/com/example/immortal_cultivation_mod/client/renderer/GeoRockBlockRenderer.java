@@ -11,8 +11,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.world.item.ItemDisplayContext;
 import software.bernie.geckolib.cache.object.GeoBone;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -22,10 +20,10 @@ import net.minecraft.world.phys.AABB;
 import software.bernie.geckolib.renderer.GeoBlockRenderer;
 
 public class GeoRockBlockRenderer extends GeoBlockRenderer<GeoRockBlockEntity> {
-   private final ItemRenderer itemRenderer;
+   private final DingItemPileRenderer dingItems;
    public GeoRockBlockRenderer(BlockEntityRendererProvider.Context context) {
       super(new GeoRockModel());
-      itemRenderer = context.getItemRenderer();
+      dingItems = new DingItemPileRenderer(context.getItemRenderer());
    }
 
    @Override
@@ -47,10 +45,10 @@ public class GeoRockBlockRenderer extends GeoBlockRenderer<GeoRockBlockEntity> {
          poseStack.scale(scale, scale, scale);
          poseStack.translate(-0.5, 0, -0.5);
          super.render(animatable, partialTick, poseStack, bufferSource, packedLight, packedOverlay);
-         if (animatable instanceof DingBlockEntity ding && (!ding.hasLid() || ding.isLidOpen())) {
-            renderDingContents(ding, poseStack, bufferSource, packedLight, packedOverlay);
-         }
          poseStack.popPose();
+         if (animatable instanceof DingBlockEntity ding && (!ding.hasLid() || ding.isLidOpen())) {
+            dingItems.render(ding, poseStack, bufferSource, packedLight, packedOverlay);
+         }
          return;
       }
       if (usesModelKitCoordinates(animatable.modelName())) {
@@ -90,39 +88,6 @@ public class GeoRockBlockRenderer extends GeoBlockRenderer<GeoRockBlockEntity> {
       }
    }
 
-   private void renderDingContents(DingBlockEntity ding, PoseStack poseStack, MultiBufferSource buffer,
-           int light, int overlay) {
-      if (ding.getLevel() == null) return;
-      int count = 0;
-      for (int slot = 0; slot < DingBlockEntity.SLOT_COUNT; slot++) {
-         if (!ding.getDisplayItem(slot).isEmpty()) count++;
-      }
-      if (count == 0) return;
-      int columns = (int) Math.ceil(Math.sqrt(count));
-      int rows = (count + columns - 1) / columns;
-      double spacing = Math.min(.25, .54 / Math.max(1, columns - 1));
-      double floor = "cu_tie_xiaoding".equals(ding.modelName()) ? .48 : .69;
-      poseStack.pushPose();
-      poseStack.translate(.5, floor, .5);
-      poseStack.mulPose(Axis.YP.rotationDegrees(rotationDegrees(ding.getBlockState().getValue(DingBlock.FACING))));
-      int index = 0;
-      for (int slot = 0; slot < DingBlockEntity.SLOT_COUNT; slot++) {
-         var stack = ding.getDisplayItem(slot);
-         if (stack.isEmpty()) continue;
-         poseStack.pushPose();
-         poseStack.translate((index % columns - (columns - 1) / 2.0) * spacing,
-                 .015, (index / columns - (rows - 1) / 2.0) * spacing);
-         poseStack.mulPose(Axis.XP.rotationDegrees(-90));
-         float size = (float) Math.min(.22, spacing * .85);
-         poseStack.scale(size, size, size);
-         itemRenderer.renderStatic(stack, ItemDisplayContext.FIXED, light, overlay, poseStack, buffer,
-                 ding.getLevel(), (int) (ding.getBlockPos().asLong() + slot));
-         poseStack.popPose();
-         index++;
-      }
-      poseStack.popPose();
-   }
-
    protected Direction getFacing(GeoRockBlockEntity blockEntity) {
       if (blockEntity.getBlockState().getBlock() instanceof DingBlock) {
          return blockEntity.getBlockState().getValue(DingBlock.FACING);
@@ -137,8 +102,9 @@ public class GeoRockBlockRenderer extends GeoBlockRenderer<GeoRockBlockEntity> {
          double centerZ = (double)blockEntity.getBlockPos().getZ() + (double)0.5F;
          double minY = (double)blockEntity.getBlockPos().getY();
          if (blockEntity.getBlockState().getBlock() instanceof DingBlock) {
-            return new AABB(centerX - 1.3 * scale, minY, centerZ - 1.3 * scale,
+            AABB bounds = new AABB(centerX - 1.3 * scale, minY, centerZ - 1.3 * scale,
                     centerX + 1.3 * scale, minY + 2.5 * scale, centerZ + 1.3 * scale);
+            return bounds;
          }
          return new AABB(centerX - (double)scale, minY, centerZ - (double)scale, centerX + (double)scale, minY + (double)2.0F * (double)scale, centerZ + (double)scale);
       } else {

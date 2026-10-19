@@ -1,0 +1,23 @@
+{
+  "name": "流金沙",
+  "icon": "immortal_cultivation_mod:liujin_sand",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "流金沙",
+      "text": "$(bold)起始高度：$()Y 48 至 96$(br2)$(bold)尝试频率：$()1/10 区块"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《灵矿录》记载",
+      "text": "流金沙乃水土交汇、金气沉积之灵砂。其粒细若尘，色泽金黄，遇光时隐隐流辉。多聚于荒漠沙丘、江河浅滩与海岸沙地，常呈薄薄数层，散布于地表。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻脉",
+      "text": "沙漠、恶地、风蚀恶地、河流及海滩。多见于 Y 48 至 96，常成一至两层浅薄矿砂。"
+    }
+  ]
+}

@@ -108,14 +108,14 @@ final class UndeadAbilityVfx {
             Vec3 start = center.add(basis.right.scale(Math.cos(angle) * 0.58D))
                     .add(basis.up.scale(Math.sin(angle) * target.getBbHeight() * 0.34D));
             curvedDoubleStream(level, start, center, DIRTY_GREEN,
-                    ModParticles.METHOD_QI_DARK.get(), 7, 0.08D, 0.12D);
+                    ModParticles.METHOD_QI_YIN.get(), 7, 0.08D, 0.12D);
         }
     }
 
     static void pounceStart(ServerLevel level, LivingEntity caster) {
         Vec3 feet = caster.position().add(0.0D, 0.08D, 0.0D);
         Vec3 back = caster.getLookAngle().multiply(-1.0D, 0.0D, -1.0D).normalize();
-        inwardDisc(level, feet.add(back.scale(0.45D)), ModParticles.METHOD_QI_DARK.get(), 1.15D, 18);
+        inwardDisc(level, feet.add(back.scale(0.45D)), ModParticles.METHOD_QI_YIN.get(), 1.15D, 18);
         dragGroundLine(level, feet, feet.add(caster.getLookAngle().multiply(3.0D, 0.0D, 3.0D)), CORPSE_BLACK, 0.18D);
         level.sendParticles(ParticleTypes.LARGE_SMOKE, feet.x + back.x * 0.35D,
                 feet.y + 0.08D, feet.z + back.z * 0.35D, 12, 0.30D, 0.04D, 0.30D, 0.025D);
@@ -185,7 +185,7 @@ final class UndeadAbilityVfx {
             jaggedLine(level, start, end, slash % 2 == 0
                     ? ModParticles.METHOD_QI_BLOOD.get() : CORPSE_GREEN, 7, 0.07D);
         }
-        level.sendParticles(ModParticles.METHOD_QI_DARK.get(), hit.x, hit.y, hit.z,
+        level.sendParticles(ModParticles.METHOD_QI_YIN.get(), hit.x, hit.y, hit.z,
                 18, target.getBbWidth() * 0.32D, target.getBbHeight() * 0.24D,
                 target.getBbWidth() * 0.32D, 0.04D);
     }
@@ -249,7 +249,7 @@ final class UndeadAbilityVfx {
                 root.add(body.right.scale(-0.70D)).add(0.0D, h * 0.36D, 0.0D), 3);
         level.sendParticles(ParticleTypes.ASH, caster.getX(), caster.getY() + h * 0.58D,
                 caster.getZ(), 18, 0.42D, h * 0.34D, 0.42D, 0.012D);
-        level.sendParticles(ModParticles.METHOD_QI_DARK.get(), caster.getX(),
+        level.sendParticles(ModParticles.METHOD_QI_YIN.get(), caster.getX(),
                 caster.getY() + h * 0.52D, caster.getZ(), 10,
                 0.35D, h * 0.30D, 0.35D, 0.012D);
     }
@@ -321,7 +321,7 @@ final class UndeadAbilityVfx {
 
     static void bodyBurst(ServerLevel level, LivingEntity caster, double radius) {
         Vec3 center = caster.position().add(0.0D, caster.getBbHeight() * 0.48D, 0.0D);
-        sphere(level, center, radius, ModParticles.METHOD_QI_DARK.get(), 90, true);
+        sphere(level, center, radius, ModParticles.METHOD_QI_YIN.get(), 90, true);
         sphere(level, center, radius * 0.72D, CORPSE_GREEN, 56, true);
         radialBurst(level, center, ModParticles.BLACK_FLAME_ASH.get(), 48, 0.28D, 0.18D);
         level.sendParticles(ParticleTypes.LARGE_SMOKE, center.x, center.y, center.z,
@@ -570,7 +570,7 @@ final class UndeadAbilityVfx {
         Vec3 center = entity.position().add(0.0D, entity.getBbHeight() * 0.5D, 0.0D);
         level.sendParticles(ModParticles.BLACK_FLAME_ASH.get(), center.x, center.y, center.z,
                 28, 0.35D, entity.getBbHeight() * 0.40D, 0.35D, 0.04D);
-        radialBurst(level, center, ModParticles.METHOD_QI_DARK.get(), 18, 0.09D, 0.12D);
+        radialBurst(level, center, ModParticles.METHOD_QI_YIN.get(), 18, 0.09D, 0.12D);
     }
 
     static void hardenedShell(ServerLevel level, LivingEntity entity, boolean start) {
@@ -1191,7 +1191,7 @@ final class UndeadAbilityVfx {
         if (isDrought(ability)) {
             return ModParticles.METHOD_QI_FIRE.get();
         }
-        return ModParticles.METHOD_QI_DARK.get();
+        return ModParticles.METHOD_QI_YIN.get();
     }
 
     private static ParticleOptions accent(String ability) {

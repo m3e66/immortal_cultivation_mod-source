@@ -115,6 +115,7 @@ public class ModClientModBusEvents {
     public static void register(IEventBus eventBus) {
         eventBus.addListener(ModClientModBusEvents::registerGuiLayers);
         eventBus.addListener(ModClientModBusEvents::registerRenderers);
+        eventBus.addListener(BeastVfxGeometry::registerBuffers);
         eventBus.addListener(ModClientModBusEvents::registerParticleProviders);
         eventBus.addListener(ModClientModBusEvents::registerMenuScreens);
         eventBus.addListener(ModClientModBusEvents::onClientSetup);
@@ -129,12 +130,20 @@ public class ModClientModBusEvents {
     }
 
     public static void registerGuiLayers(RegisterGuiLayersEvent event) {
+        event.registerAbove(VanillaGuiLayers.CROSSHAIR,com.example.immortal_cultivation_mod.client.hud.ChargeReticleOverlay.HUD_ID,
+                com.example.immortal_cultivation_mod.client.hud.ChargeReticleOverlay.INSTANCE);
+        event.registerAboveAll(com.example.immortal_cultivation_mod.client.hud.CompassOverlay.HUD_ID,
+                com.example.immortal_cultivation_mod.client.hud.CompassOverlay.INSTANCE);
         event.registerAbove(VanillaGuiLayers.FOOD_LEVEL, QiBarOverlay.HUD_ID, QiBarOverlay.INSTANCE);
         event.registerAboveAll(
                 MysteriousRingDialogueOverlay.HUD_ID,
                 MysteriousRingDialogueOverlay.INSTANCE);
         event.registerAboveAll(JindanTribulationOverlay.HUD_ID, JindanTribulationOverlay.INSTANCE);
         event.registerAboveAll(DaoGuidanceOverlay.HUD_ID, DaoGuidanceOverlay.INSTANCE);
+        event.registerAboveAll(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID,"pill_toxicity"),
+                (graphics,delta)->PillToxicityClient.render(graphics,delta.getGameTimeDeltaPartialTick(false)));
+        event.registerAboveAll(com.example.immortal_cultivation_mod.client.hud.ShentongCalligraphyOverlay.HUD_ID,
+                com.example.immortal_cultivation_mod.client.hud.ShentongCalligraphyOverlay.INSTANCE);
     }
 
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
@@ -159,13 +168,13 @@ public class ModClientModBusEvents {
                 CosmicVoidPortalRenderer::new);
         event.registerEntityRenderer(ModEntities.TALISMAN_MESSAGE.get(),
                 ThrownItemRenderer::new);
-        event.registerEntityRenderer(ModEntities.CRIMSON_FLAME_FIREBALL.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.CRIMSON_FLAME_FIREBALL.get(), BeastProjectileRenderer::new);
         event.registerEntityRenderer(ModEntities.CRIMSON_DRAGON_SCALE_PROJECTILE.get(),
-                ThrownItemRenderer::new);
-        event.registerEntityRenderer(ModEntities.SPIRIT_SILK_PROJECTILE.get(), ThrownItemRenderer::new);
+                BeastProjectileRenderer::new);
+        event.registerEntityRenderer(ModEntities.SPIRIT_SILK_PROJECTILE.get(), BeastProjectileRenderer::new);
         event.registerEntityRenderer(ModEntities.IGNITE_FLARE_PROJECTILE.get(), EmptyEntityRenderer::new);
         event.registerEntityRenderer(ModEntities.LIGHT_BEAM_PROJECTILE.get(), net.minecraft.client.renderer.entity.NoopRenderer::new);
-        event.registerEntityRenderer(ModEntities.LINGZHI_BULLET_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, 0.32F, true));
+        event.registerEntityRenderer(ModEntities.LINGZHI_BULLET_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, 0.32F * SpellProjectileVisuals.SCALE, true));
         event.registerEntityRenderer(ModEntities.JINMANG_CHUANSHA_PROJECTILE.get(), EmptyEntityRenderer::new);
         event.registerEntityRenderer(ModEntities.ELEMENTAL_TECHNIQUE_PROJECTILE.get(),
                 ElementalTechniqueProjectileRenderer::new);
@@ -184,17 +193,17 @@ public class ModClientModBusEvents {
         event.registerEntityRenderer(ModEntities.YAOGUANG_FLASH.get(), YaoguangFlashRenderer::new);
         event.registerEntityRenderer(ModEntities.WANTENG_VINE.get(), WantengVineRenderer::new);
         event.registerEntityRenderer(ModEntities.SHANBENG_SEAL.get(), ShanbengSealRenderer::new);
-        event.registerEntityRenderer(ModEntities.WIND_BLADE_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, 0.32F, true));
-        event.registerEntityRenderer(ModEntities.SMOKE_PROJECTILE.get(), ThrownItemRenderer::new);
-        event.registerEntityRenderer(ModEntities.SLIDING_WATER_PROJECTILE.get(), ThrownItemRenderer::new);
-        event.registerEntityRenderer(ModEntities.ABSORB_CULTIVATION_PROJECTILE.get(), ThrownItemRenderer::new);
-        event.registerEntityRenderer(ModEntities.DINGSHEN_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, 0.32F, true));
-        event.registerEntityRenderer(ModEntities.KONGSHI_PROJECTILE.get(), ThrownItemRenderer::new);
-        event.registerEntityRenderer(ModEntities.LIGHTNING_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, 0.32F, true));
-        event.registerEntityRenderer(ModEntities.FROST_CRY_PROJECTILE.get(), ThrownItemRenderer::new);
-        event.registerEntityRenderer(ModEntities.LIUGUANG_JIANYING_PROJECTILE.get(), ThrownItemRenderer::new);
-        event.registerEntityRenderer(ModEntities.DUANLIU_KONGDUN_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, 0.32F, true));
-        event.registerEntityRenderer(ModEntities.YIHEN_CI_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, 0.32F, true));
+        event.registerEntityRenderer(ModEntities.WIND_BLADE_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, 0.32F * SpellProjectileVisuals.SCALE, true));
+        event.registerEntityRenderer(ModEntities.SMOKE_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, SpellProjectileVisuals.SCALE, false));
+        event.registerEntityRenderer(ModEntities.SLIDING_WATER_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, SpellProjectileVisuals.SCALE, false));
+        event.registerEntityRenderer(ModEntities.ABSORB_CULTIVATION_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, SpellProjectileVisuals.SCALE, false));
+        event.registerEntityRenderer(ModEntities.DINGSHEN_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, 0.32F * SpellProjectileVisuals.SCALE, true));
+        event.registerEntityRenderer(ModEntities.KONGSHI_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, SpellProjectileVisuals.SCALE, false));
+        event.registerEntityRenderer(ModEntities.LIGHTNING_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, 0.32F * SpellProjectileVisuals.SCALE, true));
+        event.registerEntityRenderer(ModEntities.FROST_CRY_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, SpellProjectileVisuals.SCALE, false));
+        event.registerEntityRenderer(ModEntities.LIUGUANG_JIANYING_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, SpellProjectileVisuals.SCALE, false));
+        event.registerEntityRenderer(ModEntities.DUANLIU_KONGDUN_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, 0.32F * SpellProjectileVisuals.SCALE, true));
+        event.registerEntityRenderer(ModEntities.YIHEN_CI_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, 0.32F * SpellProjectileVisuals.SCALE, true));
         event.registerEntityRenderer(ModEntities.SUOKONG_PROJECTILE.get(), EmptyEntityRenderer::new);
         event.registerEntityRenderer(ModEntities.XINLIAO_FIREBALL.get(), EmptyEntityRenderer::new);
         event.registerEntityRenderer(ModEntities.STARFALL_PROJECTILE.get(), EmptyEntityRenderer::new);
@@ -222,16 +231,17 @@ public class ModClientModBusEvents {
         event.registerEntityRenderer(ModEntities.LIANQI_CULTIVATOR.get(), LianqiCultivatorRenderer::new);
         event.registerEntityRenderer(ModEntities.ZHUJI_CULTIVATOR.get(), ZhujiCultivatorRenderer::new);
         event.registerEntityRenderer(ModEntities.JINDAN_CULTIVATOR.get(), JindanCultivatorRenderer::new);
+        event.registerEntityRenderer(ModEntities.TRAINING_DUMMY.get(),com.example.immortal_cultivation_mod.client.renderer.TrainingDummyRenderer::new);
         event.registerEntityRenderer(ModEntities.FANREN_NPC.get(), FanrenNpcRenderer::new);
         event.registerEntityRenderer(ModEntities.HOTEL_NPC.get(), HotelNpcRenderer::new);
+        event.registerEntityRenderer(ModEntities.RECIPE_MERCHANT.get(), ZhujiCultivatorRenderer::new);
+        event.registerEntityRenderer(ModEntities.SPELL_MERCHANT.get(), ZhujiCultivatorRenderer::new);
         event.registerEntityRenderer(ModEntities.CRIMSON_SCALE_FLAME_LIZARD.get(),
                 CrimsonScaleFlameLizardRenderer::new);
         event.registerEntityRenderer(ModEntities.CRIMSON_SKY_FLAME_FLOOD_DRAGON.get(),
                 CrimsonSkyFlameFloodDragonRenderer::new);
         event.registerEntityRenderer(ModEntities.BLOOD_APE_DEMON_GENERAL.get(),
                 BloodApeDemonGeneralRenderer::new);
-        com.example.immortal_cultivation_mod.pagoda.PagodaClientAccess.tick = com.example.immortal_cultivation_mod.client.PagodaVisuals::tick;
-        event.registerEntityRenderer(ModEntities.PAGODA.get(), com.example.immortal_cultivation_mod.client.renderer.PagodaRenderer::new);
         event.registerEntityRenderer(ModEntities.XUANJIN_ZHENG.get(),
                 com.example.immortal_cultivation_mod.client.renderer.XuanjinZhengRenderer::new);
         event.registerEntityRenderer(ModEntities.ESCAPED_YUANYING_CORE.get(),
@@ -255,29 +265,22 @@ public class ModClientModBusEvents {
         event.registerEntityRenderer(ModEntities.EMBER_FEATHER_FIRE_OWL.get(),
                 CultivationBestiaryBeastRenderer::new);
         event.registerEntityRenderer(ModEntities.CULTIVATION_BEAST_PROJECTILE.get(),
-                ThrownItemRenderer::new);
+                BeastProjectileRenderer::new);
         event.registerEntityRenderer(ModEntities.CULTIVATION_BEAST_FIRE_PATCH.get(),
                 EmptyEntityRenderer::new);
-        event.registerEntityRenderer(ModEntities.ZHUJI_PHANTOM_VEIL_FOX.get(),
-                context -> new PhantomVeilFoxRenderer(context, 0.78F));
-        event.registerEntityRenderer(ModEntities.JINDAN_PHANTOM_VEIL_FOX.get(),
-                context -> new PhantomVeilFoxRenderer(context, 0.90F));
         event.registerEntityRenderer(ModEntities.PHANTOM_VEIL_FOX.get(),
                 PhantomVeilFoxRenderer::new);
         event.registerEntityRenderer(ModEntities.PHANTOM_VEIL_FOX_CLONE.get(),
                 PhantomVeilFoxCloneRenderer::new);
         event.registerEntityRenderer(ModEntities.PHANTOM_FOXFIRE.get(),
-                ThrownItemRenderer::new);
+                BeastProjectileRenderer::new);
         event.registerEntityRenderer(ModEntities.KONGMING_CRYSTAL_PROJECTILE.get(),
-                ThrownItemRenderer::new);
+                BeastProjectileRenderer::new);
         event.registerEntityRenderer(ModEntities.THUNDER_ROCK_PROJECTILE.get(),
-                ThrownItemRenderer::new);
+                BeastProjectileRenderer::new);
         event.registerEntityRenderer(ModEntities.VAULT_SPIRIT_SPIKE.get(),
                 ThrownItemRenderer::new);
-        event.registerEntityRenderer(ModEntities.ZHUJI_VAULT_GUARDIAN.get(),
-                VaultGuardianRenderer::new);
-        event.registerEntityRenderer(ModEntities.JINDAN_VAULT_GUARDIAN.get(),
-                VaultGuardianRenderer::new);
+        event.registerEntityRenderer(ModEntities.VAULT_GUARDIAN.get(), VaultGuardianRenderer::new);
         event.registerEntityRenderer(ModEntities.CULTIVATOR_CORPSE.get(), CultivatorCorpseRenderer::new);
         event.registerEntityRenderer(ModEntities.JINDAN_CLONE.get(), JindanCloneRenderer::new);
         event.registerEntityRenderer(ModEntities.JINDAN.get(), JindanEntityRenderer::new);
@@ -334,8 +337,8 @@ public class ModClientModBusEvents {
         registerMethodQiParticle(event, ModParticles.METHOD_QI_THUNDER.get(), 0xA967FF);
         registerMethodQiParticle(event, ModParticles.METHOD_QI_ICE.get(), 0x9BEFFF);
         registerMethodQiParticle(event, ModParticles.METHOD_QI_WIND.get(), 0x9CE7BD);
-        registerMethodQiParticle(event, ModParticles.METHOD_QI_LIGHT.get(), 0xFFF4B0);
-        registerMethodQiParticle(event, ModParticles.METHOD_QI_DARK.get(), 0x6D3A91);
+        registerMethodQiParticle(event, ModParticles.METHOD_QI_YANG.get(), 0xFFF4B0);
+        registerMethodQiParticle(event, ModParticles.METHOD_QI_YIN.get(), 0x6D3A91);
         registerMethodQiParticle(event, ModParticles.METHOD_QI_BLOOD.get(), 0xD71920);
         registerMethodQiParticle(event, ModParticles.METHOD_QI_NEUTRAL.get(), 0xFFD66B);
         event.registerSpriteSet(
@@ -464,7 +467,6 @@ public class ModClientModBusEvents {
                     com.example.immortal_cultivation_mod.client.renderer.FortuneCharmCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.ENLIGHTENMENT_LEAF.get(),
                     com.example.immortal_cultivation_mod.client.renderer.FortuneCharmCurioRenderer::new);
-            CuriosRendererRegistry.register(ModItems.JIN_HULU.get(), com.example.immortal_cultivation_mod.client.renderer.GoldenGourdCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.ZHENHUN_BELL.get(), ZhenhunBellCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.YINHUN_GONG.get(), YinhunGongCurioRenderer::new);
         });

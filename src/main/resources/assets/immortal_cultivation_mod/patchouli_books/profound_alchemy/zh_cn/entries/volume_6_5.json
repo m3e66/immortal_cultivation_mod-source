@@ -1,0 +1,18 @@
+{
+  "name": "辟谷丹",
+  "icon": "immortal_cultivation_mod:bigu_pill",
+  "category": "immortal_cultivation_mod:volume_6",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "辟谷丹乃修士远行闭关之常备丹药。服之可补饥馁，恢复饱腹之感，使修士不必时刻为凡俗饮食所扰。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹效",
+      "text": "恢复饥饿值及饱和度。"
+    }
+  ]
+}

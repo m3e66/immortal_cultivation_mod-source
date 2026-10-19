@@ -42,12 +42,6 @@ public final class CultivationBeastFirePatchEntity extends Entity {
             return;
         }
         if (!(level() instanceof ServerLevel server)) return;
-        if ((tickCount & 1) == 0) {
-            server.sendParticles(ParticleTypes.SMALL_FLAME, getX(), getY() + 0.12D, getZ(),
-                    3, radius * 0.45D, 0.08D, radius * 0.45D, 0.015D);
-            server.sendParticles(ParticleTypes.SMOKE, getX(), getY() + 0.18D, getZ(),
-                    1, radius * 0.30D, 0.05D, radius * 0.30D, 0.005D);
-        }
         if (tickCount % 20 != 0) return;
         Entity owner = ownerId == null ? null : server.getEntity(ownerId);
         AABB area = getBoundingBox().inflate(radius, 0.8D, radius);

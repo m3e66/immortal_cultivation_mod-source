@@ -25,18 +25,17 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @PrefixGameTestTemplate(false)
 public final class NpcCombatGameTests {
     @GameTest(template="npc_combat_arena")
-    public static void realNpcSlashUsesDamageScaledCollisionRadius(GameTestHelper h) {
+    public static void realNpcSlashUsesWeaponLevelCollisionRadius(GameTestHelper h) {
         var npc=npc(h);npc.setItemSlot(EquipmentSlot.MAINHAND,new ItemStack(Items.IRON_SWORD));
         var enemy=EntityType.ZOMBIE.create(h.getLevel());enemy.setPos(npc.position().add(5,0,0));npc.setTarget(enemy);
-        double previous=0;
         for(float damage:new float[]{10,100,1000}) {
             h.assertTrue(WeaponQiSlashEntity.releaseNpc(npc,enemy,7,damage,.95,"any",2,false),"NPC releases a real slash");
             var slashes=h.getLevel().getEntitiesOfClass(WeaponQiSlashEntity.class,npc.getBoundingBox().inflate(3));
             h.assertTrue(slashes.size()==1,"One slash exists for this release");
             var slash=slashes.getFirst();var save=new CompoundTag();slash.saveWithoutId(save);
             double radius=save.getDouble("Radius");
-            h.assertTrue(radius>previous&&Math.abs(radius-WeaponQiSlashEntity.damageScaledRadius(.95,damage,32))<.00001,
-                    "Actual entity stores the damage-scaled visual/collision radius");
+            h.assertTrue(Math.abs(radius-com.example.immortal_cultivation_mod.combat.ExternalQiSize.radius(npc.getMainHandItem(),1,false,false,false))<.00001,
+                    "Actual entity stores weapon-level radius independently of released damage");
             h.assertTrue(save.getFloat("Damage")==damage&&save.getDouble("MaxDistance")==7,
                     "Changing width does not increase attack damage or travel range");
             h.assertTrue(save.getInt("RemainingBlocks") == WeaponQiSlashEntity.damageScaledBlockBudget(damage),
@@ -55,7 +54,7 @@ public final class NpcCombatGameTests {
             h.assertTrue(Math.abs(loaded.forcefieldSupport(new net.minecraft.world.phys.Vec3(0,0,1))
                     - com.example.immortal_cultivation_mod.effect.ExternalQiVfxShape.bladeReach(radius))<.00001,
                     "Reload preserves width without applying the damage scale twice");
-            previous=radius;slash.discard();
+            slash.discard();
         }
         h.succeed();
     }

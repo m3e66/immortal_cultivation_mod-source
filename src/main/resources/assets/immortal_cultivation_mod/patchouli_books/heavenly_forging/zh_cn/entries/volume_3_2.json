@@ -1,0 +1,38 @@
+{
+  "name": "投材纳灵",
+  "icon": "immortal_cultivation_mod:dao",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "开鼎之后，依炼器玉简所载，将灵材逐一投入鼎中，再置灵石，以供阵纹运转。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "凡炼器之法，多耗灵石六十四枚；若凝炼赤炎火种，仅需八枚；若欲重铸残兵，则需一百二十八枚。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "若集齐完整兵器残片，则可循残片之灵机重铸原器，不必另寻玉简。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "规则速查",
+      "text": "寻常炼器 / 64"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "规则速查",
+      "text": "赤炎火种 / 8"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "规则速查",
+      "text": "兵器残片重铸 / 128"
+    }
+  ]
+}

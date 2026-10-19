@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 public final class CultivationBestiaryBeastRenderer
-        extends GeoEntityRenderer<CultivationBestiaryBeastEntity> {
+        extends BeastGeoRenderer<CultivationBestiaryBeastEntity> {
     public CultivationBestiaryBeastRenderer(EntityRendererProvider.Context context) {
         super(context, new CultivationBestiaryBeastModel());
         shadowRadius = 1.1F;

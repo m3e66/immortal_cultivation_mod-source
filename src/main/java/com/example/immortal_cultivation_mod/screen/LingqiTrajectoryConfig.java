@@ -95,50 +95,59 @@ public record LingqiTrajectoryConfig(
 
     public static LingqiTrajectoryConfig create(String learningType, String targetId,
                                                  int requiredPoints, float difficulty,
-                                                 float talent, boolean assisted, long seed) {
+                                                 float talent, boolean assisted, String playerLevel, long seed) {
+        return generate(learningType, targetId, requiredPoints, difficulty, talent, assisted, playerLevel, seed).config();
+    }
+
+    static GeneratedPuzzle generate(String learningType, String targetId,
+                                    int requiredPoints, float difficulty,
+                                    float talent, boolean assisted, String playerLevel, long seed) {
         GeneratedPuzzle firstCandidate = null;
         for (int attempt = 0; attempt < MAX_GENERATION_ATTEMPTS; attempt++) {
             GeneratedPuzzle candidate = createCandidate(
-                    learningType, targetId, requiredPoints, difficulty, talent, assisted,
+                    learningType, targetId, requiredPoints, difficulty, talent, assisted, playerLevel,
                     seed + RETRY_SEED_STEP * attempt);
             if (firstCandidate == null) {
                 firstCandidate = candidate;
             }
             if (hasGuaranteedRoute(candidate.config(), candidate.route())) {
-                return candidate.config();
+                return candidate;
             }
         }
-        return guaranteedFallback(firstCandidate.config(), firstCandidate.route());
+        return new GeneratedPuzzle(guaranteedFallback(firstCandidate.config(), firstCandidate.route()), firstCandidate.route());
     }
 
     private static GeneratedPuzzle createCandidate(String learningType, String targetId,
                                                     int requiredPoints, float difficulty,
-                                                    float talent, boolean assisted, long seed) {
+                                                    float talent, boolean assisted, String playerLevel, long seed) {
         String safeType = learningType == null ? "" : learningType;
         String safeTarget = targetId == null ? "" : targetId;
         Target target = resolveTarget(safeType, safeTarget);
-        int realmRank = Mth.clamp(CultivationLevels.getRealmIndex(target.level()), 1, 6);
+        boolean spellLearning = "spell".equals(safeType);
+        boolean starterMethod = "method".equals(safeType) && isStarterMethod(safeTarget);
+        int realmRank = starterMethod ? 1 : learningPuzzleRealmRank(playerLevel, target.level());
+        String puzzleRealm = realmName(realmRank);
         int pointDifficulty = pointDifficulty(requiredPoints, difficulty, talent);
-        int puzzleDifficulty = Math.max(
+        int puzzleDifficulty = starterMethod ? -1 : Math.max(
                 -1, earlyRealmDifficulty(realmRank, pointDifficulty) - (assisted ? 1 : 0));
-        Template template = "spell".equals(safeType) ? SPELL_TEMPLATES.get(safeTarget) : null;
+        // Keep authored layouts at their own tier; a lowered realm must use the lower-tier rules.
+        Template template = spellLearning
+                && realmRank == Mth.clamp(CultivationLevels.getRealmIndex(target.level()), 1, 9)
+                ? SPELL_TEMPLATES.get(safeTarget) : null;
 
         int difficultyRouteBonus = Math.max(0, puzzleDifficulty) * 2;
         int difficultySizeBonus = puzzleDifficulty >= 3 ? 1 : 0;
         int baseSize = template == null ? 4 + realmRank : template.size();
         int size = Mth.clamp(baseSize + difficultySizeBonus, 5, 9);
         int cellCount = size * size;
-        int baseIdealSteps = template == null
-                ? switch (realmRank) {
-                    case 1 -> 10;
-                    case 2 -> 17;
-                    case 3 -> 25;
-                    default -> 34;
-                }
-                : template.idealSteps();
+        int baseIdealSteps = template == null ? switch (realmRank) {
+            case 1 -> 10;
+            case 2 -> 17;
+            case 3 -> 25;
+            default -> 34 + (spellLearning ? Math.max(0, realmRank - 4) * 6 : 0);
+        } : template.idealSteps();
         int idealSteps = Mth.clamp(baseIdealSteps + difficultyRouteBonus, size + 2, cellCount - 3);
-        int baseMaximumSteps = template == null
-                ? baseIdealSteps + (realmRank >= 4 ? 5 : 3)
+        int baseMaximumSteps = template == null ? baseIdealSteps + (realmRank >= 4 ? 5 : 3)
                 : template.maximumSteps();
         int maximumSteps = Mth.clamp(
                 baseMaximumSteps + difficultyRouteBonus - Math.min(2, Math.max(0, puzzleDifficulty)),
@@ -179,7 +188,7 @@ public record LingqiTrajectoryConfig(
                     case 1 -> 1;
                     case 2 -> Math.max(3, target.elements().size());
                     case 3 -> Math.max(4, target.elements().size());
-                    default -> Math.max(5, target.elements().size());
+                    default -> Math.max(spellLearning ? realmRank + 1 : 5, target.elements().size());
                 } + talentElementBonus : template.requiredElementCount() + talentElementBonus;
         List<String> requestedElements = repeatElements(target.elements(), requiredElementCount);
         List<Integer> requiredNodes = addRequiredElements(
@@ -188,7 +197,7 @@ public record LingqiTrajectoryConfig(
                 .map(index -> nodes.get(index).element())
                 .toList();
 
-        int[] strengthRange = strengthRange(realmRank);
+        int[] strengthRange = strengthRange(spellLearning ? realmRank : Math.min(5, realmRank));
         int startingStrength = 20;
         int drainCount = realmRank < 3 ? 0 : realmRank >= 5 ? 2 : 1;
         int gatherCount = Math.max(0,
@@ -228,7 +237,7 @@ public record LingqiTrajectoryConfig(
                 .count() * 3;
         int hazardAllowance = movingHazards.size() * 2;
         int adjustedIdealSteps = idealSteps + branchMoves + rotatingAllowance;
-        int minimumSlack = puzzleDifficulty >= 3 ? 1 : puzzleDifficulty >= 1 ? 2 : 3;
+        int minimumSlack = starterMethod ? 6 : puzzleDifficulty >= 3 ? 1 : puzzleDifficulty >= 1 ? 2 : 3;
         int adjustedMaximumSteps = Math.max(adjustedIdealSteps + minimumSlack,
                 maximumSteps + branchMoves + rotatingAllowance + hazardAllowance);
         int unavoidableStabilityLoss = unavoidableStabilityLoss(nodes, solution);
@@ -251,8 +260,8 @@ public record LingqiTrajectoryConfig(
                 startingStrength,
                 strengthRange[0],
                 strengthRange[1],
-                realmRank >= 2 || ModSpells.WULEI_ZHENGFA.equals(safeTarget),
-                target.realm(),
+                realmRank >= 2,
+                puzzleRealm,
                 directionalEdges,
                 collapsingEdges,
                 timedRequirements,
@@ -263,7 +272,7 @@ public record LingqiTrajectoryConfig(
         return new GeneratedPuzzle(config, solution);
     }
 
-    private static boolean hasGuaranteedRoute(LingqiTrajectoryConfig config, List<Integer> route) {
+    static boolean hasGuaranteedRoute(LingqiTrajectoryConfig config, List<Integer> route) {
         if (route == null || route.size() < 2
                 || route.getFirst() != config.startIndex()
                 || route.getLast() != config.finalCoreIndex()) {
@@ -556,6 +565,33 @@ public record LingqiTrajectoryConfig(
         return new Target(fallback, CultivationLevels.REALM_LIANQI, List.of());
     }
 
+    static boolean isStarterMethod(String methodId) {
+        return CultivationMethods.BASIC_BREATHING.equals(methodId)
+                || CultivationMethods.CLEAR_HEART.equals(methodId);
+    }
+
+    /** Same-realm learning starts at Foundation difficulty; each realm gap adds one tier. */
+    static int learningPuzzleRealmRank(String playerLevel, String contentLevel) {
+        if (playerLevel == null || playerLevel.isBlank()) return 1;
+        int contentRealm = Mth.clamp(CultivationLevels.getRealmIndex(contentLevel), 1, 9);
+        int playerRealm = Mth.clamp(CultivationLevels.getRealmIndex(playerLevel), 0, 9);
+        return Mth.clamp(2 + contentRealm - playerRealm, 1, 9);
+    }
+
+    private static String realmName(int rank) {
+        return switch (rank) {
+            case 2 -> CultivationLevels.REALM_ZHUJI;
+            case 3 -> CultivationLevels.REALM_JINDAN;
+            case 4 -> CultivationLevels.REALM_YUANYING;
+            case 5 -> CultivationLevels.REALM_HUASHEN;
+            case 6 -> CultivationLevels.REALM_LIANXU;
+            case 7 -> CultivationLevels.REALM_HETI;
+            case 8 -> CultivationLevels.REALM_DACHENG;
+            case 9 -> CultivationLevels.REALM_DUJIE;
+            default -> CultivationLevels.REALM_LIANQI;
+        };
+    }
+
     private static String inferredLevel(String tier) {
         return switch (tier == null ? "" : tier) {
             case "earth" -> CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_EARLY;
@@ -615,7 +651,7 @@ public record LingqiTrajectoryConfig(
             case 2 -> new int[]{40, 100};
             case 3 -> new int[]{60, 80};
             case 4 -> new int[]{65, 85};
-            default -> new int[]{70, 90};
+            default -> new int[]{70 + (realmRank - 5) * 2, 90 - (realmRank - 5) * 2};
         };
     }
 
@@ -1273,11 +1309,12 @@ public record LingqiTrajectoryConfig(
         YANG;
 
         public static QiType fromElement(String element) {
+            element = SpiritRoots.normalizeElement(element);
             if (SpiritRoots.FIRE.equals(element)) return FIRE;
             if (SpiritRoots.WATER.equals(element) || SpiritRoots.ICE.equals(element)) return WATER;
             if (SpiritRoots.THUNDER.equals(element)) return THUNDER;
-            if (SpiritRoots.DARK.equals(element)) return YIN;
-            if (SpiritRoots.LIGHT.equals(element)) return YANG;
+            if (SpiritRoots.YIN.equals(element)) return YIN;
+            if (SpiritRoots.YANG.equals(element)) return YANG;
             return NORMAL;
         }
     }
@@ -1365,8 +1402,8 @@ public record LingqiTrajectoryConfig(
         }
     }
 
-    private record GeneratedPuzzle(LingqiTrajectoryConfig config, List<Integer> route) {
-        private GeneratedPuzzle {
+    record GeneratedPuzzle(LingqiTrajectoryConfig config, List<Integer> route) {
+        GeneratedPuzzle {
             route = List.copyOf(route);
         }
     }
@@ -1376,4 +1413,5 @@ public record LingqiTrajectoryConfig(
 
     private record Template(int size, int idealSteps, int maximumSteps, int requiredElementCount) {
     }
+
 }

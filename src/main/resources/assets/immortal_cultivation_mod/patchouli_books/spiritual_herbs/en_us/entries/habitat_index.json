@@ -1,0 +1,58 @@
+{
+  "name": "Herb Habitat Index",
+  "icon": "minecraft:map",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Herb Habitat Index",
+      "text": "Clear Spirit Grass · 1/5$(br)Woodlands, meadows, lush caves$(br2)Crimson Flame Flower · 1/5$(br)Deserts, badlands, Nether"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Herb Habitat Index",
+      "text": "Dew-Congealing Lingzhi · 1/5$(br)Ancient forests, jungles, damp caves$(br2)Violet Cloud Vine · 1/5$(br)Jungles, bamboo jungles, caves"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Herb Habitat Index",
+      "text": "Profound Ice Lotus · 1/5$(br)Ice plains, snowy mountains, frozen oceans$(br2)Soul-Devouring Grass · 1/5$(br)Swamps, dark forests, soul sand valleys"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Herb Habitat Index",
+      "text": "Bone-Rot Moss · 1/5$(br)Dark caves, swamps$(br2)Mirage Cloud Silk · 1/9$(br)Meadows, cherry groves, peaks"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Herb Habitat Index",
+      "text": "Nine-Leaf Immortal Orchid · 1/12$(br)Cherry groves, flower forests, lush caves$(br2)Harmony Grass · 1/6$(br)Plains, forests"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Herb Habitat Index",
+      "text": "Spirit Spring Leaf · 1/8$(br)Rivers, wetlands, forests$(br2)Spirit-Converging Flower · 1/8$(br)Flower forests, meadows, cherry groves"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Herb Habitat Index",
+      "text": "Catalysis Flower · 1/12$(br)Meadows, windswept hills, flower forests$(br2)Golden-Veined Fruit · 1/24$(br)Sunlit plains, meadows, savannas"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Herb Habitat Index",
+      "text": "Thousand-Year Spirit Wood Heart · 1/24$(br)Ancient forests, jungles$(br2)Spirit Wood Tree · 1/7$(br)Forests, taigas, jungles"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Herb Habitat Index",
+      "text": "Wild Glutinous Rice · 1/3$(br)Rivers, swamps, woodlands"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Index Note",
+      "text": "Frequencies retain the original generation data and represent attempts, not guaranteed placements. Medicinal properties and alchemical uses described in this compendium are lore, rather than confirmed gameplay effects."
+    }
+  ]
+}

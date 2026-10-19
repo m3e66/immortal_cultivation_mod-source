@@ -80,7 +80,6 @@ public class FanrenNpcEntity extends PathfinderMob implements CultivationNpc {
     @Override
     public void tick() {
         super.tick();
-        NpcProfile.ensure(this, npcArchetype());
         NpcProfile.tickCultivation(this, npcArchetype());
     }
 

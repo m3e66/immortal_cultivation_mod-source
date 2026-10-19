@@ -1,0 +1,13 @@
+{
+  "name": "Preface",
+  "icon": "minecraft:book",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "The Heavenly Art of Forging",
+      "text": "Heaven and earth form the furnace, the elements provide the materials, and spiritual energy guides their transformation. Ordinary iron may become a fine blade through repeated forging, but the creation of spiritual weapons requires far greater understanding. A true artifact refiner must master materials, flames, temperature, and the art of quenching."
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "清灵草",
+  "icon": "immortal_cultivation_mod:qingling_grass",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "清灵草",
+      "text": "$(bold)生成尝试频率：$()1/5"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《百草录》记载",
+      "text": "清灵草，性温而灵纯，生于山林清气汇聚之所。叶色青翠，隐有淡淡灵光，晨露未散之时尤为鲜明。此草虽非稀世奇珍，却是初涉丹道者常寻之物。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻药",
+      "text": "草甸、山间林地、森林、河流沿岸、繁茂洞穴及古老松林。"
+    }
+  ]
+}

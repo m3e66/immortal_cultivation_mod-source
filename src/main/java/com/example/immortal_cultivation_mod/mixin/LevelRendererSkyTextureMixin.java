@@ -3,6 +3,7 @@ package com.example.immortal_cultivation_mod.mixin;
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.client.CosmicVoidSkyShaders;
 import com.example.immortal_cultivation_mod.client.ShaderPackCompatibility;
+import com.example.immortal_cultivation_mod.config.ModClientConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -45,6 +46,7 @@ public abstract class LevelRendererSkyTextureMixin {
 
     private ResourceLocation replacementTexture(ResourceLocation vanillaTexture) {
         return level != null && level.dimension().equals(Level.OVERWORLD)
+                && ModClientConfig.enableModSky()
                 && CosmicVoidSkyShaders.celestialShader() != null
                 && !ShaderPackCompatibility.isShaderPackActive()
                 ? IMMORTAL_CULTIVATION_TRANSPARENT_SKY_TEXTURE

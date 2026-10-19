@@ -1,0 +1,43 @@
+{
+  "name": "火候境界",
+  "icon": "immortal_cultivation_mod:thunder_flame_seed",
+  "category": "immortal_cultivation_mod:volume_4",
+  "sortnum": -1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "火候境界",
+      "text": "凡兵可由常火炼成，灵器则须真焰淬就。境界愈高，所需火候愈烈。炼器者若强以低火炼高器，不过徒耗灵气，难成其功。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "规则速查",
+      "text": "筑基 / 4,500°C / 赤炎火"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "规则速查",
+      "text": "金丹 / 6,500°C / 青木灵火"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "规则速查",
+      "text": "元婴 / 8,500°C / 雷炎"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "规则速查",
+      "text": "化神 / 10,500°C / 紫霄天火"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "规则速查",
+      "text": "炼虚及以上 / 12,000°C / 紫霄天火"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》注",
+      "text": "此表所载乃兵器重铸之火候，以原器境界为准。寻常兵器初炼，则各依其炼器配方所定，不可混为一谈。"
+    }
+  ]
+}

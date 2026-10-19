@@ -1,0 +1,23 @@
+{
+  "name": "Flowing Golden Sand",
+  "icon": "immortal_cultivation_mod:liujin_sand",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Flowing Golden Sand",
+      "text": "$(bold)Starting height: $()Y 48 to 96$(br2)$(bold)Attempt frequency: $()1/10 chunks"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Flowing Golden Sand is a spiritual sediment formed where the essence of earth and metal accumulates. Its fine golden grains shimmer faintly beneath sunlight. Deposits are often scattered across desert sands, riverbanks, and beaches, appearing in thin layers rather than massive ore bodies."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Search deserts, badlands, eroded badlands, rivers, and beaches, particularly around Y 48–96. Deposits form patches one or two layers thick."
+    }
+  ]
+}

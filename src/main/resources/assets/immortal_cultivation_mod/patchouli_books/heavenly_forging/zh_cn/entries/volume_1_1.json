@@ -1,0 +1,23 @@
+{
+  "name": "粗铁小鼎",
+  "icon": "immortal_cultivation_mod:cu_tie_xiaoding",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "粗铁小鼎",
+      "text": "容纳材料 ：10 格"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "粗铁小鼎，乃初入炼器之道者所用之器。以凡铁铸成，鼎身朴实，虽无精妙玄纹，却可承载基础炼器之需。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "炼器者置其于火源之上，纳灵材于鼎中，以灵气催动火候，便可尝试熔炼凡铁与初阶灵材。"
+    }
+  ]
+}

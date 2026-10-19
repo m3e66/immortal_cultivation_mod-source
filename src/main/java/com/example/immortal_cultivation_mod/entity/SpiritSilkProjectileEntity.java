@@ -16,6 +16,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
 public final class SpiritSilkProjectileEntity extends ThrowableItemProjectile {
+    // Visuals use synchronized BeastAttackVfx; server combat and sounds remain unchanged.
     public SpiritSilkProjectileEntity(
             EntityType<? extends ThrowableItemProjectile> entityType, Level level) {
         super(entityType, level);
@@ -33,10 +34,7 @@ public final class SpiritSilkProjectileEntity extends ThrowableItemProjectile {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) {
-            level().addParticle(ParticleTypes.ENCHANT,
-                    getX(), getY(), getZ(), 0.0D, 0.0D, 0.0D);
-        }
+
         if (!level().isClientSide && tickCount > 80) {
             discard();
         }
@@ -78,11 +76,7 @@ public final class SpiritSilkProjectileEntity extends ThrowableItemProjectile {
     }
 
     private void discardWithParticles(HitResult result) {
-        if (!level().isClientSide && level() instanceof ServerLevel serverLevel) {
-            serverLevel.sendParticles(ParticleTypes.ENCHANT,
-                    result.getLocation().x, result.getLocation().y, result.getLocation().z,
-                    18, 0.25D, 0.25D, 0.25D, 0.04D);
-        }
+
         if (!level().isClientSide) {
             discard();
         }

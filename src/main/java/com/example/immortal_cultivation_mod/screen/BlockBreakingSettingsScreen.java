@@ -83,12 +83,6 @@ public final class BlockBreakingSettingsScreen extends FittedMenuScreen {
         graphics.fill(0, 0, width, height, 0xA0101716);
         CultivationGuiTextures.drawLandscape(graphics, left, top, panelWidth(), panelHeight());
         drawCentered(graphics, title, top + 20, 0xFF38352E);
-        var notice = font.split(Component.translatable(PREFIX + ".notice"), panelWidth() - 80);
-        for (int i = 0; i < Math.min(2, notice.size()); i++) {
-            var line = notice.get(i);
-            graphics.drawString(font, line, left + panelWidth() / 2 - font.width(line) / 2,
-                    top + 38 + i * 10, 0xFF645C4D, false);
-        }
         graphics.enableScissor(left + 20, contentTop(), left + panelWidth() - 20,
                 contentTop() + contentHeight());
         for (int i = 0; i < BlockBreakingSettings.Category.values().length; i++) {

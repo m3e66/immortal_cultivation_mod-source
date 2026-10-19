@@ -132,7 +132,15 @@ public class SwordCaseItem extends Item implements GeoItem, ICurioItem {
         if (released <= 0) {
             return false;
         }
-        stored.subList(0, released).clear();
+        // Older cases can still contain a Dao. Remove only the exact eligible entries that were released.
+        int remaining = released;
+        for (var iterator = stored.iterator(); iterator.hasNext() && remaining > 0;) {
+            ItemStack weapon = iterator.next();
+            if (FlyingSwordEntity.isFlyingWeapon(weapon) && WeaponBinding.canUse(weapon, player)) {
+                iterator.remove();
+                remaining--;
+            }
+        }
         setStoredWeapons(swordCase, stored, player.registryAccess());
         player.displayClientMessage(Component.translatable(
                 "message." + ImmortalCultivationMod.MODID + ".sword_case_released", released), true);
@@ -177,7 +185,7 @@ public class SwordCaseItem extends Item implements GeoItem, ICurioItem {
 
     private static void tickNurturing(ServerPlayer player, ItemStack swordCase) {
         List<ItemStack> stored = getStoredWeapons(swordCase, player.registryAccess());
-        if (stored.isEmpty()) {
+        if (stored.stream().noneMatch(FlyingSwordEntity::isFlyingWeapon)) {
             return;
         }
 
@@ -243,6 +251,7 @@ public class SwordCaseItem extends Item implements GeoItem, ICurioItem {
         int realmGrade = realmIndex >= 3 ? 3 : realmIndex >= 2 ? 2 : 1;
         int weaponGrade = 1;
         for (ItemStack weapon : stored) {
+            if (!FlyingSwordEntity.isFlyingWeapon(weapon)) continue;
             int tier = WeaponRestrictionSystem.tier(weapon);
             weaponGrade = Math.max(
                     weaponGrade, tier >= 4 ? 3 : tier >= 2 ? 2 : 1);
@@ -255,6 +264,7 @@ public class SwordCaseItem extends Item implements GeoItem, ICurioItem {
         double remaining = Math.max(0.0D, amount);
         double consumed = 0.0D;
         for (ItemStack weapon : stored) {
+            if (!FlyingSwordEntity.isFlyingWeapon(weapon)) continue;
             if (remaining <= 0.0001D) {
                 break;
             }
@@ -284,7 +294,8 @@ public class SwordCaseItem extends Item implements GeoItem, ICurioItem {
         List<ItemStack> result = new ArrayList<>(list.size());
         for (int i = 0; i < list.size(); i++) {
             ItemStack stack = ItemStack.parseOptional(registries, list.getCompound(i));
-            if (FlyingSwordEntity.isFlyingWeapon(stack)) {
+            // Preserve legacy non-swords so the owner can cycle them back out safely.
+            if (!stack.isEmpty()) {
                 result.add(stack);
             }
         }
@@ -296,7 +307,7 @@ public class SwordCaseItem extends Item implements GeoItem, ICurioItem {
         CompoundTag root = swordCase.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
         ListTag list = new ListTag();
         for (ItemStack weapon : weapons) {
-            if (!weapon.isEmpty() && FlyingSwordEntity.isFlyingWeapon(weapon)) {
+            if (!weapon.isEmpty()) {
                 list.add(weapon.copyWithCount(1).saveOptional(registries));
             }
         }

@@ -74,14 +74,14 @@ public final class LingqiTrajectoryScreen extends Screen {
     private Component status;
 
     public LingqiTrajectoryScreen(String learningType, String targetId, int requiredPoints,
-                                  float difficulty, float talent, boolean assisted, long token) {
+                                  float difficulty, float talent, boolean assisted, String playerLevel, long token) {
         super(Component.translatable(PREFIX + "title"));
         this.learningType = learningType;
         this.targetId = targetId;
         this.requiredPoints = Math.max(1, requiredPoints);
         this.token = token;
         this.config = LingqiTrajectoryConfig.create(
-                learningType, targetId, requiredPoints, difficulty, talent, assisted, token);
+                learningType, targetId, requiredPoints, difficulty, talent, assisted, playerLevel, token);
         resetPuzzle();
     }
 
@@ -1002,8 +1002,8 @@ public final class LingqiTrajectoryScreen extends Screen {
         if (SpiritRoots.THUNDER.equals(element)) return 0xFF6551B8;
         if (SpiritRoots.ICE.equals(element)) return 0xFF6CB9CC;
         if (SpiritRoots.WIND.equals(element)) return 0xFF3C9B8C;
-        if (SpiritRoots.LIGHT.equals(element)) return 0xFFD5AE3C;
-        if (SpiritRoots.DARK.equals(element)) return 0xFF59405F;
+        if (SpiritRoots.YANG.equals(element)) return 0xFFD5AE3C;
+        if (SpiritRoots.YIN.equals(element)) return 0xFF59405F;
         return 0xFF56655B;
     }
 
@@ -1016,8 +1016,8 @@ public final class LingqiTrajectoryScreen extends Screen {
         if (SpiritRoots.THUNDER.equals(element)) return "thunder";
         if (SpiritRoots.ICE.equals(element)) return "ice";
         if (SpiritRoots.WIND.equals(element)) return "wind";
-        if (SpiritRoots.LIGHT.equals(element)) return "light";
-        if (SpiritRoots.DARK.equals(element)) return "dark";
+        if (SpiritRoots.YANG.equals(element)) return "yang";
+        if (SpiritRoots.YIN.equals(element)) return "yin";
         return "none";
     }
 

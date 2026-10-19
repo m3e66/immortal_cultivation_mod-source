@@ -5,7 +5,7 @@ import com.example.immortal_cultivation_mod.entity.ThunderhornRockBadgerEntity;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
-public final class ThunderhornRockBadgerRenderer extends GeoEntityRenderer<ThunderhornRockBadgerEntity> {
+public final class ThunderhornRockBadgerRenderer extends BeastGeoRenderer<ThunderhornRockBadgerEntity> {
    public ThunderhornRockBadgerRenderer(EntityRendererProvider.Context context) {
       super(context, new ThunderhornRockBadgerModel());
       this.withScale(1.0F);

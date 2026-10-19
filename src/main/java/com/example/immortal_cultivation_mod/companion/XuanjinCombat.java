@@ -184,7 +184,7 @@ public final class XuanjinCombat {
                     XuanjinVisuals.emit(actor,RETURN,targets.getFirst().getBoundingBox().getCenter(),24); animate(actor,"roar",30);
                 } else {
                     if (owner == null) return false;
-                    var data = ModAttachments.getData(owner); int cap = CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi()+data.maxQiBonus();
+                    var data = ModAttachments.getData(owner); int cap = data.maxQi();
                     ModAttachments.setData(owner,data.withQi(Math.min(cap,data.qi()+Math.min(8000,(int)(absorbed*.2F))))); ServerEvents.syncPlayerData(owner);
                     XuanjinVisuals.emit(actor,REFINE,24);animate(actor,"devour",24);
                 }
@@ -261,8 +261,8 @@ public final class XuanjinCombat {
         if(id.matches(".*(soul|ghost|魂).*")) return "soul";
         if(id.matches(".*(frost|ice|bing|冰).*")) return "ice";
         if(id.matches(".*(water|shui|水).*")) return "water";
-        if(id.matches(".*(dark|shadow|暗).*")) return "dark";
-        if(id.matches(".*(light_beam|光).*")) return "light";
+        if(id.matches(".*(\\byin\\b|dark|shadow|阴|暗).*")) return "yin";
+        if(id.matches(".*(\\byang\\b|light_beam|阳|光).*")) return "yang";
         if(id.matches(".*(wood|木).*")) return "wood";
         if(id.matches(".*(wind|feng|风).*")) return "wind";
         if(id.matches(".*(earth|rock|土).*")) return "earth";

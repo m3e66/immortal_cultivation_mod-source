@@ -21,6 +21,7 @@ import net.minecraft.world.phys.Vec3;
 
 /** One of the five curved, lightly homing flames created by 迷心狐火. */
 public final class PhantomFoxfireProjectileEntity extends ThrowableItemProjectile {
+    // Visuals use synchronized BeastAttackVfx; server combat and sounds remain unchanged.
     private static final EntityDataAccessor<Optional<UUID>> TARGET_UUID =
             SynchedEntityData.defineId(PhantomFoxfireProjectileEntity.class,
                     EntityDataSerializers.OPTIONAL_UUID);
@@ -63,7 +64,6 @@ public final class PhantomFoxfireProjectileEntity extends ThrowableItemProjectil
             homeTowardTarget();
         }
         super.tick();
-        spawnTrail();
         if (!level().isClientSide && tickCount > 90) {
             impactParticles();
             discard();
@@ -93,17 +93,6 @@ public final class PhantomFoxfireProjectileEntity extends ThrowableItemProjectil
                 ? living : null;
     }
 
-    private void spawnTrail() {
-        Vec3 motion = getDeltaMovement();
-        for (int i = 0; i < 2; i++) {
-            double back = 0.18D * i;
-            level().addParticle(i == 0 ? ParticleTypes.SOUL_FIRE_FLAME : ParticleTypes.WITCH,
-                    getX() - motion.x * back,
-                    getY() - motion.y * back,
-                    getZ() - motion.z * back,
-                    -motion.x * 0.025D, -motion.y * 0.025D, -motion.z * 0.025D);
-        }
-    }
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
@@ -133,10 +122,6 @@ public final class PhantomFoxfireProjectileEntity extends ThrowableItemProjectil
         if (level() instanceof ServerLevel serverLevel) {
             if (getOwner() instanceof PhantomVeilFoxEntity fox && BeastMoveBlockBreaker.destructiveRealm(fox) >= 3)
                 BeastMoveBlockBreaker.breakSphere(serverLevel, fox, position(), 1.5, 1.2, 24, 8);
-            serverLevel.sendParticles(ParticleTypes.SOUL_FIRE_FLAME,
-                    getX(), getY(), getZ(), 12, 0.3D, 0.3D, 0.3D, 0.04D);
-            serverLevel.sendParticles(ParticleTypes.WITCH,
-                    getX(), getY(), getZ(), 8, 0.25D, 0.25D, 0.25D, 0.03D);
         }
     }
 

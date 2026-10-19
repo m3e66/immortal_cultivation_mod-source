@@ -1,0 +1,23 @@
+{
+  "name": "Frostsoul Jade",
+  "icon": "immortal_cultivation_mod:hanpo_jade",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Frostsoul Jade",
+      "text": "$(bold)Starting height: $()Y −32 to 80$(br2)$(bold)Attempt frequency: $()1/28 chunks"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Frostsoul Jade forms when ancient cold essence seeps into stone and crystallizes over countless winters. Its translucent body carries a deep, lingering chill. Deposits are found in frozen landscapes, where snow and ice endure throughout the seasons."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Search snowy plains and slopes, ice spikes, frozen rivers and oceans, frozen peaks, and groves, starting between Y −32 and 80."
+    }
+  ]
+}

@@ -1,9 +1,0 @@
-{
-  "id": "immortal_cultivation_mod:childhood_herb",
-  "minimum_age": 3,
-  "maximum_age": 7,
-  "weight": 16,
-  "conditions": ["alive", "!flag:childhood_herb"],
-  "text_key": "life.immortal_cultivation_mod.event.childhood_herb",
-  "effects": ["health+8", "comprehension+3", "set_flag:childhood_herb"]
-}

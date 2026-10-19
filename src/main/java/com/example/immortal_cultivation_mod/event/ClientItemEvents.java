@@ -23,6 +23,18 @@ public final class ClientItemEvents {
                 com.example.immortal_cultivation_mod.magicritual.item.ModItems.ZHENPAN.get())) {
             return;
         }
+        if (com.example.immortal_cultivation_mod.entity.FlyingSwordEntity.isFlyingWeapon(event.getItemStack())) {
+            event.getToolTip().add(net.minecraft.network.chat.Component.translatable(
+                    "tooltip.immortal_cultivation_mod.sword_control",
+                    net.minecraft.network.chat.Component.keybind("key.immortal_cultivation_mod.release_weapon")));
+            if (!(event.getItemStack().getItem() instanceof com.example.immortal_cultivation_mod.item.FlyingSwordItem)) {
+                event.getToolTip().add(net.minecraft.network.chat.Component.translatable(
+                        "tooltip.immortal_cultivation_mod.sword_ride",
+                        net.minecraft.network.chat.Component.keybind("key.immortal_cultivation_mod.ride_flying_sword")));
+            }
+        }
+        var binding = com.example.immortal_cultivation_mod.item.WeaponBinding.tooltip(event.getItemStack());
+        if (!binding.getString().isEmpty()) event.getToolTip().add(binding);
         boolean higherWeapon = event.getItemStack().getItem() instanceof com.example.immortal_cultivation_mod.item.HigherWeaponItem;
         boolean weapon = WeaponRestrictionSystem.isWeapon(event.getItemStack());
         // Keep the name first, then the same rank/restriction header for every weapon.

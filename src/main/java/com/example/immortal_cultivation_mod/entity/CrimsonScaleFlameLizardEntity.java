@@ -42,7 +42,8 @@ import static com.example.immortal_cultivation_mod.entity.BoneHitboxAnimation.cu
 import static com.example.immortal_cultivation_mod.entity.BoneHitboxAnimation.positionAndRotation;
 import static com.example.immortal_cultivation_mod.entity.BoneHitboxAnimation.rotation;
 
-public class CrimsonScaleFlameLizardEntity extends Monster implements GeoEntity {
+public class CrimsonScaleFlameLizardEntity extends RealmBeastMonster implements GeoEntity {
+    // Visuals use synchronized BeastAttackVfx; server combat and sounds remain unchanged.
     public static final float MODEL_SCALE = 1.18F;
     public static final float RENDERER_YAW_OFFSET = -90.0F;
 
@@ -267,10 +268,7 @@ public class CrimsonScaleFlameLizardEntity extends Monster implements GeoEntity 
         double x = getX() + (random.nextDouble() - 0.5D) * getBbWidth() * 1.2D;
         double y = getY() + 0.2D + random.nextDouble() * getBbHeight() * 0.9D;
         double z = getZ() + (random.nextDouble() - 0.5D) * getBbWidth() * 1.2D;
-        level().addParticle(ParticleTypes.FLAME, x, y, z, 0.0D, 0.025D, 0.0D);
-        if (random.nextInt(4) == 0) {
-            level().addParticle(ParticleTypes.LAVA, x, y, z, 0.0D, 0.01D, 0.0D);
-        }
+
     }
 
     @Override
@@ -512,14 +510,7 @@ public class CrimsonScaleFlameLizardEntity extends Monster implements GeoEntity 
             double distance = step * 0.68D;
             double spread = 0.045D + step * 0.055D;
             Vec3 point = origin.add(forward.scale(distance));
-            serverLevel.sendParticles(ParticleTypes.FLAME,
-                    point.x, point.y, point.z,
-                    3, spread, spread * 0.65D, spread, 0.025D);
-            if (step % 3 == 0) {
-                serverLevel.sendParticles(ParticleTypes.SMOKE,
-                        point.x, point.y, point.z,
-                        1, spread * 0.5D, spread * 0.35D, spread * 0.5D, 0.01D);
-            }
+
         }
         if (getActionTicks() == 27) {
             serverLevel.playSound(null, blockPosition(), SoundEvents.BLAZE_SHOOT,
@@ -545,12 +536,6 @@ public class CrimsonScaleFlameLizardEntity extends Monster implements GeoEntity 
                         getY() + Math.min(2.0D, getBbHeight() + 0.5D),
                         getZ() + TAIL_SWEEP_RANGE),
                 getBoundingBox().getCenter(), 28, 4.0F);
-        serverLevel.sendParticles(ParticleTypes.SWEEP_ATTACK,
-                getX(), getY() + 0.75D, getZ(),
-                18, 2.1D, 0.35D, 2.1D, 0.0D);
-        serverLevel.sendParticles(ParticleTypes.FLAME,
-                getX(), getY() + 0.55D, getZ(),
-                36, 2.0D, 0.25D, 2.0D, 0.035D);
         serverLevel.playSound(null, blockPosition(), SoundEvents.PLAYER_ATTACK_SWEEP,
                 SoundSource.HOSTILE, 1.4F, 0.55F);
     }
@@ -566,12 +551,6 @@ public class CrimsonScaleFlameLizardEntity extends Monster implements GeoEntity 
         fireball.shoot(direction.x, direction.y, direction.z, 1.05F, 1.5F);
         serverLevel.addFreshEntity(fireball);
 
-        serverLevel.sendParticles(ParticleTypes.LAVA,
-                origin.x, origin.y, origin.z,
-                12, 0.28D, 0.28D, 0.28D, 0.04D);
-        serverLevel.sendParticles(ParticleTypes.FLAME,
-                origin.x, origin.y, origin.z,
-                24, 0.35D, 0.35D, 0.35D, 0.07D);
         serverLevel.playSound(null, blockPosition(), SoundEvents.BLAZE_SHOOT,
                 SoundSource.HOSTILE, 1.5F, 0.52F);
     }
@@ -625,11 +604,7 @@ public class CrimsonScaleFlameLizardEntity extends Monster implements GeoEntity 
                 && distanceToSqr(attacker) <= 4.5D * 4.5D) {
             attacker.hurt(damageSources().mobAttack(this), HEATED_SCALE_DAMAGE);
             attacker.igniteForSeconds(3.0F);
-            if (level() instanceof ServerLevel serverLevel) {
-                serverLevel.sendParticles(ParticleTypes.FLAME,
-                        attacker.getX(), attacker.getY() + attacker.getBbHeight() * 0.5D,
-                        attacker.getZ(), 14, 0.35D, 0.45D, 0.35D, 0.04D);
-            }
+
         }
         return true;
     }

@@ -1,5 +1,7 @@
 package com.example.immortal_cultivation_mod.client;
 
+import com.example.immortal_cultivation_mod.client.hud.HudLayout;
+import com.example.immortal_cultivation_mod.config.HudElement;
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
@@ -8,6 +10,7 @@ import com.example.immortal_cultivation_mod.network.SpiritualSensePayloads;
 import com.example.immortal_cultivation_mod.network.SpiritualSensePayloads.Signature;
 import com.example.immortal_cultivation_mod.spiritual.SpiritualSenseSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
@@ -23,13 +26,13 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
@@ -43,13 +46,13 @@ import org.joml.Vector4f;
 
 /** Shader-like, non-outline presentation of server-provided spiritual signatures. */
 public final class SpiritualSenseClient {
-    private static final ResourceLocation WHITE_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(
-                    "minecraft", "textures/misc/white.png");
+    private static final ResourceLocation WHITE_TEXTURE = ResourceLocation.withDefaultNamespace("textures/misc/white.png");
     private static final RenderType SENSE_RENDER_TYPE =
             createSenseRenderType();
     private static final RenderType AIR_FLOW_RENDER_TYPE =
             createAirFlowRenderType();
+    private static final MultiBufferSource.BufferSource SENSE_BUFFERS =
+            MultiBufferSource.immediate(new ByteBufferBuilder(65536));
     private static final Color SENSE_CYAN = new Color(0.35F, 0.93F, 1.0F);
     private static final Color SENSE_VIOLET = new Color(0.64F, 0.48F, 1.0F);
     private static final Color SENSE_GOLD = new Color(1.0F, 0.88F, 0.52F);
@@ -85,16 +88,19 @@ public final class SpiritualSenseClient {
     private static final Matrix4f WORLD_TO_CLIP = new Matrix4f();
     private static Vec3 projectionCameraPosition = Vec3.ZERO;
     private static boolean projectionReady;
+    private static final AtmosphericQiCells ATMOSPHERIC_CELLS = new AtmosphericQiCells();
+    private static final it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap<Vec3> ATMOSPHERIC_FLOW_NODES =
+            new it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap<>(16);
 
     private SpiritualSenseClient() {
     }
 
     private static RenderType createSenseRenderType() {
         RenderType.CompositeState state = RenderType.CompositeState.builder()
-                .setShaderState(RenderStateShard
-                        .RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER)
-                .setTextureState(new RenderStateShard.TextureStateShard(
-                        WHITE_TEXTURE, false, false))
+                .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER)
+                .setTextureState(new RenderStateShard.TextureStateShard(WHITE_TEXTURE, false, false))
+                .setLightmapState(RenderStateShard.LIGHTMAP)
+                .setOverlayState(RenderStateShard.OVERLAY)
                 .setTransparencyState(
                         RenderStateShard.TRANSLUCENT_TRANSPARENCY)
                 .setDepthTestState(RenderStateShard.NO_DEPTH_TEST)
@@ -113,10 +119,10 @@ public final class SpiritualSenseClient {
 
     private static RenderType createAirFlowRenderType() {
         RenderType.CompositeState state = RenderType.CompositeState.builder()
-                .setShaderState(RenderStateShard
-                        .RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER)
-                .setTextureState(new RenderStateShard.TextureStateShard(
-                        WHITE_TEXTURE, false, false))
+                .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER)
+                .setTextureState(new RenderStateShard.TextureStateShard(WHITE_TEXTURE, false, false))
+                .setLightmapState(RenderStateShard.LIGHTMAP)
+                .setOverlayState(RenderStateShard.OVERLAY)
                 .setTransparencyState(
                         RenderStateShard.TRANSLUCENT_TRANSPARENCY)
                 .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
@@ -205,7 +211,7 @@ public final class SpiritualSenseClient {
      * identification makes it steadier, while 洞察 reveals the clear body.
      */
     public static Reconstruction reconstructionFor(int entityId) {
-        if (fade <= 0.01F) return null;
+        if (fade <= 0.01F || ShaderPackCompatibility.isRenderingShadowPass()) return null;
         SignatureVisual visual = VISUALS.get(entityId);
         if (visual == null || visual.missingTicks > 8) return null;
         Signature signature = visual.signature;
@@ -337,10 +343,14 @@ public final class SpiritualSenseClient {
             signatures = List.of();
             VISUALS.clear();
             focusedSignatureId = Integer.MIN_VALUE;
+            ATMOSPHERIC_CELLS.clear();
+            ATMOSPHERIC_FLOW_NODES.clear();
         }
     }
 
     private static void clear() {
+        ATMOSPHERIC_CELLS.clear();
+        ATMOSPHERIC_FLOW_NODES.clear();
         keyWasDown = false;
         focusKeyWasDown = false;
         holding = false;
@@ -457,26 +467,30 @@ public final class SpiritualSenseClient {
                 Mth.lerp(partialTick, minecraft.player.yo, minecraft.player.getY())
                         + minecraft.player.getBbHeight() * 0.5D,
                 Mth.lerp(partialTick, minecraft.player.zo, minecraft.player.getZ()));
-        MultiBufferSource.BufferSource buffers =
-                minecraft.renderBuffers().bufferSource();
+        MultiBufferSource.BufferSource buffers = SENSE_BUFFERS;
         float time = minecraft.level.getGameTime() + partialTick;
 
-        if (ClientData.showSpiritualSenseQiCurrents()) {
-            VertexConsumer airFlowVertices =
-                    buffers.getBuffer(AIR_FLOW_RENDER_TYPE);
-            renderAtmosphericQiFlow(poseStack, airFlowVertices,
-                    playerPosition, cameraPosition, time);
-            buffers.endBatch(AIR_FLOW_RENDER_TYPE);
-        }
+        WorldRenderState previous = WorldRenderState.capture();
+        try {
+            if (ClientData.showSpiritualSenseQiCurrents()) {
+                VertexConsumer airFlowVertices =
+                        buffers.getBuffer(AIR_FLOW_RENDER_TYPE);
+                renderAtmosphericQiFlow(poseStack, airFlowVertices,
+                        playerPosition, cameraPosition, time);
+                buffers.endBatch(AIR_FLOW_RENDER_TYPE);
+            }
 
-        VertexConsumer vertices = buffers.getBuffer(SENSE_RENDER_TYPE);
-        renderExpansionField(poseStack, vertices, playerPosition,
-                cameraPosition, renderedRadius, time);
-        renderFocusedPerception(poseStack, vertices, camera,
-                playerPosition, cameraPosition, time);
-        renderSignatures(poseStack, vertices, camera,
-                playerPosition, cameraPosition, time);
-        buffers.endBatch(SENSE_RENDER_TYPE);
+            VertexConsumer vertices = buffers.getBuffer(SENSE_RENDER_TYPE);
+            renderExpansionField(poseStack, vertices, playerPosition,
+                    cameraPosition, renderedRadius, time);
+            renderFocusedPerception(poseStack, vertices, camera,
+                    playerPosition, cameraPosition, time);
+            renderSignatures(poseStack, vertices, camera,
+                    playerPosition, cameraPosition, time);
+            buffers.endBatch(SENSE_RENDER_TYPE);
+        } finally {
+            previous.restore();
+        }
     }
 
     /**
@@ -499,6 +513,9 @@ public final class SpiritualSenseClient {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level == null) return;
 
+        // Thousands of cells interpolate the same few 24-block flow nodes.
+        // Recompute each animated node once for this frame, preserving live motion.
+        ATMOSPHERIC_FLOW_NODES.clear();
         List<QiAttractor> attractors = new ArrayList<>();
         if (selfUsingQi) {
             attractors.add(new QiAttractor(center, 1.0F));
@@ -526,17 +543,6 @@ public final class SpiritualSenseClient {
             }
         }
 
-        // Half of the previous 50x field: cbrt(25) scales each axis while
-        // preserving an exact 25x sample density by volume.
-        final float densityScale = 2.9240177F;
-        final float horizontalCell = 4.0F / densityScale;
-        final float verticalCell = 3.0F / densityScale;
-        int minX = Mth.floor((center.x - radius) / horizontalCell);
-        int maxX = Mth.floor((center.x + radius) / horizontalCell);
-        int minY = Mth.floor((center.y - verticalRadius) / verticalCell);
-        int maxY = Mth.floor((center.y + verticalRadius) / verticalCell);
-        int minZ = Mth.floor((center.z - radius) / horizontalCell);
-        int maxZ = Mth.floor((center.z + radius) / horizontalCell);
         // Minecraft quantizes the final alpha to 8 bits. The former 0.01
         // base opacity became effectively transparent after the lifetime and
         // boundary fades, while a 0.007-block ribbon was sub-pixel at normal
@@ -545,104 +551,84 @@ public final class SpiritualSenseClient {
         float selection = 0.40F + richness * 0.18F;
         Matrix4f matrix = poseStack.last().pose();
 
-        for (int cellX = minX; cellX <= maxX; cellX++) {
-            for (int cellY = minY; cellY <= maxY; cellY++) {
-                for (int cellZ = minZ; cellZ <= maxZ; cellZ++) {
-                    int seed = mixVeinSeed(cellX * 0x632BE5AB
-                            ^ cellY * 0x85157AF5
-                            ^ cellZ * 0x9E3779B9);
-                    Vec3 origin = new Vec3(
-                            (cellX + 0.18F
-                                    + veinNoise(seed, 0, 1) * 0.64F)
-                                    * horizontalCell,
-                            (cellY + 0.20F
-                                    + veinNoise(seed, 0, 2) * 0.60F)
-                                    * verticalCell,
-                            (cellZ + 0.18F
-                                    + veinNoise(seed, 0, 3) * 0.64F)
-                                    * horizontalCell);
-                    Vec3 offset = origin.subtract(center);
-                    double horizontalDistanceSqr = offset.x * offset.x
-                            + offset.z * offset.z;
-                    if (horizontalDistanceSqr > radius * radius
-                            || Math.abs(offset.y) > verticalRadius) continue;
+        for (AtmosphericQiCells.Cell cell : ATMOSPHERIC_CELLS.samples(minecraft.level, center, radius, verticalRadius)) {
+            int seed = cell.seed;
+            Vec3 origin = cell.origin;
+            double offsetX = origin.x - center.x;
+            double offsetY = origin.y - center.y;
+            double offsetZ = origin.z - center.z;
+            double horizontalDistanceSqr = offsetX * offsetX + offsetZ * offsetZ;
+            if (horizontalDistanceSqr > radius * radius
+                    || Math.abs(offsetY) > verticalRadius) continue;
 
-                    // Every candidate is still an absolute world cell. Qi use
-                    // only reveals more of those pre-existing cells nearby.
-                    float localDensity = 0.0F;
-                    for (QiAttractor attractor : attractors) {
-                        double distance = attractor.position()
-                                .distanceTo(origin);
-                        if (distance > 12.0D) continue;
-                        float local = (1.0F - (float) distance / 12.0F)
-                                * attractor.strength();
-                        localDensity = Math.max(localDensity, local * local);
-                    }
-                    if (veinNoise(seed, 0, 0)
-                            > selection + localDensity * 0.18F) continue;
-                    BlockPos originBlock = BlockPos.containing(origin);
-                    if (!minecraft.level.getBlockState(originBlock)
-                            .getCollisionShape(minecraft.level, originBlock)
-                            .isEmpty()) {
-                        continue;
-                    }
-
-                    Vec3 direction = atmosphericDirection(origin, time, seed);
-                    float attraction = 0.0F;
-                    for (QiAttractor attractor : attractors) {
-                        Vec3 inward = attractor.position().subtract(origin);
-                        double distance = inward.length();
-                        if (distance < 0.15D || distance > 11.0D) continue;
-                        float local = (1.0F - (float) distance / 11.0F)
-                                * attractor.strength();
-                        local *= local;
-                        direction = direction.scale(1.0F - local * 0.88F)
-                                .add(inward.scale(1.0D / distance)
-                                        .scale(local * 0.88F))
-                                .normalize();
-                        attraction = Math.max(attraction, local);
-                    }
-
-                    float phase = Mth.frac(time
-                            * (0.0062F + richness * 0.0014F
-                                    + attraction * 0.0055F)
-                            + veinNoise(seed, 0, 4));
-                    float lifeFade = Mth.sin(phase * Mth.PI);
-                    lifeFade *= lifeFade;
-                    float edgeFade = Mth.clamp(
-                            (radius - (float) Math.sqrt(horizontalDistanceSqr))
-                                    / 3.0F,
-                            0.0F, 1.0F);
-                    float alpha = visibility * lifeFade * edgeFade
-                            * (1.0F + attraction * 1.25F);
-                    if (alpha <= 0.001F) continue;
-
-                    Vec3 side = new Vec3(-direction.z, 0.0D, direction.x);
-                    if (side.lengthSqr() < 1.0E-5D) {
-                        side = new Vec3(1.0D, 0.0D, 0.0D);
-                    } else {
-                        side = side.normalize();
-                    }
-                    float travel = (phase - 0.5F)
-                            * (1.25F + richness * 0.55F
-                                    + attraction * 1.20F);
-                    Vec3 start = origin.add(direction.scale(travel));
-                    float length = 0.90F
-                            + veinNoise(seed, 0, 5) * 0.60F
-                            + richness * 0.24F
-                            + attraction * 0.34F;
-                    float curve = (veinNoise(seed, 0, 6) - 0.5F)
-                            * (0.15F + attraction * 0.12F);
-                    float width = 0.044F + richness * 0.014F;
-                    float hazeWidth = width * 2.8F;
-                    renderCurvedFlowStreak(vertices, matrix,
-                            start, direction, side, length, curve,
-                            hazeWidth, alpha * 0.30F, cameraPosition);
-                    renderCurvedFlowStreak(vertices, matrix,
-                            start, direction, side, length, curve,
-                            width, alpha, cameraPosition);
-                }
+            // Every candidate is still an absolute world cell. Qi use
+            // only reveals more of those pre-existing cells nearby.
+            float localDensity = 0.0F;
+            for (QiAttractor attractor : attractors) {
+                double distance = attractor.position()
+                        .distanceTo(origin);
+                if (distance > 12.0D) continue;
+                float local = (1.0F - (float) distance / 12.0F)
+                        * attractor.strength();
+                localDensity = Math.max(localDensity, local * local);
             }
+            if (cell.selectionNoise
+                    > selection + localDensity * 0.18F) continue;
+            if (!cell.isOpen(minecraft.level, clientTicks)) continue;
+
+            Vec3 direction = atmosphericDirection(origin, time, seed);
+            float attraction = 0.0F;
+            for (QiAttractor attractor : attractors) {
+                Vec3 inward = attractor.position().subtract(origin);
+                double distance = inward.length();
+                if (distance < 0.15D || distance > 11.0D) continue;
+                float local = (1.0F - (float) distance / 11.0F)
+                        * attractor.strength();
+                local *= local;
+                direction = direction.scale(1.0F - local * 0.88F)
+                        .add(inward.scale(1.0D / distance)
+                                .scale(local * 0.88F))
+                        .normalize();
+                attraction = Math.max(attraction, local);
+            }
+
+            float phase = Mth.frac(time
+                    * (0.0062F + richness * 0.0014F
+                            + attraction * 0.0055F)
+                    + cell.phaseNoise);
+            float lifeFade = Mth.sin(phase * Mth.PI);
+            lifeFade *= lifeFade;
+            float edgeFade = Mth.clamp(
+                    (radius - (float) Math.sqrt(horizontalDistanceSqr))
+                            / 3.0F,
+                    0.0F, 1.0F);
+            float alpha = visibility * lifeFade * edgeFade
+                    * (1.0F + attraction * 1.25F);
+            // A current passing through the camera otherwise expands across the
+            // screen and makes temporal exposure/antialiasing pulse in shader packs.
+            alpha *= Mth.clamp((float) origin.distanceTo(cameraPosition) - 1.5F, 0.0F, 1.0F);
+            if (alpha <= 0.001F) continue;
+
+            Vec3 side = new Vec3(-direction.z, 0.0D, direction.x);
+            if (side.lengthSqr() < 1.0E-5D) {
+                side = new Vec3(1.0D, 0.0D, 0.0D);
+            } else {
+                side = side.normalize();
+            }
+            float travel = (phase - 0.5F)
+                    * (1.25F + richness * 0.55F
+                            + attraction * 1.20F);
+            Vec3 start = origin.add(direction.scale(travel));
+            float length = 0.90F
+                    + cell.lengthNoise * 0.60F
+                    + richness * 0.24F
+                    + attraction * 0.34F;
+            float curve = (cell.curveNoise - 0.5F)
+                    * (0.15F + attraction * 0.12F);
+            float width = 0.044F + richness * 0.014F;
+            renderCurvedFlowStreak(vertices, matrix,
+                    start, direction, side, length, curve,
+                    width, alpha, cameraPosition);
         }
     }
 
@@ -662,20 +648,26 @@ public final class SpiritualSenseClient {
         Vec3 end = start.add(direction.scale(length))
                 .add(side.scale(curve * 1.55F));
         final int segments = 5;
-        Vec3 previous = start;
-        for (int segment = 0; segment < segments; segment++) {
-            float startProgress = segment / (float) segments;
-            float endProgress = (segment + 1) / (float) segments;
-            Vec3 next = cubicFlowPoint(start, controlOne, controlTwo, end,
-                    endProgress);
-            float startTaper = Mth.sin(startProgress * Mth.PI);
-            float endTaper = Mth.sin(endProgress * Mth.PI);
-            renderTaperedFlowSegment(vertices, matrix,
-                    previous, next, cameraPosition,
-                    Math.max(0.0005F, width * startTaper),
-                    Math.max(0.0005F, width * endTaper),
-                    alpha * startTaper, alpha * endTaper);
-            previous = next;
+        Vec3[] points = new Vec3[segments + 1];
+        points[0] = start;
+        for (int point = 1; point <= segments; point++) {
+            points[point] = cubicFlowPoint(start, controlOne, controlTwo, end,
+                    point / (float) segments);
+        }
+        // Both layers share their curve. Keep haze before core and all five
+        // segments so density, taper and translucent draw order stay unchanged.
+        for (int layer = 0; layer < 2; layer++) {
+            float layerWidth = layer == 0 ? width * 2.8F : width;
+            float layerAlpha = layer == 0 ? alpha * 0.30F : alpha;
+            for (int segment = 0; segment < segments; segment++) {
+                float startTaper = Mth.sin(segment / (float) segments * Mth.PI);
+                float endTaper = Mth.sin((segment + 1) / (float) segments * Mth.PI);
+                renderTaperedFlowSegment(vertices, matrix,
+                        points[segment], points[segment + 1], cameraPosition,
+                        Math.max(0.0005F, layerWidth * startTaper),
+                        Math.max(0.0005F, layerWidth * endTaper),
+                        layerAlpha * startTaper, layerAlpha * endTaper);
+            }
         }
     }
 
@@ -683,10 +675,13 @@ public final class SpiritualSenseClient {
             Vec3 start, Vec3 controlOne, Vec3 controlTwo, Vec3 end,
             float progress) {
         double inverse = 1.0D - progress;
-        return start.scale(inverse * inverse * inverse)
-                .add(controlOne.scale(3.0D * inverse * inverse * progress))
-                .add(controlTwo.scale(3.0D * inverse * progress * progress))
-                .add(end.scale(progress * progress * progress));
+        double a = inverse * inverse * inverse;
+        double b = 3.0D * inverse * inverse * progress;
+        double c = 3.0D * inverse * progress * progress;
+        double d = progress * progress * progress;
+        return new Vec3(start.x * a + controlOne.x * b + controlTwo.x * c + end.x * d,
+                start.y * a + controlOne.y * b + controlTwo.y * c + end.y * d,
+                start.z * a + controlOne.z * b + controlTwo.z * c + end.z * d);
     }
 
     private static Vec3 atmosphericDirection(
@@ -710,12 +705,17 @@ public final class SpiritualSenseClient {
 
     private static Vec3 atmosphericFlowNode(
             int gridX, int gridZ, float time) {
+        long key = (long) gridX << 32 | (gridZ & 0xFFFFFFFFL);
+        Vec3 cached = ATMOSPHERIC_FLOW_NODES.get(key);
+        if (cached != null) return cached;
         int seed = mixVeinSeed(gridX * 0x27D4EB2D
                 ^ gridZ * 0x165667B1);
         float angle = veinNoise(seed, 0, 7) * Mth.TWO_PI
                 + Mth.sin(time * 0.0014F + seed * 0.000011F) * 0.12F;
         float vertical = (veinNoise(seed, 0, 9) - 0.5F) * 0.075F;
-        return new Vec3(Mth.cos(angle), vertical, Mth.sin(angle)).normalize();
+        Vec3 direction = new Vec3(Mth.cos(angle), vertical, Mth.sin(angle)).normalize();
+        ATMOSPHERIC_FLOW_NODES.put(key, direction);
+        return direction;
     }
 
     private static float smoothFlowBlend(float value) {
@@ -728,27 +728,27 @@ public final class SpiritualSenseClient {
             Vec3 startWorld, Vec3 endWorld, Vec3 cameraPosition,
             float startWidth, float endWidth,
             float startAlpha, float endAlpha) {
-        Vec3 direction = endWorld.subtract(startWorld);
-        if (direction.lengthSqr() < 1.0E-6D) return;
-        Vec3 midpoint = startWorld.add(endWorld).scale(0.5D);
-        Vec3 side = direction.cross(cameraPosition.subtract(midpoint));
-        if (side.lengthSqr() < 1.0E-6D) {
-            side = direction.cross(new Vec3(0.0D, 1.0D, 0.0D));
-        }
-        if (side.lengthSqr() < 1.0E-6D) return;
-        side = side.normalize();
-        Vec3 startSide = side.scale(startWidth);
-        Vec3 endSide = side.scale(endWidth);
-        Vec3 start = startWorld.subtract(cameraPosition);
-        Vec3 end = endWorld.subtract(cameraPosition);
-        trailVertex(vertices, matrix, start.add(startSide), 0.0F, 0.0F,
-                AIR_FLOW_COLOR, startAlpha);
-        trailVertex(vertices, matrix, start.subtract(startSide), 1.0F, 0.0F,
-                AIR_FLOW_COLOR, startAlpha);
-        trailVertex(vertices, matrix, end.subtract(endSide), 1.0F, 1.0F,
-                AIR_FLOW_COLOR, endAlpha);
-        trailVertex(vertices, matrix, end.add(endSide), 0.0F, 1.0F,
-                AIR_FLOW_COLOR, endAlpha);
+        double dx = endWorld.x - startWorld.x, dy = endWorld.y - startWorld.y, dz = endWorld.z - startWorld.z;
+        if (dx * dx + dy * dy + dz * dz < 1.0E-6D) return;
+        double mx = cameraPosition.x - (startWorld.x + endWorld.x) * .5;
+        double my = cameraPosition.y - (startWorld.y + endWorld.y) * .5;
+        double mz = cameraPosition.z - (startWorld.z + endWorld.z) * .5;
+        double sx = dy * mz - dz * my, sy = dz * mx - dx * mz, sz = dx * my - dy * mx;
+        if (sx * sx + sy * sy + sz * sz < 1.0E-6D) { sx = -dz; sy = 0; sz = dx; }
+        double lengthSquared = sx * sx + sy * sy + sz * sz;
+        if (lengthSquared < 1.0E-6D) return;
+        double length = Math.sqrt(lengthSquared);
+        sx /= length; sy /= length; sz /= length;
+        double ax = startWorld.x - cameraPosition.x, ay = startWorld.y - cameraPosition.y, az = startWorld.z - cameraPosition.z;
+        double bx = endWorld.x - cameraPosition.x, by = endWorld.y - cameraPosition.y, bz = endWorld.z - cameraPosition.z;
+        trailVertex(vertices, matrix, ax + sx * startWidth, ay + sy * startWidth, az + sz * startWidth,
+                0, 0, AIR_FLOW_COLOR, startAlpha);
+        trailVertex(vertices, matrix, ax - sx * startWidth, ay - sy * startWidth, az - sz * startWidth,
+                1, 0, AIR_FLOW_COLOR, startAlpha);
+        trailVertex(vertices, matrix, bx - sx * endWidth, by - sy * endWidth, bz - sz * endWidth,
+                1, 1, AIR_FLOW_COLOR, endAlpha);
+        trailVertex(vertices, matrix, bx + sx * endWidth, by + sy * endWidth, bz + sz * endWidth,
+                0, 1, AIR_FLOW_COLOR, endAlpha);
     }
 
     private record QiAttractor(Vec3 position, float strength) {
@@ -1558,7 +1558,7 @@ public final class SpiritualSenseClient {
         }
     }
 
-    private static int mixVeinSeed(int value) {
+    static int mixVeinSeed(int value) {
         value ^= value >>> 16;
         value *= 0x7FEB352D;
         value ^= value >>> 15;
@@ -1566,7 +1566,7 @@ public final class SpiritualSenseClient {
         return value ^ value >>> 16;
     }
 
-    private static float veinNoise(int seed, int branch, int segment) {
+    static float veinNoise(int seed, int branch, int segment) {
         int mixed = mixVeinSeed(seed
                 ^ branch * 0x632BE5AB
                 ^ segment * 0x85157AF5);
@@ -1958,6 +1958,8 @@ public final class SpiritualSenseClient {
         int centerX = width / 2;
         int y = 39;
         int halfWidth = Math.min(190, width / 3);
+        var position = HudLayout.place(graphics, HudElement.SENSE_COMPASS, centerX - halfWidth - 5, y - 13, halfWidth * 2 + 10, 20);
+        centerX = position.x() + halfWidth + 5; y = position.y() + 13;
         graphics.fill(centerX - halfWidth, y,
                 centerX + halfWidth, y + 1, 0x446EEBFF);
         // Minecraft yaw: south 0, west 90, north 180, east -90.
@@ -2029,6 +2031,17 @@ public final class SpiritualSenseClient {
         if (nearest.isEmpty()) return;
         int x = 12;
         int y = height - 20 - nearest.size() * 16;
+        int panelWidth = 1;
+        int panelHeight = nearest.size() * 16;
+        for (Signature signature : nearest) {
+            panelWidth = Math.max(panelWidth, minecraft.font.width(primaryLine(minecraft, signature)));
+            if (signature.id() == focusedSignatureId && !detailLine(signature).isEmpty()) {
+                panelWidth = Math.max(panelWidth, minecraft.font.width(detailLine(signature)) + 8);
+                panelHeight += 11;
+            }
+        }
+        var position = HudLayout.place(graphics, HudElement.SENSE_DETAILS, x, y, panelWidth, panelHeight);
+        x = position.x(); y = position.y();
         for (Signature signature : nearest) {
             Color color = colorFor(signature);
             Component primary = primaryLine(minecraft, signature);
@@ -2191,7 +2204,7 @@ public final class SpiritualSenseClient {
     private static String elementName(String roots) {
         List<String> translated = new ArrayList<>();
         for (String root : roots.split("[/,]")) {
-            String suffix = switch (root.trim()) {
+            String suffix = switch (com.example.immortal_cultivation_mod.attachment.SpiritRoots.normalizeElement(root)) {
                 case "金" -> "metal";
                 case "木" -> "wood";
                 case "水" -> "water";
@@ -2200,8 +2213,8 @@ public final class SpiritualSenseClient {
                 case "雷" -> "thunder";
                 case "冰" -> "ice";
                 case "风" -> "wind";
-                case "光" -> "light";
-                case "暗" -> "dark";
+                case "阳" -> "yang";
+                case "阴" -> "yin";
                 default -> "";
             };
             if (!suffix.isBlank()) {
@@ -2247,7 +2260,8 @@ public final class SpiritualSenseClient {
 
     private static Color colorFor(Signature signature) {
         if (!signature.element().isBlank()) {
-            String first = signature.element().split("[/,]")[0].trim();
+            String first = com.example.immortal_cultivation_mod.attachment.SpiritRoots.normalizeElement(
+                    signature.element().split("[/,]")[0]);
             return switch (first) {
                 case "金" -> new Color(1.0F, 0.78F, 0.20F);
                 case "木" -> new Color(0.28F, 0.92F, 0.38F);
@@ -2257,8 +2271,8 @@ public final class SpiritualSenseClient {
                 case "雷" -> new Color(0.46F, 0.65F, 1.0F);
                 case "冰" -> new Color(0.58F, 0.96F, 1.0F);
                 case "风" -> new Color(0.50F, 1.0F, 0.72F);
-                case "光" -> new Color(1.0F, 0.96F, 0.66F);
-                case "暗" -> new Color(0.52F, 0.25F, 0.72F);
+                case "阳" -> new Color(1.0F, 0.96F, 0.66F);
+                case "阴" -> new Color(0.52F, 0.25F, 0.72F);
                 default -> SENSE_CYAN;
             };
         }
@@ -2431,39 +2445,44 @@ public final class SpiritualSenseClient {
             VertexConsumer vertices, Matrix4f matrix,
             float x, float y, float u, float v,
             Color color, float alpha) {
-        vertices.addVertex(matrix, x, y, 0.0F)
+        VfxVertexWriter.vertex(vertices, matrix, x, y, 0.0F)
                 .setColor(color.red, color.green, color.blue, alpha)
-                .setUv(u, v)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setLight(LightTexture.FULL_BRIGHT)
-                .setNormal(0.0F, 0.0F, 1.0F);
+                .setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT)
+                .setNormal(0, 0, 1);
     }
 
     private static void flatVertex(
             VertexConsumer vertices, Matrix4f matrix,
             float x, float y, float z, float u, float v,
             Color color, float alpha) {
-        vertices.addVertex(matrix, x, y, z)
+        VfxVertexWriter.vertex(vertices, matrix, x, y, z)
                 .setColor(color.red, color.green, color.blue, alpha)
-                .setUv(u, v)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setLight(LightTexture.FULL_BRIGHT)
-                .setNormal(0.0F, 1.0F, 0.0F);
+                .setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT)
+                .setNormal(0, 1, 0);
     }
 
     private static void trailVertex(
             VertexConsumer vertices, Matrix4f matrix,
             Vec3 position, float u, float v,
             Color color, float alpha) {
-        vertices.addVertex(matrix,
-                        (float) position.x,
-                        (float) position.y,
-                        (float) position.z)
+        trailVertex(vertices, matrix, position.x, position.y, position.z, u, v, color, alpha);
+    }
+
+    private static void trailVertex(VertexConsumer vertices, Matrix4f matrix,
+            double x, double y, double z, float u, float v, Color color, float alpha) {
+        if (vertices.getClass() == com.mojang.blaze3d.vertex.BufferBuilder.class) {
+            int packedColor = ((int) (alpha * 255F) & 255) << 24
+                    | ((int) (color.red * 255F) & 255) << 16
+                    | ((int) (color.green * 255F) & 255) << 8
+                    | ((int) (color.blue * 255F) & 255);
+            VfxVertexWriter.entity(vertices, matrix, (float) x, (float) y, (float) z,
+                    packedColor, u, v, OverlayTexture.NO_OVERLAY, LightTexture.FULL_BRIGHT, 0, 1, 0);
+            return;
+        }
+        VfxVertexWriter.vertex(vertices, matrix, (float) x, (float) y, (float) z)
                 .setColor(color.red, color.green, color.blue, alpha)
-                .setUv(u, v)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setLight(LightTexture.FULL_BRIGHT)
-                .setNormal(0.0F, 1.0F, 0.0F);
+                .setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT)
+                .setNormal(0, 1, 0);
     }
 
     private static final class SignatureVisual {

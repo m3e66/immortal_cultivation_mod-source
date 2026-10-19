@@ -17,6 +17,7 @@ public final class BeastMoveBlockBreaker {
 
     /** Only beast realms are amplified; cultivators using the helper keep their existing limits. */
     public static int destructiveRealm(Mob beast) {
+        if (beast instanceof RealmBeast variant) return variant.beastRealm();
         if (beast instanceof CrimsonSkyFlameFloodDragonEntity || beast instanceof BloodApeDemonGeneralEntity) return 4;
         if (beast instanceof PhantomVeilFoxEntity fox)
             return com.example.immortal_cultivation_mod.attachment.CultivationLevels.getRealmIndex(fox.cultivationRealm());

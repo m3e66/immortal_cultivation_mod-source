@@ -5,43 +5,31 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
 public final class SystemGuiTextures {
-    static final ResourceLocation WINDOWS =
-            ResourceLocation.fromNamespaceAndPath(
-                    ImmortalCultivationMod.MODID,
-                    "textures/gui/system_windows.png");
-
-    private static final int TEXTURE_SIZE = 1254;
-
-    private static final int WINDOW_X = 40;
-    private static final int WINDOW_Y = 61;
-    private static final int WINDOW_RIGHT = 549;
-    private static final int WINDOW_BODY_Y = 130;
-    private static final int WINDOW_BOTTOM_Y = 412;
-    private static final int WINDOW_BOTTOM = 427;
-    private static final int WINDOW_LEFT_INNER_X = 54;
-    private static final int WINDOW_RIGHT_INNER_X = 536;
-
-    private static final int TITLE_LEFT_SOURCE_WIDTH = 20;
-    private static final int TITLE_BLANK_X = 300;
-    private static final int TITLE_CONTROLS_X = 389;
-    private static final int TITLE_SOURCE_HEIGHT =
-            WINDOW_BODY_Y - WINDOW_Y;
-
-    private static final int TITLE_LEFT_WIDTH = 10;
+    private record Slice(ResourceLocation texture, int width, int height) {
+        Slice(String name, int width, int height) {
+            this(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID,
+                    "textures/gui/system/" + name + ".png"), width, height);
+        }
+        void draw(GuiGraphics g, int x, int y, int w, int h) {
+            g.blit(texture, x, y, w, h, 0, 0, width, height, width, height);
+        }
+    }
+    private static final Slice TITLE_LEFT = new Slice("title_left",20,69);
+    private static final Slice TITLE_FILL = new Slice("title_fill",2,69);
+    private static final Slice MINIMIZE = new Slice("title_minimize",46,69);
+    private static final Slice MAXIMIZE = new Slice("title_maximize",46,69);
+    private static final Slice CLOSE = new Slice("title_close",68,69);
+    private static final Slice LEFT = new Slice("window_left",14,282);
+    private static final Slice BODY = new Slice("window_body",482,282);
+    private static final Slice RIGHT = new Slice("window_right",13,282);
+    private static final Slice BOTTOM_LEFT = new Slice("window_bottom_left",14,15);
+    private static final Slice BOTTOM = new Slice("window_bottom",482,15);
+    private static final Slice BOTTOM_RIGHT = new Slice("window_bottom_right",13,15);
+    private static final Slice BUTTON_LEFT = new Slice("button_left",13,58);
+    private static final Slice BUTTON_FILL = new Slice("button_fill",2,58);
+    private static final Slice BUTTON_RIGHT = new Slice("button_right",13,58);
     private static final int TITLE_CONTROLS_WIDTH = 80;
     private static final int TITLE_HEIGHT = 35;
-    private static final int BORDER_LEFT_WIDTH = 7;
-    private static final int BORDER_RIGHT_WIDTH = 7;
-    private static final int BORDER_BOTTOM_HEIGHT = 8;
-
-    private static final int BUTTON_X = 41;
-    private static final int BUTTON_Y = 808;
-    private static final int BUTTON_SOURCE_HEIGHT = 58;
-    private static final int BUTTON_LEFT_SOURCE_WIDTH = 13;
-    private static final int BUTTON_RIGHT_X = 223;
-    private static final int BUTTON_RIGHT_SOURCE_WIDTH = 13;
-    private static final int BUTTON_BLANK_X = 62;
-    private static final int BUTTON_CAP_WIDTH = 5;
 
     private static final int FACE = 0xFFC0C0C0;
     private static final int LIGHT = 0xFFDFDFDF;
@@ -55,168 +43,30 @@ public final class SystemGuiTextures {
     private SystemGuiTextures() {
     }
 
-    static void drawWindow(
-            GuiGraphics graphics, int x, int y, int width, int height) {
-        int safeWidth = Math.max(
-                TITLE_LEFT_WIDTH + TITLE_CONTROLS_WIDTH + 1,
-                width);
-        drawTitleBar(graphics, x, y, safeWidth);
-        if (height <= TITLE_HEIGHT) {
-            return;
-        }
-
-        int safeHeight = Math.max(
-                TITLE_HEIGHT + BORDER_BOTTOM_HEIGHT + 1,
-                height);
-        int bodyHeight = Math.max(
-                1, safeHeight - TITLE_HEIGHT - BORDER_BOTTOM_HEIGHT);
-        int bodyWidth = Math.max(
-                1, safeWidth - BORDER_LEFT_WIDTH - BORDER_RIGHT_WIDTH);
-
-        blit(
-                graphics,
-                x,
-                y + TITLE_HEIGHT,
-                BORDER_LEFT_WIDTH,
-                bodyHeight,
-                WINDOW_X,
-                WINDOW_BODY_Y,
-                WINDOW_LEFT_INNER_X - WINDOW_X,
-                WINDOW_BOTTOM_Y - WINDOW_BODY_Y);
-        blit(
-                graphics,
-                x + BORDER_LEFT_WIDTH,
-                y + TITLE_HEIGHT,
-                bodyWidth,
-                bodyHeight,
-                WINDOW_LEFT_INNER_X,
-                WINDOW_BODY_Y,
-                WINDOW_RIGHT_INNER_X - WINDOW_LEFT_INNER_X,
-                WINDOW_BOTTOM_Y - WINDOW_BODY_Y);
-        blit(
-                graphics,
-                x + safeWidth - BORDER_RIGHT_WIDTH,
-                y + TITLE_HEIGHT,
-                BORDER_RIGHT_WIDTH,
-                bodyHeight,
-                WINDOW_RIGHT_INNER_X,
-                WINDOW_BODY_Y,
-                WINDOW_RIGHT - WINDOW_RIGHT_INNER_X,
-                WINDOW_BOTTOM_Y - WINDOW_BODY_Y);
-
-        blit(
-                graphics,
-                x,
-                y + safeHeight - BORDER_BOTTOM_HEIGHT,
-                BORDER_LEFT_WIDTH,
-                BORDER_BOTTOM_HEIGHT,
-                WINDOW_X,
-                WINDOW_BOTTOM_Y,
-                WINDOW_LEFT_INNER_X - WINDOW_X,
-                WINDOW_BOTTOM - WINDOW_BOTTOM_Y);
-        blit(
-                graphics,
-                x + BORDER_LEFT_WIDTH,
-                y + safeHeight - BORDER_BOTTOM_HEIGHT,
-                bodyWidth,
-                BORDER_BOTTOM_HEIGHT,
-                WINDOW_LEFT_INNER_X,
-                WINDOW_BOTTOM_Y,
-                WINDOW_RIGHT_INNER_X - WINDOW_LEFT_INNER_X,
-                WINDOW_BOTTOM - WINDOW_BOTTOM_Y);
-        blit(
-                graphics,
-                x + safeWidth - BORDER_RIGHT_WIDTH,
-                y + safeHeight - BORDER_BOTTOM_HEIGHT,
-                BORDER_RIGHT_WIDTH,
-                BORDER_BOTTOM_HEIGHT,
-                WINDOW_RIGHT_INNER_X,
-                WINDOW_BOTTOM_Y,
-                WINDOW_RIGHT - WINDOW_RIGHT_INNER_X,
-                WINDOW_BOTTOM - WINDOW_BOTTOM_Y);
+    static void drawWindow(GuiGraphics g, int x, int y, int width, int height) {
+        int w = Math.max(91, width);
+        TITLE_LEFT.draw(g,x,y,10,TITLE_HEIGHT);
+        TITLE_FILL.draw(g,x+10,y,w-90,TITLE_HEIGHT);
+        MINIMIZE.draw(g,x+w-80,y,23,TITLE_HEIGHT);
+        MAXIMIZE.draw(g,x+w-57,y,23,TITLE_HEIGHT);
+        CLOSE.draw(g,x+w-34,y,34,TITLE_HEIGHT);
+        if (height <= TITLE_HEIGHT) return;
+        int h = Math.max(44,height), bodyHeight = h-TITLE_HEIGHT-8;
+        LEFT.draw(g,x,y+TITLE_HEIGHT,7,bodyHeight);
+        BODY.draw(g,x+7,y+TITLE_HEIGHT,w-14,bodyHeight);
+        RIGHT.draw(g,x+w-7,y+TITLE_HEIGHT,7,bodyHeight);
+        BOTTOM_LEFT.draw(g,x,y+h-8,7,8);
+        BOTTOM.draw(g,x+7,y+h-8,w-14,8);
+        BOTTOM_RIGHT.draw(g,x+w-7,y+h-8,7,8);
     }
 
-    private static void drawTitleBar(
-            GuiGraphics graphics, int x, int y, int width) {
-        blit(
-                graphics,
-                x,
-                y,
-                TITLE_LEFT_WIDTH,
-                TITLE_HEIGHT,
-                WINDOW_X,
-                WINDOW_Y,
-                TITLE_LEFT_SOURCE_WIDTH,
-                TITLE_SOURCE_HEIGHT);
-        blit(
-                graphics,
-                x + TITLE_LEFT_WIDTH,
-                y,
-                Math.max(
-                        1,
-                        width - TITLE_LEFT_WIDTH - TITLE_CONTROLS_WIDTH),
-                TITLE_HEIGHT,
-                TITLE_BLANK_X,
-                WINDOW_Y,
-                2,
-                TITLE_SOURCE_HEIGHT);
-        blit(
-                graphics,
-                x + width - TITLE_CONTROLS_WIDTH,
-                y,
-                TITLE_CONTROLS_WIDTH,
-                TITLE_HEIGHT,
-                TITLE_CONTROLS_X,
-                WINDOW_Y,
-                WINDOW_RIGHT - TITLE_CONTROLS_X,
-                TITLE_SOURCE_HEIGHT);
-    }
-
-    public static void drawButton(
-            GuiGraphics graphics,
-            int x,
-            int y,
-            int width,
-            int height,
-            boolean active,
-            boolean hovered) {
-        int centerWidth = Math.max(1, width - BUTTON_CAP_WIDTH * 2);
-        blit(
-                graphics,
-                x,
-                y,
-                BUTTON_CAP_WIDTH,
-                height,
-                BUTTON_X,
-                BUTTON_Y,
-                BUTTON_LEFT_SOURCE_WIDTH,
-                BUTTON_SOURCE_HEIGHT);
-        blit(
-                graphics,
-                x + BUTTON_CAP_WIDTH,
-                y,
-                centerWidth,
-                height,
-                BUTTON_BLANK_X,
-                BUTTON_Y,
-                2,
-                BUTTON_SOURCE_HEIGHT);
-        blit(
-                graphics,
-                x + width - BUTTON_CAP_WIDTH,
-                y,
-                BUTTON_CAP_WIDTH,
-                height,
-                BUTTON_RIGHT_X,
-                BUTTON_Y,
-                BUTTON_RIGHT_SOURCE_WIDTH,
-                BUTTON_SOURCE_HEIGHT);
-        if (!active) {
-            graphics.fill(x + 2, y + 2, x + width - 2, y + height - 2,
-                    0x66707070);
-        } else if (hovered) {
-            drawFocusRect(graphics, x + 3, y + 3, width - 6, height - 6);
-        }
+    public static void drawButton(GuiGraphics g, int x, int y, int width, int height,
+                                  boolean active, boolean hovered) {
+        BUTTON_LEFT.draw(g,x,y,5,height);
+        BUTTON_FILL.draw(g,x+5,y,Math.max(1,width-10),height);
+        BUTTON_RIGHT.draw(g,x+width-5,y,5,height);
+        if (!active) g.fill(x+2,y+2,x+width-2,y+height-2,0x66707070);
+        else if (hovered) drawFocusRect(g,x+3,y+3,width-6,height-6);
     }
 
     public static void drawInsetPanel(
@@ -493,27 +343,4 @@ public final class SystemGuiTextures {
                 && mouseY < y + closeHeight();
     }
 
-    private static void blit(
-            GuiGraphics graphics,
-            int x,
-            int y,
-            int width,
-            int height,
-            int sourceX,
-            int sourceY,
-            int sourceWidth,
-            int sourceHeight) {
-        graphics.blit(
-                WINDOWS,
-                x,
-                y,
-                width,
-                height,
-                sourceX,
-                sourceY,
-                sourceWidth,
-                sourceHeight,
-                TEXTURE_SIZE,
-                TEXTURE_SIZE);
-    }
 }

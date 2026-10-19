@@ -1,16 +1,6 @@
 {
   "type": "neoforge:add_spawns",
-  "biomes": [
-    "minecraft:windswept_hills",
-    "minecraft:windswept_gravelly_hills",
-    "minecraft:windswept_forest",
-    "minecraft:stony_peaks",
-    "minecraft:jagged_peaks",
-    "minecraft:frozen_peaks",
-    "minecraft:meadow",
-    "minecraft:grove",
-    "minecraft:dripstone_caves"
-  ],
+  "biomes": "#immortal_cultivation_mod:beast_spawns/thunderhorn_rock_badger",
   "spawners": {
     "type": "immortal_cultivation_mod:thunderhorn_rock_badger",
     "weight": 4,

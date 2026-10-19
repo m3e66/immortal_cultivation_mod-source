@@ -7,7 +7,7 @@
     {
       "type": "patchouli:text",
       "title": "Fire Beneath the Ding",
-      "text": "Shoot supported empty ground with a filled vessel, then place the Ding directly above that fire.$(br2)The floating essence released by sneaking does not substitute for a burning forge block. Open the Ding, insert the recipe slip and materials, and inspect its temperature and flame requirements.$(br2)Bronze Fire-Guiding Ding and Crimson Gold Sanyang Ding have lids: sneak-right-click only opens or closes the lid, without opening the menu. With the lid open, ordinary right-click opens the menu; a closed lid prevents menu access. Leaving the menu keeps the lid open. Inserted items appear inside its basin. With Debug Eye enabled, hold the stat editor and sneak-right-click to resize the Ding."
+      "text": "Shoot supported empty ground with a filled vessel, then place the Ding directly above that fire.$(br2)The floating essence released by sneaking does not substitute for a burning forge block. Open the Ding, insert the recipe slip and materials, and inspect its temperature and flame requirements.$(br2)Bronze Fire-Guiding Ding and Crimson Gold Sanyang Ding have lids: sneak-right-click only opens or closes the lid, without opening the menu. With the lid open, ordinary right-click opens the menu; a closed lid prevents menu access. Leaving the menu keeps the lid open. Inserted items appear inside its basin. With Debug Eye enabled, sneak-right-click resizes the Ding before any lid action, regardless of the held item."
     },
     {
       "type": "patchouli:text",

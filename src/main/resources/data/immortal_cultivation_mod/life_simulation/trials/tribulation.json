@@ -1,0 +1,179 @@
+{
+  "id": "life_danger_tribulation",
+  "version": 5,
+  "repeat": true,
+  "category": "trial",
+  "minimum_realm": 6,
+  "maximum_realm": 27,
+  "title_key": "life.trial.title",
+  "nodes": [
+    {
+      "id": "start",
+      "text_key": "life.trial.ready",
+      "choices": [
+        {
+          "id": "begin",
+          "text_key": "life.trial.begin",
+          "next": "a",
+          "failure": "c",
+          "battle": {
+            "arena": "tribulation",
+            "objective_key": "life.story.tribulation.objective",
+            "stakes": "lethal",
+            "goal": 3,
+            "limit": 12,
+            "mechanic": "tribulation",
+            "anchors": [
+              {
+                "name_key": "life.story.tribulation.anchor.0",
+                "purpose": "body",
+                "owner": 0,
+                "hp_fraction": 0.08,
+                "dc": 14,
+                "order": -1,
+                "protected": false,
+                "inspection_required": false,
+                "preparation_identifies": true,
+                "explicit_bypass": false,
+                "hidden": false,
+                "cast_role": ""
+              },
+              {
+                "name_key": "life.story.tribulation.anchor.1",
+                "purpose": "meridians",
+                "owner": 0,
+                "hp_fraction": 0.08,
+                "dc": 14,
+                "order": -1,
+                "protected": false,
+                "inspection_required": false,
+                "preparation_identifies": true,
+                "explicit_bypass": false,
+                "hidden": false,
+                "cast_role": ""
+              },
+              {
+                "name_key": "life.story.tribulation.anchor.2",
+                "purpose": "will",
+                "owner": 0,
+                "hp_fraction": 0.08,
+                "dc": 14,
+                "order": -1,
+                "protected": false,
+                "inspection_required": false,
+                "preparation_identifies": true,
+                "explicit_bypass": false,
+                "hidden": false,
+                "cast_role": ""
+              }
+            ],
+            "victory_rule": "either",
+            "objective_win": "",
+            "hazard_limit": 12,
+            "hazard_key": "life.story.tribulation.hazard",
+            "objective_enabled": true,
+            "disaster": true,
+            "enemies": [
+              {
+                "name_key": "life.story.tribulation.opponent",
+                "realm": -1,
+                "sprite": "storm_front",
+                "profile": "tribulation",
+                "moves": [
+                  {
+                    "id": "tribulation_strike",
+                    "kind": "strike",
+                    "name_key": "life.story.tribulation.move.strike",
+                    "element": "thunder",
+                    "potency": 1,
+                    "accuracy": 0,
+                    "priority": 0,
+                    "qi_fraction": 0,
+                    "cooldown": 0,
+                    "effect": "disrupt",
+                    "area": false
+                  },
+                  {
+                    "id": "tribulation_heavy",
+                    "kind": "heavy",
+                    "name_key": "life.story.tribulation.move.heavy",
+                    "element": "thunder",
+                    "potency": 1.6,
+                    "accuracy": -2,
+                    "priority": -1,
+                    "qi_fraction": 0.04,
+                    "cooldown": 1,
+                    "effect": "disrupt",
+                    "area": false
+                  },
+                  {
+                    "id": "tribulation_shield",
+                    "kind": "shield",
+                    "name_key": "life.story.tribulation.move.shield",
+                    "element": "thunder",
+                    "potency": 0,
+                    "accuracy": 0,
+                    "priority": 1,
+                    "qi_fraction": 0.08,
+                    "cooldown": 2,
+                    "effect": "shield",
+                    "area": false
+                  }
+                ]
+              }
+            ],
+            "escape": "b",
+            "surrender": "b",
+            "abandoned_ending": true
+          }
+        },
+        {
+          "id": "leave",
+          "text_key": "life.trial.leave",
+          "next": "b"
+        }
+      ]
+    },
+    {
+      "id": "a",
+      "text_key": "life.trial.a",
+      "effects": [
+        "breakthrough"
+      ],
+      "choices": [
+        {
+          "id": "finish",
+          "text_key": "life.replacement.finish",
+          "next": "a",
+          "ending": true
+        }
+      ]
+    },
+    {
+      "id": "b",
+      "text_key": "life.trial.b",
+      "effects": [],
+      "choices": [
+        {
+          "id": "finish",
+          "text_key": "life.replacement.finish",
+          "next": "b",
+          "ending": true
+        }
+      ]
+    },
+    {
+      "id": "c",
+      "text_key": "life.trial.c",
+      "effects": [],
+      "choices": [
+        {
+          "id": "finish",
+          "text_key": "life.replacement.finish",
+          "next": "c",
+          "ending": true
+        }
+      ]
+    }
+  ]
+}

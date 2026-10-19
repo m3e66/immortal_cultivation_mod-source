@@ -1,0 +1,18 @@
+{
+  "name": "Spirit-Gathering Pill",
+  "icon": "immortal_cultivation_mod:juling_pill",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Scripture Account",
+      "text": "The Spirit-Gathering Pill temporarily improves a cultivator's ability to accumulate cultivation progress. It also provides gradual Qi recovery, making it especially useful during periods of intensive training."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Effect",
+      "text": "+10% cultivation gain for 120 seconds, and restores 2% maximum Qi over 20 seconds."
+    }
+  ]
+}

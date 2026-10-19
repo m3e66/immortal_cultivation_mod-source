@@ -62,7 +62,8 @@ import software.bernie.geckolib.util.GeckoLibUtil;
  * 雷角岩獾: a Foundation Establishment middle-stage earth/thunder ambush beast.
  * Its three upper armor sections each absorb 90 damage and break independently.
  */
-public final class ThunderhornRockBadgerEntity extends Monster implements GeoEntity {
+public final class ThunderhornRockBadgerEntity extends RealmBeastMonster implements GeoEntity {
+    // Visuals use synchronized BeastAttackVfx; server combat and sounds remain unchanged.
     public static final float MODEL_SCALE = 1.0F;
 
     private static final EntityDataAccessor<Byte> ACTION_STATE =
@@ -176,7 +177,7 @@ public final class ThunderhornRockBadgerEntity extends Monster implements GeoEnt
             EntityType<ThunderhornRockBadgerEntity> type,
             ServerLevelAccessor level, MobSpawnType spawnType,
             BlockPos pos, RandomSource random) {
-        if (!Monster.checkMonsterSpawnRules(type, level, spawnType, pos, random)) {
+        if (!Monster.checkAnyLightMonsterSpawnRules(type, level, spawnType, pos, random)) {
             return false;
         }
         BlockPos floor = pos.below();
@@ -219,18 +220,8 @@ public final class ThunderhornRockBadgerEntity extends Monster implements GeoEnt
             double x = getX() + (random.nextDouble() - 0.5D) * 1.8D;
             double y = getY() + 0.9D + random.nextDouble() * 0.65D;
             double z = getZ() + (random.nextDouble() - 0.5D) * 2.1D;
-            level().addParticle(ParticleTypes.ELECTRIC_SPARK,
-                    x, y, z, 0.0D, 0.02D, 0.0D);
-            level().addParticle(ModParticles.METHOD_QI_THUNDER.get(),
-                    x, y, z, 0.0D, 0.008D, 0.0D);
         }
-        if (isFrenzied() && (tickCount & 1) == 0) {
-            level().addParticle(ModParticles.METHOD_QI_EARTH.get(),
-                    getX() + (random.nextDouble() - 0.5D) * 2.0D,
-                    getY() + random.nextDouble() * 1.2D,
-                    getZ() + (random.nextDouble() - 0.5D) * 2.0D,
-                    0.0D, 0.025D, 0.0D);
-        }
+
     }
 
     @Override
@@ -331,12 +322,6 @@ public final class ThunderhornRockBadgerEntity extends Monster implements GeoEnt
         updateCombatAttributes();
         beginAction(ACTION_FRENZY, FRENZY_ACTION_TICKS, getTarget());
         if (level() instanceof ServerLevel level) {
-            level.sendParticles(ParticleTypes.ELECTRIC_SPARK,
-                    getX(), getY() + 0.9D, getZ(),
-                    45, 1.1D, 0.8D, 1.1D, 0.16D);
-            level.sendParticles(ModParticles.METHOD_QI_THUNDER.get(),
-                    getX(), getY() + 0.8D, getZ(),
-                    35, 1.0D, 0.65D, 1.0D, 0.09D);
             level.playSound(null, blockPosition(), SoundEvents.RAVAGER_ROAR,
                     SoundSource.HOSTILE, 1.35F, 0.78F);
         }
@@ -465,13 +450,7 @@ public final class ThunderhornRockBadgerEntity extends Monster implements GeoEnt
     private void crashIntoWall(ServerLevel level) {
         super.hurt(damageSources().generic(), 35.0F);
         setDeltaMovement(Vec3.ZERO);
-        level.sendParticles(ParticleTypes.ELECTRIC_SPARK,
-                getX(), getY() + 0.8D, getZ(), 30,
-                0.9D, 0.65D, 0.9D, 0.18D);
         BlockState floor = level.getBlockState(blockPosition().below());
-        level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, floor),
-                getX(), getY() + 0.5D, getZ(), 35,
-                0.8D, 0.6D, 0.8D, 0.14D);
         level.playSound(null, blockPosition(), SoundEvents.ANVIL_LAND,
                 SoundSource.HOSTILE, 1.3F, 0.62F);
         entityData.set(ACTION_STATE, ACTION_STUN);
@@ -581,31 +560,18 @@ public final class ThunderhornRockBadgerEntity extends Monster implements GeoEnt
             projectile.setOwner(this);
             projectile.hasImpulse = true;
         }
-        level.sendParticles(ParticleTypes.ELECTRIC_SPARK,
-                getX(), getY() + 0.8D, getZ(),
-                32, radius * 0.55D, 0.65D, radius * 0.55D, 0.16D);
-        level.sendParticles(ModParticles.METHOD_QI_EARTH.get(),
-                getX(), getY() + 0.35D, getZ(),
-                38, radius * 0.6D, 0.35D, radius * 0.6D, 0.12D);
+        {}
         level.playSound(null, blockPosition(), SoundEvents.IRON_GOLEM_DAMAGE,
                 SoundSource.HOSTILE, 1.25F, 0.7F);
     }
 
     private void tickFrenzyAction(ServerLevel level, int ticks) {
-        if (ticks % 4 == 0) {
-            level.sendParticles(ParticleTypes.ELECTRIC_SPARK,
-                    getX(), getY() + 0.8D, getZ(),
-                    7, 0.9D, 0.65D, 0.9D, 0.12D);
-        }
+
     }
 
     private void tickStun(ServerLevel level, int ticks) {
         setDeltaMovement(Vec3.ZERO);
-        if (ticks % 5 == 0) {
-            level.sendParticles(ParticleTypes.ELECTRIC_SPARK,
-                    getX(), getY() + 1.45D, getZ(),
-                    4, 0.35D, 0.15D, 0.35D, 0.05D);
-        }
+
     }
 
     private void finishAction() {
@@ -721,15 +687,7 @@ public final class ThunderhornRockBadgerEntity extends Monster implements GeoEnt
     private void emitPlateHit(int plate, float absorbed) {
         if (!(level() instanceof ServerLevel level)) return;
         Vec3 offset = plateOffset(plate);
-        level.sendParticles(ParticleTypes.ELECTRIC_SPARK,
-                offset.x, offset.y, offset.z,
-                Mth.clamp(Mth.ceil(absorbed / 5.0F), 4, 18),
-                0.45D, 0.35D, 0.45D, 0.09D);
         BlockState state = level.getBlockState(blockPosition().below());
-        level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, state),
-                offset.x, offset.y, offset.z,
-                Mth.clamp(Mth.ceil(absorbed / 6.0F), 3, 14),
-                0.4D, 0.3D, 0.4D, 0.08D);
         level.playSound(null, blockPosition(), SoundEvents.STONE_HIT,
                 SoundSource.HOSTILE, 0.7F, 0.72F + random.nextFloat() * 0.2F);
     }
@@ -740,12 +698,6 @@ public final class ThunderhornRockBadgerEntity extends Monster implements GeoEnt
         if (level() instanceof ServerLevel level) {
             Vec3 offset = plateOffset(plate);
             BlockState state = level.getBlockState(blockPosition().below());
-            level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, state),
-                    offset.x, offset.y, offset.z,
-                    42, 0.7D, 0.55D, 0.7D, 0.18D);
-            level.sendParticles(ParticleTypes.ELECTRIC_SPARK,
-                    offset.x, offset.y, offset.z,
-                    28, 0.65D, 0.5D, 0.65D, 0.16D);
             level.playSound(null, blockPosition(), SoundEvents.DEEPSLATE_BREAK,
                     SoundSource.HOSTILE, 1.25F, 0.62F);
         }
@@ -876,21 +828,11 @@ public final class ThunderhornRockBadgerEntity extends Monster implements GeoEnt
 
     private void emitHornCharge(ServerLevel level) {
         Vec3 horn = position().add(horizontalLook().scale(1.15D)).add(0.0D, 1.45D, 0.0D);
-        level.sendParticles(ParticleTypes.ELECTRIC_SPARK,
-                horn.x, horn.y, horn.z, 7, 0.24D, 0.22D, 0.24D, 0.08D);
-        level.sendParticles(ModParticles.METHOD_QI_THUNDER.get(),
-                horn.x, horn.y, horn.z, 4, 0.18D, 0.18D, 0.18D, 0.04D);
     }
 
     private void emitChargeTrail(ServerLevel level) {
         Vec3 behind = position().subtract(chargeDirection.scale(0.9D));
         BlockState floor = level.getBlockState(blockPosition().below());
-        level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, floor),
-                behind.x, getY() + 0.2D, behind.z,
-                7, 0.5D, 0.18D, 0.5D, 0.08D);
-        level.sendParticles(ParticleTypes.ELECTRIC_SPARK,
-                getX(), getY() + 0.85D, getZ(),
-                4, 0.6D, 0.35D, 0.6D, 0.04D);
     }
 
     private void emitJaggedCracks(ServerLevel level, Vec3 center,
@@ -903,36 +845,18 @@ public final class ThunderhornRockBadgerEntity extends Monster implements GeoEnt
                 double x = center.x + Math.cos(angle) * distance;
                 double z = center.z + Math.sin(angle) * distance;
                 double y = center.y + 0.08D;
-                level.sendParticles(ModParticles.METHOD_QI_EARTH.get(),
-                        x, y, z, 1, 0.03D, 0.02D, 0.03D, 0.0D);
-                if (random.nextBoolean()) {
-                    level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, floor),
-                            x, y, z, 1, 0.08D, 0.08D, 0.08D, 0.04D);
-                }
+
             }
         }
     }
 
     private void emitRisingRocks(ServerLevel level) {
         BlockState floor = level.getBlockState(blockPosition().below());
-        level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, floor),
-                getX(), getY() + 0.35D, getZ(),
-                26, 1.0D, 0.25D, 1.0D, 0.18D);
-        level.sendParticles(ParticleTypes.ELECTRIC_SPARK,
-                getX(), getY() + 0.65D, getZ(),
-                16, 0.8D, 0.4D, 0.8D, 0.09D);
     }
 
     private void emitBurrowTrail(ServerLevel level) {
         BlockState floor = level.getBlockState(blockPosition().below());
-        level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, floor),
-                getX(), getY() + 0.12D, getZ(),
-                8, 0.45D, 0.15D, 0.45D, 0.1D);
-        if ((tickCount & 1) == 0) {
-            level.sendParticles(ModParticles.METHOD_QI_EARTH.get(),
-                    getX(), getY() + 0.1D, getZ(),
-                    3, 0.35D, 0.08D, 0.35D, 0.03D);
-        }
+
     }
 
     private void emitEruptionWarning(ServerLevel level, Vec3 point) {
@@ -943,12 +867,6 @@ public final class ThunderhornRockBadgerEntity extends Monster implements GeoEnt
 
     private void emitEruption(ServerLevel level) {
         BlockState floor = level.getBlockState(blockPosition().below());
-        level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, floor),
-                getX(), getY() + 0.2D, getZ(),
-                58, 1.35D, 0.45D, 1.35D, 0.28D);
-        level.sendParticles(ParticleTypes.ELECTRIC_SPARK,
-                getX(), getY() + 0.8D, getZ(),
-                22, 0.9D, 0.75D, 0.9D, 0.14D);
         level.playSound(null, blockPosition(), SoundEvents.GENERIC_EXPLODE.value(),
                 SoundSource.HOSTILE, 1.2F, 0.82F);
     }
@@ -997,7 +915,7 @@ public final class ThunderhornRockBadgerEntity extends Monster implements GeoEnt
     }
 
     public String cultivationRealm() {
-        return CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_MID;
+        return beastCultivationLevel();
     }
 
     @Override

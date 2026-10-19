@@ -241,7 +241,7 @@ public class ServerEvents {
     private static final Map<UUID, Vec3> QI_GATHERING_ANCHORS = new ConcurrentHashMap<>();
     private static final Map<UUID, Boolean> SPIRIT_SIGHT_ACTIVE = new ConcurrentHashMap<>();
     private static final Map<UUID, FogReveal> FOG_REVEALS = new ConcurrentHashMap<>();
-    private static final Map<UUID, AmbientQi> AMBIENT_QI_CACHE = new ConcurrentHashMap<>();
+    private static final Map<UUID, AmbientQiCache> AMBIENT_QI_CACHE = new ConcurrentHashMap<>();
     private static final List<String> DEBUG_STATS = List.of(
             "cultivation_level",
             "age",
@@ -332,6 +332,14 @@ public class ServerEvents {
     public static void onPlayerTickPre(PlayerTickEvent.Pre event) {
         Player player = event.getEntity();
         if (player.level().isClientSide) return;
+
+        if (!player.isAlive()) {
+            MEDITATION_ANCHORS.remove(player.getUUID());
+            if (player instanceof ServerPlayer serverPlayer) {
+                stopMeditating(serverPlayer, ModAttachments.getData(player));
+            }
+            return;
+        }
 
         if (player instanceof ServerPlayer serverPlayer) {
             HeavyIronBracerItem.syncOffhandCompanion(serverPlayer);
@@ -509,6 +517,7 @@ public class ServerEvents {
         int maxAge = levelDef.maxAge() - data.agePenalty();
         if (maxAge <= 0) {
             if (player instanceof ServerPlayer serverPlayer) {
+                com.example.immortal_cultivation_mod.system.OuterSystemManager.loseOnAgeExhaustion(serverPlayer);
                 if (CultivationAccessoryItem.isLivingCorpse(serverPlayer)
                         || CultivationAccessoryItem.tryBecomeLivingCorpse(serverPlayer)) {
                     return;
@@ -534,7 +543,7 @@ public class ServerEvents {
                 && !CultivationShieldSpells.blocksNaturalQiRegen(player)
                 && !CultivationLevels.isMortal(data.cultivationLevel()) && maxQi > 0 && data.qi() < maxQi && player.tickCount % 20 == 0) {
             AmbientQi ambientQi = getAmbientQi(player);
-            int regen = Math.max(1, player.hasEffect(ModEffects.QI_GATHERING) ? maxQi * 5 / 100 : maxQi / 100);
+            int regen = Math.max(1, player.hasEffect(ModEffects.QI_GATHERING) ? (int)((long)maxQi * 5 / 100) : maxQi / 100);
             regen = applyAmbientQiRegenBonus(regen, ambientQi);
             int forgedQiRegen = com.example.immortal_cultivation_mod.item.ForgingSystem.heldQiRegenBonusPercent(player);
             if (forgedQiRegen > 0) {
@@ -555,7 +564,9 @@ public class ServerEvents {
             regen = UndeadAbilitySystem.adjustQiRegen(player, regen);
             regen = com.example.immortal_cultivation_mod.entity.CultivationBestiaryBeastEntity
                     .adjustQiRegeneration(player, regen);
-            ModAttachments.setData(player, data.withQi(Math.min(maxQi, data.qi() + regen)));
+            regen = com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.qiRegeneration(player, regen);
+            regen = com.example.immortal_cultivation_mod.alchemy.PillToxicity.naturalQi(player,regen);
+            ModAttachments.setData(player, data.withQi((int)Math.min(maxQi, (long)data.qi() + regen)));
             data = ModAttachments.getData(player);
         }
 
@@ -564,7 +575,8 @@ public class ServerEvents {
             data = ModAttachments.getData(player);
         }
 
-        if (data.isMeditating() && player.tickCount % 20 == 0 && CultivationMethods.get(data.activeCultivationMethod()) != null) {
+        if (data.isMeditating() && !com.example.immortal_cultivation_mod.curse.AnnihilationCurse.blocksMeditationExperience(player)
+                && player.tickCount % 20 == 0 && CultivationMethods.get(data.activeCultivationMethod()) != null) {
             int meditationSpeed = getMeditationSpeedMultiplier(player)
                     * (player instanceof ServerPlayer serverPlayer
                     ? CultivationAccessoryItem.proficiencyMultiplier(serverPlayer) : 1);
@@ -572,7 +584,8 @@ public class ServerEvents {
             ModAttachments.setData(player, data);
         }
 
-        if (data.isMeditating() && maxQi > 0 && player.tickCount % 20 == 0) {
+        if (data.isMeditating() && !com.example.immortal_cultivation_mod.curse.AnnihilationCurse.blocksMeditationExperience(player)
+                && maxQi > 0 && player.tickCount % 20 == 0) {
             long need = CultivationLevels.getTotalQiNeeded(data.cultivationLevel());
             if (data.cultivationProgress() < need
                     && CultivationMethods.canGainProgress(data.activeCultivationMethod(), data.cultivationLevel())
@@ -596,6 +609,7 @@ public class ServerEvents {
             com.example.immortal_cultivation_mod.item.IdentityItems.tickIdentityProgress(sp);
             com.example.immortal_cultivation_mod.item.IdentityItems.tickQiRecovery(sp);
             WindStep.tick(sp);
+            HutiQi.tick(sp);
             YufengJue.tick(sp);
             JindanCreativeFlight.tick(sp);
             ChangqingJue.tick(sp);
@@ -629,9 +643,71 @@ public class ServerEvents {
         ModAttachments.setData(player, data);
         applyLevelStats(player, data, CultivationLevels.getLevelDef(data.cultivationLevel()));
         if (player instanceof ServerPlayer sp) {
+            com.example.immortal_cultivation_mod.system.OuterSystemManager.loseOnAgeExhaustion(sp);
             CultivationShieldSpells.clear(sp);
             syncPlayerData(sp);
         }
+    }
+
+    /** Debug age is remaining lifespan. Zero explicitly ends this life rather than clamping to one. */
+    public static boolean setDebugRemainingAge(ServerPlayer player,long remaining) {
+        if(remaining<=0) {
+            startDebugNewLife(player);
+            return true;
+        }
+        var data=ModAttachments.getData(player);
+        int limit=CultivationLevels.getLevelDef(data.cultivationLevel()).maxAge();
+        int penalty=(int)Math.clamp((long)limit-remaining,0L,(long)Math.max(0,limit-1));
+        if(penalty==data.agePenalty())return false;
+        ModAttachments.setData(player,data.withAgePenalty(penalty));
+        return true;
+    }
+
+    public static boolean adjustDebugRemainingAge(ServerPlayer player,int delta) {
+        if(delta==0)return false;
+        var data=ModAttachments.getData(player);
+        long remaining=(long)CultivationLevels.getLevelDef(data.cultivationLevel()).maxAge()-data.agePenalty();
+        return setDebugRemainingAge(player,remaining+delta);
+    }
+
+    private static void startDebugNewLife(ServerPlayer player) {
+        HeavyIronBracerItem.restoreStoredOffhand(player);
+        spawnAgeExhaustedCorpse(player);
+        stopMeditating(player,ModAttachments.getData(player));
+        MEDITATION_ANCHORS.remove(player.getUUID());
+        QI_GATHERING_ANCHORS.remove(player.getUUID());
+        EARTH_ESCAPE_GRACE_TICKS.remove(player.getUUID());
+        SPIRIT_SIGHT_ACTIVE.remove(player.getUUID());
+        FOG_REVEALS.remove(player.getUUID());
+        AMBIENT_QI_CACHE.remove(player.getUUID());
+        ModPayloads.clearPendingLearning(player);
+        CombatStateManager.clear(player);
+        com.example.immortal_cultivation_mod.combat.QiDomainSystem.stop(player);
+        JindanTribulation.clear(player);
+        CultivationAccessoryItem.clearLivingCorpse(player);
+        WindStep.clear(player);
+        YufengJue.clear(player);
+        ShixuChiliu.clear(player);
+        FentianLifeRenewal.clear(player);
+        HantiBingqin.clear(player);
+        DielangShield.clear(player);
+        BloodQiShield.clear(player);
+        HutiQi.clear(player);
+        GushiShield.clear(player);
+        SifangJie.clear(player);
+        BlackTortoiseHeartguardMirrorItem.clear(player);
+        PlayerShieldManager.clearAll(player);
+        player.removeAllEffects();
+        player.clearFire();
+        player.noPhysics=false;
+        player.setNoGravity(false);
+        player.setPose(Pose.STANDING);
+        player.getPersistentData().putLong(LAST_AGE_DAY_TAG,
+                player.server.overworld().getDayTime()/TICKS_PER_INGAME_DAY);
+        resetPlayer(player);
+        JindanCreativeFlight.refreshFlightAbilities(player);
+        player.setHealth(player.getMaxHealth());
+        player.sendSystemMessage(Component.translatable("message.immortal_cultivation_mod.debug.new_life"));
     }
 
     private static int getMeditationSpeedMultiplier(Player player) {
@@ -723,7 +799,6 @@ public class ServerEvents {
     /** Resolve revival before Luck, and before any death cleanup or kill rewards. */
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void preventProtectedDeath(LivingDeathEvent event) {
-        if (com.example.immortal_cultivation_mod.pagoda.PagodaSystem.adminKill(event.getEntity(),event.getSource())) return;
         if (event.isCanceled() || event.getEntity().level().isClientSide) return;
         if (event.getEntity() instanceof ServerPlayer player
                 && com.example.immortal_cultivation_mod.item.IdentityItems.tryUseProtectivePendant(player)) {
@@ -759,7 +834,7 @@ public class ServerEvents {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onPlayerDeath(LivingDeathEvent event) {
-        if (event.isCanceled()) return;
+        if (event.isCanceled() || event.getEntity() instanceof com.example.immortal_cultivation_mod.entity.TrainingDummyEntity) return;
         if (event.getEntity() instanceof ServerPlayer player) {
             com.example.immortal_cultivation_mod.item.ManifestedWeaponItem
                     .removeAll(player);
@@ -805,10 +880,12 @@ public class ServerEvents {
                     amount));
         }
         if (event.getEntity() instanceof ServerPlayer player) {
+            ModPayloads.clearPendingLearning(player);
             NoobAchievement.recordDeath(player);
             CombatStateManager.clear(player);
             JindanTribulation.failOnDeath(player);
             JindanTribulation.clear(player);
+            stopMeditating(player, ModAttachments.getData(player));
             MEDITATION_ANCHORS.remove(player.getUUID());
             QI_GATHERING_ANCHORS.remove(player.getUUID());
             EARTH_ESCAPE_GRACE_TICKS.remove(player.getUUID());
@@ -915,13 +992,8 @@ public class ServerEvents {
 
     private static void capBeastDemonCoreDrop(LivingDropsEvent event) {
         LivingEntity dead = event.getEntity();
-        if (!(dead instanceof CrimsonScaleFlameLizardEntity)
-                && !(dead instanceof CrimsonSkyFlameFloodDragonEntity)
-                && !(dead instanceof BloodApeDemonGeneralEntity)
-                && !(dead instanceof PhantomVeilFoxEntity)
-                && !(dead instanceof EscapedYuanyingCoreEntity)) {
-            return;
-        }
+        if (!(dead instanceof com.example.immortal_cultivation_mod.entity.RealmBeast)
+                && !(dead instanceof EscapedYuanyingCoreEntity)) return;
         if (dead instanceof PhantomVeilFoxEntity fox) {
             for (ItemEntity drop : event.getDrops()) {
                 ItemStack stack = drop.getItem();
@@ -932,15 +1004,7 @@ public class ServerEvents {
             }
         }
         List<ItemEntity> demonCores = event.getDrops().stream()
-                .filter(drop -> drop.getItem().is(ModItems.LIANQI_YAODAN.get())
-                        || drop.getItem().is(ModItems.ZHUJI_YAODAN.get())
-                        || drop.getItem().is(ModItems.JINDAN_YAODAN.get())
-                        || drop.getItem().is(ModItems.YUANYING_YAODAN.get())
-                        || drop.getItem().is(ModItems.HUASHEN_YAODAN.get())
-                        || drop.getItem().is(ModItems.LIANXU_YAODAN.get())
-                        || drop.getItem().is(ModItems.HETI_YAODAN.get())
-                        || drop.getItem().is(ModItems.DACHENG_YAODAN.get())
-                        || drop.getItem().is(ModItems.DUJIE_YAODAN.get()))
+                .filter(drop -> com.example.immortal_cultivation_mod.entity.BeastRealmEvents.isCore(drop.getItem()))
                 .toList();
         if (demonCores.isEmpty()) {
             return;
@@ -965,6 +1029,8 @@ public class ServerEvents {
     @SubscribeEvent
     public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
+            stopMeditating(sp, ModAttachments.getData(sp));
+            MEDITATION_ANCHORS.remove(sp.getUUID());
             var data = ModAttachments.getData(sp);
             applyLevelStats(sp, data, CultivationLevels.getLevelDef(data.cultivationLevel()));
             sp.setHealth(sp.getMaxHealth());
@@ -988,6 +1054,15 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onPlayerClone(PlayerEvent.Clone event) {
+        if (event.getOriginal() instanceof ServerPlayer original) ModPayloads.clearPendingLearning(original);
+        if (event.getEntity() instanceof ServerPlayer replacement) ModPayloads.clearPendingLearning(replacement);
+        if (event.isWasDeath()) {
+            MEDITATION_ANCHORS.remove(event.getOriginal().getUUID());
+            MEDITATION_ANCHORS.remove(event.getEntity().getUUID());
+            var data = ModAttachments.getData(event.getEntity());
+            ModAttachments.setData(event.getEntity(), data.withMeditating(false));
+            event.getEntity().setPose(Pose.STANDING);
+        }
         if (event.getOriginal().getPersistentData().contains(NpcProfile.PLAYER_GENDER_TAG)) {
             event.getEntity().getPersistentData().putString(
                     NpcProfile.PLAYER_GENDER_TAG,
@@ -1019,6 +1094,12 @@ public class ServerEvents {
     @SubscribeEvent
     public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
+            stopMeditating(player, ModAttachments.getData(player));
+            MEDITATION_ANCHORS.remove(player.getUUID());
+            QI_GATHERING_ANCHORS.remove(player.getUUID());
+            AMBIENT_QI_CACHE.remove(player.getUUID());
+            SPIRIT_SIGHT_ACTIVE.remove(player.getUUID());
+            FOG_REVEALS.remove(player.getUUID());
             JindanTribulation.clear(player);
             HeavyIronBracerItem.restoreStoredOffhand(player);
             ModPayloads.clearPendingLearning(player);
@@ -1031,6 +1112,7 @@ public class ServerEvents {
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
+            ModPayloads.clearPendingLearning(sp);
             if (!JindanPocketWorlds.isJindanDimension(sp.level().dimension())) {
                 ModPayloads.cleanupJindanClones(sp);
             }
@@ -1136,6 +1218,10 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+        if (event.getEntity() instanceof ServerPlayer moved) {
+            stopMeditating(moved, ModAttachments.getData(moved));
+            QI_GATHERING_ANCHORS.remove(moved.getUUID());
+        }
         if (event.getEntity() instanceof ServerPlayer player
                 && JindanPocketWorlds.isJindanDimension(event.getFrom())
                 && !JindanPocketWorlds.isJindanDimension(event.getTo())) {
@@ -1147,13 +1233,6 @@ public class ServerEvents {
     @SubscribeEvent
     public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
         if (event.getLevel().isClientSide || !(event.getEntity() instanceof ServerPlayer player)) {
-            return;
-        }
-
-        if (CombatStateManager.interceptTeleportUse(
-                player, event.getHand(), event.getItemStack())) {
-            event.setCancellationResult(InteractionResult.SUCCESS);
-            event.setCanceled(true);
             return;
         }
 
@@ -1403,7 +1482,7 @@ public class ServerEvents {
             triggerLingbeng(player, event.getTarget().getX(), event.getTarget().getY(), event.getTarget().getZ());
             var data = ModAttachments.getData(player);
             if (data.physicalAttack() > 0) {
-                event.getTarget().hurt(player.damageSources().playerAttack(player), (float)(data.physicalAttack() * com.example.immortal_cultivation_mod.pagoda.GourdSystem.multiplier(player)));
+                event.getTarget().hurt(player.damageSources().playerAttack(player), (float)data.physicalAttack());
             }
             QiInfusedWeapon.strike(player, event.getTarget());
         }
@@ -1465,8 +1544,18 @@ public class ServerEvents {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onEarthEscapeSuffocation(LivingIncomingDamageEvent event) {
+        // Player ticks can reset noPhysics before vanilla checks suffocation.
+        // Protection follows the spell itself, rather than that transient flag.
+        if (event.getEntity() instanceof Player player
+                && player.hasEffect(ModEffects.EARTH_ESCAPE)
+                && event.getSource().is(DamageTypes.IN_WALL)) {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onCultivationArmorIncomingDamage(LivingIncomingDamageEvent event) {
-        if (com.example.immortal_cultivation_mod.pagoda.PagodaSystem.adminKill(event.getEntity(),event.getSource())) return;
         if (event.getEntity() instanceof LivingEntity target) {
             if ((target instanceof BloodApeDemonGeneralEntity
                     || target instanceof CrimsonSkyFlameFloodDragonEntity)
@@ -1495,6 +1584,7 @@ public class ServerEvents {
         float defenseBypass = Math.max(
                 DefensePiercingProjectile.defenseBypass(event.getSource()),
                 XuanyueSuifengJue.armorPenetration(event.getSource().getEntity()));
+        defenseBypass = 1 - (1 - defenseBypass) * (1 - com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.armorBypass(event.getSource()));
         boolean armorPiercing = defenseBypass > 0.0F;
         if (cultivationArmor <= 0.0D && !armorPiercing) {
             return;
@@ -1524,6 +1614,7 @@ public class ServerEvents {
                     DefensePiercingProjectile.defenseBypass(container.getSource()),
                     XuanyueSuifengJue.armorPenetration(
                             container.getSource().getEntity()));
+            bypass = 1 - (1 - bypass) * (1 - com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.armorBypass(container.getSource()));
             if (bypass > 0.0F) {
                 effectiveness *= 1.0F - bypass;
             }
@@ -1538,7 +1629,7 @@ public class ServerEvents {
         }
         if (target instanceof Player) {
             AttributeModifier modifier = armor.getModifier(CULTIVATION_ARMOR_MODIFIER);
-            return modifier == null ? 0.0D : Math.max(0.0D, modifier.amount());
+            return modifier == null ? 0.0D : Math.max(0.0D, modifier.amount()) * com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.armorMultiplier(target);
         }
         return target instanceof CultivationNpc ? Math.max(0.0D, armor.getBaseValue()) : 0.0D;
     }
@@ -1556,7 +1647,6 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
-        if (com.example.immortal_cultivation_mod.pagoda.PagodaSystem.adminKill(event.getEntity(),event.getSource())) return;
         boolean shieldBreakerAttack = event.getSource().is(DamageTypes.PLAYER_ATTACK)
                 && event.getSource().getEntity() instanceof ServerPlayer attacker
                 && CultivationAccessoryItem.hasShieldBreaker(attacker);
@@ -1749,6 +1839,9 @@ public class ServerEvents {
                 && CombatStateManager.isPostureBroken(player)) {
             event.setAmount(event.getAmount() * 1.25F);
         }
+        com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.outgoing(event);
+        com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.incoming(event);
+        if (event.isCanceled()) return;
         float fortunePiercing = com.example.immortal_cultivation_mod.fate.FateCombat.shieldPiercing(
                 event.getSource(), event.getAmount());
         event.setAmount(event.getAmount() - fortunePiercing);
@@ -1831,7 +1924,7 @@ public class ServerEvents {
         amount = HutiQi.absorb(player, source, amount);
         amount = BloodQiShield.absorb(player, source, amount);
         return com.example.immortal_cultivation_mod.item.UtilityTalismanItem
-                .absorbTalismanShields(player, amount);
+                .absorbTalismanShields(player, source, amount);
     }
 
     @SubscribeEvent
@@ -1841,7 +1934,8 @@ public class ServerEvents {
             event.setCanceled(true);
             return;
         }
-        event.setAmount(event.getAmount() * UndeadAbilitySystem.healingMultiplier(event.getEntity()));
+        event.setAmount(event.getAmount() * UndeadAbilitySystem.healingMultiplier(event.getEntity())
+                * com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.healingMultiplier(event.getEntity()));
     }
 
     @SubscribeEvent
@@ -1923,7 +2017,7 @@ public class ServerEvents {
 
     private static int adjustDebugStat(CommandSourceStack source, Collection<ServerPlayer> targets, String stat, int delta) {
         if (!DEBUG_STATS.contains(stat)) {
-            source.sendFailure(Component.literal("Unknown cultivation debug stat: " + stat));
+            source.sendFailure(Component.translatable("message.immortal_cultivation_mod.debug.unknown_stat", stat));
             return 0;
         }
 
@@ -1938,8 +2032,7 @@ public class ServerEvents {
                 }
             }
             int changedCount = changed;
-            source.sendSuccess(() -> Component.literal(
-                    "Adjusted restriction_hints by " + delta + " for " + changedCount + " player(s)."), true);
+            source.sendSuccess(() -> Component.translatable("message.immortal_cultivation_mod.debug.adjusted", "restriction_hints", delta, changedCount), true);
             return changed;
         }
 
@@ -1954,14 +2047,16 @@ public class ServerEvents {
                 }
             }
             int changedCount = changed;
-            source.sendSuccess(() -> Component.literal(
-                    "Adjusted simulation_attempts by " + delta + " for "
-                            + changedCount + " player(s)."), true);
+            source.sendSuccess(() -> Component.translatable("message.immortal_cultivation_mod.debug.adjusted", "simulation_attempts", delta, changedCount), true);
             return changed;
         }
 
         int changed = 0;
         for (ServerPlayer target : targets) {
+            if("age".equals(stat)) {
+                if(adjustDebugRemainingAge(target,delta)){syncPlayerData(target);changed++;}
+                continue;
+            }
             var data = ModAttachments.getData(target);
             var updated = adjustDebugData(data, stat, delta);
             if (!updated.equals(data)) {
@@ -1972,13 +2067,13 @@ public class ServerEvents {
         }
 
         int changedCount = changed;
-        source.sendSuccess(() -> Component.literal("Adjusted " + stat + " by " + delta + " for " + changedCount + " player(s)."), true);
+        source.sendSuccess(() -> Component.translatable("message.immortal_cultivation_mod.debug.adjusted", stat, delta, changedCount), true);
         return changed;
     }
 
     private static int setDebugStat(CommandSourceStack source, Collection<ServerPlayer> targets, String stat, int value) {
         if (!SETTABLE_DEBUG_STATS.contains(stat)) {
-            source.sendFailure(Component.literal("Set only supports numeric debug stats: " + String.join(", ", SETTABLE_DEBUG_STATS)));
+            source.sendFailure(Component.translatable("message.immortal_cultivation_mod.debug.numeric_only", String.join(", ", SETTABLE_DEBUG_STATS)));
             return 0;
         }
 
@@ -1997,15 +2092,16 @@ public class ServerEvents {
                 }
             }
             int changedCount = changed;
-            source.sendSuccess(() -> Component.literal(
-                    "Set simulation_attempts to "
-                            + Math.max(0, Math.min(LifeSimulationSystem.MAX_ATTEMPTS, value))
-                            + " for " + changedCount + " player(s)."), true);
+            source.sendSuccess(() -> Component.translatable("message.immortal_cultivation_mod.debug.set", "simulation_attempts", Math.max(0, Math.min(LifeSimulationSystem.MAX_ATTEMPTS, value)), changedCount), true);
             return changed;
         }
 
         int changed = 0;
         for (ServerPlayer target : targets) {
+            if("age".equals(stat)) {
+                if(setDebugRemainingAge(target,value)){syncPlayerData(target);changed++;}
+                continue;
+            }
             var data = ModAttachments.getData(target);
             var updated = setDebugData(data, stat, value);
             if (!updated.equals(data)) {
@@ -2016,7 +2112,7 @@ public class ServerEvents {
         }
 
         int changedCount = changed;
-        source.sendSuccess(() -> Component.literal("Set " + stat + " to " + value + " for " + changedCount + " player(s)."), true);
+        source.sendSuccess(() -> Component.translatable("message.immortal_cultivation_mod.debug.set", stat, value, changedCount), true);
         return changed;
     }
 
@@ -2033,8 +2129,7 @@ public class ServerEvents {
             }
         }
         int changedCount = changed;
-        source.sendSuccess(() -> Component.literal(
-                "Set restriction hints to " + clamped + " for " + changedCount + " player(s)."), true);
+        source.sendSuccess(() -> Component.translatable("message.immortal_cultivation_mod.debug.set", "restriction_hints", clamped, changedCount), true);
         return changed;
     }
 
@@ -2052,9 +2147,7 @@ public class ServerEvents {
             }
         }
         int changedCount = changed;
-        source.sendSuccess(() -> Component.literal(
-                "Gave " + amount + " simulation attempt(s) to "
-                        + changedCount + " player(s)."), true);
+        source.sendSuccess(() -> Component.translatable("message.immortal_cultivation_mod.debug.gave_attempts", amount, changedCount), true);
         return changed;
     }
 
@@ -2083,9 +2176,7 @@ public class ServerEvents {
             }
         }
         int changedPlayers = changed;
-        source.sendSuccess(() -> Component.literal(
-                "Unlocked all " + registeredSpells.size() + " registered spells for "
-                        + changedPlayers + " player(s)."), true);
+        source.sendSuccess(() -> Component.translatable("message.immortal_cultivation_mod.debug.unlocked_spells", registeredSpells.size(), changedPlayers), true);
         return changed;
     }
 
@@ -2136,11 +2227,6 @@ public class ServerEvents {
         return switch (stat) {
             case "cultivation_level" -> data.withCultivationLevel(nextCultivationLevel(data.cultivationLevel(), delta));
             case "body_type" -> data.withBodyType(BodyTypes.next(data.bodyType(), delta));
-            case "age" -> data.withAgePenalty(clamp(
-                    data.agePenalty() - delta,
-                    0,
-                    Math.max(0, CultivationLevels.getLevelDef(data.cultivationLevel()).maxAge() - 1)
-            ));
             case "moral" -> data.withMoral(clamp(data.moral() + delta, 0, 100));
             case "luck" -> data.withLuck(clamp(data.luck() + delta, 0, 100));
             case "soul" -> data.withSoul(clamp(data.soul() + delta, 0, 1000));
@@ -2156,7 +2242,6 @@ public class ServerEvents {
     private static ModAttachments.CultivationData setDebugData(ModAttachments.CultivationData data, String stat, int value) {
         var levelDef = CultivationLevels.getLevelDef(data.cultivationLevel());
         return switch (stat) {
-            case "age" -> data.withAgePenalty(clamp(levelDef.maxAge() - value, 0, Math.max(0, levelDef.maxAge() - 1)));
             case "moral" -> data.withMoral(clamp(value, 0, 100));
             case "luck" -> data.withLuck(clamp(value, 0, 100));
             case "soul" -> data.withSoul(clamp(value, 0, 1000));
@@ -2298,7 +2383,7 @@ public class ServerEvents {
             long progressFromBlood = Math.min(missing, data.blood() / 10L);
             int bloodToUse = (int) (progressFromBlood * 10L);
             data = data.withBlood(data.blood() - bloodToUse)
-                    .withCultivationProgress(Math.min(need, data.cultivationProgress() + progressFromBlood));
+                    .withCultivationProgress(Math.min(need, data.cultivationProgress() + com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.cultivationGain(player, progressFromBlood)));
             ModAttachments.setData(player, data);
         }
 
@@ -2319,6 +2404,7 @@ public class ServerEvents {
 
             for (var s : player.getInventory().items) {
                 if (s.is(ModItems.BREAKTHROUGH_PILL.get())) {
+                    com.example.immortal_cultivation_mod.alchemy.PillToxicity.consumed(player,s);
                     s.shrink(1);
                     break;
                 }
@@ -2621,7 +2707,7 @@ public class ServerEvents {
     }
 
     private static int getEffectiveMaxQi(ModAttachments.CultivationData data, CultivationLevels.LevelDef levelDef) {
-        return Math.max(1, levelDef.maxQi() + data.maxQiBonus());
+        return Math.max(1, data.maxQi());
     }
 
     public static int getMaxBlood(Player player) {
@@ -2642,6 +2728,17 @@ public class ServerEvents {
         return spendQiOrBlood(player, data, cost, true, false);
     }
 
+    public static boolean spendSustainedSpellQiOrBlood(
+            Player player, ModAttachments.CultivationData data, int cost, String spellId) {
+        var definition = com.example.immortal_cultivation_mod.spell.ModSpells.get(spellId);
+        if (!com.example.immortal_cultivation_mod.magicritual.center.CenterEffectSupport.hasSpellContext(player)) {
+            cost = cost <= 0 ? 0 : Math.max(1, (int)Math.ceil(cost
+                    * com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.spellCostMultiplier(
+                    player, definition == null ? "" : definition.element())));
+        }
+        return spendQiOrBlood(player, data, cost, true, false);
+    }
+
     private static boolean spendQiOrBlood(
             Player player, ModAttachments.CultivationData data,
             int cost, boolean sustained, boolean spell) {
@@ -2652,6 +2749,8 @@ public class ServerEvents {
                         .adjustSpellQiCost(player, Math.max(0, cost));
         int actualCost = com.example.immortal_cultivation_mod.magicritual.center.CenterEffectSupport
                 .adjustSpellQiCost(player, sealedCost);
+        if (spell && !com.example.immortal_cultivation_mod.magicritual.center.CenterEffectSupport.hasSpellContext(player))
+            actualCost = actualCost <= 0 ? 0 : Math.max(1, (int)Math.ceil(actualCost * com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.spellCostMultiplier(player, "")));
         double discount=spell&&actualCost>0
                 ?com.example.immortal_cultivation_mod.alchemy.AlchemyEffects.spellDiscount(player):0;
         if(discount>0)actualCost=Math.max(1,(int)Math.ceil(actualCost*(1-discount)));
@@ -2751,6 +2850,10 @@ public class ServerEvents {
         syncPlayerData(player);
     }
 
+    public static void stopMeditation(ServerPlayer player) {
+        stopMeditating(player,ModAttachments.getData(player));
+    }
+
     public static void startQiGathering(ServerPlayer player) {
         QI_GATHERING_ANCHORS.put(player.getUUID(), player.position());
     }
@@ -2777,8 +2880,6 @@ public class ServerEvents {
     }
 
     private static void handleSpiritSightTick(ServerPlayer player, ModAttachments.CultivationData data) {
-        player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 260, 0, false, false, true));
-        player.addEffect(new MobEffectInstance(ModEffects.SPIRIT_SIGHT, 260, 0, false, false, true));
         if (player.tickCount % 20 != 0) {
             return;
         }
@@ -2792,6 +2893,8 @@ public class ServerEvents {
             return;
         }
 
+        player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 260, 0, false, false, true));
+        player.addEffect(new MobEffectInstance(ModEffects.SPIRIT_SIGHT, 260, 0, false, false, true));
         syncPlayerData(player);
     }
 
@@ -2805,7 +2908,8 @@ public class ServerEvents {
 
     public static AmbientQi refreshAmbientQi(ServerPlayer player) {
         AmbientQi ambientQi = scanAmbientQi(player, AMBIENT_QI_SCAN_RADIUS, player.tickCount);
-        AMBIENT_QI_CACHE.put(player.getUUID(), ambientQi);
+        AMBIENT_QI_CACHE.put(player.getUUID(), new AmbientQiCache(
+                ambientQi, player.level().dimension(), player.blockPosition()));
         return ambientQi;
     }
 
@@ -2824,13 +2928,17 @@ public class ServerEvents {
     }
 
     private static AmbientQi getAmbientQi(Player player) {
-        AmbientQi cached = AMBIENT_QI_CACHE.get(player.getUUID());
-        if (cached != null && player.tickCount - cached.lastScanTick() < AMBIENT_QI_CACHE_TICKS) {
-            return cached;
+        AmbientQiCache cached = AMBIENT_QI_CACHE.get(player.getUUID());
+        if (cached != null && cached.dimension().equals(player.level().dimension())
+                && cached.origin().distSqr(player.blockPosition()) <= 64.0D
+                && player.tickCount >= cached.value().lastScanTick()
+                && player.tickCount - cached.value().lastScanTick() < AMBIENT_QI_CACHE_TICKS) {
+            return cached.value();
         }
 
         AmbientQi ambientQi = scanAmbientQi(player, AMBIENT_QI_SCAN_RADIUS, player.tickCount);
-        AMBIENT_QI_CACHE.put(player.getUUID(), ambientQi);
+        AMBIENT_QI_CACHE.put(player.getUUID(), new AmbientQiCache(
+                ambientQi, player.level().dimension(), player.blockPosition()));
         return ambientQi;
     }
 
@@ -2841,10 +2949,11 @@ public class ServerEvents {
 
     private static int countSpiritVeinCenters(Level level, BlockPos center, int radius) {
         int count = 0;
-        BlockPos min = center.offset(-radius, -radius, -radius);
-        BlockPos max = center.offset(radius, radius, radius);
-        for (BlockPos pos : BlockPos.betweenClosed(min, max)) {
-            if (level.isLoaded(pos) && isSpiritVeinCenter(level.getBlockState(pos))) {
+        for (var entity : com.example.immortal_cultivation_mod.magicritual.block.custom.MagicCenterBlockEntity
+                .getLoadedBlockEntitiesNear(level, center, radius)) {
+            BlockPos pos = entity.getBlockPos();
+            if (Math.abs(pos.getY() - center.getY()) <= radius
+                    && isSpiritVeinCenter(entity.getBlockState())) {
                 count++;
             }
         }
@@ -2854,10 +2963,11 @@ public class ServerEvents {
     private static List<BlockPos> findFogEscapeBlocks(ServerPlayer player, int radius) {
         List<BlockPos> positions = new ArrayList<>();
         BlockPos center = player.blockPosition();
-        BlockPos min = center.offset(-radius, -radius, -radius);
-        BlockPos max = center.offset(radius, radius, radius);
-        for (BlockPos pos : BlockPos.betweenClosed(min, max)) {
-            if (isFogEscapeBlock(player.level().getBlockState(pos))) {
+        for (var entity : com.example.immortal_cultivation_mod.magicritual.block.custom.MagicCenterBlockEntity
+                .getLoadedBlockEntitiesNear(player.level(), center, radius)) {
+            BlockPos pos = entity.getBlockPos();
+            if (Math.abs(pos.getY() - center.getY()) <= radius
+                    && isFogEscapeBlock(entity.getBlockState())) {
                 positions.add(pos.immutable());
             }
         }
@@ -2914,6 +3024,9 @@ public class ServerEvents {
     private record FogReveal(List<BlockPos> positions, int ticksLeft) {}
 
     public record AmbientQi(int value, int spiritVeinCenters, int lastScanTick) {}
+
+    private record AmbientQiCache(AmbientQi value,
+            net.minecraft.resources.ResourceKey<Level> dimension, BlockPos origin) {}
 
     private static void broadcastMeditationState(ServerPlayer player, boolean meditating) {
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(player,

@@ -23,6 +23,10 @@ public final class PhantomVeilFurItem extends Item {
         super(properties);
     }
 
+    @Override public Component getName(ItemStack stack) {
+        return com.example.immortal_cultivation_mod.entity.BeastRealms.prefix(realmIndex(stack), super.getName(stack));
+    }
+
     public static String realm(ItemStack stack) {
         if (stack.isEmpty()) {
             return DEFAULT_REALM;

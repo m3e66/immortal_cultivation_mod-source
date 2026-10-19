@@ -1,0 +1,23 @@
+{
+  "name": "前世遗泽",
+  "icon": "immortal_cultivation_mod:cultivation_manual",
+  "category": "immortal_cultivation_mod:worldly",
+  "sortnum": 35,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "前身与今身",
+      "text": "人生中的修为、灵根、术法与财物属于所模拟之人。结束时所列修为感悟，按那一生真实积累的修为与奖励比例计算，并非取现实角色当前修为的百分比。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "有所得方可传",
+      "text": "术法遗产须是该人生真正习得且符合灵根、境界等条件的术法；无灵根凡人不能凭空传下术法。物品遗产取自人生实际背包，未曾拥有的物品不会凭空出现。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "择一承受",
+      "text": "自然寿终或手动结算后，查看可领取的遗产，选定一项再领取；同一生不能重复领取。没有合格遗产时可选择不领取。手动结算会结束这一生，不能再回到未完的岁月。"
+    }
+  ]
+}

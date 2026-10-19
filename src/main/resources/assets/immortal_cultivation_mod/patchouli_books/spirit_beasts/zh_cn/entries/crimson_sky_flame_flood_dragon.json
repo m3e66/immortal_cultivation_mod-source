@@ -1,0 +1,33 @@
+{
+  "name": "赤霄炎蛟",
+  "icon": "immortal_cultivation_mod:crimson_sky_flame_flood_dragon_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_4",
+  "sortnum": 11,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "赤霄炎蛟",
+      "text": "$(bold)境界：$()金丹至化神"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《灵兽志》记载",
+      "text": "赤霄炎蛟乃火脉深处所孕大妖，蛟躯盘踞，周身炎气滔天。喜伏于地底熔岩之渊，吸纳地火精华。其威势远超寻常妖兽，传闻蛟吟所至，岩壁震颤，烈焰翻涌。非修为高深者，万不可贸然寻之。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻踪",
+      "text": "主世界及下界深处皆可能藏有其踪，须深入四十格以下且靠近熔岩。此蛟极为罕见，寻常修士终其一生亦难得一见。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "逃逸妖丹与战利品",
+      "text": "各境界炎蛟死亡均会释放逃逸妖丹，肉身不掉落蛟龙战利品。须在其10秒后复生前击杀或收取。赤鳞、炎骨、火蜥血、蛟角、兽肉与妖丹只由逃逸妖丹结算一次，继承原炎蛟境界；养刃材料的额外掉落也由其结算。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "收取与蛟龙炎",
+      "text": "用玻璃瓶或储灵晶收取逃逸妖丹时，妖丹进入背包，其余战利品掉落在附近。击杀或收取时，有1/64概率出现蛟龙炎。须另用空火种瓶收取这团灵火。"
+    }
+  ]
+}

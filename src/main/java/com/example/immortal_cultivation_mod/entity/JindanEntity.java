@@ -55,7 +55,7 @@ public class JindanEntity extends PathfinderMob {
         setNoAi(true);
         setNoGravity(true);
         setPersistenceRequired();
-        setCustomName(Component.literal("金丹"));
+        setCustomName(Component.translatable("entity.immortal_cultivation_mod.jindan"));
         setCustomNameVisible(true);
     }
 
@@ -400,7 +400,7 @@ public class JindanEntity extends PathfinderMob {
         setNoAi(true);
         setNoGravity(true);
         setPersistenceRequired();
-        setCustomName(Component.literal("金丹"));
+        setCustomName(Component.translatable("entity.immortal_cultivation_mod.jindan"));
         setCustomNameVisible(true);
     }
 }

@@ -16,7 +16,8 @@ public final class BloodQiShield {
     }
 
     public static void grant(ServerPlayer player) {
-        float added = Math.max(1.0F, player.getMaxHealth() * 0.05F);
+        float added = (float)(Math.max(1.0F, player.getMaxHealth() * 0.05F) * com.example.immortal_cultivation_mod.alchemy.PillToxicity.multiplier(player,"Benefit"));
+        if(added<=0)return;
         ShieldState existing = SHIELDS.get(player.getUUID());
         float remaining = added;
         float max = added;
@@ -37,7 +38,7 @@ public final class BloodQiShield {
         if (state == null || damage <= 0.0F) {
             return damage;
         }
-        float multiplier = DefensePiercingProjectile.shieldMultiplier(source);
+        float multiplier = DefensePiercingProjectile.shieldMultiplier(source) * com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.shieldMultiplier(source);
         float absorbed = Math.min(damage * multiplier, state.remaining());
         float remaining = state.remaining() - absorbed;
         if (remaining <= 0.0F) {

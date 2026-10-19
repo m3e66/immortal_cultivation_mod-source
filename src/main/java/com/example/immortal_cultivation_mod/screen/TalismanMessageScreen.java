@@ -15,7 +15,8 @@ public final class TalismanMessageScreen extends Screen {
     private EditBox messageBox;
 
     public TalismanMessageScreen(boolean longRange) {
-        super(Component.literal(longRange ? "千里传讯符" : "传音符"));
+        super(Component.translatable(longRange ? "item.immortal_cultivation_mod.qianli_chuanxun_talisman"
+                : "item.immortal_cultivation_mod.chuanyin_talisman"));
         this.longRange = longRange;
     }
 
@@ -24,20 +25,20 @@ public final class TalismanMessageScreen extends Screen {
         int panelX = width / 2 - 150;
         int panelY = height / 2 - 72;
         targetBox = new EditBox(font, panelX + 18, panelY + 34,
-                264, 20, Component.literal("目标名字"));
+                264, 20, text("target"));
         targetBox.setMaxLength(16);
-        targetBox.setHint(Component.literal("目标玩家名字"));
+        targetBox.setHint(text("target_hint"));
         addRenderableWidget(targetBox);
         messageBox = new EditBox(font, panelX + 18, panelY + 70,
-                264, 20, Component.literal("传音内容"));
+                264, 20, text("content"));
         messageBox.setMaxLength(200);
-        messageBox.setHint(Component.literal("输入一条短消息"));
+        messageBox.setHint(text("content_hint"));
         addRenderableWidget(messageBox);
         addRenderableWidget(Button.builder(
-                Component.literal("发送"), button -> submit())
+                text("send"), button -> submit())
                 .bounds(panelX + 18, panelY + 108, 124, 20).build());
         addRenderableWidget(Button.builder(
-                Component.literal("取消"), button -> onClose())
+                Component.translatable("gui.cancel"), button -> onClose())
                 .bounds(panelX + 158, panelY + 108, 124, 20).build());
         setInitialFocus(targetBox);
     }
@@ -73,12 +74,12 @@ public final class TalismanMessageScreen extends Screen {
         graphics.renderOutline(panelX, panelY, 300, 146, 0xFFD9B967);
         graphics.drawCenteredString(font, title,
                 width / 2, panelY + 12, 0xFFF5D982);
-        graphics.drawString(font, "目标", panelX + 18,
+        graphics.drawString(font, text("target"), panelX + 18,
                 panelY + 23, 0xFFD8C9A2, false);
-        graphics.drawString(font, "内容", panelX + 18,
+        graphics.drawString(font, text("content"), panelX + 18,
                 panelY + 59, 0xFFD8C9A2, false);
         graphics.drawCenteredString(font,
-                "范围：" + (longRange ? "1000" : "100") + " 格",
+                text("range", longRange ? 1000 : 100),
                 width / 2, panelY + 94, 0xFFB9AA86);
 
         // Screen.render() reapplies Minecraft's framebuffer blur. Rendering it
@@ -94,5 +95,9 @@ public final class TalismanMessageScreen extends Screen {
     @Override
     public boolean isPauseScreen() {
         return false;
+    }
+
+    private static Component text(String suffix, Object... args) {
+        return Component.translatable("screen.immortal_cultivation_mod.talisman_message." + suffix, args);
     }
 }

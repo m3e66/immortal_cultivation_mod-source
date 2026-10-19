@@ -1,6 +1,5 @@
 package com.example.immortal_cultivation_mod.screen;
 
-import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -8,120 +7,54 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 
+/** Ten element seals scan once, then reveal the actual rolled spirit roots. */
 public class SpiritRootSelectionScreen extends EnlightenmentSelectionScreen {
-    private static final int WINDOW_W = 260;
-    private static final int WINDOW_H = 150;
     private static final int MAX_REFRESHES = 3;
-
     private final RandomSource random = RandomSource.create();
     private SpiritRoots.RootData selectedRoots;
     private int refreshesLeft = MAX_REFRESHES;
+    private Button refresh, proceed;
 
     public SpiritRootSelectionScreen() {
-        super(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".spirit_root_selection"));
-        rollRoots();
-    }
-
-    @Override
-    protected void init() {
-        clearWidgets();
-        int x = (width - WINDOW_W) / 2;
-        int y = (height - WINDOW_H) / 2;
-
-        addRenderableWidget(new StyledButton(
-                x + 20,
-                y + WINDOW_H - 32,
-                100,
-                20,
-                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".refresh_count", refreshesLeft),
-                b -> refreshRoots()
-        )).active = refreshesLeft > 0;
-
-        addRenderableWidget(new StyledButton(
-                x + WINDOW_W - 120,
-                y + WINDOW_H - 32,
-                100,
-                20,
-                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".continue_button"),
-                b -> Minecraft.getInstance().setScreen(new BodyTypeSelectionScreen(
-                        selectedRoots.roots(), selectedRoots.grade()))
-        ));
-    }
-
-    private void refreshRoots() {
-        if (refreshesLeft <= 0) {
-            return;
-        }
-        refreshesLeft--;
-        rollRoots();
-        init();
-    }
-
-    private void rollRoots() {
+        super(Component.translatable("screen.immortal_cultivation_mod.spirit_root_selection"));
         selectedRoots = SpiritRoots.random(random);
     }
 
-    @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        int x = (width - WINDOW_W) / 2;
-        int y = (height - WINDOW_H) / 2;
-        Minecraft mc = Minecraft.getInstance();
+    @Override protected float revealSeconds() { return AwakeningVisuals.ROOT_REVEAL; }
 
-        drawPanel(g, x, y, WINDOW_W, WINDOW_H);
-        g.drawString(mc.font, title, x + 14, y + 12, 0x55DDFF, true);
+    @Override protected void init() {
+        clearWidgets();
+        int size = Math.max(12, Math.round(48 * AwakeningVisuals.scale(width, height)));
+        int y = AwakeningVisuals.screenY(width, height, 665) - size / 2;
+        refresh = addRenderableWidget(new AwakeningVisuals.IconButton(
+                AwakeningVisuals.screenX(width, height, 582) - size / 2, y, size,
+                Component.translatable("screen.immortal_cultivation_mod.refresh_count", refreshesLeft),
+                button -> refreshRoots(), true, () -> refreshesLeft));
+        proceed = addRenderableWidget(new AwakeningVisuals.IconButton(
+                AwakeningVisuals.screenX(width, height, 698) - size / 2, y, size,
+                Component.translatable("screen.immortal_cultivation_mod.continue_button"),
+                button -> Minecraft.getInstance().setScreen(new BodyTypeSelectionScreen(selectedRoots.roots(), selectedRoots.grade())),
+                false, () -> 0));
+        tick();
+    }
 
-        Component rootLabel = Component.translatable("screen." + ImmortalCultivationMod.MODID + ".spirit_roots");
-        Component rootValue = Component.literal(SpiritRoots.format(selectedRoots.roots(), selectedRoots.grade()));
-        g.drawString(mc.font, rootLabel.copy().append(": "), x + 18, y + 48, 0xCCCCCC, true);
-        g.drawString(mc.font, rootValue, x + 18, y + 66, 0x88FFCC, true);
+    @Override public void tick() {
+        if (refresh != null) refresh.active = animationReady() && refreshesLeft > 0;
+        if (proceed != null) proceed.active = animationReady();
+    }
 
-        Component tries = Component.translatable("screen." + ImmortalCultivationMod.MODID + ".refreshes_left", refreshesLeft);
-        g.drawString(mc.font, tries, x + 18, y + 92, 0xAAAAAA, true);
+    private void refreshRoots() {
+        if (!animationReady() || refreshesLeft <= 0) return;
+        refreshesLeft--;
+        selectedRoots = SpiritRoots.random(random);
+        restartAnimation(); init();
+    }
 
+    @Override public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        float time = animationSeconds();
+        AwakeningVisuals.roots(g, width, height, time, selectedRoots.roots(), selectedRoots.grade());
         super.render(g, mouseX, mouseY, partialTick);
     }
-
-    @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-    }
-
-    @Override
-    public boolean isPauseScreen() {
-        return false;
-    }
-
-    static void drawPanel(GuiGraphics g, int x, int y, int w, int h) {
-        g.fill(x, y, x + w, y + h, 0xD0181818);
-        g.renderOutline(x, y, w, h, 0xFF55DDFF);
-        g.fill(x + 1, y + 1, x + w - 1, y + 2, 0xAA8FFFFF);
-        g.fill(x + 1, y + h - 2, x + w - 1, y + h - 1, 0xAA1E6F7A);
-    }
-
-    static class StyledButton extends Button {
-        StyledButton(int x, int y, int width, int height, Component message, OnPress onPress) {
-            super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
-        }
-
-        @Override
-        protected void renderWidget(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-            int x = getX();
-            int y = getY();
-            int bg = active ? 0xCC202020 : 0x88404040;
-            int top = isHoveredOrFocused() && active ? 0xFF8FFFFF : 0xFF55DDFF;
-            int bottom = active ? 0xFF1E6F7A : 0xFF555555;
-            int text = active ? 0xFFEAFDFF : 0xFF999999;
-
-            g.fill(x, y, x + width, y + height, bg);
-            g.fill(x, y, x + width, y + 1, top);
-            g.fill(x, y, x + 1, y + height, top);
-            g.fill(x, y + height - 1, x + width, y + height, bottom);
-            g.fill(x + width - 1, y, x + width, y + height, bottom);
-
-            var font = Minecraft.getInstance().font;
-            Component message = getMessage();
-            int tx = x + (width - font.width(message)) / 2;
-            int ty = y + (height - 8) / 2;
-            g.drawString(font, message, tx, ty, text, false);
-        }
-    }
+    @Override public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {}
+    @Override public boolean isPauseScreen() { return false; }
 }

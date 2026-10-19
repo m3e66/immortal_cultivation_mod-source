@@ -7,7 +7,7 @@ import net.minecraft.world.damagesource.DamageSource;
 
 /** One cast's weapon power, retained by every delayed hit after the held item changes. */
 public final class WeaponSkillAttack {
-    private record Context(WeaponSkillAttack attack, ServerPlayer owner, DamageSource source) {}
+    private record Context(WeaponSkillAttack attack, net.minecraft.world.entity.LivingEntity owner, DamageSource source) {}
     private static final ThreadLocal<Context> ACTIVE = new ThreadLocal<>();
     private final ItemStack original;
     private final ItemStack weapon;
@@ -16,6 +16,7 @@ public final class WeaponSkillAttack {
     private boolean paid;
 
     private WeaponSkillAttack(ItemStack stack) {
+        WeaponBinding.prepare(stack);
         original = stack;
         weapon = stack.copy();
         injectedQi = QiInfusedWeapon.injectedQiDamage(stack);
@@ -38,10 +39,10 @@ public final class WeaponSkillAttack {
         QiInfusedWeapon.consumeInjectedQiDamage(original, injectedQi);
     }
 
-    public boolean withWeapon(ServerPlayer owner, DamageSource source, BooleanSupplier hit) {
+    public boolean withWeapon(net.minecraft.world.entity.LivingEntity owner, DamageSource source, BooleanSupplier hit) {
         Context previous = ACTIVE.get();
         ACTIVE.set(new Context(this, owner, source));
-        try { return hit.getAsBoolean(); }
+        try { return WeaponBinding.withWeapon(weapon, source, hit); }
         finally {
             if (previous == null) ACTIVE.remove();
             else ACTIVE.set(previous);

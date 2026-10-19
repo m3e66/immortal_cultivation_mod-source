@@ -17,17 +17,17 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @PrefixGameTestTemplate(false)
 public final class WeaponQiGameTests {
     @GameTest(template = "fate_test")
-    public static void externalQiWidthGrowsWithDamageAndStaysBounded(GameTestHelper helper) {
-        double previous=0;
-        for(float damage:new float[]{1,10,25,100,1000,10000}) {
-            double radius=com.example.immortal_cultivation_mod.entity.WeaponQiSlashEntity.damageScaledRadius(1,damage,32);
-            helper.assertTrue(radius>previous&&radius<=32,"Higher released damage produces a larger slash: "+damage);
-            previous=radius;
+    public static void externalQiWidthGrowsWithWeaponLevelAndStaysBounded(GameTestHelper helper) {
+        var weapon = new ItemStack(Items.IRON_SWORD);
+        double previous = 0;
+        for (int tier = 0; tier <= WeaponRestrictionSystem.MAX_TIER; tier++) {
+            WeaponRestrictionSystem.setTier(weapon, tier);
+            double radius = com.example.immortal_cultivation_mod.combat.ExternalQiSize.radius(weapon, 1, false, false, false);
+            helper.assertTrue(radius > previous && radius <= 32, "Higher weapon levels produce larger external Qi");
+            previous = radius;
         }
-        helper.assertTrue(com.example.immortal_cultivation_mod.entity.WeaponQiSlashEntity.damageScaledRadius(1,Float.MAX_VALUE,32)==32,
-                "Extreme damage respects the restored size limit");
-        helper.assertTrue(Math.abs(com.example.immortal_cultivation_mod.entity.WeaponQiSlashEntity.damageScaledRadius(2,100,32)
-                - 2 * Math.sqrt(11)) < .00001, "Extra blade-length multiplier is removed");
+        helper.assertTrue(com.example.immortal_cultivation_mod.combat.ExternalQiSize.radius(weapon, 2, false, false, false) == 32,
+                "High-level gear and maximum scroll size respect the shared size cap");
         for (double radius : new double[]{1, 2, 8, 16, 32}) {
             helper.assertTrue(Math.abs(com.example.immortal_cultivation_mod.effect.ExternalQiVfxShape.halfThickness(radius)
                     - 4 * (.2 + radius * .025)) < .00001, "Blade body is four times thicker without extra reach");
@@ -40,8 +40,11 @@ public final class WeaponQiGameTests {
             helper.assertTrue(com.example.immortal_cultivation_mod.network.HigherWeaponPayloads.clampWidth(shape,48) == 32,
                     "Packet and renderer share the restored blade-length cap: " + shape);
         }
-        helper.assertTrue(com.example.immortal_cultivation_mod.entity.WeaponQiSlashEntity.damageScaledRadius(3,1000000,12)==12,
-                "Fist waves preserve their distinct maximum size");
+        var bracer = new ItemStack(ModItems.HEAVY_IRON_BRACER.get());
+        WeaponRestrictionSystem.setTier(bracer, WeaponRestrictionSystem.MAX_TIER);
+        helper.assertTrue(com.example.immortal_cultivation_mod.combat.ExternalQiSize.radius(bracer, 2, true, true, false) == 12
+                && com.example.immortal_cultivation_mod.combat.ExternalQiSize.radius(bracer, 2, true, false, false) == 7,
+                "Fist waves preserve their distinct maximum sizes");
         int previousBlocks = 0;
         for (float damage : new float[]{1, 10, 25, 100, 1000}) {
             int blocks = com.example.immortal_cultivation_mod.entity.WeaponQiSlashEntity.damageScaledBlockBudget(damage);

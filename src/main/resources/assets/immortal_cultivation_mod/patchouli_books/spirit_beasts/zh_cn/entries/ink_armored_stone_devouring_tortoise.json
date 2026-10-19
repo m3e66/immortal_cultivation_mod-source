@@ -1,0 +1,23 @@
+{
+  "name": "墨甲吞石龟",
+  "icon": "immortal_cultivation_mod:ink_armored_stone_devouring_tortoise_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "墨甲吞石龟",
+      "text": "$(bold)境界：$()炼气至金丹"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《灵兽志》记载",
+      "text": "此龟身披墨色重甲，以山石矿气滋养己身。行动虽缓，甲壳却极为厚重。常蛰伏于高山绝顶，亦可深藏地底岩窟，远望如同一块寻常黑石。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻踪",
+      "text": "高山石峰及钟乳石洞穴。或现于百格以上的露天高处，或潜藏于四十格以下、不见天光的深层洞窟，偏好岩石、深板岩、凝灰岩及各类矿质地面。"
+    }
+  ]
+}

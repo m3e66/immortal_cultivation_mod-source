@@ -17,21 +17,16 @@ import com.example.immortal_cultivation_mod.network.ModPayloads;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
 import com.example.immortal_cultivation_mod.spell.SolarTechniques;
 import com.example.immortal_cultivation_mod.spell.UndeadAbilitySystem;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -47,7 +42,6 @@ public final class CombatStateManager {
     public static final int COMBAT_DURATION_TICKS = 20 * 15;
     public static final int POSTURE_BREAK_TICKS = 30;
     public static final int HEAVY_CHARGE_TICKS = 10;
-    public static final int TELEPORT_CHANNEL_TICKS = 60;
     private static final int COMBO_RESET_TICKS = 24;
     private static final int DUPLICATE_ATTACK_WINDOW_TICKS = 3;
 
@@ -56,14 +50,9 @@ public final class CombatStateManager {
     private static final String MANUAL_COMBAT_TAG = "ImmortalCultivationManualCombat";
     private static final String POSTURE_TAG = "ImmortalCultivationPosture";
     private static final String POSTURE_BROKEN_UNTIL_TAG = "ImmortalCultivationPostureBrokenUntil";
-    private static final TagKey<Item> COMBAT_DELAYED_TELEPORT_ITEMS = TagKey.create(
-            Registries.ITEM,
-            ResourceLocation.fromNamespaceAndPath(
-                    ImmortalCultivationMod.MODID, "combat_delayed_teleport"));
     private static final Map<UUID, RecentHit> RECENT_HITS = new ConcurrentHashMap<>();
     private static final Map<UUID, Long> HEAVY_CHARGE_STARTS = new ConcurrentHashMap<>();
     private static final Map<UUID, SpellPreparation> SPELL_PREPARATIONS = new ConcurrentHashMap<>();
-    private static final Map<UUID, PendingTeleport> PENDING_TELEPORTS = new ConcurrentHashMap<>();
     private static final Map<UUID, SyncState> LAST_SYNC = new ConcurrentHashMap<>();
     private static final Map<UUID, ComboState> COMBO_STATES = new ConcurrentHashMap<>();
     private static final Set<UUID> BLOCKING_PLAYERS = ConcurrentHashMap.newKeySet();
@@ -161,7 +150,6 @@ public final class CombatStateManager {
     }
 
     public static void tick(ServerPlayer player) {
-        CombatBarrage.tick(player);
         WhipItem.tickCombo(player);
         if (SPELL_PREPARATIONS.containsKey(player.getUUID())
                 && isSpellPreparationBlocked(player)) {
@@ -183,7 +171,6 @@ public final class CombatStateManager {
                 && !canMaintainBlock(player)) {
             setBlocking(player, false);
         }
-        tickPendingTeleport(player);
         if (!isInCombat(player)) {
             if (player.getPersistentData().contains(COMBAT_UNTIL_TAG)) {
                 player.getPersistentData().remove(COMBAT_UNTIL_TAG);
@@ -355,7 +342,6 @@ public final class CombatStateManager {
         }
         cancelHeavyCharge(player);
         setBlocking(player, false);
-        CombatBarrage.clear(player);
         SPELL_PREPARATIONS.put(player.getUUID(), new SpellPreparation(
                 normalized, player.serverLevel().getGameTime()));
     }
@@ -390,6 +376,7 @@ public final class CombatStateManager {
     }
 
     public static void interruptSpellPreparation(ServerPlayer player) {
+        com.example.immortal_cultivation_mod.spell.SelfExplosionConfirmation.cancel(player);
         if (SPELL_PREPARATIONS.remove(player.getUUID()) != null) {
             sendSpellPreparationInterrupt(player);
         }
@@ -406,7 +393,7 @@ public final class CombatStateManager {
     }
 
     public static boolean isSpellcastingBlocked(ServerPlayer player) {
-        return !player.isAlive()
+        return !player.isAlive()||ColdTideFreeze.isFrozen(player)
                 || player.isSpectator()
                 || isPostureBroken(player)
                 || player.hasEffect(ModEffects.DAZE)
@@ -462,7 +449,6 @@ public final class CombatStateManager {
         }
         cancelHeavyCharge(player);
         if (nextBlocking) {
-            CombatBarrage.clear(player);
             interruptSpellPreparation(player);
         }
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(
@@ -509,17 +495,13 @@ public final class CombatStateManager {
         if (!canPerformWeaponAttack(player)) {
             return;
         }
-        if (CombatBarrage.onNormalClick(player)) return;
-        executeNormalAttack(player, entityId, false);
+        QiDomainSystem.attack(player);
+        executeNormalAttack(player, entityId);
     }
 
-    static void performBarrageAttack(ServerPlayer player, int entityId) {
-        if (canPerformWeaponAttack(player)) executeNormalAttack(player, entityId, true);
-    }
-
-    private static void executeNormalAttack(ServerPlayer player, int entityId, boolean barrage) {
+    private static void executeNormalAttack(ServerPlayer player, int entityId) {
         if (XiujianItem.canFire(player)) {
-            if (barrage || XiujianItem.isHeld(player)) {
+            if (XiujianItem.isHeld(player)) {
                 XiujianItem.fireNeedle(player, false);
             }
             return;
@@ -576,7 +558,6 @@ public final class CombatStateManager {
     }
 
     public static void performHeavyAttack(ServerPlayer player, int entityId, long packedBlockPos) {
-        CombatBarrage.clear(player);
         Long started = HEAVY_CHARGE_STARTS.remove(player.getUUID());
         long gameTime = player.serverLevel().getGameTime();
         if (started == null
@@ -585,6 +566,7 @@ public final class CombatStateManager {
             return;
         }
 
+        QiDomainSystem.attack(player);
         if (XiujianItem.canFire(player)) {
             XiujianItem.fireNeedle(player, true);
             return;
@@ -660,14 +642,16 @@ public final class CombatStateManager {
     }
 
     private static boolean canPerformWeaponAttack(ServerPlayer player) {
-        return (canMaintainBlock(player) || XiujianItem.canFire(player))
+        return com.example.immortal_cultivation_mod.item.WeaponBinding.checkUse(player.getMainHandItem(), player)
+                && (canMaintainBlock(player) || XiujianItem.canFire(player))
                 && !BLOCKING_PLAYERS.contains(player.getUUID());
     }
 
     private static boolean canMaintainBlock(ServerPlayer player) {
         return isInCombat(player)
                 && !isPostureBroken(player)
-                && isCombatWeapon(player.getMainHandItem());
+                && isCombatWeapon(player.getMainHandItem())
+                && com.example.immortal_cultivation_mod.item.WeaponBinding.canUse(player.getMainHandItem(), player);
     }
 
     private static boolean attackEntity(ServerPlayer player, int entityId, boolean heavy) {
@@ -728,58 +712,17 @@ public final class CombatStateManager {
                 || QiInfusedWeapon.isWeapon(stack);
     }
 
-    public static boolean interceptTeleportUse(
-            ServerPlayer player, InteractionHand hand, ItemStack stack) {
-        if (!isInCombat(player)
-                || !stack.is(COMBAT_DELAYED_TELEPORT_ITEMS)
-                || PENDING_TELEPORTS.containsKey(player.getUUID())) {
-            if (isInCombat(player)
-                    && stack.is(COMBAT_DELAYED_TELEPORT_ITEMS)
-                    && PENDING_TELEPORTS.containsKey(player.getUUID())) {
-                player.displayClientMessage(Component.translatable(
-                        "message." + ImmortalCultivationMod.MODID + ".teleport_channel_active"), true);
-                return true;
-            }
-            return false;
-        }
-        Holder<Item> item = stack.getItem().builtInRegistryHolder();
-        PENDING_TELEPORTS.put(player.getUUID(), new PendingTeleport(
-                hand, item, player.serverLevel().getGameTime() + TELEPORT_CHANNEL_TICKS));
-        player.displayClientMessage(Component.translatable(
-                "message." + ImmortalCultivationMod.MODID + ".teleport_channel_started"), true);
-        return true;
-    }
-
-    private static void tickPendingTeleport(ServerPlayer player) {
-        PendingTeleport pending = PENDING_TELEPORTS.get(player.getUUID());
-        if (pending == null || player.serverLevel().getGameTime() < pending.executeAt()) {
-            return;
-        }
-        PENDING_TELEPORTS.remove(player.getUUID());
-        ItemStack stack = player.getItemInHand(pending.hand());
-        if (!stack.is(pending.item()) || !player.isAlive()) {
-            return;
-        }
-        InteractionResultHolder<ItemStack> result =
-                stack.use(player.serverLevel(), player, pending.hand());
-        if (result.getObject() != stack) {
-            player.setItemInHand(pending.hand(), result.getObject());
-        }
-    }
-
     public static void clear(ServerPlayer player) {
         clear(player, true);
     }
 
     private static void clear(ServerPlayer player, boolean clearSpellPreparation) {
-        CombatBarrage.clear(player);
         player.getPersistentData().remove(COMBAT_UNTIL_TAG);
         player.getPersistentData().remove(MANUAL_COMBAT_TAG);
         player.getPersistentData().remove(POSTURE_BROKEN_UNTIL_TAG);
         player.getPersistentData().putFloat(POSTURE_TAG, maxPosture(player));
         RECENT_HITS.remove(player.getUUID());
         HEAVY_CHARGE_STARTS.remove(player.getUUID());
-        PENDING_TELEPORTS.remove(player.getUUID());
         COMBO_STATES.remove(player.getUUID());
         if (clearSpellPreparation) {
             interruptSpellPreparation(player);
@@ -790,10 +733,9 @@ public final class CombatStateManager {
     }
 
     public static void onLogout(ServerPlayer player) {
-        CombatBarrage.clear(player);
+        com.example.immortal_cultivation_mod.spell.SelfExplosionConfirmation.cancel(player);
         RECENT_HITS.remove(player.getUUID());
         HEAVY_CHARGE_STARTS.remove(player.getUUID());
-        PENDING_TELEPORTS.remove(player.getUUID());
         LAST_SYNC.remove(player.getUUID());
         COMBO_STATES.remove(player.getUUID());
         BLOCKING_PLAYERS.remove(player.getUUID());
@@ -826,9 +768,6 @@ public final class CombatStateManager {
     }
 
     private record RecentHit(UUID attacker, long gameTime) {
-    }
-
-    private record PendingTeleport(InteractionHand hand, Holder<Item> item, long executeAt) {
     }
 
     private record SpellPreparation(String spellId, long startedAt) {

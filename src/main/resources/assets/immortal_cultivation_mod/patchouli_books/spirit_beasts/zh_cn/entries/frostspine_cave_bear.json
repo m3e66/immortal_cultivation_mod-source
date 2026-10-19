@@ -1,0 +1,23 @@
+{
+  "name": "霜脊穴熊",
+  "icon": "immortal_cultivation_mod:frostspine_cave_bear_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 7,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "霜脊穴熊",
+      "text": "$(bold)境界：$()炼气至金丹"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《灵兽志》记载",
+      "text": "霜脊穴熊背生寒霜骨脊，体魄雄壮，久居冰雪群山。其身可耐极寒，喜栖于积雪深厚之地，亦常隐于山中幽洞。外来者若惊扰其巢穴，恐难全身而退。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻踪",
+      "text": "雪坡、冰封尖峰、山间林地、积雪针叶林、冰刺原及冰封河流。常见于七十二格以上高处，亦可出没于天光被遮蔽之地。"
+    }
+  ]
+}

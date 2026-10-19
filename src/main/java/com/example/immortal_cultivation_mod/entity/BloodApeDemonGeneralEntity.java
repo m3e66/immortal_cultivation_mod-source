@@ -50,7 +50,12 @@ import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 /** Yuanying early-stage blood/earth martial beast with deliberate, stateful combat. */
-public final class BloodApeDemonGeneralEntity extends Monster implements GeoEntity {
+public final class BloodApeDemonGeneralEntity extends RealmBeastMonster implements GeoEntity {
+    // Visuals use synchronized BeastAttackVfx; server combat and sounds remain unchanged.
+    /** Shared visual and physical scale of the restored original general. */
+    public static final float MODEL_SCALE = 1.0F;
+    public static final float BODY_WIDTH = 1.15F * MODEL_SCALE;
+    public static final float BODY_HEIGHT = 2.8F * MODEL_SCALE;
     private static final EntityDataAccessor<Byte> ACTION_STATE = SynchedEntityData.defineId(
             BloodApeDemonGeneralEntity.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Integer> ACTION_TICKS = SynchedEntityData.defineId(
@@ -213,11 +218,7 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
             float bloodLoss = getMaxHealth() * 0.0015F;
             setHealth(Math.max(1.0F, getHealth() - bloodLoss));
         }
-        if (level() instanceof ServerLevel level && (tickCount & 1) == 0) {
-            level.sendParticles(ModParticles.METHOD_QI_BLOOD.get(),
-                    getX(), getY() + getBbHeight() * 0.55D, getZ(),
-                    4, 0.55D, 0.9D, 0.55D, 0.025D);
-        }
+
     }
 
     private void updateYuanyingGuard() {
@@ -316,11 +317,8 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
     private void tickHeavyPunch(ServerLevel level, int ticks, LivingEntity target) {
         Vec3 forward = horizontalDirection(getYRot());
         Vec3 fist = position().add(0.0D, getBbHeight() * 0.66D, 0.0D)
-                .add(forward.scale(0.95D));
-        if (ticks > 11 && (ticks & 1) == 0) {
-            level.sendParticles(ModParticles.METHOD_QI_BLOOD.get(),
-                    fist.x, fist.y, fist.z, 8, 0.28D, 0.28D, 0.28D, 0.025D);
-        }
+                .add(forward.scale(0.95D * MODEL_SCALE));
+
         if (ticks != 12) {
             return;
         }
@@ -349,11 +347,7 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
     }
 
     private void tickEarthStomp(ServerLevel level, int ticks) {
-        if (ticks > 14 && ticks % 3 == 0) {
-            level.sendParticles(ModParticles.METHOD_QI_EARTH.get(),
-                    getX(), getY() + 0.15D, getZ(), 10,
-                    0.75D, 0.15D, 0.75D, 0.02D);
-        }
+
         if (ticks != 14) {
             return;
         }
@@ -430,7 +424,7 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
 
     private void holdGrabbedTarget(LivingEntity target) {
         Vec3 forward = horizontalDirection(getYRot());
-        Vec3 held = position().add(forward.scale(1.25D))
+        Vec3 held = position().add(forward.scale(1.25D * MODEL_SCALE))
                 .add(0.0D, getBbHeight() * 0.43D, 0.0D);
         target.teleportTo(held.x, held.y, held.z);
         target.setDeltaMovement(Vec3.ZERO);
@@ -445,9 +439,6 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
         thrownTargetUuid = target.getUUID();
         thrownCollisionTicks = 20;
         grabbedTargetUuid = null;
-        level.sendParticles(ModParticles.METHOD_QI_BLOOD.get(),
-                target.getX(), target.getY() + target.getBbHeight() * 0.5D, target.getZ(),
-                24, 0.45D, 0.6D, 0.45D, 0.12D);
         level.playSound(null, blockPosition(), SoundEvents.PLAYER_ATTACK_KNOCKBACK,
                 SoundSource.HOSTILE, 1.5F, 0.62F);
     }
@@ -469,11 +460,6 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
         target.setDeltaMovement(target.getDeltaMovement().scale(0.18D));
         if (level() instanceof ServerLevel level) {
             BlockState state = level.getBlockState(target.blockPosition());
-            level.sendParticles(new net.minecraft.core.particles.BlockParticleOption(
-                            net.minecraft.core.particles.ParticleTypes.BLOCK,
-                            state.isAir() ? net.minecraft.world.level.block.Blocks.STONE.defaultBlockState() : state),
-                    target.getX(), target.getY() + target.getBbHeight() * 0.5D, target.getZ(),
-                    36, 0.55D, 0.8D, 0.55D, 0.18D);
             level.playSound(null, target.blockPosition(), SoundEvents.GENERIC_EXPLODE.value(),
                     SoundSource.HOSTILE, 1.4F, 0.78F);
         }
@@ -535,8 +521,6 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
                 position().add(0.0D, 0.35D, 0.0D),
                 4.0D, 2.0D, 48, 8.0F);
         emitShockwave(level, position(), 4.5D, 64, true);
-        level.sendParticles(net.minecraft.core.particles.ParticleTypes.EXPLOSION,
-                getX(), getY() + 0.4D, getZ(), 6, 1.2D, 0.35D, 1.2D, 0.05D);
         level.playSound(null, blockPosition(), SoundEvents.GENERIC_EXPLODE.value(),
                 SoundSource.HOSTILE, 2.0F, 0.52F);
     }
@@ -544,9 +528,6 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
     private void tickBerserkTransform(ServerLevel level, int ticks) {
         if ((ticks & 1) == 0) {
             double progress = 1.0D - ticks / (double) BERSERK_TRANSFORM_TICKS;
-            level.sendParticles(ModParticles.METHOD_QI_BLOOD.get(),
-                    getX(), getY() + getBbHeight() * (0.2D + progress * 0.55D), getZ(),
-                    10, 0.65D + progress, 0.45D, 0.65D + progress, 0.06D);
         }
     }
 
@@ -562,6 +543,7 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
 
     private void emitApeSilhouette(ServerLevel level, Vec3 base, float yaw,
                                    double scale, boolean spectralGuard) {
+        scale *= MODEL_SCALE;
         Vec3 forward = horizontalDirection(yaw);
         Vec3 right = new Vec3(forward.z, 0.0D, -forward.x);
         for (double y = 0.25D; y <= 2.25D; y += 0.32D) {
@@ -595,12 +577,6 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
                                      boolean spectralGuard) {
         Vec3 point = base.add(right.scale(localX)).add(forward.scale(localZ))
                 .add(0.0D, localY, 0.0D);
-        level.sendParticles(ModParticles.METHOD_QI_BLOOD.get(),
-                point.x, point.y, point.z, 1,
-                spectralGuard ? 0.055D : 0.025D,
-                spectralGuard ? 0.055D : 0.025D,
-                spectralGuard ? 0.055D : 0.025D,
-                spectralGuard ? 0.012D : 0.003D);
     }
 
     private void emitShockwave(ServerLevel level, Vec3 center,
@@ -610,11 +586,6 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
             Vec3 point = center.add(
                     Math.cos(angle) * radius, 0.18D,
                     Math.sin(angle) * radius);
-            level.sendParticles(blood && index % 3 == 0
-                            ? ModParticles.METHOD_QI_BLOOD.get()
-                            : ModParticles.METHOD_QI_EARTH.get(),
-                    point.x, point.y, point.z, 1,
-                    0.04D, 0.08D, 0.04D, 0.025D);
         }
     }
 
@@ -718,11 +689,7 @@ public final class BloodApeDemonGeneralEntity extends Monster implements GeoEnti
         setDeltaMovement(movement.x, onGround() ? 0.24D : getDeltaMovement().y, movement.z);
         hasImpulse = true;
         dodgeCooldown = isBerserk() ? 16 : 25;
-        if (level() instanceof ServerLevel level) {
-            level.sendParticles(ModParticles.METHOD_QI_BLOOD.get(),
-                    getX(), getY() + getBbHeight() * 0.5D, getZ(),
-                    18, 0.45D, 0.75D, 0.45D, 0.08D);
-        }
+
         return true;
     }
 

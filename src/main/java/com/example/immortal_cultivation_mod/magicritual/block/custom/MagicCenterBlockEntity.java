@@ -1002,8 +1002,10 @@ public class MagicCenterBlockEntity extends BlockEntity implements MenuProvider 
 
       for(int chunkX = minChunkX; chunkX <= maxChunkX; ++chunkX) {
          for(int chunkZ = minChunkZ; chunkZ <= maxChunkZ; ++chunkZ) {
-            if (level.hasChunk(chunkX, chunkZ)) {
-               for(BlockEntity blockEntity : level.getChunk(chunkX, chunkZ).getBlockEntities().values()) {
+            var chunk = level.getChunkSource().getChunkNow(chunkX, chunkZ);
+            if (chunk != null) {
+               for(BlockEntity blockEntity : chunk.getBlockEntities().values()) {
+                  if (blockEntity.isRemoved()) continue;
                   BlockPos blockPos = blockEntity.getBlockPos();
                   if (Math.abs(blockPos.getX() - origin.getX()) <= radius && Math.abs(blockPos.getZ() - origin.getZ()) <= radius) {
                      blockEntities.add(blockEntity);

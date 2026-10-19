@@ -1,5 +1,6 @@
 package com.example.immortal_cultivation_mod.client.renderer;
 
+import com.example.immortal_cultivation_mod.client.VfxVertexWriter;
 import com.example.immortal_cultivation_mod.entity.AsteroidEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -65,7 +66,16 @@ public final class AsteroidRenderer extends EntityRenderer<AsteroidEntity> {
                int positionIndex = reference.positionIndex();
                Vector3f position = geometry.positions()[positionIndex];
                Vector3f normal = geometry.normals()[this.mesh.weldIndices()[positionIndex]];
-               vertices.addVertex(poseMatrix, position.x, position.y, position.z).setColor(255, 255, 255, 255).setUv(reference.uv().x, 1.0F - reference.uv().y).setOverlay(OverlayTexture.NO_OVERLAY).setLight(modelLight).setNormal(pose, normal.x, normal.y, normal.z);
+               if (vertices.getClass() == com.mojang.blaze3d.vertex.BufferBuilder.class) {
+                  VfxVertexWriter.entity(vertices, pose, position.x, position.y, position.z,
+                          0xFFFFFFFF, reference.uv().x, 1.0F - reference.uv().y,
+                          OverlayTexture.NO_OVERLAY, modelLight, normal.x, normal.y, normal.z);
+               } else {
+                  VfxVertexWriter.vertex(vertices, poseMatrix, position.x, position.y, position.z)
+                          .setColor(255, 255, 255, 255).setUv(reference.uv().x, 1.0F - reference.uv().y)
+                          .setOverlay(OverlayTexture.NO_OVERLAY).setLight(modelLight);
+                  VfxVertexWriter.normal(vertices, pose, normal.x, normal.y, normal.z);
+               }
             }
          }
 

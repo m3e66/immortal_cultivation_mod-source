@@ -1,5 +1,6 @@
 package com.example.immortal_cultivation_mod.client;
 
+import com.example.immortal_cultivation_mod.config.ModClientConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.Level;
@@ -17,12 +18,14 @@ public final class OverworldCosmicSkyRenderer {
     }
 
     private static void onRenderLevel(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY
+                || ShaderPackCompatibility.isRenderingShadowPass()) {
             return;
         }
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level == null || minecraft.player == null
-                || !minecraft.level.dimension().equals(Level.OVERWORLD)) {
+                || !minecraft.level.dimension().equals(Level.OVERWORLD)
+                || !ModClientConfig.enableModSky()) {
             return;
         }
         FogType fog = event.getCamera().getFluidInCamera();
@@ -46,9 +49,14 @@ public final class OverworldCosmicSkyRenderer {
         // panorama overlay, but leave those pack-controlled celestial bodies alone.
         if (!ShaderPackCompatibility.isShaderPackActive()
                 && CosmicVoidSkyShaders.celestialShader() != null) {
-            CosmicVoidDynamicVfxRenderer.renderOverworldCelestials(
-                    event.getModelViewMatrix(), dayTime / 24_000.0F,
-                    weatherAlpha);
+            var state=CosmicVoidSkyRenderer.SkyPassState.capture();
+            try {
+                CosmicVoidDynamicVfxRenderer.renderOverworldCelestials(
+                        event.getModelViewMatrix(), dayTime / 24_000.0F,
+                        weatherAlpha);
+            } finally {
+                state.restore();
+            }
         }
     }
 

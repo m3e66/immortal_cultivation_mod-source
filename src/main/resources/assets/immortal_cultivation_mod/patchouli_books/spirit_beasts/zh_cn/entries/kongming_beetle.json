@@ -1,0 +1,23 @@
+{
+  "name": "空冥甲虫",
+  "icon": "immortal_cultivation_mod:kongming_beetle_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "空冥甲虫",
+      "text": "$(bold)境界：$()炼气至金丹"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《灵兽志》记载",
+      "text": "空冥甲虫乃地脉深处所孕奇虫，甲壳隐现幽光，体内暗藏空冥之息。此虫极为稀少，非寻常地表可见。欲寻其踪，当深入地底，静察岩层间的微弱灵息。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻踪",
+      "text": "主世界各地深层地下皆可能出现，须位于海平面以下至少十格，且脚下有坚实地面。其踪迹尤为罕见。"
+    }
+  ]
+}

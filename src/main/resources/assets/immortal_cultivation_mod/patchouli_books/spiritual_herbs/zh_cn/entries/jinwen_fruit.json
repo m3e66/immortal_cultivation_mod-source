@@ -1,0 +1,23 @@
+{
+  "name": "金纹果",
+  "icon": "immortal_cultivation_mod:jinwen_fruit",
+  "category": "immortal_cultivation_mod:volume_4",
+  "sortnum": 13,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "金纹果",
+      "text": "$(bold)生成尝试频率：$()1/24"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《百草录》记载",
+      "text": "金纹果通体温润，果皮生有细密金纹，宛若天然符络。其生长缓慢，喜阳光充足、地气平稳之所。成熟之时金纹愈显，灵气渐聚于果实之中，为山野间较为罕见的灵果。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻药",
+      "text": "向日葵平原、草甸、热带草原、狂风山丘及白桦林。"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Golden-Veined Fruit",
+  "icon": "immortal_cultivation_mod:jinwen_fruit",
+  "category": "immortal_cultivation_mod:volume_4",
+  "sortnum": 13,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Golden-Veined Fruit",
+      "text": "$(bold)Spawn attempt frequency: $()1/24"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Golden-Veined Fruit is distinguished by delicate golden patterns that spread across its skin like natural talisman markings. It matures slowly in warm, open landscapes, gradually concentrating spiritual essence within the fruit. Its unusual appearance makes it a prized discovery."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Sunflower plains, meadows, savannas, windswept hills, and birch forests."
+    }
+  ]
+}

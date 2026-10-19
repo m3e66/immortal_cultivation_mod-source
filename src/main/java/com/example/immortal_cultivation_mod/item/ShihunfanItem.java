@@ -103,6 +103,8 @@ public class ShihunfanItem extends Item implements GeoItem, SoulStorageWeapon {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
+        if (!WeaponBinding.checkUse(stack, player)) return InteractionResultHolder.fail(stack);
+        WeaponBinding.prepare(stack);
         if (!(player instanceof ServerPlayer serverPlayer)) {
             return InteractionResultHolder.sidedSuccess(stack, true);
         }
@@ -120,7 +122,7 @@ public class ShihunfanItem extends Item implements GeoItem, SoulStorageWeapon {
 
     public static boolean soulWindSlash(ServerPlayer player) {
         ItemStack stack = player.getMainHandItem();
-        if (!stack.is(ModItems.SHIHUNFAN.get()) || !player.isShiftKeyDown()) {
+        if (!stack.is(ModItems.SHIHUNFAN.get()) || !player.isShiftKeyDown() || !WeaponBinding.checkUse(stack, player)) {
             return false;
         }
         long now = player.level().getGameTime();
@@ -156,7 +158,7 @@ public class ShihunfanItem extends Item implements GeoItem, SoulStorageWeapon {
                     || (distance > 1.0E-4D && horizontal.scale(1.0D / distance).dot(forward) < 0.5D)) {
                 continue;
             }
-            target.hurt(damageSource, damage);
+            WeaponBinding.withWeapon(stack, damageSource, () -> target.hurt(damageSource, damage));
             renderSoulImpact(level, target.getBoundingBox().getCenter(), soulDensity, true);
         }
         return true;
@@ -181,8 +183,10 @@ public class ShihunfanItem extends Item implements GeoItem, SoulStorageWeapon {
 
         double baseDamage = Math.max(1.0D, QiInfusedWeapon.baseAttackDamage(stack));
         float damage = (float) Math.min(1_000_000_000.0D, baseDamage + souls * 5.0D);
+        WeaponBinding.prepare(stack);
         ShihunfanSoulWaveEntity wave = ShihunfanSoulWaveEntity.create(
                 player.serverLevel(), player, player.getLookAngle(), damage, soulDensity(stack, souls));
+        if (wave != null) wave.setBindingWeapon(stack);
         if (wave == null) {
             return false;
         }
@@ -269,6 +273,7 @@ public class ShihunfanItem extends Item implements GeoItem, SoulStorageWeapon {
     }
 
     private static boolean fireBeam(ServerPlayer player, ItemStack stack) {
+        if (!WeaponBinding.checkUse(stack, player)) return false;
         double souls = getSoulAmount(stack);
         if (souls <= 0.0D) {
             player.displayClientMessage(Component.translatable(
@@ -306,7 +311,8 @@ public class ShihunfanItem extends Item implements GeoItem, SoulStorageWeapon {
                 ? null : ModelBonePartEntity.resolveLiving(entityHit.getEntity());
         if (target != null) {
             float damage = (float) Math.min(1_000_000_000.0D, souls * 5.0D);
-            target.hurt(player.damageSources().indirectMagic(player, player), damage);
+            var source = player.damageSources().indirectMagic(player, player);
+            WeaponBinding.withWeapon(stack, source, () -> target.hurt(source, damage));
         }
         return true;
     }
@@ -341,7 +347,8 @@ public class ShihunfanItem extends Item implements GeoItem, SoulStorageWeapon {
         setSoulAmount(stack, souls * 0.95D);
         renderBeam(level, start, end);
         float damage = (float) Math.min(1_000_000_000.0D, souls * 5.0D);
-        target.hurt(caster.damageSources().indirectMagic(caster, caster), damage);
+        var source = caster.damageSources().indirectMagic(caster, caster);
+        WeaponBinding.withWeapon(stack, source, () -> target.hurt(source, damage));
         return true;
     }
 

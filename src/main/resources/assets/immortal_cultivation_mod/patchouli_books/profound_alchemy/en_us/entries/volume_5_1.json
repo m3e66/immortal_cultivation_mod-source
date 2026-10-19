@@ -1,0 +1,18 @@
+{
+  "name": "Meridian-Restoring Pill",
+  "icon": "immortal_cultivation_mod:xumai_pill",
+  "category": "immortal_cultivation_mod:volume_5",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Scripture Account",
+      "text": "The Meridian-Restoring Pill is an emergency medicine that remains dormant within the body after consumption. When the cultivator's health falls below a critical threshold, its medicinal power activates automatically and gradually restores vitality."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Effect",
+      "text": "When HP falls below 20% of maximum, restores 20% maximum HP over 45 seconds. Triggers once per dose."
+    }
+  ]
+}

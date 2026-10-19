@@ -25,6 +25,7 @@ import net.minecraft.world.phys.HitResult;
 
 /** A real burning-scale projectile launched by 炎鳞爆. */
 public final class CrimsonDragonScaleProjectileEntity extends ThrowableItemProjectile {
+    // Visuals use synchronized BeastAttackVfx; server combat and sounds remain unchanged.
     private static final float DAMAGE = 280.0F;
 
     public CrimsonDragonScaleProjectileEntity(
@@ -44,20 +45,7 @@ public final class CrimsonDragonScaleProjectileEntity extends ThrowableItemProje
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) {
-            level().addParticle(ModParticles.DRAGON_EMBER.get(),
-                    getX(), getY(), getZ(),
-                    -getDeltaMovement().x * 0.12D,
-                    -getDeltaMovement().y * 0.12D,
-                    -getDeltaMovement().z * 0.12D);
-            if ((tickCount & 1) == 0) {
-                level().addParticle(ModParticles.DRAGON_SCALE_SPARK.get(),
-                        getX(), getY(), getZ(),
-                        -getDeltaMovement().x * 0.05D,
-                        -getDeltaMovement().y * 0.05D,
-                        -getDeltaMovement().z * 0.05D);
-            }
-        } else if (tickCount > 80) {
+        if (!level().isClientSide && tickCount > 80) {
             discard();
         }
     }
@@ -121,12 +109,6 @@ public final class CrimsonDragonScaleProjectileEntity extends ThrowableItemProje
         if (level() instanceof ServerLevel serverLevel) {
             if (getOwner() instanceof CrimsonSkyFlameFloodDragonEntity dragon)
                 BeastMoveBlockBreaker.breakSphere(serverLevel, dragon, result.getLocation(), 1.3, 1.1, 16, 12);
-            serverLevel.sendParticles(ModParticles.DRAGON_EMBER.get(),
-                    result.getLocation().x, result.getLocation().y, result.getLocation().z,
-                    18, 0.34D, 0.34D, 0.34D, 0.09D);
-            serverLevel.sendParticles(ModParticles.DRAGON_SCALE_SPARK.get(),
-                    result.getLocation().x, result.getLocation().y, result.getLocation().z,
-                    12, 0.26D, 0.26D, 0.26D, 0.16D);
             serverLevel.playSound(null, blockPosition(), SoundEvents.FIRECHARGE_USE,
                     SoundSource.HOSTILE, 0.65F, 1.45F);
             discard();

@@ -174,7 +174,8 @@ public final class NpcSpellcasting {
             return false;
         }
         if (profile.role() == Role.ATTACK || profile.role() == Role.CONTROL) {
-            if (target == null || !target.isAlive() || target.level() != caster.level()) {
+            if (target == null || !target.isAlive() || target.level() != caster.level()
+                    || NpcProfile.isNonCombatPlayer(target)) {
                 return false;
             }
             double distance = Math.sqrt(caster.distanceToSqr(target));
@@ -245,7 +246,8 @@ public final class NpcSpellcasting {
     }
 
     public static boolean releaseLingbeng(PathfinderMob caster, LivingEntity target) {
-        if (target == null || !target.isAlive() || !caster.hasEffect(ModEffects.LINGBENG)
+        if (target == null || !target.isAlive() || NpcProfile.isNonCombatPlayer(target)
+                || !caster.hasEffect(ModEffects.LINGBENG)
                 || NpcProfile.qi(caster, archetype(caster)) < LINGBENG_RELEASE_COST
                 || !caster.hasLineOfSight(target)) {
             return false;
@@ -353,7 +355,6 @@ public final class NpcSpellcasting {
             case ModSpells.REGENERATION -> CultivatorSpellExecution.applyRegeneration(caster);
             case ModSpells.CLEANSE -> CultivatorSpellExecution.applyCleanse(caster);
             case ModSpells.QI_GATHERING -> CultivatorSpellExecution.applyQiGathering(caster);
-            case ModSpells.IGNITE_FLARE -> CultivatorSpellExecution.igniteFlare(caster, target, 1.0F);
             case ModSpells.ZHENSHAN_PALM -> CultivatorSpellExecution.zhenshanPalm(caster, 1.0F);
             case ModSpells.LIGHT_BEAM_ATTACK -> CultivatorSpellExecution.lightBeamVolley(caster, target);
             case ModSpells.DIELANG_SHIELD -> DielangShield.activateNext(caster);
@@ -388,7 +389,6 @@ public final class NpcSpellcasting {
         profiles.put(ModSpells.SHENGXI_BAOFA, self(Role.HEAL));
         profiles.put(ModSpells.CLEANSE, self(Role.DEFENSE));
         profiles.put(ModSpells.QI_GATHERING, self(Role.RECOVERY));
-        profiles.put(ModSpells.IGNITE_FLARE, attack(2.5D, 25.0D, false, false));
         profiles.put(ModSpells.ZHENSHAN_PALM, attack(2.0D, 12.0D, true, false));
         profiles.put(ModSpells.LIGHT_BEAM_ATTACK, attack(3.0D, 30.0D, false, true));
         profiles.put(ModSpells.DIELANG_SHIELD, self(Role.DEFENSE));

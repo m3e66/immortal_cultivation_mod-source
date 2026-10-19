@@ -83,7 +83,7 @@ public class AbsorbCultivationProjectileEntity extends ThrowableItemProjectile {
 
         long casterNeed = Math.max(1L, CultivationLevels.getTotalQiNeeded(casterData.cultivationLevel()));
         ModAttachments.setData(target, drained.data());
-        ModAttachments.setData(caster, casterData.withCultivationProgress(Math.min(casterNeed, casterData.cultivationProgress() + drained.amount())));
+        ModAttachments.setData(caster, casterData.withCultivationProgress(Math.min(casterNeed, casterData.cultivationProgress() + com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.cultivationGain(caster, drained.amount()))));
         com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(target);
         com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(caster);
 

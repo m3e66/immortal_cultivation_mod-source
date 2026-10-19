@@ -7,7 +7,7 @@
     {
       "type": "patchouli:text",
       "title": "Start and Choose",
-      "text": "Open Life Simulation and begin a new life. Read events and available actions before choosing.$(br2)Earlier choices influence later experiences and opportunities. Your simulated life is separate from your actual character; a simulated realm is not automatically your real cultivation realm."
+      "text": "Begin a new life in Life Simulation. Its roots, methods, inventory, and cultivation belong to the simulated person.$(br2)Activities, journeys, and stories appear according to age, realm, history, and prerequisites. Some choices lead to battles. Read Planning the Year, Battles Within a Life, and Inheritance of a Life for their details."
     },
     {
       "type": "patchouli:text",

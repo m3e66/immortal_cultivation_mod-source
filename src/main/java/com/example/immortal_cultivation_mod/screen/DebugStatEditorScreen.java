@@ -8,11 +8,14 @@ import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import com.example.immortal_cultivation_mod.client.ClientData;
 import com.example.immortal_cultivation_mod.item.TalismanRecipes;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
+import com.example.immortal_cultivation_mod.network.DebugShentongPayloads;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
 import com.example.immortal_cultivation_mod.system.OuterSystemType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -25,7 +28,9 @@ import java.util.UUID;
 public class DebugStatEditorScreen extends Screen {
     static final int WINDOW_W = 320;
     static final int WINDOW_H = 320;
-    static final String[] TAB_KEYS = {"stats", "roots", "methods", "jindan", "proficiency", "system", "talisman_mastery", "weapon"};
+    static final String[] TAB_KEYS = {"stats", "roots", "methods", "jindan", "proficiency", "system", "talisman_mastery", "weapon", "shentong"};
+    static final int TAB_STEP = (WINDOW_W - 20) / TAB_KEYS.length;
+    private static final int SHENTONG_PAGE = 8;
     private static final int VISIBLE_METHOD_ROWS = 11;
     private static final int VISIBLE_TALISMAN_ROWS = 11;
     private static final String METHOD_PROFICIENCY_PREFIX = "method_proficiency:";
@@ -57,6 +62,13 @@ public class DebugStatEditorScreen extends Screen {
     private int methodScroll = 0;
     private int talismanScroll = 0;
     private boolean closeSyncSent;
+    private DebugShentongPayloads.State shentongState;
+    private String selectedShentongId;
+    private int shentongFieldScroll;
+    private Button shentongAdd, shentongRemove, shentongPrevious, shentongNext;
+    private final java.util.Map<String, EditBox> shentongValues = new java.util.LinkedHashMap<>();
+    private final java.util.Map<String, Button> shentongActions = new java.util.LinkedHashMap<>();
+    private int shentongRefreshTicks;
 
     public DebugStatEditorScreen(UUID targetId, String targetName, String systemType) {
         this(targetId, targetName, systemType, 0);
@@ -64,7 +76,7 @@ public class DebugStatEditorScreen extends Screen {
 
     public DebugStatEditorScreen(UUID targetId, String targetName, String systemType, int initialPage) {
         super(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".debug_stat_editor"));
-        this.page = Math.clamp(initialPage, 0, 6);
+        this.page = Math.clamp(initialPage, 0, SHENTONG_PAGE);
         this.targetId = targetId;
         this.targetName = targetName;
         this.selectedSystemId = OuterSystemType.byId(systemType).id();
@@ -85,9 +97,16 @@ public class DebugStatEditorScreen extends Screen {
         int x = (width - WINDOW_W) / 2;
         int y = (height - WINDOW_H) / 2;
 
-        for (int i = 0; i < TAB_KEYS.length; i++) addPageButton(i, x + 10 + i * 37, y + 30, TAB_KEYS[i]);
+        for (int i = 0; i < TAB_KEYS.length; i++) addPageButton(i, x + 10 + i * TAB_STEP, y + 30, TAB_KEYS[i]);
         addHintControls(x + 264, y + 5);
         adjustStat("restriction_hints", 0);
+
+        if (page == SHENTONG_PAGE) {
+            addShentongControls(x, y);
+            if (minecraft.getConnection() != null)
+                PacketDistributor.sendToServer(new DebugShentongPayloads.Request(targetId));
+            return;
+        }
 
         if (page == 1) {
             addSpiritRootButtons(x + 12, y + 98);
@@ -138,7 +157,7 @@ public class DebugStatEditorScreen extends Screen {
     private void addPageButton(int targetPage, int x, int y, String key) {
         Component label = Component.literal(page == targetPage ? "[X] " : "")
                 .append(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".debug_tab_" + key));
-        addRenderableWidget(new DebugButton(x, y, 36, 18, label, b -> {
+        addRenderableWidget(new DebugButton(x, y, TAB_STEP - 1, 18, label, b -> {
             if (targetPage == 7) {
                 PacketDistributor.sendToServer(new com.example.immortal_cultivation_mod.network.DebugWeaponEditorPayloads.Open());
                 return;
@@ -149,8 +168,10 @@ public class DebugStatEditorScreen extends Screen {
     }
 
     private void addAdjustRow(String stat, int x, int y, int step) {
-        addRenderableWidget(new DebugButton(x + 238, y, 22, 18, Component.literal("-"), b ->
+        Button decrease=addRenderableWidget(new DebugButton(x + 238, y, 22, 18, Component.literal("-"), b ->
                 adjustStat(stat, -step)));
+        if("age".equals(stat))decrease.setTooltip(Tooltip.create(Component.translatable(
+                "screen.immortal_cultivation_mod.debug_age_new_life")));
         addRenderableWidget(new DebugButton(x + 264, y, 22, 18, Component.literal("+"), b ->
                 adjustStat(stat, step)));
     }
@@ -280,7 +301,7 @@ public class DebugStatEditorScreen extends Screen {
             String element = SpiritRoots.ALL_ELEMENTS.get(i);
             int bx = x + (i % 5) * 58;
             int by = y + (i / 5) * 22;
-            Button button = new DebugButton(bx, by, 52, 18, Component.literal(element), b -> toggleRoot(element));
+            Button button = new DebugButton(bx, by, 52, 18, SpiritRoots.elementDisplayName(element), b -> toggleRoot(element));
             elementToggles.add(new ElementToggle(element, button));
             addRenderableWidget(button);
         }
@@ -289,7 +310,7 @@ public class DebugStatEditorScreen extends Screen {
     private void addGradeButtons(int x, int y) {
         for (int i = 0; i < SpiritRoots.GRADES.size(); i++) {
             String grade = SpiritRoots.GRADES.get(i);
-            Button button = new DebugButton(x + i * 58, y, 52, 18, Component.literal(grade), b -> setGrade(grade));
+            Button button = new DebugButton(x + i * 58, y, 52, 18, SpiritRoots.gradeDisplayName(grade), b -> setGrade(grade));
             gradeToggles.add(new GradeToggle(grade, button));
             addRenderableWidget(button);
         }
@@ -325,8 +346,141 @@ public class DebugStatEditorScreen extends Screen {
     }
 
     private void adjustStat(String stat, int delta) {
+        if (minecraft.getConnection() == null) return;
         PacketDistributor.sendToServer(new ModPayloads.ServerboundDebugAdjustStatPayload(
                 targetId, stat, delta));
+    }
+
+    private static Component shentongText(String key) {
+        return Component.translatable("screen.immortal_cultivation_mod.debug_shentong_" + key);
+    }
+
+    private DebugShentongPayloads.AbilityState selectedShentong() {
+        if (shentongState == null || shentongState.abilities().isEmpty()) return null;
+        return shentongState.abilities().stream().filter(a -> a.id().equals(selectedShentongId))
+                .findFirst().orElse(shentongState.abilities().getFirst());
+    }
+
+    private void changeShentong(int step) {
+        var selected = selectedShentong();
+        if (selected == null) return;
+        var abilities = shentongState.abilities();
+        selectedShentongId = abilities.get(Math.floorMod(abilities.indexOf(selected) + step, abilities.size())).id();
+        shentongFieldScroll = 0;
+        init();
+    }
+
+    private void addShentongControls(int x, int y) {
+        shentongValues.clear(); shentongActions.clear();
+        shentongPrevious = addRenderableWidget(new DebugButton(x + 12, y + 60, 20, 20,
+                Component.literal("<"), b -> changeShentong(-1)));
+        shentongNext = addRenderableWidget(new DebugButton(x + 286, y + 60, 20, 20,
+                Component.literal(">"), b -> changeShentong(1)));
+        shentongAdd = addRenderableWidget(new DebugButton(x + 12, y + 106, 142, 20,
+                shentongText("add"), b -> editShentong("add", 0)));
+        shentongRemove = addRenderableWidget(new DebugButton(x + 164, y + 106, 142, 20,
+                shentongText("remove"), b -> editShentong("remove", 0)));
+        var selected = selectedShentong();
+        if (selected != null) {
+            selectedShentongId = selected.id();
+            shentongFieldScroll = Math.clamp(shentongFieldScroll,0,Math.max(0,selected.fields().size()-4));
+            for (int i=shentongFieldScroll; i<Math.min(selected.fields().size(),shentongFieldScroll+4); i++) {
+                var field = selected.fields().get(i);
+                int rowY = y + 140 + (i-shentongFieldScroll)*30;
+                Button action;
+                if (field.toggle()) {
+                    action = addRenderableWidget(new DebugButton(x + 178,rowY,128,20,Component.empty(), b -> {
+                        var current = selectedShentong();
+                        if (current != null) current.fields().stream().filter(f -> f.id().equals(field.id())).findFirst()
+                                .ifPresent(f -> editShentong(f.id(),f.value() == 0 ? 1 : 0));
+                    }));
+                } else {
+                    var box = addRenderableWidget(new EditBox(font,x+174,rowY,70,18,Component.translatable(field.nameKey())));
+                    box.setMaxLength(11); box.setFilter(value -> value.matches("-?[0-9]*"));
+                    box.setTextColor(0xFFEAFDFF);
+                    shentongValues.put(field.id(),box);
+                    action = addRenderableWidget(new DebugButton(x+250,rowY,56,18,shentongText("apply"), b -> {
+                        try {
+                            int value = Integer.parseInt(box.getValue());
+                            box.setFocused(false); editShentong(field.id(),value);
+                        } catch (NumberFormatException ignored) { }
+                    }));
+                    box.setTooltip(Tooltip.create(Component.translatable(
+                            "screen.immortal_cultivation_mod.debug_shentong_range",field.min(),field.max())));
+                }
+                action.setTooltip(Tooltip.create(Component.translatable(field.nameKey())));
+                shentongActions.put(field.id(),action);
+            }
+        }
+        updateShentongControls();
+    }
+
+    private void editShentong(String field, int value) {
+        var selected = selectedShentong();
+        if (selected == null || minecraft.getConnection() == null) return;
+        PacketDistributor.sendToServer(new DebugShentongPayloads.Edit(targetId,selected.id(),field,value));
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (page == SHENTONG_PAGE && minecraft.getConnection() != null && ++shentongRefreshTicks >= 20) {
+            shentongRefreshTicks = 0;
+            PacketDistributor.sendToServer(new DebugShentongPayloads.Request(targetId));
+        }
+    }
+
+    public void acceptShentongState(DebugShentongPayloads.State state) {
+        if (!targetId.equals(state.targetId())) return;
+        var previous = selectedShentong();
+        shentongState = state;
+        var selected = selectedShentong();
+        if (page != SHENTONG_PAGE || shentongAdd == null) return;
+        // Preserve focused input during periodic value refreshes. Rebuild only if the controls change.
+        boolean sameSchema = previous == null && selected == null || previous != null && selected != null
+                && previous.id().equals(selected.id()) && previous.fields().size() == selected.fields().size();
+        if (sameSchema && previous != null) for (int i=0; i<previous.fields().size(); i++) {
+            var old = previous.fields().get(i); var next = selected.fields().get(i);
+            if (!old.id().equals(next.id()) || !old.nameKey().equals(next.nameKey()) || old.min()!=next.min()
+                    || old.max()!=next.max() || old.toggle()!=next.toggle()) { sameSchema=false; break; }
+        }
+        if (!sameSchema) { shentongFieldScroll=0; init(); }
+        else updateShentongControls();
+    }
+
+    private void updateShentongControls() {
+        var selected = selectedShentong();
+        boolean owned = selected != null && selected.owned();
+        shentongAdd.active = selected != null && !owned;
+        shentongRemove.active = owned;
+        shentongPrevious.active = shentongNext.active = shentongState != null && shentongState.abilities().size()>1;
+        for (var action : shentongActions.values()) action.active=owned;
+        for (var box : shentongValues.values()) box.setEditable(owned);
+        if (selected == null) return;
+        for (var field : selected.fields()) {
+            var box = shentongValues.get(field.id());
+            if (box != null && !box.isFocused()) box.setValue(Integer.toString(field.value()));
+            var action = shentongActions.get(field.id());
+            if (action != null && field.toggle()) action.setMessage(shentongText(field.value()!=0 ? "enabled" : "disabled"));
+        }
+    }
+
+    private void drawShentong(GuiGraphics g, int x, int y) {
+        var selected = selectedShentong();
+        if (selected != null) {
+            drawFittedLabel(g,minecraft,Component.translatable(selected.nameKey()),x+40,y+66,240,0xE6D0FF);
+            String position = (shentongState.abilities().indexOf(selected)+1) + " / " + shentongState.abilities().size();
+            g.drawString(font,position,x+306-font.width(position),y+87,0xFFAAAAAA,false);
+            for (int i=shentongFieldScroll; i<Math.min(selected.fields().size(),shentongFieldScroll+4); i++)
+                drawFittedLabel(g,minecraft,Component.translatable(selected.fields().get(i).nameKey()),
+                        x+12,y+145+(i-shentongFieldScroll)*30,156,0xFFEAFDFF);
+            if (selected.fields().size()>4) g.drawString(font,Component.translatable(
+                    "screen.immortal_cultivation_mod.debug_shentong_scroll",shentongFieldScroll+1,
+                    Math.min(selected.fields().size(),shentongFieldScroll+4),selected.fields().size()),x+12,y+258,0xFFAAAAAA,false);
+        }
+        Component status = shentongText(shentongState == null ? "loading" : selected == null ? "empty" : selected.owned() ? "owned" : "absent");
+        g.drawString(font,status,x+12,y+87,0xFFE1A8,false);
+        g.drawWordWrap(font,shentongText("note"),x+12,y+278,294,0xFFAAAAAA);
     }
 
     @Override
@@ -345,16 +499,18 @@ public class DebugStatEditorScreen extends Screen {
                 Integer.toString(ClientData.restrictionHints()), 0xFFEAFDFF);
 
         if (data == null) {
-            g.drawString(mc.font, Component.literal("No player data"), x + 12, y + 66, 0xFF5555, true);
+            g.drawString(mc.font, Component.translatable("screen.immortal_cultivation_mod.no_data"), x + 12, y + 66, 0xFF5555, true);
             super.render(g, mouseX, mouseY, partialTick);
             return;
         }
-        if (page == 1) {
-            drawValue(g, mc, x + 12, y + 62, "spirit_roots", SpiritRoots.format(data.spiritRoots(), data.spiritRootGrade()), 0x88FFCC);
+        if (page == SHENTONG_PAGE) {
+            drawShentong(g, x, y);
+        } else if (page == 1) {
+            drawValue(g, mc, x + 12, y + 62, "spirit_roots", SpiritRoots.displayName(data.spiritRoots(), data.spiritRootGrade()), 0x88FFCC);
             g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".spirit_root_elements"), x + 12, y + 88, 0x88FFCC, true);
             g.drawString(mc.font, Component.translatable("screen." + ImmortalCultivationMod.MODID + ".spirit_root_grade"), x + 12, y + 150, 0xFFDDAA, true);
             drawValue(g, mc, x + 12, y + 208, "body_type",
-                    BodyTypes.sanitize(data.bodyType()), 0xFFD0B8FF);
+                    BodyTypes.displayName(data.bodyType()), 0xFFD0B8FF);
             updateSpiritRootButtons(data.spiritRoots(), data.spiritRootGrade());
         } else if (page == 2) {
             drawMethodProficiencies(g, mc, data, x + 12, y + 66);
@@ -393,7 +549,7 @@ public class DebugStatEditorScreen extends Screen {
                     String.format(java.util.Locale.ROOT, "%.1f", data.talent()), 0xFFD76A);
             drawValue(g, mc, x + 12, y + 188, "skill_points_debug", Integer.toString(data.skillPoints()), 0x55FFFF);
             drawValue(g, mc, x + 12, y + 206, "max_hp", Integer.toString(levelDef.maxHp() + data.maxHpBonus()), 0xFFFFFF);
-            drawValue(g, mc, x + 12, y + 224, "max_qi", Integer.toString(levelDef.maxQi() + data.maxQiBonus()), 0x55FFFF);
+            drawValue(g, mc, x + 12, y + 224, "max_qi", Integer.toString(data.maxQi()), 0x55FFFF);
             drawValue(g, mc, x + 12, y + 242, "max_energy", Integer.toString(data.thoughtSkillBonus()), 0xFFFF55);
             drawValue(g, mc, x + 12, y + 260, "physical", Integer.toString(data.physicalAttack()), 0xFFAA66);
             drawValue(g, mc, x + 12, y + 278, "magic", Integer.toString(data.magicAttack()), 0xAA88FF);
@@ -409,7 +565,7 @@ public class DebugStatEditorScreen extends Screen {
 
         for (ElementToggle toggle : elementToggles) {
             boolean active = selected.contains(toggle.element());
-            toggle.button().setMessage(Component.literal((active ? "[X] " : "[ ] ") + toggle.element()));
+            toggle.button().setMessage(Component.literal(active ? "[X] " : "[ ] ").append(SpiritRoots.elementDisplayName(toggle.element())));
             toggle.button().active = active || !full;
         }
 
@@ -417,7 +573,7 @@ public class DebugStatEditorScreen extends Screen {
 
         for (GradeToggle toggle : gradeToggles) {
             boolean active = cleanGrade.equals(toggle.grade());
-            toggle.button().setMessage(Component.literal((active ? "[X] " : "[ ] ") + toggle.grade()));
+            toggle.button().setMessage(Component.literal(active ? "[X] " : "[ ] ").append(SpiritRoots.gradeDisplayName(toggle.grade())));
         }
     }
 
@@ -545,6 +701,17 @@ public class DebugStatEditorScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (page == SHENTONG_PAGE) {
+            var selected = selectedShentong();
+            if (selected != null) {
+                int x=(width-WINDOW_W)/2, y=(height-WINDOW_H)/2;
+                if (mouseX>=x+10 && mouseX<=x+310 && mouseY>=y+132 && mouseY<=y+256) {
+                    int next=Math.clamp(shentongFieldScroll-(int)Math.signum(scrollY),0,Math.max(0,selected.fields().size()-4));
+                    if (next!=shentongFieldScroll) { shentongFieldScroll=next; init(); return true; }
+                }
+            }
+            return super.mouseScrolled(mouseX,mouseY,scrollX,scrollY);
+        }
         if (page == 6) {
             int max = Math.max(0, TalismanRecipes.all().size() - VISIBLE_TALISMAN_ROWS);
             int next = Math.max(0,

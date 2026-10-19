@@ -1,0 +1,3277 @@
+{
+  "stories": [
+    {
+      "id": "life_event_missing_disciple",
+      "version": 6,
+      "replacement": true,
+      "category": "sect",
+      "sect": true,
+      "minimum_age": 16,
+      "minimum_realm": 0,
+      "maximum_realm": 27,
+      "start_node": "S01",
+      "title_key": "life.replacement.missing_disciple.title",
+      "location_key": "life.story.missing_disciple.location",
+      "required_living_cast": [
+        "lead",
+        "steward",
+        "worker"
+      ],
+      "unconscious_node": "E4",
+      "fallback_node": "S16",
+      "nodes": [
+        {
+          "id": "S01",
+          "text_key": "life.replacement.missing_disciple.S01.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.S01.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S01.en_us.17",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.missing_disciple.S01.A",
+              "requirement_key": "life.replacement.missing_disciple.S01.A.requires",
+              "next": "S02"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.missing_disciple.S01.B",
+              "requirement_key": "life.replacement.missing_disciple.S01.B.requires",
+              "next": "S03"
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.missing_disciple.S01.C",
+              "requirement_key": "life.replacement.missing_disciple.S01.C.requires",
+              "next": "S04"
+            },
+            {
+              "id": "D",
+              "text_key": "life.replacement.missing_disciple.S01.D",
+              "requirement_key": "life.replacement.missing_disciple.S01.D.requires",
+              "next": "S16"
+            }
+          ],
+          "enter_effects": [
+            "md:initialize",
+            "note_held",
+            "document:note",
+            "delivery_owed"
+          ],
+          "seen_roles": [
+            "lead",
+            "steward",
+            "worker"
+          ]
+        },
+        {
+          "id": "S02",
+          "text_key": "life.replacement.missing_disciple.S02.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.S02.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.zh_cn.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S02.en_us.18",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.missing_disciple.S02.A",
+              "requirement_key": "life.replacement.missing_disciple.S02.A.requires",
+              "next": "S05",
+              "story_effects": [
+                "cloak_held",
+                "meal_ticket_held"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.missing_disciple.S02.B",
+              "requirement_key": "life.replacement.missing_disciple.S02.B.requires",
+              "next": "S03"
+            }
+          ],
+          "seen_roles": [
+            "lead"
+          ]
+        },
+        {
+          "id": "S03",
+          "text_key": "life.replacement.missing_disciple.S03.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.S03.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.zh_cn.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S03.en_us.18",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.missing_disciple.S03.A",
+              "requirement_key": "life.replacement.missing_disciple.S03.A.requires",
+              "next": "S04",
+              "requires": "conscious&!insight_attempted",
+              "check": {
+                "attribute": "Comprehension",
+                "proficiency": "Alchemy",
+                "purpose": "insight",
+                "dc": 17
+              },
+              "failure": "S04",
+              "no_strain": true,
+              "success_story_effects": [
+                "insight_attempted",
+                "accounting_evidence",
+                "document:receipts",
+                "receipts_verified"
+              ],
+              "failure_story_effects": [
+                "insight_attempted",
+                "incomplete_accounts"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.missing_disciple.S03.B",
+              "requirement_key": "life.replacement.missing_disciple.S03.B.requires",
+              "next": "S05",
+              "story_effects": [
+                "accounting_evidence",
+                "unauthorized_records",
+                "register_held",
+                "document:register"
+              ]
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.missing_disciple.S03.C",
+              "requirement_key": "life.replacement.missing_disciple.S03.C.requires",
+              "next": "S05"
+            }
+          ],
+          "seen_roles": [
+            "steward"
+          ]
+        },
+        {
+          "id": "S04",
+          "text_key": "life.replacement.missing_disciple.S04.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.S04.incomplete_accounts",
+              "requires": "incomplete_accounts"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.verified_receipts",
+              "requires": "receipts_verified"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.zh_cn.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.zh_cn.20",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.en_us.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S04.en_us.20",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.missing_disciple.S04.A",
+              "requirement_key": "life.replacement.missing_disciple.S04.A.requires",
+              "next": "S06",
+              "story_effects": [
+                "inspection_pass",
+                "document:inspection_pass"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.missing_disciple.S04.B",
+              "requirement_key": "life.replacement.missing_disciple.S04.B.requires",
+              "next": "S05"
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.missing_disciple.S04.C",
+              "requirement_key": "life.replacement.missing_disciple.S04.C.requires",
+              "next": "S14"
+            }
+          ],
+          "seen_roles": [
+            "lead",
+            "steward"
+          ]
+        },
+        {
+          "id": "S05",
+          "text_key": "life.replacement.missing_disciple.S05.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.S05.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.zh_cn.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.en_us.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S05.en_us.19",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.missing_disciple.S05.A",
+              "requirement_key": "life.replacement.missing_disciple.S05.A.requires",
+              "next": "S06",
+              "story_effects": [
+                "confidentiality",
+                "private_statement",
+                "document:private_statement",
+                "md:worker_trust"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.missing_disciple.S05.B",
+              "requirement_key": "life.replacement.missing_disciple.S05.B.requires",
+              "next": "S06"
+            }
+          ],
+          "enter_effects": [
+            "key_held",
+            "key_borrowed"
+          ],
+          "seen_roles": [
+            "lead"
+          ]
+        },
+        {
+          "id": "S06",
+          "text_key": "life.replacement.missing_disciple.S06.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.20",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.21",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.22",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.23",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.25",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.zh_cn.27",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.20",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.21",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.22",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.23",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.25",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S06.en_us.27",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.missing_disciple.S06.A",
+              "requirement_key": "life.replacement.missing_disciple.S06.A.requires",
+              "next": "S07"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.missing_disciple.S06.B",
+              "requirement_key": "life.replacement.missing_disciple.S06.B.requires",
+              "next": "S08"
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.missing_disciple.S06.C",
+              "requirement_key": "life.replacement.missing_disciple.S06.C.requires",
+              "next": "S14"
+            },
+            {
+              "id": "D",
+              "text_key": "life.replacement.missing_disciple.S06.D",
+              "requirement_key": "life.replacement.missing_disciple.S06.D.requires",
+              "next": "S16"
+            }
+          ],
+          "enter_effects": [
+            "lin_seen",
+            "document:direct_observation"
+          ],
+          "seen_roles": [
+            "lead",
+            "steward"
+          ]
+        },
+        {
+          "id": "S07",
+          "text_key": "life.replacement.missing_disciple.S07.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.S07.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.zh_cn.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.zh_cn.21",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.en_us.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.en_us.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S07.en_us.21",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.missing_disciple.S07.A",
+              "requirement_key": "life.replacement.missing_disciple.S07.A.requires",
+              "next": "S08",
+              "story_effects": [
+                "technical_evidence",
+                "document:night_duty_sheet"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.missing_disciple.S07.B",
+              "requirement_key": "life.replacement.missing_disciple.S07.B.requires",
+              "next": "S08"
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.missing_disciple.S07.C",
+              "requirement_key": "life.replacement.missing_disciple.S07.C.requires",
+              "next": "S14"
+            }
+          ],
+          "enter_effects": [
+            "shutdown_order_known",
+            "reserve_seen"
+          ],
+          "seen_roles": [
+            "lead",
+            "steward"
+          ]
+        },
+        {
+          "id": "S08",
+          "text_key": "life.replacement.missing_disciple.S08.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.S08.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S08.en_us.16",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.missing_disciple.S08.A",
+              "requirement_key": "life.replacement.missing_disciple.S08.A.requires",
+              "next": "S10",
+              "requires": "inspection_pass",
+              "story_effects": [
+                "control_access"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.missing_disciple.S08.B",
+              "requirement_key": "life.replacement.missing_disciple.S08.B.requires",
+              "next": "S10",
+              "story_effects": [
+                "control_access",
+                "brief_wait"
+              ]
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.missing_disciple.S08.C",
+              "requirement_key": "life.replacement.missing_disciple.S08.C.requires",
+              "next": "S09",
+              "requires": "combat"
+            },
+            {
+              "id": "D",
+              "text_key": "life.replacement.missing_disciple.S08.D",
+              "requirement_key": "life.replacement.missing_disciple.S08.D.requires",
+              "next": "S14"
+            }
+          ],
+          "seen_roles": [
+            "lead",
+            "steward"
+          ]
+        },
+        {
+          "id": "S09",
+          "text_key": "life.replacement.missing_disciple.S09.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.S09.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.zh_cn.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.zh_cn.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.zh_cn.20",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.zh_cn.22",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.en_us.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.en_us.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.en_us.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.en_us.20",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S09.en_us.22",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.missing_disciple.S09.A",
+              "requirement_key": "life.replacement.missing_disciple.S09.A.requires",
+              "next": "S10",
+              "requires": "combat",
+              "story_effects": [
+                "battle_started",
+                "confrontation_recorded"
+              ],
+              "battle": {
+                "arena": "temple",
+                "objective_key": "life.replacement.missing_disciple.battle.objective",
+                "stakes": "retreat",
+                "limit": 10,
+                "mechanic": "guard_passage",
+                "victory_rule": "combat",
+                "hazard_limit": 12,
+                "hazard_key": "life.story.missing_disciple.hazard",
+                "objective_enabled": false,
+                "disaster": false,
+                "enemies": [
+                  {
+                    "name_key": "life.story.missing_disciple.opponent",
+                    "realm": 4,
+                    "sprite": "cultivator_front",
+                    "profile": "defensive",
+                    "moves": [
+                      {
+                        "id": "missing_disciple_strike",
+                        "kind": "strike",
+                        "name_key": "life.story.missing_disciple.move.strike",
+                        "element": "physical",
+                        "potency": 1,
+                        "accuracy": 0,
+                        "priority": 0,
+                        "qi_fraction": 0,
+                        "cooldown": 0,
+                        "effect": "",
+                        "area": false
+                      },
+                      {
+                        "id": "missing_disciple_heavy",
+                        "kind": "heavy",
+                        "name_key": "life.story.missing_disciple.move.heavy",
+                        "element": "physical",
+                        "potency": 1.6,
+                        "accuracy": -2,
+                        "priority": -1,
+                        "qi_fraction": 0.04,
+                        "cooldown": 1,
+                        "effect": "",
+                        "area": false
+                      },
+                      {
+                        "id": "missing_disciple_shield",
+                        "kind": "shield",
+                        "name_key": "life.story.missing_disciple.move.shield",
+                        "element": "physical",
+                        "potency": 0,
+                        "accuracy": 0,
+                        "priority": 1,
+                        "qi_fraction": 0.08,
+                        "cooldown": 2,
+                        "effect": "shield",
+                        "area": false
+                      }
+                    ]
+                  }
+                ],
+                "escape": "S16",
+                "surrender": "S16"
+              },
+              "failure": "S16"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.missing_disciple.S09.B",
+              "requirement_key": "life.replacement.missing_disciple.S09.B.requires",
+              "next": "S14",
+              "requires": "!battle_started"
+            }
+          ],
+          "seen_roles": [
+            "lead",
+            "steward"
+          ]
+        },
+        {
+          "id": "S10",
+          "text_key": "life.replacement.missing_disciple.S10.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.20",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.21",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.22",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.zh_cn.24",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.20",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.21",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.22",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S10.en_us.24",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.missing_disciple.S10.A",
+              "requirement_key": "life.replacement.missing_disciple.S10.A.requires",
+              "next": "S11",
+              "requires": "cast_alive:steward"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.missing_disciple.S10.B",
+              "requirement_key": "life.replacement.missing_disciple.S10.B.requires",
+              "next": "S12",
+              "requires": "project_reserve&cast_alive:lead",
+              "story_effects": [
+                "substitution_consent"
+              ]
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.missing_disciple.S10.C",
+              "requirement_key": "life.replacement.missing_disciple.S10.C.requires",
+              "next": "S14"
+            }
+          ],
+          "seen_roles": [
+            "lead",
+            "steward"
+          ]
+        },
+        {
+          "id": "S11",
+          "text_key": "life.replacement.missing_disciple.S11.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.S11.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.zh_cn.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.zh_cn.20",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.zh_cn.21",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.zh_cn.22",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.en_us.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.en_us.20",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.en_us.21",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.en_us.22",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.cloak",
+              "requires": "cloak_returned_to_lin"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S11.blanket",
+              "requires": "!cloak_returned_to_lin"
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.missing_disciple.S11.A",
+              "requirement_key": "life.replacement.missing_disciple.S11.A.requires",
+              "next": "S13"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.missing_disciple.S11.B",
+              "requirement_key": "life.replacement.missing_disciple.S11.B.requires",
+              "next": "S16"
+            }
+          ],
+          "enter_effects": [
+            "md:shutdown",
+            "md:return_cloak"
+          ],
+          "seen_roles": [
+            "lead",
+            "steward"
+          ]
+        },
+        {
+          "id": "S12",
+          "text_key": "life.replacement.missing_disciple.S12.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.S12.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.zh_cn.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.zh_cn.20",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.en_us.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.en_us.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S12.en_us.20",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "B",
+              "text_key": "life.replacement.missing_disciple.S12.B",
+              "requirement_key": "life.replacement.missing_disciple.S12.B.requires",
+              "next": "E2",
+              "requires": "project_reserve&substitution_consent&cast_alive:steward",
+              "story_effects": [
+                "md:substitute",
+                "md:return_cloak"
+              ]
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.missing_disciple.S12.C",
+              "requirement_key": "life.replacement.missing_disciple.S12.C.requires",
+              "next": "S11"
+            }
+          ],
+          "seen_roles": [
+            "lead",
+            "steward"
+          ]
+        },
+        {
+          "id": "S13",
+          "text_key": "life.replacement.missing_disciple.S13.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.S13.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S13.en_us.14",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.missing_disciple.S13.A",
+              "requirement_key": "life.replacement.missing_disciple.S13.A.requires",
+              "next": "E1",
+              "requires": "accounting_evidence|technical_evidence&cast_alive:worker",
+              "story_effects": [
+                "md:publish_evidence"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.missing_disciple.S13.B",
+              "requirement_key": "life.replacement.missing_disciple.S13.B.requires",
+              "next": "S14"
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.missing_disciple.S13.C",
+              "requirement_key": "life.replacement.missing_disciple.S13.C.requires",
+              "next": "S16"
+            }
+          ],
+          "seen_roles": [
+            "lead",
+            "steward"
+          ]
+        },
+        {
+          "id": "S14",
+          "text_key": "life.replacement.missing_disciple.S14.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.S14.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S14.en_us.17",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.missing_disciple.S14.A",
+              "requirement_key": "life.replacement.missing_disciple.S14.A.requires",
+              "next": "S15",
+              "story_effects": [
+                "witness_identity_sealed"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.missing_disciple.S14.B",
+              "requirement_key": "life.replacement.missing_disciple.S14.B.requires",
+              "next": "S15",
+              "requires": "private_statement",
+              "story_effects": [
+                "md:privacy_breach"
+              ]
+            }
+          ],
+          "seen_roles": [
+            "lead",
+            "steward"
+          ]
+        },
+        {
+          "id": "S15",
+          "text_key": "life.replacement.missing_disciple.S15.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.S15.privacy",
+              "requires": "confidentiality_broken"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.en_us.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S15.censure",
+              "requires": "censure_pending"
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.missing_disciple.S15.A",
+              "requirement_key": "life.replacement.missing_disciple.S15.A.requires",
+              "next": "E3"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.missing_disciple.S15.B",
+              "requirement_key": "life.replacement.missing_disciple.S15.B.requires",
+              "next": "E3",
+              "story_effects": [
+                "review_requested"
+              ]
+            }
+          ],
+          "enter_effects": [
+            "md:shutdown",
+            "md:return_cloak",
+            "md:protect",
+            "md:censure"
+          ],
+          "seen_roles": [
+            "lead",
+            "steward"
+          ]
+        },
+        {
+          "id": "S16",
+          "text_key": "life.replacement.missing_disciple.S16.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.S16.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.zh_cn.8",
+              "requires": "lin_seen&!lin_freed"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.zh_cn.11",
+              "requires": "lin_freed"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.zh_cn.14",
+              "requires": "!lin_seen"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.zh_cn.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.zh_cn.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.zh_cn.21",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.zh_cn.23",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.zh_cn.25",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.en_us.8",
+              "requires": "lin_seen&!lin_freed"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.en_us.11",
+              "requires": "lin_freed"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.en_us.14",
+              "requires": "!lin_seen"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.en_us.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.en_us.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.en_us.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.en_us.21",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.en_us.23",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.S16.en_us.25",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.missing_disciple.S16.A",
+              "requirement_key": "life.replacement.missing_disciple.S16.A.requires",
+              "next": "E4",
+              "requires": "conscious",
+              "story_effects": [
+                "signed_account"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.missing_disciple.S16.B",
+              "requirement_key": "life.replacement.missing_disciple.S16.B.requires",
+              "next": "E4",
+              "requires": "conscious"
+            }
+          ],
+          "enter_effects": [
+            "md:return_entrusted",
+            "document:handover"
+          ],
+          "seen_roles": []
+        },
+        {
+          "id": "E1",
+          "text_key": "life.replacement.missing_disciple.E1.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.E1.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.zh_cn.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.zh_cn.20",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.en_us.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.en_us.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E1.en_us.20",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.replacement.finish",
+              "ending": true,
+              "next": "E1"
+            }
+          ],
+          "enter_effects": [
+            "public_accountability",
+            "identity_restored",
+            "human_supply_stopped",
+            "future_meal_agreed",
+            "md:return_entrusted",
+            "md:world"
+          ],
+          "seen_roles": [
+            "lead",
+            "steward"
+          ]
+        },
+        {
+          "id": "E2",
+          "text_key": "life.replacement.missing_disciple.E2.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.E2.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.zh_cn.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E2.en_us.18",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.replacement.finish",
+              "ending": true,
+              "next": "E2"
+            }
+          ],
+          "enter_effects": [
+            "sealed_agreement",
+            "identity_restored",
+            "human_supply_stopped",
+            "complaint_right_preserved",
+            "md:return_entrusted",
+            "md:world"
+          ],
+          "seen_roles": [
+            "lead",
+            "steward"
+          ]
+        },
+        {
+          "id": "E3",
+          "text_key": "life.replacement.missing_disciple.E3.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.E3.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.zh_cn.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.en_us.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.en_us.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E3.worker_trust",
+              "requires": "confidentiality_broken"
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.replacement.finish",
+              "ending": true,
+              "next": "E3"
+            }
+          ],
+          "enter_effects": [
+            "identity_restored",
+            "human_supply_stopped",
+            "md:return_entrusted",
+            "md:world"
+          ],
+          "seen_roles": [
+            "lead"
+          ]
+        },
+        {
+          "id": "E4",
+          "text_key": "life.replacement.missing_disciple.E4.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.missing_disciple.E4.zh_cn.1",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.zh_cn.3",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.zh_cn.4",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.zh_cn.5",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.zh_cn.6",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.zh_cn.7",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.zh_cn.8",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.zh_cn.9",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.zh_cn.10",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.zh_cn.12",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.zh_cn.14",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.zh_cn.16",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.zh_cn.18",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.en_us.1",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.en_us.3",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.en_us.4",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.en_us.5",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.en_us.6",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.en_us.7",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.en_us.8",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.en_us.9",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.en_us.10",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.en_us.12",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.en_us.14",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.en_us.16",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.en_us.18",
+              "requires": "cast_alive:worker"
+            },
+            {
+              "text_key": "life.replacement.missing_disciple.E4.legacy",
+              "requires": "!cast_alive:worker"
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.replacement.finish",
+              "ending": true,
+              "next": "E4"
+            }
+          ],
+          "enter_effects": [
+            "md:return_entrusted",
+            "document:handover",
+            "md:world"
+          ],
+          "seen_roles": [
+            "lead"
+          ]
+        }
+      ],
+      "cast": [
+        {
+          "role": "lead",
+          "name": "林阙",
+          "name_key": "life.replacement.missing_disciple.cast.lead",
+          "age": 19,
+          "realm": 1,
+          "kind": "human",
+          "rootless": false,
+          "health": 25,
+          "injury_years": 1,
+          "same_sect": true,
+          "occupation": "sect_disciple",
+          "gender": "male"
+        },
+        {
+          "role": "steward",
+          "name": "谢管事",
+          "name_key": "life.replacement.missing_disciple.cast.steward",
+          "age": 55,
+          "realm": 4,
+          "kind": "human",
+          "rootless": false,
+          "health": 80,
+          "injury_years": 0,
+          "same_sect": true,
+          "occupation": "sect_disciple",
+          "gender": "male"
+        },
+        {
+          "role": "worker",
+          "name": "受伤工人",
+          "name_key": "life.replacement.missing_disciple.cast.worker",
+          "age": 32,
+          "realm": 0,
+          "kind": "human",
+          "rootless": true,
+          "health": 55,
+          "injury_years": 1,
+          "same_sect": true,
+          "occupation": "laborer",
+          "gender": "male"
+        }
+      ],
+      "battle_win_effects": [
+        "battle_won",
+        "control_access"
+      ],
+      "battle_loss_effects": [
+        "battle_lost"
+      ],
+      "battle_escape_effects": [
+        "battle_escaped"
+      ]
+    }
+  ]
+}

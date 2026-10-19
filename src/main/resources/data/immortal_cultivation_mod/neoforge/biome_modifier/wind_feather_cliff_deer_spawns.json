@@ -1,12 +1,6 @@
 {
   "type": "neoforge:add_spawns",
-  "biomes": [
-    "minecraft:windswept_hills",
-    "minecraft:meadow",
-    "minecraft:grove",
-    "minecraft:jagged_peaks",
-    "minecraft:stony_peaks"
-  ],
+  "biomes": "#immortal_cultivation_mod:beast_spawns/wind_feather_cliff_deer",
   "spawners": {
     "type": "immortal_cultivation_mod:wind_feather_cliff_deer",
     "weight": 5,

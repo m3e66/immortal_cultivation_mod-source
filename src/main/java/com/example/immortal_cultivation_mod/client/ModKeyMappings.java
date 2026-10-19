@@ -46,8 +46,8 @@ public class ModKeyMappings {
             "key." + ImmortalCultivationMod.MODID + ".spiritual_sense",
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_U, KEY_CATEGORY));
 
-    public static final Lazy<KeyMapping> TARGET_LOCK = Lazy.of(() -> new KeyMapping(
-            "key." + ImmortalCultivationMod.MODID + ".target_lock",
+    public static final Lazy<KeyMapping> BLAST_QI = Lazy.of(() -> new KeyMapping(
+            "key." + ImmortalCultivationMod.MODID + ".blast_qi",
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, KEY_CATEGORY));
 
     public static final Lazy<KeyMapping> RELEASE_WEAPON = Lazy.of(() -> new KeyMapping(
@@ -57,6 +57,10 @@ public class ModKeyMappings {
     public static final Lazy<KeyMapping> SWORD_CASE = Lazy.of(() -> new KeyMapping(
             "key." + ImmortalCultivationMod.MODID + ".sword_case",
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Z, KEY_CATEGORY));
+
+    public static final Lazy<KeyMapping> RIDE_FLYING_SWORD = Lazy.of(() -> new KeyMapping(
+            "key." + ImmortalCultivationMod.MODID + ".ride_flying_sword",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_N, KEY_CATEGORY));
 
     public static final Lazy<KeyMapping> CAST_PREPARED_SPELL = Lazy.of(() -> new KeyMapping(
             "key." + ImmortalCultivationMod.MODID + ".cast_prepared_spell",
@@ -80,9 +84,10 @@ public class ModKeyMappings {
         event.register(INJECT_QI.get());
         event.register(TOGGLE_COMBAT_MODE.get());
         event.register(SPIRITUAL_SENSE.get());
-        event.register(TARGET_LOCK.get());
+        event.register(BLAST_QI.get());
         event.register(RELEASE_WEAPON.get());
         event.register(SWORD_CASE.get());
+        event.register(RIDE_FLYING_SWORD.get());
         event.register(CAST_PREPARED_SPELL.get());
         event.register(DEBUG_EYE.get());
         event.register(OPEN_SETTINGS.get());

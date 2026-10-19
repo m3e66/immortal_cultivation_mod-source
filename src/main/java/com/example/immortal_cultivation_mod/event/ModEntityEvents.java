@@ -41,23 +41,22 @@ import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 public class ModEntityEvents {
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event) {
-        event.put(ModEntities.PAGODA.get(), com.example.immortal_cultivation_mod.pagoda.PagodaEntity.attributes().build());
         event.put(ModEntities.XUANJIN_ZHENG.get(), com.example.immortal_cultivation_mod.entity.XuanjinZhengEntity.createAttributes().build());
         event.put(ModEntities.LIANQI_CULTIVATOR.get(), LianqiCultivatorEntity.createAttributes().build());
         event.put(ModEntities.ZHUJI_CULTIVATOR.get(), ZhujiCultivatorEntity.createAttributes().build());
         event.put(ModEntities.JINDAN_CULTIVATOR.get(), JindanCultivatorEntity.createAttributes().build());
+        event.put(ModEntities.TRAINING_DUMMY.get(),com.example.immortal_cultivation_mod.entity.TrainingDummyEntity.createAttributes().build());
         event.put(ModEntities.FANREN_NPC.get(), FanrenNpcEntity.createAttributes().build());
         event.put(ModEntities.HOTEL_NPC.get(), HotelNpcEntity.createAttributes().build());
+        event.put(ModEntities.RECIPE_MERCHANT.get(), ZhujiCultivatorEntity.createAttributes().build());
+        event.put(ModEntities.SPELL_MERCHANT.get(), ZhujiCultivatorEntity.createAttributes().build());
         event.put(ModEntities.CRIMSON_SCALE_FLAME_LIZARD.get(),
                 CrimsonScaleFlameLizardEntity.createAttributes().build());
         event.put(ModEntities.CRIMSON_SKY_FLAME_FLOOD_DRAGON.get(),
                 CrimsonSkyFlameFloodDragonEntity.createAttributes().build());
         event.put(ModEntities.BLOOD_APE_DEMON_GENERAL.get(),
                 BloodApeDemonGeneralEntity.createAttributes().build());
-        event.put(ModEntities.ZHUJI_VAULT_GUARDIAN.get(),
-                VaultGuardianEntity.createZhujiAttributes().build());
-        event.put(ModEntities.JINDAN_VAULT_GUARDIAN.get(),
-                VaultGuardianEntity.createJindanAttributes().build());
+        event.put(ModEntities.VAULT_GUARDIAN.get(), VaultGuardianEntity.createAttributes().build());
         event.put(ModEntities.ESCAPED_YUANYING_CORE.get(),
                 EscapedYuanyingCoreEntity.createAttributes().build());
         event.put(ModEntities.AZURE_SPIRIT_SILKWORM.get(),
@@ -78,10 +77,6 @@ public class ModEntityEvents {
                 com.example.immortal_cultivation_mod.entity.CultivationBestiaryBeastEntity.tortoiseAttributes().build());
         event.put(ModEntities.EMBER_FEATHER_FIRE_OWL.get(),
                 com.example.immortal_cultivation_mod.entity.CultivationBestiaryBeastEntity.owlAttributes().build());
-        event.put(ModEntities.ZHUJI_PHANTOM_VEIL_FOX.get(),
-                PhantomVeilFoxEntity.createAttributes(PhantomVeilFoxTier.ZHUJI).build());
-        event.put(ModEntities.JINDAN_PHANTOM_VEIL_FOX.get(),
-                PhantomVeilFoxEntity.createAttributes(PhantomVeilFoxTier.JINDAN).build());
         event.put(ModEntities.PHANTOM_VEIL_FOX.get(),
                 PhantomVeilFoxEntity.createAttributes(PhantomVeilFoxTier.YUANYING).build());
         event.put(ModEntities.PHANTOM_VEIL_FOX_CLONE.get(),
@@ -133,103 +128,13 @@ public class ModEntityEvents {
                 (type, level, spawnType, pos, random) -> true,
                 RegisterSpawnPlacementsEvent.Operation.REPLACE
         );
-        event.register(
-                ModEntities.CRIMSON_SCALE_FLAME_LIZARD.get(),
-                SpawnPlacementTypes.ON_GROUND,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                Mob::checkMobSpawnRules,
-                RegisterSpawnPlacementsEvent.Operation.REPLACE
-        );
-        event.register(
-                ModEntities.CRIMSON_SKY_FLAME_FLOOD_DRAGON.get(),
-                SpawnPlacementTypes.ON_GROUND,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                CrimsonSkyFlameFloodDragonEntity::checkDragonSpawnRules,
-                RegisterSpawnPlacementsEvent.Operation.REPLACE
-        );
-        event.register(
-                ModEntities.AZURE_SPIRIT_SILKWORM.get(),
-                SpawnPlacementTypes.ON_GROUND,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                AzureSpiritSilkwormEntity::checkAzureSpawnRules,
-                RegisterSpawnPlacementsEvent.Operation.REPLACE
-        );
-        event.register(
-                ModEntities.KONGMING_BEETLE.get(),
-                SpawnPlacementTypes.ON_GROUND,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                KongmingBeetleEntity::checkKongmingSpawnRules,
-                RegisterSpawnPlacementsEvent.Operation.REPLACE
-        );
-        event.register(
-                ModEntities.THUNDERHORN_ROCK_BADGER.get(),
-                SpawnPlacementTypes.ON_GROUND,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                ThunderhornRockBadgerEntity::checkSpawnRules,
-                RegisterSpawnPlacementsEvent.Operation.REPLACE
-        );
-        event.register(
-                ModEntities.FROSTSPINE_CAVE_BEAR.get(),
-                SpawnPlacementTypes.ON_GROUND,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                FrostspineCaveBearEntity::checkSpawnRules,
-                RegisterSpawnPlacementsEvent.Operation.REPLACE
-        );
-        event.register(
-                ModEntities.GREEN_PATTERNED_SPIRIT_DEVOURING_RAT.get(),
-                SpawnPlacementTypes.ON_GROUND,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                com.example.immortal_cultivation_mod.entity.CultivationBestiaryBeastEntity::checkSpawnRules,
-                RegisterSpawnPlacementsEvent.Operation.REPLACE
-        );
-        event.register(
-                ModEntities.RED_BACKED_IRON_SCALE_SCORPION.get(),
-                SpawnPlacementTypes.ON_GROUND,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                com.example.immortal_cultivation_mod.entity.CultivationBestiaryBeastEntity::checkSpawnRules,
-                RegisterSpawnPlacementsEvent.Operation.REPLACE
-        );
-        event.register(
-                ModEntities.WIND_FEATHER_CLIFF_DEER.get(),
-                SpawnPlacementTypes.ON_GROUND,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                com.example.immortal_cultivation_mod.entity.CultivationBestiaryBeastEntity::checkSpawnRules,
-                RegisterSpawnPlacementsEvent.Operation.REPLACE
-        );
-        event.register(
-                ModEntities.INK_ARMORED_STONE_DEVOURING_TORTOISE.get(),
-                SpawnPlacementTypes.ON_GROUND,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                com.example.immortal_cultivation_mod.entity.CultivationBestiaryBeastEntity::checkSpawnRules,
-                RegisterSpawnPlacementsEvent.Operation.REPLACE
-        );
-        event.register(
-                ModEntities.EMBER_FEATHER_FIRE_OWL.get(),
-                SpawnPlacementTypes.NO_RESTRICTIONS,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                com.example.immortal_cultivation_mod.entity.CultivationBestiaryBeastEntity::checkSpawnRules,
-                RegisterSpawnPlacementsEvent.Operation.REPLACE
-        );        event.register(
-                ModEntities.ZHUJI_PHANTOM_VEIL_FOX.get(),
-                SpawnPlacementTypes.ON_GROUND,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                PhantomVeilFoxEntity::checkSpawnRules,
-                RegisterSpawnPlacementsEvent.Operation.REPLACE
-        );
-        event.register(
-                ModEntities.JINDAN_PHANTOM_VEIL_FOX.get(),
-                SpawnPlacementTypes.ON_GROUND,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                PhantomVeilFoxEntity::checkSpawnRules,
-                RegisterSpawnPlacementsEvent.Operation.REPLACE
-        );
-        event.register(
-                ModEntities.PHANTOM_VEIL_FOX.get(),
-                SpawnPlacementTypes.ON_GROUND,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                PhantomVeilFoxEntity::checkSpawnRules,
-                RegisterSpawnPlacementsEvent.Operation.REPLACE
-        );
+        com.example.immortal_cultivation_mod.entity.BeastSpawnRules.register(event);
+        event.register(ModEntities.RECIPE_MERCHANT.get(), SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Mob::checkMobSpawnRules,
+                RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(ModEntities.SPELL_MERCHANT.get(), SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Mob::checkMobSpawnRules,
+                RegisterSpawnPlacementsEvent.Operation.REPLACE);
     }
 
     @SubscribeEvent

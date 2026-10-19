@@ -155,12 +155,12 @@ public final class HigherWeaponItemRenderer extends GeoItemRenderer<HigherWeapon
             return;
         }
         if(motion!=null && (bone.getName().equals("silk_00") || bone.getName().equals("chain_0"))
-                && renderFlexible(pose,item,bone,buffer,partial,light,overlay,color))return;
+                && renderFlexible(pose,item,bone,type,source,buffer,rerender,partial,light,overlay,color))return;
         super.renderRecursively(pose,item,bone,type,source,buffer,rerender,partial,light,overlay,color);
     }
 
-    private boolean renderFlexible(PoseStack pose,HigherWeaponGeoItem item,GeoBone first,VertexConsumer buffer,
-            float partial,int light,int overlay,int color) {
+    private boolean renderFlexible(PoseStack pose,HigherWeaponGeoItem item,GeoBone first,RenderType type,
+            MultiBufferSource source,VertexConsumer buffer,boolean rerender,float partial,int light,int overlay,int color) {
         if(item.spec==HigherWeaponSpec.SPIRIT_SILK_WHIP) {
             var binding=HigherWeaponItem.data(currentItemStack);
             if(binding.getLong("SilkBindingUntil")>world.getGameTime()
@@ -212,7 +212,10 @@ public final class HigherWeaponItemRenderer extends GeoItemRenderer<HigherWeapon
             double authoredLength=silk?2.2/16D:(index==6?2:1.5)/16D;
             link.scale(scale,hook?scale:(float)(start.distanceTo(end)/authoredLength),scale);
             link.translate(-part.getPivotX()/16D,-part.getPivotY()/16D,-part.getPivotZ()/16D);
+            buffer=checkAndRefreshBuffer(rerender,buffer,source,type);
             renderCubesOfBone(link,part,buffer,light,overlay,color);
+            // Layer effects must use the same physics-deformed segment pose as the whip.
+            if(!rerender)applyRenderLayersForBone(link,item,part,type,source,buffer,partial,light,overlay);
         }
         return true;
     }

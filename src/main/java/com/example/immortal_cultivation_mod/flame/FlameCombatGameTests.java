@@ -350,7 +350,7 @@ public final class FlameCombatGameTests {
         var max = center.offset(13, 13, 13);
         for (var pos : BlockPos.betweenClosed(min, max))
             h.getLevel().setBlock(pos, Blocks.STONE.defaultBlockState(), 2 | 16 | 32);
-        BlockPos far = center.east(59), outside = center.east(61), protectedPos = center.south(59);
+        BlockPos far = center.east(40), outside = center.east(61), protectedPos = center.south(40);
         for (var pos : new BlockPos[] {center, far, outside, protectedPos})
             h.getLevel().setBlockAndUpdate(pos, Blocks.DIRT.defaultBlockState());
         owner.player.setPos(Vec3.atCenterOf(center).add(0, 1, 0));

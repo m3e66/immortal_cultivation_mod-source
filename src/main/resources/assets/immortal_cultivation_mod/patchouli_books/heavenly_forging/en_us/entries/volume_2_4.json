@@ -1,0 +1,23 @@
+{
+  "name": "Azurewood Spirit Flame",
+  "icon": "immortal_cultivation_mod:wood_flame_heart",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Azurewood Spirit Flame",
+      "text": "Maximum temperature: 7,000°C"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Azurewood Spirit Flame",
+      "text": "Qi per pulse: 16"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Azurewood Spirit Flame combines the essence of wood with the power of fire. Its jade-green flames can reach high temperatures while consuming comparatively little Qi per heat pulse, making it an efficient spiritual flame."
+    }
+  ]
+}

@@ -110,7 +110,7 @@ public final class SmallSectProtection {
             return false;
         }
         VaultGuardianEntity guardian =
-                ModEntities.JINDAN_VAULT_GUARDIAN.get().create(level);
+                ModEntities.VAULT_GUARDIAN.get().create(level);
         if (guardian == null) {
             return false;
         }

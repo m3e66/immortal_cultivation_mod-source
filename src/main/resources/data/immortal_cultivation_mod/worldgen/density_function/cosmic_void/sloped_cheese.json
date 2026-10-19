@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:add",
+  "argument1": {
+    "type": "immortal_cultivation_mod:scaled_void_islands"
+  },
+  "argument2": {
+    "type": "minecraft:old_blended_noise",
+    "smear_scale_multiplier": 4.0,
+    "xz_factor": 80.0,
+    "xz_scale": 0.08333333333333333,
+    "y_factor": 160.0,
+    "y_scale": 0.25
+  }
+}

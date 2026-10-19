@@ -1,0 +1,18 @@
+{
+  "name": "Preparing the Furnace",
+  "icon": "immortal_cultivation_mod:qi_recovery_pill",
+  "category": "immortal_cultivation_mod:volume_7",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Scripture Account",
+      "text": "To refine pills, place the recipe jade slip, required ingredients, and 64 spirit stones into a cauldron. The target refining temperature is 1,200°C."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Scripture Account",
+      "text": "Unlike molded weapons, finished pills are produced directly and do not require water quenching."
+    }
+  ]
+}

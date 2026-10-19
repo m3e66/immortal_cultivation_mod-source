@@ -96,7 +96,6 @@ public final class SpellDestruction {
         if (!BlockBreakingSettings.enabled(source.actor(), source.category())) return false;
         boolean modBlock = externalQi && net.minecraft.core.registries.BuiltInRegistries.BLOCK
                 .getKey(state.getBlock()).getNamespace().equals("immortal_cultivation_mod");
-        if (com.example.immortal_cultivation_mod.pagoda.PagodaWorlds.isInterior(level.dimension())) return false;
         boolean qiBreakable = externalQi && (modBlock || state.is(Blocks.OBSIDIAN) || state.is(Blocks.CRYING_OBSIDIAN));
         if(state.isAir() || (state.hasBlockEntity() && !modBlock)
                 || (state.is(BlockTags.DRAGON_IMMUNE) && !qiBreakable))return false;

@@ -85,7 +85,7 @@ public class ParticleEngineMixin {
     }
 
     private static boolean immortalCultivation$isSolarParticle(ParticleType<?> type) {
-        return type == ModParticles.METHOD_QI_LIGHT.get()
+        return type == ModParticles.METHOD_QI_YANG.get()
                 || type == ModParticles.METHOD_QI_FIRE.get()
                 || type == ModParticles.SOLAR_EMBER.get()
                 || type == ModParticles.SOLAR_CORE.get()
@@ -105,7 +105,7 @@ public class ParticleEngineMixin {
                 || type == ModParticles.METHOD_QI_WIND.get()
                 || type == ModParticles.METHOD_QI_WATER.get()
                 || type == ModParticles.METHOD_QI_BLOOD.get()
-                || type == ModParticles.METHOD_QI_LIGHT.get()
+                || type == ModParticles.METHOD_QI_YANG.get()
                 || type == ModParticles.METHOD_QI_NEUTRAL.get()
                 || type == ParticleTypes.DUST
                 || type == ParticleTypes.BLOCK

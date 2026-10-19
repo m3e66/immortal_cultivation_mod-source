@@ -23,7 +23,7 @@ public final class ExternalQiSpaceFit {
             positive[i] = clearance(player, center, directions[i]);
             negative[i] = clearance(player, center, directions[i].scale(-1));
         }
-        // Ground alone is not an enclosure: outdoor casts retain their full damage-scaled size.
+        // Ground alone is not an enclosure: outdoor casts retain their full weapon-level size.
         boolean enclosed = Double.isFinite(positive[1])
                 || (Double.isFinite(positive[0]) && Double.isFinite(negative[0]))
                 || (Double.isFinite(positive[2]) && Double.isFinite(negative[2]));

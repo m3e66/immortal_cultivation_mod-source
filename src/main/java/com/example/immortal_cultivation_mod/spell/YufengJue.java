@@ -79,7 +79,7 @@ public final class YufengJue {
         var data = ModAttachments.getData(player);
         int cost = com.example.immortal_cultivation_mod.entity.TalismanWardEntity
                 .adjustFlightQiCost(player, QI_PER_SECOND);
-        if (!ServerEvents.spendSustainedQiOrBlood(player, data, cost)) {
+        if (!ServerEvents.spendSustainedSpellQiOrBlood(player, data, cost, ModSpells.YUFENG_JUE)) {
             stop(player);
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return;

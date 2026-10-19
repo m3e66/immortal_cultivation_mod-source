@@ -36,6 +36,13 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.function.Consumer;
 
 public class HeavyIronBracerItem extends SwordItem implements GeoItem {
+    @Override public Component getName(ItemStack stack) {
+        if (!stack.is(ModItems.YAOYUAN_FIST_BONE.get())) return super.getName(stack);
+        var tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+        int realm = tag.contains(com.example.immortal_cultivation_mod.entity.BeastRealms.NBT_KEY)
+                ? tag.getInt(com.example.immortal_cultivation_mod.entity.BeastRealms.NBT_KEY) : 4;
+        return com.example.immortal_cultivation_mod.entity.BeastRealms.prefix(realm, super.getName(stack));
+    }
     private static final String DEBUG_STACK_TAG = "ImmortalCultivationHeavyIronBracerDebug";
     private static final String COMPANION_ACTIVE_TAG = "ImmortalCultivationHeavyIronBracerCompanionActive";
     private static final String STORED_OFFHAND_TAG = "ImmortalCultivationHeavyIronBracerStoredOffhand";
@@ -78,7 +85,7 @@ public class HeavyIronBracerItem extends SwordItem implements GeoItem {
     }
 
     public static void syncOffhandCompanion(ServerPlayer player) {
-        if (!isRealStack(player.getMainHandItem())) {
+        if (!isRealStack(player.getMainHandItem()) || !WeaponBinding.canUse(player.getMainHandItem(), player)) {
             restoreStoredOffhand(player);
             return;
         }
@@ -117,7 +124,7 @@ public class HeavyIronBracerItem extends SwordItem implements GeoItem {
     /** Keeps the registered dual-bracer presentation for NPC off-hand punches. */
     public static void syncNpcOffhandCompanion(PathfinderMob npc) {
         ItemStack offhand = npc.getOffhandItem();
-        if (isRealStack(npc.getMainHandItem())) {
+        if (isRealStack(npc.getMainHandItem()) && WeaponBinding.canUse(npc.getMainHandItem(), npc)) {
             if (offhand.isEmpty() || isDebugStack(offhand)) {
                 if (!isDebugStack(offhand)
                         || !offhand.is(npc.getMainHandItem().getItem())) {

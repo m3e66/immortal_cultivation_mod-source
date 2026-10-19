@@ -14,7 +14,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -25,18 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class SpellSelectionScreen extends Screen {
-    private static final ResourceLocation BACKGROUND =
-            ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_selection.png");
-    private static final ResourceLocation SPELL_ROW_BACKGROUND =
-            ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_background.png");
-    private static final int TEXTURE_W = 1567;
-    private static final int TEXTURE_H = 1004;
-    private static final int ROW_TEXTURE_W = 782;
-    private static final int ROW_TEXTURE_H = 83;
+public class SpellSelectionScreen extends FittedMenuScreen {
+    private static final int PANEL_W = 600, PANEL_H = 392;
     private static final int DESIGN_W = 1567;
     private static final int DESIGN_H = 1004;
-    private static final int WHEEL_CENTER_Y = 470;
     private static final int WHEEL_RADIUS = 92;
     private static final int WHEEL_SLOT_SIZE = 46;
     private static final int SCREEN_MARGIN = 4;
@@ -48,7 +39,10 @@ public class SpellSelectionScreen extends Screen {
     private Button moveUpButton;
     private Button moveDownButton;
     private Button yuqiModeButton;
-    private Button closeButton;
+    private Button previousMethodsButton,nextMethodsButton;
+    private int methodPage,methodPages=1;
+    private List<String> displayedSpellIds=List.of();
+    private String displayedMethod="";
     private SelectionEntry selectedEntry;
     private SpellListEntry draggedWheelEntry;
     private String draggedCircleSpellId;
@@ -59,101 +53,59 @@ public class SpellSelectionScreen extends Screen {
     private String lastMethodClickId = "";
 
     public SpellSelectionScreen() {
-        super(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".spell_selection"));
+        super(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".spell_selection"), 748, 416);
         this.allEntries = getKnownEntries();
     }
 
     @Override
-    protected void init() {
-        int x = panelX();
-        int y = panelY();
-
-        listWidget = new SpellListWidget(minecraft, sx(835), sy(618), y + sy(165), sy(85));
-        listWidget.setX(x + sx(78));
+    protected void initMenu() {
+        if (ClientData.cultivationData != null)
+            ClientData.reconcileWheelSelection(ClientData.cultivationData.knownSpells());
+        int x = panelX(), y = panelY();
+        listWidget = new SpellListWidget(minecraft, 316, 192, y + 101, 34);
+        listWidget.setX(x + 30);
         populateList();
         addRenderableWidget(listWidget);
-
-        toggleButton = addRenderableWidget(new StyledButton(
-                x + sx(594),
-                y + sy(900),
-                sx(420),
-                sy(54),
-                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".toggle_in_wheel"),
-                btn -> {
-                    if (selectedEntry != null) {
-                        toggleEntry(selectedEntry);
-                        updateToggleButton();
-                    }
-                }
-        ));
-        updateToggleButton();
-
-        moveUpButton = addRenderableWidget(new StyledButton(
-                x + sx(280),
-                y + sy(900),
-                sx(136),
-                sy(54),
-                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".wheel_move_up"),
-                btn -> moveSelectedWheelSpell(-1)
-        ));
-        moveDownButton = addRenderableWidget(new StyledButton(
-                x + sx(430),
-                y + sy(900),
-                sx(146),
-                sy(54),
-                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".wheel_move_down"),
-                btn -> moveSelectedWheelSpell(1)
-        ));
-        updateMoveButtons();
-
-        yuqiModeButton = addRenderableWidget(new TextStyledButton(
-                x + sx(985),
-                y + sy(690),
-                sx(360),
-                sy(46),
-                Component.empty(),
-                btn -> {
+        toggleButton = addRenderableWidget(new StyledButton(x + 146, y + 354, 252, 22,
+                text("toggle_in_wheel"), btn -> {
+                    if (selectedEntry != null) { toggleEntry(selectedEntry); updateToggleButton(); }
+                }));
+        moveUpButton = addRenderableWidget(new StyledButton(x + 24, y + 354, 54, 22,
+                text("wheel_move_up"), btn -> moveSelectedWheelSpell(-1)));
+        moveDownButton = addRenderableWidget(new StyledButton(x + 84, y + 354, 54, 22,
+                text("wheel_move_down"), btn -> moveSelectedWheelSpell(1)));
+        yuqiModeButton = addRenderableWidget(new StyledButton(x + 376, y + 321, 188, 18,
+                Component.empty(), btn -> {
                     boolean allMode = ClientData.toggleYuqiControlAllMode();
                     PacketDistributor.sendToServer(new ModPayloads.ServerboundYuqiModePayload(allMode));
                     updateYuqiModeButton();
-                }
-        ));
+                }));
+        previousMethodsButton=addRenderableWidget(new StyledButton(x+272,y+306,18,14,Component.literal("‹"),btn->changeMethodPage(-1)));
+        nextMethodsButton=addRenderableWidget(new StyledButton(x+324,y+306,18,14,Component.literal("›"),btn->changeMethodPage(1)));
+        previousMethodsButton.visible=nextMethodsButton.visible=false;
+        addRenderableWidget(new StyledButton(x + 470, y + 354, 106, 22,
+                Component.translatable("gui.done"), btn -> onClose()));
+        addRenderableWidget(new StyledButton(x + 555, y + 15, 22, 22,
+                Component.literal("×"), btn -> onClose()));
+        updateToggleButton();
+        updateMoveButtons();
         updateYuqiModeButton();
-
-        addRenderableWidget(new StyledButton(
-                x + sx(1106),
-                y + sy(900),
-                sx(234),
-                sy(54),
-                Component.translatable("gui.done"),
-                btn -> onClose()
-        ));
-
-        closeButton = addRenderableWidget(new StyledButton(
-                x + sx(1490),
-                y + sy(18),
-                sx(58),
-                sy(58),
-                Component.empty(),
-                btn -> onClose()
-        ));
     }
 
-    private int panelW() {
-        return Math.max(320, Math.min(width - 8, Math.round((height - 8) * (DESIGN_W / (float) DESIGN_H))));
+    private static Component text(String key) {
+        return Component.translatable("screen." + ImmortalCultivationMod.MODID + "." + key);
     }
 
-    private int panelH() {
-        return Math.max(205, Math.round(panelW() * (DESIGN_H / (float) DESIGN_W)));
-    }
-
+    private int panelW() { return PANEL_W; }
+    private int panelH() { return PANEL_H; }
     private int panelX() {
-        return Math.max(SCREEN_MARGIN, width - panelW() - SCREEN_MARGIN);
+        int wheelWidth = Math.round((2 * WHEEL_RADIUS + WHEEL_SLOT_SIZE) * (PANEL_W / (float) DESIGN_W));
+        // Center the wheel and panel together instead of pinning the panel to the right edge.
+        return (width - PANEL_W + wheelWidth + WHEEL_PANEL_GAP) / 2;
     }
-
-    private int panelY() {
-        return (height - panelH()) / 2;
-    }
+    private int panelY() { return (height - PANEL_H) / 2; }
+    private int listTop() { return panelY() + 101; }
+    private int listBottom() { return listTop() + 192; }
 
     private int sx(int designX) {
         return Math.round(designX * (panelW() / (float) DESIGN_W));
@@ -285,14 +237,20 @@ public class SpellSelectionScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderMenu(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         int x = panelX();
         int y = panelY();
         int panelWidth = panelW();
         int panelHeight = panelH();
 
-        guiGraphics.blit(BACKGROUND, x, y, panelWidth, panelHeight,
-                0.0F, 0.0F, TEXTURE_W, TEXTURE_H, TEXTURE_W, TEXTURE_H);
+        guiGraphics.fill(0, 0, width, height, 0x90101716);
+        CultivationGuiTextures.drawLandscape(guiGraphics, x, y, panelWidth, panelHeight);
+        guiGraphics.drawString(font, title, x + (panelWidth - font.width(title)) / 2,
+                y + 19, 0xFF3D3A32, false);
+        CultivationGuiTextures.drawInnerBox(guiGraphics, x + 24, y + 58, 552, 27);
+        CultivationGuiTextures.drawInnerBox(guiGraphics, x + 24, y + 95, 328, 204);
+        CultivationGuiTextures.drawInnerBox(guiGraphics, x + 364, y + 95, 212, 250);
+        CultivationGuiTextures.drawInnerBox(guiGraphics, x + 24, y + 305, 328, 46);
 
         if (listWidget != null) {
             for (SpellListEntry entry : listWidget.children()) {
@@ -300,14 +258,16 @@ public class SpellSelectionScreen extends Screen {
             }
         }
 
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        super.renderMenu(guiGraphics, mouseX, mouseY, partialTick);
         renderWheelOrderCircle(guiGraphics, mouseX, mouseY);
 
         Component wheelCount = Component.literal(ClientData.selectedWheelSpellCount() + "/" + ClientData.MAX_WHEEL_SPELLS);
-        guiGraphics.drawString(font, wheelCount, x + sx(870), y + sy(45), 0xFF3D3A32, false);
+        CultivationGuiTextures.drawInnerBox(guiGraphics, x + 496, y + 15, 50, 22);
+        guiGraphics.drawString(font, wheelCount, x + 521 - font.width(wheelCount) / 2,
+                y + 22, 0xFF3D3A32, false);
 
-        renderActiveToggleSpells(guiGraphics, x + sx(250), y + sy(110), sx(1120));
-        renderSpellDetails(guiGraphics, x + sx(978), y + sy(230), sx(390));
+        renderActiveToggleSpells(guiGraphics, x + 34, y + 67, 532);
+        renderSpellDetails(guiGraphics, x + 376, y + 104, 188);
         renderLearnedMethods(guiGraphics, mouseX, mouseY);
 
         if (toggleButton != null
@@ -326,28 +286,29 @@ public class SpellSelectionScreen extends Screen {
 
         if (allEntries.isEmpty()) {
             Component none = Component.translatable("screen." + ImmortalCultivationMod.MODID + ".no_spells");
-            guiGraphics.drawString(font, none, (width - font.width(none)) / 2, height / 2 - 4, 0xCCCCCC, true);
+            guiGraphics.drawString(font, none, x + 188 - font.width(none) / 2, y + 191, 0xFF756F63, false);
         }
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        double menuX = toMenuCoordinate(mouseX), menuY = toMenuCoordinate(mouseY);
         if (button == 0 && draggedCircleSpellId != null) {
-            int target = wheelCircleTarget(mouseX, mouseY);
+            int target = wheelCircleTarget(menuX, menuY);
             if (target >= 0) {
                 dragTargetWheelIndex = target;
             }
             return true;
         }
         if (button == 0 && draggedWheelEntry != null) {
-            int listTop = panelY() + sy(165);
-            int listBottom = listTop + sy(618);
-            if (mouseY < listTop + sy(24)) {
+            int listTop = listTop();
+            int listBottom = listBottom();
+            if (menuY < listTop + sy(24)) {
                 listWidget.setScrollAmount(listWidget.getScrollAmount() - sy(12));
-            } else if (mouseY > listBottom - sy(24)) {
+            } else if (menuY > listBottom - sy(24)) {
                 listWidget.setScrollAmount(listWidget.getScrollAmount() + sy(12));
             }
-            int target = wheelDragTarget(mouseY);
+            int target = wheelDragTarget(menuY);
             if (target >= 0) {
                 dragTargetWheelIndex = target;
             }
@@ -358,11 +319,12 @@ public class SpellSelectionScreen extends Screen {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        double menuX = toMenuCoordinate(mouseX), menuY = toMenuCoordinate(mouseY);
         if (button == 0 && isWheelOrderDragging()) {
             boolean circleDrag = draggedCircleSpellId != null;
             String draggedId = circleDrag ? draggedCircleSpellId : draggedWheelEntry.entry.id();
             int current = ClientData.selectedWheelSpellIndex(draggedId);
-            int target = circleDrag ? wheelCircleTarget(mouseX, mouseY) : wheelDragTarget(mouseY);
+            int target = circleDrag ? wheelCircleTarget(menuX, menuY) : wheelDragTarget(menuY);
             if (target < 0) {
                 target = dragTargetWheelIndex;
             }
@@ -384,8 +346,8 @@ public class SpellSelectionScreen extends Screen {
     }
 
     private int wheelDragTarget(double mouseY) {
-        int listTop = panelY() + sy(165);
-        int listBottom = listTop + sy(618);
+        int listTop = listTop();
+        int listBottom = listBottom();
         if (mouseY < listTop || mouseY > listBottom || listWidget == null) {
             return -1;
         }
@@ -469,14 +431,12 @@ public class SpellSelectionScreen extends Screen {
     }
 
     private int wheelCenterX() {
-        int left = SCREEN_MARGIN;
-        int right = Math.max(left, panelX() - WHEEL_PANEL_GAP);
         int extent = wheelRadius() + (wheelSlotSize() + 1) / 2;
-        return Math.max(left + extent, (left + right) / 2);
+        return Math.max(SCREEN_MARGIN + extent, panelX() - WHEEL_PANEL_GAP - extent);
     }
 
     private int wheelCenterY() {
-        return panelY() + sy(WHEEL_CENTER_Y);
+        return panelY() + 204;
     }
 
     private int wheelCircleTarget(double mouseX, double mouseY) {
@@ -506,14 +466,9 @@ public class SpellSelectionScreen extends Screen {
                 .reduce((a, b) -> a + ", " + b)
                 .orElse(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".none_active_toggles").getString());
 
-        Component line = Component.literal(names);
+        Component line = text("active_toggle_spells").copy().append(" ").append(names);
 
-        if (font.width(line) > maxWidth) {
-            names = font.plainSubstrByWidth(names, Math.max(20, maxWidth)) + "...";
-            line = Component.literal(names);
-        }
-
-        guiGraphics.drawString(font, line, x, y, 0xFF3D3A32, false);
+        drawClippedString(guiGraphics, line, x, y, x + maxWidth, 0xFF3D3A32);
     }
 
     private List<ModSpells.SpellDef> activeToggleSpells() {
@@ -527,6 +482,7 @@ public class SpellSelectionScreen extends Screen {
         addIfActive(active, ModSpells.QI_GATHERING, ModEffects.QI_GATHERING);
         addIfActive(active, ModSpells.SPIRIT_SIGHT, ModEffects.SPIRIT_SIGHT);
         addIfActive(active, ModSpells.WIND_STEP, ModEffects.WIND_STEP);
+        addIfActive(active, ModSpells.HUTI_QI, ModEffects.HUTI_QI);
         addIfActive(active, ModSpells.YUFENG_JUE, ModEffects.YUFENG_JUE);
         addIfActive(active, ModSpells.WEIYA, ModEffects.WEIYA);
         addIfActive(active, ModSpells.SHIXU_CHILIU, ModEffects.SHIXU_CHILIU);
@@ -545,26 +501,31 @@ public class SpellSelectionScreen extends Screen {
         }
     }
 
-    private void renderSpellDetails(GuiGraphics guiGraphics, int x, int y, int maxWidth) {
+    private void renderSpellDetails(GuiGraphics g, int x, int y, int maxWidth) {
+        g.drawString(font, text("description_label"), x, y, 0xFF9B7C43, false);
+        g.fill(x, y + 12, x + maxWidth, y + 13, 0x669B8A65);
         if (selectedEntry == null) {
+            CultivationGuiText.drawFittedWrapped(g, font, text("select_spell_hint"),
+                    x, y + 28, maxWidth, 55, 0xFF756F63, false);
             return;
         }
+        CultivationGuiTextures.drawInnerBox(g, x, y + 18, 30, 30);
+        TechniqueIcons.blitCentered(g, selectedEntry.icon(), x + 3, y + 21, 24, 24);
+        CultivationGuiText.drawFittedSingle(g, font, selectedEntry.name(),
+                x + 36, y + 29, maxWidth - 36, selectedEntry.nameColor(), false);
+        CultivationGuiText.drawFittedWrapped(g, font, selectedEntry.description(),
+                x, y + 55, maxWidth, 57, 0xFF4A443A, false);
+        g.fill(x, y + 119, x + maxWidth, y + 120, 0x669B8A65);
+        renderAttribute(g, text("qi_cost"), selectedEntry.costText(), x, y + 132, maxWidth);
+        renderAttribute(g, text("realm_requirement"), selectedEntry.requirementText(), x, y + 152, maxWidth);
+        renderAttribute(g, text("proficiency"), selectedEntry.proficiencyText(), x, y + 172, maxWidth);
+        renderAttribute(g, text("cooldown_label"), selectedEntry.cooldownText(), x, y + 192, maxWidth);
+    }
 
-        int detailSlotSize = sx(86);
-        int detailIconSize = sx(80);
-        TechniqueIcons.blitCentered(guiGraphics, selectedEntry.icon(), x - sx(3), y - sy(4),
-                detailSlotSize, detailIconSize);
-        guiGraphics.drawString(font, selectedEntry.name(), x + sx(98), y + sy(8), selectedEntry.nameColor(), false);
-
-        Component desc = selectedEntry.description();
-        CultivationGuiText.drawFittedWrapped(guiGraphics, font, desc, x, y + sy(96),
-                maxWidth, sy(110), 0xFF4A443A, false);
-
-        int attrY = y + sy(250);
-        guiGraphics.drawString(font, Component.literal(selectedEntry.costText()), x + sx(134), attrY + sy(5), 0xFF4A443A, false);
-        guiGraphics.drawString(font, Component.literal(selectedEntry.requirementText()), x + sx(134), attrY + sy(50), 0xFF4A443A, false);
-        guiGraphics.drawString(font, Component.literal(selectedEntry.proficiencyText()), x + sx(115), attrY + sy(100), 0xFF4A443A, false);
-        guiGraphics.drawString(font, Component.literal(selectedEntry.cooldownText()), x + sx(137), attrY + sy(147), 0xFF4A443A, false);
+    private void renderAttribute(GuiGraphics g, Component label, String value, int x, int y, int width) {
+        CultivationGuiText.drawFittedSingle(g, font, label, x, y, 89, 0xFF756F63, false);
+        CultivationGuiText.drawFittedSingle(g, font, Component.literal(value),
+                x + 96, y, width - 96, 0xFF465A52, false);
     }
 
     private List<CultivationMethods.MethodDef> learnedMethods() {
@@ -578,50 +539,87 @@ public class SpellSelectionScreen extends Screen {
                 .toList();
     }
 
-    private void renderLearnedMethods(GuiGraphics graphics, int mouseX, int mouseY) {
-        methodHitboxes.clear();
-        List<CultivationMethods.MethodDef> methods = learnedMethods();
-        if (methods.isEmpty()) {
-            return;
-        }
+    private void changeMethodPage(int delta) {
+        methodPage=Math.clamp(methodPage+delta,0,methodPages-1);
+        methodHitboxes.clear();lastMethodClickId="";
+    }
 
-        int left = panelX() + sx(82);
-        int right = panelX() + sx(900);
-        int y = panelY() + sy(796);
-        graphics.drawString(font,
-                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".learned_methods"),
-                left, y, 0xFF665A46, false);
-        y += sy(25);
-        int x = left;
-        int rowHeight = Math.max(14, sy(25));
-        int gap = Math.max(3, sx(7));
-        for (CultivationMethods.MethodDef method : methods) {
-            Component name = Component.translatable(method.nameKey());
-            int itemWidth = Math.min(right - left, font.width(name) + sx(20));
-            if (x + itemWidth > right) {
-                x = left;
-                y += rowHeight;
-            }
-            if (y + rowHeight > panelY() + sy(898)) {
-                break;
-            }
-            boolean hovered = mouseX >= x && mouseX < x + itemWidth
-                    && mouseY >= y && mouseY < y + rowHeight;
-            graphics.fill(x, y, x + itemWidth, y + rowHeight,
-                    hovered ? 0x44588968 : 0x247E765F);
-            graphics.renderOutline(x, y, itemWidth, rowHeight, 0x55725F3A);
-            CultivationGuiText.drawFittedSingle(
-                    graphics, font, name, x + sx(7), y + Math.max(2, sy(6)),
-                    itemWidth - sx(14), 0xFF453F35, false);
-            methodHitboxes.add(new MethodHitbox(method.id(), x, y, itemWidth, rowHeight));
-            x += itemWidth + gap;
+    private List<List<MethodHitbox>> methodLayout() {
+        List<List<MethodHitbox>> pages=new ArrayList<>();pages.add(new ArrayList<>());
+        int left=panelX()+32,right=panelX()+344,x=left,row=0;
+        for(var method:learnedMethods()) {
+            int itemWidth=Math.min(right-left,font.width(Component.translatable(method.nameKey()))+18);
+            if(x+itemWidth>right){x=left;row++;}
+            if(row>=2){pages.add(new ArrayList<>());row=0;x=left;}
+            pages.getLast().add(new MethodHitbox(method.id(),x,panelY()+323+row*13,itemWidth,13));
+            x+=itemWidth+4;
         }
+        return pages;
+    }
+
+    private void renderLearnedMethods(GuiGraphics graphics,int mouseX,int mouseY) {
+        methodHitboxes.clear();var pages=methodLayout();methodPages=pages.size();
+        methodPage=Math.clamp(methodPage,0,methodPages-1);
+        previousMethodsButton.visible=nextMethodsButton.visible=methodPages>1;
+        previousMethodsButton.active=methodPage>0;nextMethodsButton.active=methodPage<methodPages-1;
+        CultivationGuiText.drawFittedSingle(graphics,font,text("learned_methods"),panelX()+32,panelY()+310,
+                methodPages>1?230:304,0xFF665A46,false);
+        if(methodPages>1)graphics.drawCenteredString(font,Component.literal((methodPage+1)+"/"+methodPages),panelX()+307,panelY()+310,0xFF665A46);
+        methodHitboxes.addAll(pages.get(methodPage));
+        if(methodHitboxes.isEmpty())graphics.drawString(font,text("debug_no_learned_methods"),panelX()+32,panelY()+329,0xFF756F63,false);
+        List<Component> hoveredTooltip=null;
+        for(var hitbox:methodHitboxes) {
+            var method=CultivationMethods.get(hitbox.methodId());Component name=Component.translatable(method.nameKey());
+            boolean active=method.id().equals(ClientData.cultivationData.activeCultivationMethod()),hovered=hitbox.contains(mouseX,mouseY);
+            graphics.fill(hitbox.x(),hitbox.y(),hitbox.x()+hitbox.width(),hitbox.y()+hitbox.height(),active?0x78588968:hovered?0x44588968:0x247E765F);
+            graphics.renderOutline(hitbox.x(),hitbox.y(),hitbox.width(),hitbox.height(),active?0xFF416C4A:0x55725F3A);
+            Component label=active?Component.literal("✓ ").append(name):name;
+            CultivationGuiText.drawFittedSingle(graphics,font,label,hitbox.x()+5,hitbox.y()+2,hitbox.width()-10,active?0xFF294D3A:0xFF453F35,false);
+            if(hovered){
+                List<Component> tooltip=new ArrayList<>();tooltip.add(name);
+                if(active)tooltip.add(text("method_active"));
+                tooltip.add(text("method_switch_hint"));
+                hoveredTooltip=tooltip;
+            }
+        }
+        if(hoveredTooltip!=null)graphics.renderTooltip(font,hoveredTooltip,java.util.Optional.empty(),mouseX,mouseY);
+    }
+
+    @Override public void tick() {
+        super.tick();if(ClientData.cultivationData==null||listWidget==null)return;
+        var spells=knownSpells().stream().map(ModSpells.SpellDef::id).toList();String method=ClientData.cultivationData.activeCultivationMethod();
+        if(spells.equals(displayedSpellIds)&&method.equals(displayedMethod))return;
+        displayedSpellIds=spells;displayedMethod=method;
+        ClientData.reconcileWheelSelection(ClientData.cultivationData.knownSpells());
+        String selected=selectedEntry==null?"":selectedEntry.id();allEntries.clear();allEntries.addAll(getKnownEntries());
+        selectedEntry=allEntries.stream().filter(entry->entry.id().equals(selected)).findFirst().orElse(null);
+        populateList();updateToggleButton();updateMoveButtons();updateYuqiModeButton();
+    }
+
+    @Override public boolean mouseScrolled(double mouseX,double mouseY,double horizontal,double vertical) {
+        double x=toMenuCoordinate(mouseX),y=toMenuCoordinate(mouseY);
+        if(methodPages>1&&vertical!=0&&x>=panelX()+24&&x<panelX()+352&&y>=panelY()+305&&y<panelY()+351){changeMethodPage(vertical>0?-1:1);return true;}
+        return super.mouseScrolled(mouseX,mouseY,horizontal,vertical);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        double menuX = toMenuCoordinate(mouseX), menuY = toMenuCoordinate(mouseY);
+        if(button==0||button==1)for(var hitbox:methodHitboxes) {
+            if(!hitbox.contains(menuX,menuY))continue;
+            long now=System.currentTimeMillis();
+            if(button==1||hitbox.methodId().equals(lastMethodClickId)&&now-lastMethodClickMillis<=350L) {
+                minecraft.setScreen(TechniqueDescriptionScreen.method(this,hitbox.methodId()));
+                lastMethodClickId="";
+            }else{
+                if(!hitbox.methodId().equals(ClientData.cultivationData.activeCultivationMethod()))
+                    PacketDistributor.sendToServer(new ModPayloads.ServerboundActivateMethodPayload(hitbox.methodId()));
+                lastMethodClickId=hitbox.methodId();lastMethodClickMillis=now;
+            }
+            return true;
+        }
         if (button == 0) {
-            int circleIndex = wheelCircleTarget(mouseX, mouseY);
+            int circleIndex = wheelCircleTarget(menuX, menuY);
             List<SelectionEntry> wheelEntries = wheelEntriesInOrder();
             if (circleIndex >= 0 && circleIndex < wheelEntries.size()) {
                 SelectionEntry entry = wheelEntries.get(circleIndex);
@@ -632,7 +630,7 @@ public class SpellSelectionScreen extends Screen {
             }
             if (listWidget != null) {
                 for (SpellListEntry row : listWidget.children()) {
-                    if (row.isHandleHovered(mouseX, mouseY)
+                    if (row.isHandleHovered(menuX, menuY)
                             && ClientData.isSpellVisibleInWheel(row.entry.id())) {
                         draggedWheelEntry = row;
                         dragTargetWheelIndex = ClientData.selectedWheelSpellIndex(row.entry.id());
@@ -640,20 +638,6 @@ public class SpellSelectionScreen extends Screen {
                         return true;
                     }
                 }
-            }
-            for (MethodHitbox hitbox : methodHitboxes) {
-                if (!hitbox.contains(mouseX, mouseY)) {
-                    continue;
-                }
-                long now = System.currentTimeMillis();
-                if (hitbox.methodId().equals(lastMethodClickId)
-                        && now - lastMethodClickMillis <= 350L
-                        && minecraft != null) {
-                    minecraft.setScreen(TechniqueDescriptionScreen.method(this, hitbox.methodId()));
-                }
-                lastMethodClickId = hitbox.methodId();
-                lastMethodClickMillis = now;
-                return true;
             }
         }
         return super.mouseClicked(mouseX, mouseY, button);
@@ -675,34 +659,8 @@ public class SpellSelectionScreen extends Screen {
 
         @Override
         protected void renderWidget(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-            if (isHoveredOrFocused() && active) {
-                g.fill(getX() + 2, getY() + 2, getX() + width - 2, getY() + height - 2, 0x1AFFFFFF);
-            }
-        }
-    }
-
-    private static class TextStyledButton extends Button {
-        TextStyledButton(int x, int y, int width, int height, Component message, OnPress onPress) {
-            super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
-        }
-
-        @Override
-        protected void renderWidget(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-            int fill = isHoveredOrFocused() && active ? 0xCC52685B : 0xBB3F5047;
-            int border = active ? 0xFFE6DDC4 : 0xFF8A8375;
-            g.fill(getX(), getY(), getX() + width, getY() + height, 0xAA2B302D);
-            g.fill(getX() + 1, getY() + 1, getX() + width - 1, getY() + height - 1, fill);
-            g.fill(getX(), getY(), getX() + width, getY() + 1, border);
-            g.fill(getX(), getY() + height - 1, getX() + width, getY() + height, border);
-            g.fill(getX(), getY(), getX() + 1, getY() + height, border);
-            g.fill(getX() + width - 1, getY(), getX() + width, getY() + height, border);
-            g.drawCenteredString(
-                    Minecraft.getInstance().font,
-                    getMessage(),
-                    getX() + width / 2,
-                    getY() + (height - 8) / 2,
-                    active ? 0xFFFFF7DF : 0xFF9A9388
-            );
+            CultivationGuiTextures.drawButton(g, getX(), getY(), width, height, active, isHoveredOrFocused());
+            CultivationGuiTextures.drawButtonText(g, getMessage(), getX(), getY(), width, height, active);
         }
     }
 
@@ -713,7 +671,29 @@ public class SpellSelectionScreen extends Screen {
 
         @Override
         public int getRowWidth() {
-            return Math.min(width - 6, sx(782));
+            return width - 8;
+        }
+
+        @Override
+        protected void renderListBackground(GuiGraphics graphics) {
+        }
+
+        @Override
+        protected void renderListSeparators(GuiGraphics graphics) {
+        }
+
+        @Override
+        protected void enableScissor(GuiGraphics graphics) {
+            var pose = graphics.pose().last().pose();
+            var topLeft = new org.joml.Vector3f(getX(), getY(), 0).mulPosition(pose);
+            var bottomRight = new org.joml.Vector3f(getRight(), getBottom(), 0).mulPosition(pose);
+            graphics.enableScissor((int)Math.floor(topLeft.x()), (int)Math.floor(topLeft.y()),
+                    (int)Math.ceil(bottomRight.x()), (int)Math.ceil(bottomRight.y()));
+        }
+
+        @Override
+        protected boolean isValidMouseClick(int button) {
+            return button == 0 || button == 1;
         }
     }
 
@@ -739,13 +719,12 @@ public class SpellSelectionScreen extends Screen {
         public void render(GuiGraphics guiGraphics, int index, int top, int left, int width, int height,
                            int mouseX, int mouseY, boolean hovering, float partialTick) {
             boolean visible = ClientData.isSpellVisibleInWheel(entry.id());
-            int rowHeight = Math.round(width * (ROW_TEXTURE_H / (float) ROW_TEXTURE_W));
+            int rowHeight = 32;
             int rowY = top + (height - rowHeight) / 2;
             this.rendered = true;
             this.rowY = rowY;
             this.rowHeight = rowHeight;
-            guiGraphics.blit(SPELL_ROW_BACKGROUND, left, rowY, width, rowHeight,
-                    0.0F, 0.0F, ROW_TEXTURE_W, ROW_TEXTURE_H, ROW_TEXTURE_W, ROW_TEXTURE_H);
+            CultivationGuiTextures.drawInnerBox(guiGraphics, left, rowY, width, rowHeight);
             if (selectedEntry == entry) {
                 guiGraphics.fill(left, rowY, left + width, rowY + rowHeight, 0x6638FF88);
             } else if (hovering) {
@@ -756,9 +735,9 @@ public class SpellSelectionScreen extends Screen {
             String marker = visible && wheelIndex >= 0 ? "[" + (wheelIndex + 1) + "]" : "[ ]";
             int markerColor = visible ? 0xFF2E6E50 : 0xFF8A8375;
 
-            int slotX = left + Math.round(width * (25 / (float) ROW_TEXTURE_W));
-            int slotY = rowY + Math.round(rowHeight * (7 / (float) ROW_TEXTURE_H));
-            int slotSize = Math.round(rowHeight * (68 / (float) ROW_TEXTURE_H));
+            int slotX = left + 5;
+            int slotY = rowY + 4;
+            int slotSize = 24;
             int iconSize = Math.round(slotSize * 0.94F);
             int handleX = slotX + slotSize + 7;
             int markerX = handleX;
@@ -784,8 +763,8 @@ public class SpellSelectionScreen extends Screen {
         }
 
         private boolean isHandleHovered(double mouseX, double mouseY) {
-            int listTop = panelY() + sy(165);
-            int listBottom = listTop + sy(618);
+            int listTop = listTop();
+            int listBottom = listBottom();
             return rendered
                     && mouseX >= handleX - 3
                     && mouseX <= handleX + handleWidth + 3

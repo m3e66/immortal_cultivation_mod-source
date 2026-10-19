@@ -1,0 +1,33 @@
+{
+  "name": "Spirit Stone Ore",
+  "icon": "immortal_cultivation_mod:spirit_ore",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 8,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Spirit Stone Ore",
+      "text": "$(bold)Starting height: $()Y −100 to 0$(br2)$(bold)Attempt frequency: $()1/4 chunks"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Spirit Stone Ore forms where the spiritual energy of heaven and earth accumulates deep beneath the surface. Unlike ordinary mineral deposits, it gathers into extensive underground veins, sometimes containing a concentrated Spirit Vein Core."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "The influence of these veins may extend toward the surface, nourishing nearby Spirit Wood. Experienced cultivators often search for unusual clusters of spiritual trees before descending into the earth to investigate."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Spirit veins may generate beneath any Overworld biome. Their centers are selected between Y −100 and 0, but ore blocks remain at Y ≤ 0. Each vein targets approximately 200–250 ore blocks within a radius of 7.5 blocks."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Successful veins may place 3–7 Spirit Wood saplings on suitable nearby surfaces inside Spiritwood Groves. Veins elsewhere do not plant these saplings. Abandoned spirit mines may contain Spirit Stone Ore exposed along corridor walls."
+    }
+  ]
+}

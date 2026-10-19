@@ -435,8 +435,7 @@ public final class FlameForgingGameTests {
                             && target.player.getEffect(ModEffects.QI_FIRE_BURN).getAmplifier() == 1,
                     "A deterministic accepted Dragon weapon hit applies the real stronger Qi-burn effect");
             var data = ModAttachments.getData(target.player);
-            long maximum = Math.max(1L, (long) CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi()
-                    + data.maxQiBonus());
+            long maximum = Math.max(1L, (long) data.maxQi());
             int drain = (int) Math.min(Integer.MAX_VALUE, Math.max(1L, (maximum + 49) / 50));
             ModEffects.QI_FIRE_BURN.get().applyEffectTick(target.player, 1);
             h.assertTrue(ModAttachments.getData(target.player).qi() == Math.max(0, before - drain),

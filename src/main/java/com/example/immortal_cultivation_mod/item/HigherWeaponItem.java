@@ -43,9 +43,11 @@ public class HigherWeaponItem extends SwordItem {
     }
     public static void save(ItemStack stack,CompoundTag tag) { stack.set(DataComponents.CUSTOM_DATA,CustomData.of(tag)); }
     public boolean ready(ServerPlayer player) {
+        if(!WeaponBinding.checkUse(player.getMainHandItem(), player))return false;
         if(player.getCooldowns().isOnCooldown(this) || com.example.immortal_cultivation_mod.combat.CombatStateManager.isSpellcastingBlocked(player))return false;
         if(!player.isCreative() && CultivationLevels.getRealmIndex(ModAttachments.getData(player).cultivationLevel())<spec.realm) {
-            player.displayClientMessage(Component.translatable("message.immortal_cultivation_mod.higher_weapon.realm",spec.realm==3?"金丹 / Golden Core":"筑基 / Foundation Establishment"),true);
+            player.displayClientMessage(Component.translatable("message.immortal_cultivation_mod.higher_weapon.realm",
+                    CultivationLevels.realmDisplayName(spec.realm == 3 ? CultivationLevels.REALM_JINDAN : CultivationLevels.REALM_ZHUJI)),true);
             return false;
         }
         return true;

@@ -86,6 +86,8 @@ public class ThrowingKnifeEntity extends ThrowableItemProjectile {
         builder.define(STUCK_PITCH, 0.0F);
     }
 
+    @Override public ItemStack getWeaponItem() { return storedKnifeStack; }
+
     @Override
     protected Item getDefaultItem() {
         return ModItems.THROWING_KNIFE.get();
@@ -108,6 +110,7 @@ public class ThrowingKnifeEntity extends ThrowableItemProjectile {
     }
 
     public void setStoredKnifeStack(ItemStack stack) {
+        com.example.immortal_cultivation_mod.item.WeaponBinding.prepare(stack);
         storedKnifeStack = stack.isEmpty()
                 ? new ItemStack(ModItems.THROWING_KNIFE.get())
                 : stack.copyWithCount(1);

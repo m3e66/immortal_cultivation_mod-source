@@ -1,0 +1,3063 @@
+{
+  "stories": [
+    {
+      "id": "life_story_ninth_spring",
+      "version": 5,
+      "replacement": true,
+      "category": "adventure",
+      "minimum_realm": 0,
+      "maximum_realm": 27,
+      "minimum_age": 16,
+      "start_node": "S01",
+      "title_key": "life.replacement.ninth_spring.title",
+      "nodes": [
+        {
+          "id": "S01",
+          "text_key": "life.replacement.ninth_spring.S01.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.ninth_spring.S01.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S01.en_us.10",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.ninth_spring.S01.A",
+              "requirement_key": "life.replacement.ninth_spring.S01.A.requires",
+              "next": "S02"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.ninth_spring.S01.B",
+              "requirement_key": "life.replacement.ninth_spring.S01.B.requires",
+              "next": "S03"
+            }
+          ],
+          "enter_effects": [
+            "document:awl",
+            "report_owed"
+          ],
+          "seen_roles": [
+            "mei",
+            "shan"
+          ]
+        },
+        {
+          "id": "S02",
+          "text_key": "life.replacement.ninth_spring.S02.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.ninth_spring.S02.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S02.en_us.15",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.ninth_spring.S02.A",
+              "requirement_key": "life.replacement.ninth_spring.S02.A.requires",
+              "next": "S04",
+              "story_effects": [
+                "trust"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.ninth_spring.S02.B",
+              "requirement_key": "life.replacement.ninth_spring.S02.B.requires",
+              "next": "S03"
+            }
+          ],
+          "enter_effects": [
+            "delivered"
+          ],
+          "seen_roles": [
+            "mei"
+          ]
+        },
+        {
+          "id": "S03",
+          "text_key": "life.replacement.ninth_spring.S03.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.ninth_spring.S03.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S03.en_us.14",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.ninth_spring.S03.A",
+              "requirement_key": "life.replacement.ninth_spring.S03.A.requires",
+              "next": "S05"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.ninth_spring.S03.B",
+              "requirement_key": "life.replacement.ninth_spring.S03.B.requires",
+              "next": "S04"
+            }
+          ],
+          "seen_roles": [
+            "mei",
+            "qin",
+            "shen",
+            "yu"
+          ]
+        },
+        {
+          "id": "S04",
+          "text_key": "life.replacement.ninth_spring.S04.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.ninth_spring.S04.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S04.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S04.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S04.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S04.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S04.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S04.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S04.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S04.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S04.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S04.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S04.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S04.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S04.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S04.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S04.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S04.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S04.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S04.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S04.en_us.9",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.ninth_spring.S04.A",
+              "requirement_key": "life.replacement.ninth_spring.S04.A.requires",
+              "next": "S05",
+              "story_effects": [
+                "map",
+                "lost_order"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.ninth_spring.S04.B",
+              "requirement_key": "life.replacement.ninth_spring.S04.B.requires",
+              "next": "S05",
+              "story_effects": [
+                "map"
+              ],
+              "stone_cost": 6
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.ninth_spring.S04.C",
+              "requirement_key": "life.replacement.ninth_spring.S04.C.requires",
+              "next": "S05"
+            }
+          ],
+          "seen_roles": [
+            "qin"
+          ]
+        },
+        {
+          "id": "S05",
+          "text_key": "life.replacement.ninth_spring.S05.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.ninth_spring.S05.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S05.en_us.14",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.ninth_spring.S05.A",
+              "requirement_key": "life.replacement.ninth_spring.S05.A.requires",
+              "next": "S06",
+              "story_effects": [
+                "audio"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.ninth_spring.S05.B",
+              "requirement_key": "life.replacement.ninth_spring.S05.B.requires",
+              "next": "S06",
+              "story_effects": [
+                "!audio"
+              ]
+            }
+          ],
+          "enter_effects": [
+            "delivered",
+            "document:trial_book"
+          ],
+          "seen_roles": [
+            "mei",
+            "qin",
+            "yu"
+          ]
+        },
+        {
+          "id": "S06",
+          "text_key": "life.replacement.ninth_spring.S06.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.zh_cn.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S06.en_us.19",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.ninth_spring.S06.A",
+              "requirement_key": "life.replacement.ninth_spring.S06.A.requires",
+              "next": "S07"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.ninth_spring.S06.B",
+              "requirement_key": "life.replacement.ninth_spring.S06.B.requires",
+              "next": "S08"
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.ninth_spring.S06.C",
+              "requirement_key": "life.replacement.ninth_spring.S06.C.requires",
+              "next": "S15"
+            }
+          ],
+          "seen_roles": [
+            "mei",
+            "qin",
+            "shen",
+            "yu"
+          ]
+        },
+        {
+          "id": "S07",
+          "text_key": "life.replacement.ninth_spring.S07.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.zh_cn.20",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S07.en_us.20",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.ninth_spring.S07.A",
+              "requirement_key": "life.replacement.ninth_spring.S07.A.requires",
+              "next": "S08",
+              "story_effects": [
+                "trust"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.ninth_spring.S07.B",
+              "requirement_key": "life.replacement.ninth_spring.S07.B.requires",
+              "next": "S15"
+            }
+          ],
+          "enter_effects": [
+            "report_done"
+          ],
+          "seen_roles": [
+            "mei",
+            "shan"
+          ]
+        },
+        {
+          "id": "S08",
+          "text_key": "life.replacement.ninth_spring.S08.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.ninth_spring.S08.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S08.en_us.14",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.ninth_spring.S08.A",
+              "requirement_key": "life.replacement.ninth_spring.S08.A.requires",
+              "next": "S09"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.ninth_spring.S08.B",
+              "requirement_key": "life.replacement.ninth_spring.S08.B.requires",
+              "next": "S11",
+              "requires": "realm>=4&ability:barrier",
+              "story_effects": [
+                "tools"
+              ],
+              "ability": "barrier"
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.ninth_spring.S08.C",
+              "requirement_key": "life.replacement.ninth_spring.S08.C.requires",
+              "next": "S11",
+              "story_effects": [
+                "!tools"
+              ]
+            }
+          ],
+          "seen_roles": [
+            "mei",
+            "qin",
+            "shen"
+          ]
+        },
+        {
+          "id": "S09",
+          "text_key": "life.replacement.ninth_spring.S09.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.ninth_spring.S09.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S09.en_us.12",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.ninth_spring.S09.A",
+              "requirement_key": "life.replacement.ninth_spring.S09.A.requires",
+              "next": "S11",
+              "requires": "map|audio",
+              "story_effects": [
+                "tools"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.ninth_spring.S09.B",
+              "requirement_key": "life.replacement.ninth_spring.S09.B.requires",
+              "next": "S10",
+              "requires": "combat"
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.ninth_spring.S09.C",
+              "requirement_key": "life.replacement.ninth_spring.S09.C.requires",
+              "next": "S11",
+              "story_effects": [
+                "!tools"
+              ]
+            }
+          ],
+          "seen_roles": [
+            "mei",
+            "qin"
+          ]
+        },
+        {
+          "id": "S10",
+          "text_key": "life.replacement.ninth_spring.S10.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.ninth_spring.S10.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S10.en_us.10",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.ninth_spring.S10.A",
+              "requirement_key": "life.replacement.ninth_spring.S10.A.requires",
+              "next": "S11",
+              "requires": "combat",
+              "story_effects": [
+                "battle_started"
+              ],
+              "failure": "S15",
+              "battle": {
+                "arena": "mountain",
+                "stakes": "retreat",
+                "escape": "S11",
+                "surrender": "S15",
+                "enemies": [
+                  {
+                    "name_key": "life.replacement.enemy.scorpion",
+                    "realm": 1,
+                    "profile": "beast",
+                    "sprite": "scorpion_front"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.ninth_spring.S10.B",
+              "requirement_key": "life.replacement.ninth_spring.S10.B.requires",
+              "next": "S11",
+              "story_effects": [
+                "!tools"
+              ]
+            }
+          ],
+          "seen_roles": [
+            "mei",
+            "qin",
+            "shen",
+            "yu"
+          ]
+        },
+        {
+          "id": "S11",
+          "text_key": "life.replacement.ninth_spring.S11.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.ninth_spring.S11.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.zh_cn.15",
+              "requires": "tools"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.zh_cn.16",
+              "requires": "!tools"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.en_us.15",
+              "requires": "tools"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S11.en_us.16",
+              "requires": "!tools"
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.ninth_spring.S11.A",
+              "requirement_key": "life.replacement.ninth_spring.S11.A.requires",
+              "next": "S12"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.ninth_spring.S11.B",
+              "requirement_key": "life.replacement.ninth_spring.S11.B.requires",
+              "next": "S13",
+              "requires": "map&tools"
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.ninth_spring.S11.C",
+              "requirement_key": "life.replacement.ninth_spring.S11.C.requires",
+              "next": "S14"
+            },
+            {
+              "id": "D",
+              "text_key": "life.replacement.ninth_spring.S11.D",
+              "requirement_key": "life.replacement.ninth_spring.S11.D.requires",
+              "next": "S15"
+            }
+          ],
+          "seen_roles": [
+            "mei",
+            "qin",
+            "shen"
+          ]
+        },
+        {
+          "id": "S12",
+          "text_key": "life.replacement.ninth_spring.S12.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.zh_cn.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S12.en_us.19",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.ninth_spring.S12.A",
+              "requirement_key": "life.replacement.ninth_spring.S12.A.requires",
+              "next": "E1",
+              "story_effects": [
+                "job"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.ninth_spring.S12.B",
+              "requirement_key": "life.replacement.ninth_spring.S12.B.requires",
+              "next": "E1",
+              "story_effects": [
+                "!job"
+              ]
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.ninth_spring.S12.C",
+              "requirement_key": "life.replacement.ninth_spring.S12.C.requires",
+              "next": "S14"
+            }
+          ],
+          "seen_roles": [
+            "mei",
+            "shen"
+          ]
+        },
+        {
+          "id": "S13",
+          "text_key": "life.replacement.ninth_spring.S13.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.ninth_spring.S13.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.zh_cn.14",
+              "requires": "lost_order"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.zh_cn.15",
+              "requires": "lost_order"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.en_us.14",
+              "requires": "lost_order"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S13.en_us.15",
+              "requires": "lost_order"
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.ninth_spring.S13.A",
+              "requirement_key": "life.replacement.ninth_spring.S13.A.requires",
+              "next": "E2",
+              "requires": "trust&mobile",
+              "story_effects": [
+                "labour_owed"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.ninth_spring.S13.B",
+              "requirement_key": "life.replacement.ninth_spring.S13.B.requires",
+              "next": "E2",
+              "stone_cost": 6
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.ninth_spring.S13.C",
+              "requirement_key": "life.replacement.ninth_spring.S13.C.requires",
+              "next": "E2"
+            }
+          ],
+          "seen_roles": [
+            "mei",
+            "qin",
+            "shen"
+          ]
+        },
+        {
+          "id": "S14",
+          "text_key": "life.replacement.ninth_spring.S14.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.ninth_spring.S14.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S14.en_us.17",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.ninth_spring.S14.A",
+              "requirement_key": "life.replacement.ninth_spring.S14.A.requires",
+              "next": "E3",
+              "story_effects": [
+                "public_record"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.ninth_spring.S14.B",
+              "requirement_key": "life.replacement.ninth_spring.S14.B.requires",
+              "next": "E3",
+              "story_effects": [
+                "private_record"
+              ]
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.ninth_spring.S14.C",
+              "requirement_key": "life.replacement.ninth_spring.S14.C.requires",
+              "next": "S15"
+            }
+          ],
+          "seen_roles": [
+            "mei",
+            "shan",
+            "qin",
+            "shen"
+          ]
+        },
+        {
+          "id": "S15",
+          "text_key": "life.replacement.ninth_spring.S15.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.ninth_spring.S15.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.S15.en_us.17",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.ninth_spring.S15.A",
+              "requirement_key": "life.replacement.ninth_spring.S15.A.requires",
+              "next": "E4",
+              "requires": "conscious",
+              "story_effects": [
+                "petitioned"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.ninth_spring.S15.B",
+              "requirement_key": "life.replacement.ninth_spring.S15.B.requires",
+              "next": "E4",
+              "requires": "conscious",
+              "story_effects": [
+                "private_report"
+              ]
+            }
+          ],
+          "seen_roles": [
+            "mei",
+            "shan",
+            "qin",
+            "shen"
+          ]
+        },
+        {
+          "id": "E1",
+          "text_key": "life.replacement.ninth_spring.E1.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.ninth_spring.E1.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.zh_cn.1",
+              "requires": "job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.zh_cn.2",
+              "requires": "job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.zh_cn.3",
+              "requires": "job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.zh_cn.4",
+              "requires": "job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.zh_cn.5",
+              "requires": "job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.zh_cn.6",
+              "requires": "job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.zh_cn.7",
+              "requires": "job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.zh_cn.8",
+              "requires": "job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.zh_cn.9",
+              "requires": "job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.zh_cn.10",
+              "requires": "!job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.zh_cn.11",
+              "requires": "!job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.zh_cn.12",
+              "requires": "!job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.zh_cn.13",
+              "requires": "!job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.zh_cn.14",
+              "requires": "!job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.zh_cn.15",
+              "requires": "!job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.en_us.1",
+              "requires": "job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.en_us.2",
+              "requires": "job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.en_us.3",
+              "requires": "job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.en_us.4",
+              "requires": "job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.en_us.5",
+              "requires": "job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.en_us.6",
+              "requires": "job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.en_us.7",
+              "requires": "job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.en_us.8",
+              "requires": "job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.en_us.9",
+              "requires": "job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.en_us.10",
+              "requires": "!job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.en_us.11",
+              "requires": "!job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.en_us.12",
+              "requires": "!job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.en_us.13",
+              "requires": "!job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.en_us.14",
+              "requires": "!job"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E1.en_us.15",
+              "requires": "!job"
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.replacement.finish",
+              "ending": true,
+              "next": "E1"
+            }
+          ],
+          "enter_effects": [
+            "report_done",
+            "!audio"
+          ],
+          "seen_roles": [
+            "mei",
+            "shan",
+            "shen"
+          ]
+        },
+        {
+          "id": "E2",
+          "text_key": "life.replacement.ninth_spring.E2.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.ninth_spring.E2.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.zh_cn.8",
+              "requires": "lost_order"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.zh_cn.9",
+              "requires": "lost_order"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.zh_cn.10",
+              "requires": "!lost_order"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.zh_cn.11",
+              "requires": "!lost_order"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.zh_cn.12",
+              "requires": "!lost_order"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.en_us.8",
+              "requires": "lost_order"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.en_us.9",
+              "requires": "lost_order"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.en_us.10",
+              "requires": "!lost_order"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.en_us.11",
+              "requires": "!lost_order"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.en_us.12",
+              "requires": "!lost_order"
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E2.en_us.14",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.replacement.finish",
+              "ending": true,
+              "next": "E2"
+            }
+          ],
+          "enter_effects": [
+            "report_done",
+            "!audio"
+          ],
+          "seen_roles": [
+            "mei",
+            "qin"
+          ]
+        },
+        {
+          "id": "E3",
+          "text_key": "life.replacement.ninth_spring.E3.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.ninth_spring.E3.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E3.en_us.13",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.replacement.finish",
+              "ending": true,
+              "next": "E3"
+            }
+          ],
+          "enter_effects": [
+            "report_done",
+            "!audio"
+          ],
+          "seen_roles": [
+            "mei",
+            "shan",
+            "qin",
+            "shen",
+            "yu"
+          ]
+        },
+        {
+          "id": "E4",
+          "text_key": "life.replacement.ninth_spring.E4.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.ninth_spring.E4.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.ninth_spring.E4.en_us.13",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.replacement.finish",
+              "ending": true,
+              "next": "E4"
+            }
+          ],
+          "enter_effects": [
+            "report_done",
+            "!audio"
+          ],
+          "seen_roles": [
+            "mei",
+            "shan",
+            "qin",
+            "shen"
+          ]
+        }
+      ],
+      "cast": [
+        {
+          "role": "mei",
+          "name": "陆湄",
+          "name_key": "life.replacement.ninth_spring.cast.mei",
+          "realm": 0,
+          "age": 24,
+          "kind": "human",
+          "occupation": "laborer",
+          "rootless": true,
+          "gender": "female"
+        },
+        {
+          "role": "shan",
+          "name": "陆杉",
+          "name_key": "life.replacement.ninth_spring.cast.shan",
+          "realm": 0,
+          "age": 29,
+          "kind": "human",
+          "occupation": "laborer",
+          "rootless": true,
+          "gender": "male"
+        },
+        {
+          "role": "qin",
+          "name": "秦荷",
+          "name_key": "life.replacement.ninth_spring.cast.qin",
+          "realm": 0,
+          "age": 41,
+          "kind": "human",
+          "occupation": "laborer",
+          "rootless": true,
+          "gender": "female"
+        },
+        {
+          "role": "shen",
+          "name": "沈秋",
+          "name_key": "life.replacement.ninth_spring.cast.shen",
+          "realm": 4,
+          "age": 39,
+          "kind": "human",
+          "occupation": "sect_disciple",
+          "rootless": false,
+          "gender": "male"
+        },
+        {
+          "role": "yu",
+          "name": "余真",
+          "name_key": "life.replacement.ninth_spring.cast.yu",
+          "realm": 3,
+          "age": 65,
+          "kind": "memory",
+          "occupation": "sect_disciple",
+          "rootless": false,
+          "gender": "male"
+        }
+      ],
+      "battle_win_effects": [
+        "tools"
+      ],
+      "battle_loss_effects": [
+        "!tools"
+      ],
+      "battle_escape_effects": [
+        "!tools"
+      ],
+      "unconscious_node": "E4",
+      "fallback_node": "S15"
+    }
+  ]
+}

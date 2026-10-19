@@ -132,11 +132,11 @@ public final class DebugEyeDiagnostics {
             fortune.add(Component.literal(key));
             if (fate.contains(key)) flatten(fortune, "", fate.get(key), 0); else fortune.add(text("none"));
         }
-        fortune.add(Component.literal("Five Mountains"));
+        fortune.add(Component.translatable("debug.immortal_cultivation_mod.five_mountains"));
         Tag wards = player.getPersistentData().get(ImmortalCultivationMod.MODID + ":five_mountains_luck");
         if (wards != null) flatten(fortune, "", wards, 0); else fortune.add(text("none"));
         stats.add(text("vitals", number(player.getHealth()), number(player.getMaxHealth()), data.qi(),
-                CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus(), number(PlayerShieldManager.totalAmount(player))));
+                data.maxQi(), number(PlayerShieldManager.totalAmount(player))));
         stats.add(text("posture", number(CombatStateManager.peekPosture(player)), number(CombatStateManager.maxPosture(player)),
                 CombatStateManager.isPostureBroken(player)));
         stats.add(text("location", player.level().dimension().location(), player.blockPosition().toShortString(), player.gameMode.getGameModeForPlayer().getName(), now));
@@ -162,11 +162,13 @@ public final class DebugEyeDiagnostics {
             target.add(Component.literal(BuiltInRegistries.ENTITY_TYPE.getKey(looked.getType()) + " | " + looked.getUUID()));
             int targetLuck = LuckSystem.luck(looked);
             target.add(text("target_stats", number(player.distanceTo(looked)), number(looked.getHealth()), number(looked.getMaxHealth()), targetLuck, LuckSystem.karma(looked)));
-            target.add(text("target_fate", luck - targetLuck, LuckRules.rescueEligible(luck, targetLuck),
-                    LuckRules.rescueEligible(targetLuck, luck), LuckRules.theftAmount(luck, targetLuck, LuckSystem.boss(looked))));
+            target.add(text("target_fate", luck - targetLuck,
+                    LuckSystem.rescueMatchupAllowed(player, looked) && LuckRules.rescueEligible(luck, targetLuck),
+                    LuckSystem.rescueMatchupAllowed(looked, player) && LuckRules.rescueEligible(targetLuck, luck),
+                    LuckRules.theftAmount(luck, targetLuck, LuckSystem.boss(looked))));
             target.add(text("target_note"));
-            target.add(Component.literal("boss=" + LuckSystem.boss(looked) + " scar=" + LuckSystem.scarred(looked)
-                    + " tags=" + looked.getTags()));
+            target.add(text("target_flags", Component.translatable(LuckSystem.boss(looked) ? "gui.yes" : "gui.no"),
+                    Component.translatable(LuckSystem.scarred(looked) ? "gui.yes" : "gui.no"), looked.getTags()));
             if (looked instanceof net.minecraft.world.entity.PathfinderMob mob
                     && mob instanceof com.example.immortal_cultivation_mod.entity.CultivationNpc) {
                 target.addAll(com.example.immortal_cultivation_mod.entity.NpcCultivation.debugLines(mob));

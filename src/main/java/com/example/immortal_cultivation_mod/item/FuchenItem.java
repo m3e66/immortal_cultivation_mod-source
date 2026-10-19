@@ -114,6 +114,7 @@ public class FuchenItem extends SwordItem implements GeoItem {
             Player player,
             InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
+        if (!WeaponBinding.checkUse(stack, player)) return InteractionResultHolder.fail(stack);
         if (hand != InteractionHand.MAIN_HAND) {
             return InteractionResultHolder.pass(stack);
         }
@@ -240,7 +241,8 @@ public class FuchenItem extends SwordItem implements GeoItem {
 
     public static boolean startHeavyAttack(LivingEntity attacker) {
         if (!(attacker.level() instanceof ServerLevel serverLevel)
-                || !(attacker.getMainHandItem().getItem() instanceof FuchenItem)) {
+                || !(attacker.getMainHandItem().getItem() instanceof FuchenItem)
+                || !WeaponBinding.checkUse(attacker.getMainHandItem(), attacker)) {
             return false;
         }
         long gameTime = serverLevel.getGameTime();
@@ -334,11 +336,8 @@ public class FuchenItem extends SwordItem implements GeoItem {
                 continue;
             }
             target.invulnerableTime = 0;
-            boolean landed = CombatStateManager.hurtAsHeavy(
-                    attacker,
-                    target,
-                    pulseSource,
-                    pulseDamage);
+            boolean landed = state.attack.withWeapon(attacker, pulseSource, () -> CombatStateManager.hurtAsHeavy(
+                    attacker, target, pulseSource, pulseDamage));
             damaged |= landed;
             if (landed && attacker instanceof PathfinderMob npc) {
                 NpcSpellcasting.releaseLingbeng(npc, target);
@@ -423,8 +422,9 @@ public class FuchenItem extends SwordItem implements GeoItem {
             finishBinding(target, state);
             return;
         }
-        target.hurt(owner.damageSources().indirectMagic(owner, owner),
-                state.attack.damage(BIND_DAMAGE_PERCENT_PER_SECOND));
+        var source = owner.damageSources().indirectMagic(owner, owner);
+        state.attack.withWeapon(owner, source, () -> target.hurt(source,
+                state.attack.damage(BIND_DAMAGE_PERCENT_PER_SECOND)));
         state.hitsRemaining--;
         state.nextDamageTick += 20L;
         if (state.hitsRemaining <= 0) {

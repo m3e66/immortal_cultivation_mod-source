@@ -232,7 +232,6 @@ public class MysteriousRingItem extends Item implements ICurioItem {
 
     public static boolean tryEmergencyTeleport(ServerPlayer player, DamageSource source,
                                                float incomingDamage) {
-        if (com.example.immortal_cultivation_mod.pagoda.PagodaSystem.adminKill(player,source)) return false;
         if (incomingDamage <= 0.0F || NpcProfile.sparPartner(player) != null) {
             return false;
         }
@@ -708,8 +707,7 @@ public class MysteriousRingItem extends Item implements ICurioItem {
         state.putBoolean(MEDITATING, meditating);
 
         int maxQi = Math.max(1,
-                CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi()
-                        + data.maxQiBonus());
+                data.maxQi());
         boolean qiNearlyFull = data.qi() >= Math.max(1, maxQi * 9 / 10);
         if (qiNearlyFull && !state.getBoolean(QI_FULL_WARNED)) {
             state.putBoolean(QI_FULL_WARNED, true);

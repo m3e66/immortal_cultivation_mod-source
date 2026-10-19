@@ -19,7 +19,25 @@ public class FlyingSwordRenderer extends EntityRenderer<FlyingSwordEntity> {
 
    public void render(FlyingSwordEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
       poseStack.pushPose();
-      if (entity.isControlled()) {
+      if (entity.isSwordFlight()) {
+         var owner = entity.ownerUuid().map(entity.level()::getPlayerByUUID).orElse(null);
+         if (owner != null) {
+            var offset = owner.getPosition(partialTick).subtract(entity.getPosition(partialTick));
+            poseStack.translate(offset.x, offset.y - FlyingSwordEntity.FLIGHT_BLADE_OFFSET, offset.z);
+         }
+         float yaw = owner == null ? entity.getYRot()
+                 : net.minecraft.util.Mth.rotLerp(partialTick, owner.yRotO, owner.getYRot());
+         poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - yaw));
+         // Keep the blade level, with the player's feet over the rear of the blade.
+         poseStack.translate(0.0D, 0.0D, -0.65D);
+         poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F));
+         poseStack.scale(5.5F, 3.4F, 1.0F);
+         if (!net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(entity.getItem().getItem())
+                 .getNamespace().equals(com.example.immortal_cultivation_mod.ImmortalCultivationMod.MODID)) {
+            // Standard handheld swords use a diagonal sprite and the inherited fixed Y=180 transform.
+            poseStack.mulPose(Axis.ZP.rotationDegrees(-45.0F));
+         }
+      } else if (entity.isControlled()) {
          float angle = entity.getFormationAngle();
          poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - entity.getYRot()));
          poseStack.mulPose(Axis.ZP.rotationDegrees(angle));
@@ -38,7 +56,7 @@ public class FlyingSwordRenderer extends EntityRenderer<FlyingSwordEntity> {
          poseStack.translate(0.0F, 0.0F, -embedDepth);
       }
 
-      poseStack.scale(4.25F, 4.25F, 1.0F);
+      if (!entity.isSwordFlight()) poseStack.scale(4.25F, 4.25F, 1.0F);
       Minecraft.getInstance().getItemRenderer().renderStatic(entity.getItem(), ItemDisplayContext.FIXED, packedLight, OverlayTexture.NO_OVERLAY, poseStack, buffer, entity.level(), entity.getId());
       poseStack.popPose();
       super.render(entity, entityYaw, partialTick, poseStack, buffer, packedLight);

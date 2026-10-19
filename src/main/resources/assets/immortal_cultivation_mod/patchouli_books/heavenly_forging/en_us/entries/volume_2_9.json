@@ -1,0 +1,33 @@
+{
+  "name": "Violet Firmament Heavenly Flame",
+  "icon": "immortal_cultivation_mod:heavenly_flame_seed",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 8,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Violet Firmament Heavenly Flame",
+      "text": "Maximum temperature: 12,000°C"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Violet Firmament Heavenly Flame",
+      "text": "Qi per pulse: 55"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Violet Firmament Heavenly Flame",
+      "text": "Quality bonus: +25"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Violet Firmament Heavenly Flame stands at the summit of the nine forging fires. Its violet radiance carries the overwhelming power of heavenly fire, reaching temperatures as high as 12,000°C."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "It is the only listed flame capable of meeting forging targets of 10,500°C or higher. Artifacts forged with it gain an additional 25 quality points, potentially surpassing ordinary quality limits."
+    }
+  ]
+}

@@ -11,7 +11,6 @@ import net.minecraft.world.entity.player.Player;
 public final class RealmKillProtection {
     private RealmKillProtection() {}
     public static boolean protects(Entity entity) {
-        if (com.example.immortal_cultivation_mod.pagoda.PagodaSystem.commandAffected(entity)) return false;
         String realm;
         if (entity instanceof Player player) realm = ModAttachments.getData(player).cultivationLevel();
         else if (entity instanceof CultivationNpc npc) realm = npc.npcRealm();

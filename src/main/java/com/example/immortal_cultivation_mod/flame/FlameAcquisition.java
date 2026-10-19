@@ -6,7 +6,6 @@ import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import com.example.immortal_cultivation_mod.block.LingFireBlock;
 import com.example.immortal_cultivation_mod.block.ModBlocks;
 import com.example.immortal_cultivation_mod.entity.CrimsonScaleFlameLizardEntity;
-import com.example.immortal_cultivation_mod.entity.CrimsonSkyFlameFloodDragonEntity;
 import com.example.immortal_cultivation_mod.entity.CultivationNpc;
 import com.example.immortal_cultivation_mod.entity.NpcProfile;
 import com.example.immortal_cultivation_mod.spell.UndeadControl;
@@ -49,6 +48,7 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 public final class FlameAcquisition {
     static final String SOURCE_KEY = "icmFlameSource";
     static final String SOURCE_KIND = "icmFlameSourceKind";
+    static final int SOLAR_RUIN_CHANCE = 3000;
     private static final String DEATH_CHECKED = "icmFlameDeathChecked";
     private static final int MAX_PENDING = 256;
     private static final int CHUNKS_PER_TICK = 2;
@@ -62,7 +62,7 @@ public final class FlameAcquisition {
     private FlameAcquisition() {}
 
     static FlameKind deathKind(LivingEntity victim) {
-        if (victim instanceof CrimsonSkyFlameFloodDragonEntity) return FlameKind.DRAGON;
+        if (victim instanceof com.example.immortal_cultivation_mod.entity.EscapedYuanyingCoreEntity) return FlameKind.DRAGON;
         if (victim instanceof CrimsonScaleFlameLizardEntity) return FlameKind.CRIMSON;
         if (victim instanceof CultivationNpc npc
                 && CultivationLevels.getRealmIndex(npc.npcRealm()) >= 3) {
@@ -84,7 +84,15 @@ public final class FlameAcquisition {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onDeath(LivingDeathEvent event) {
         if (event.isCanceled() || !(event.getEntity().level() instanceof ServerLevel level)) return;
-        LivingEntity victim = event.getEntity();
+        onDefeated(event.getEntity(), level);
+    }
+
+    /** Capture defeats the spirit without firing a death event; it gets the same single flame roll. */
+    public static void onDragonSpiritCaptured(com.example.immortal_cultivation_mod.entity.EscapedYuanyingCoreEntity spirit) {
+        if (spirit.level() instanceof ServerLevel level) onDefeated(spirit, level);
+    }
+
+    private static void onDefeated(LivingEntity victim, ServerLevel level) {
         FlameKind kind = deathKind(victim);
         if (kind == null || victim.getPersistentData().getBoolean(DEATH_CHECKED)) return;
         victim.getPersistentData().putBoolean(DEATH_CHECKED, true);
@@ -165,22 +173,16 @@ public final class FlameAcquisition {
             StructureStart start = entry.getValue();
             if (!start.isValid()) continue;
             ResourceLocation id = structures.getKey(entry.getKey());
-            boolean tomb = isTomb(id), ruin = isSolarRuin(id);
-            if (!tomb && !ruin) continue;
-            String key = (tomb ? "tomb:" : "ruin:") + id + ":" + start.getChunkPos().toLong();
-            if (!FlameAcquisitionData.get(level).claim(key) || !roll(level.getSeed(), key, tomb ? 12 : 16)) continue;
+            if (!isSolarRuin(id)) continue;
+            String key = "ruin:" + id + ":" + start.getChunkPos().toLong();
+            if (!FlameAcquisitionData.get(level).claim(key) || !roll(level.getSeed(), key, SOLAR_RUIN_CHANCE)) continue;
             // Cultivation ruins are valid spiritual sources in their own right.
             // Their shipped templates contain no vanilla metal or fire blocks.
             // Ordinary ruined portals still need their actual metal and heat.
-            boolean requireMetalFire = ruin && !id.getNamespace().equals(ImmortalCultivationMod.MODID);
+            boolean requireMetalFire = !id.getNamespace().equals(ImmortalCultivationMod.MODID);
             BlockPos room = findStructureRoom(chunk, start.getBoundingBox(), requireMetalFire);
-            if (room != null) spawn(level, Vec3.atBottomCenterOf(room).add(0, .2, 0), tomb ? FlameKind.NETHER : FlameKind.SOLAR, key);
+            if (room != null) spawn(level, Vec3.atBottomCenterOf(room).add(0, .2, 0), FlameKind.SOLAR, key);
         }
-    }
-
-    static boolean isTomb(ResourceLocation id) {
-        return id != null && id.getNamespace().equals(ImmortalCultivationMod.MODID)
-                && (id.getPath().equals("tomb1") || id.getPath().equals("tomb2"));
     }
 
     static boolean isSolarRuin(ResourceLocation id) {

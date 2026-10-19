@@ -1,0 +1,23 @@
+{
+  "name": "Planning the Year",
+  "icon": "immortal_cultivation_mod:cultivation_manual",
+  "category": "immortal_cultivation_mod:worldly",
+  "sortnum": 34,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Three Actions Each Year",
+      "text": "Use Execute Annual Plan directly on the Life tab. The planner has three action slots and uses the same requirements as manual activities; unavailable activities are greyed out. Ordinary activities cost one action point, seclusion two, and seclusion is limited to once per year."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Conditions and Recovery",
+      "text": "Each slot supports None, Any, Health, Strain, or Stability conditions. Unmet conditions, severe weakness, or excessive strain cause a recovery action instead. Awakening, a cultivation method, and sect membership are still required for their respective activities."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Resolve Encounters First",
+      "text": "A story choice, breakthrough, battle, or blocking journey stops the plan. Resolve the encounter before continuing; the plan does not make story decisions for you. Completing the routine advances the year when allowed, restoring three action points for the new year."
+    }
+  ]
+}

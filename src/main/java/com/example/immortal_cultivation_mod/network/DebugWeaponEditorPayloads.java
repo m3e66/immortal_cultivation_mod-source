@@ -41,7 +41,7 @@ public final class DebugWeaponEditorPayloads {
                     && menu.containerId == payload.menuId() && menu.stillValid(player)) {
                 if (payload.action() == 3) {
                     player.closeContainer();
-                    ModPayloads.openDebugStatEditor(player, player, Math.clamp(payload.restriction(), 0, 6));
+                    ModPayloads.openDebugStatEditor(player, player, Math.clamp(payload.restriction(), 0, 8));
                 } else menu.edit(player, payload.action(), payload.restriction(), payload.value());
             }
         }));

@@ -12,6 +12,7 @@ import com.example.immortal_cultivation_mod.screen.DingMenu;
 import com.example.immortal_cultivation_mod.screen.QiPouchMenu;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
 import com.example.immortal_cultivation_mod.spell.JindanCreativeFlight;
+import com.example.immortal_cultivation_mod.worldgen.StartingCaveManager;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -107,6 +108,10 @@ public final class DaoGuidanceSystem {
     public static void record(ServerPlayer player, String action, int amount) {
         if (player == null || action == null || action.isBlank() || amount <= 0) {
             return;
+        }
+        // Load state after discovery so this action cannot overwrite new readings.
+        for (String chapter : DaoGuidanceUpdates.relatedChapters(action)) {
+            discover(player, chapter);
         }
         CompoundTag state = read(player);
         boolean changed = initialize(state);
@@ -419,8 +424,7 @@ public final class DaoGuidanceSystem {
         if (CombatStateManager.isInCombat(player)
                 && atLeast(data.cultivationLevel(), CultivationLevels.REALM_ZHUJI)) {
             int maxQi = Math.max(1,
-                    CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi()
-                            + data.maxQiBonus());
+                    data.maxQi());
             if (data.qi() * 5 >= maxQi) {
                 runtime.foundationControlTicks++;
                 if (runtime.foundationControlTicks >= 1200) {
@@ -745,13 +749,28 @@ public final class DaoGuidanceSystem {
     private static boolean ensureCaveTarget(
             ServerPlayer player, CompoundTag state) {
         if (!state.getCompound(DISCOVERED).getBoolean(ENLIGHTENMENT)
-                || state.getCompound(COMPLETED).getBoolean(ENLIGHTENMENT)
-                || !state.getString(CAVE_TARGET_DIMENSION).isBlank()) {
+                || state.getCompound(COMPLETED).getBoolean(ENLIGHTENMENT)) {
             return false;
         }
 
         ServerLevel overworld = player.getServer().getLevel(Level.OVERWORLD);
         if (overworld == null) return false;
+        // A forced cave is not necessarily the nearest naturally generated structure.
+        // Prefer its saved position before accepting a cached target or retry cooldown.
+        var startingCave = StartingCaveManager.position(overworld);
+        if (startingCave.isPresent()) {
+            BlockPos target = startingCave.get();
+            String dimension = Level.OVERWORLD.location().toString();
+            if (dimension.equals(state.getString(CAVE_TARGET_DIMENSION))
+                    && state.getInt(CAVE_TARGET_X) == target.getX()
+                    && state.getInt(CAVE_TARGET_Z) == target.getZ()) return false;
+            state.putString(CAVE_TARGET_DIMENSION, dimension);
+            state.putInt(CAVE_TARGET_X, target.getX());
+            state.putInt(CAVE_TARGET_Z, target.getZ());
+            return true;
+        }
+        // Older worlds without a guaranteed cave retain their existing locator.
+        if (!state.getString(CAVE_TARGET_DIMENSION).isBlank()) return false;
         long now = overworld.getGameTime();
         BlockPos currentOrigin = player.serverLevel() == overworld
                 ? player.blockPosition()
@@ -950,8 +969,7 @@ public final class DaoGuidanceSystem {
         if (next == null) return false;
         long required = CultivationLevels.getTotalQiNeeded(data.cultivationLevel());
         int maxQi = Math.max(1,
-                CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi()
-                        + data.maxQiBonus());
+                data.maxQi());
         return data.cultivationProgress() >= required && data.qi() >= maxQi;
     }
 

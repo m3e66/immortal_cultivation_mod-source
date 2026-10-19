@@ -1,5 +1,7 @@
 package com.example.immortal_cultivation_mod.client.hud;
 
+import com.example.immortal_cultivation_mod.client.hud.HudLayout;
+import com.example.immortal_cultivation_mod.config.HudElement;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.UUID;
@@ -72,6 +74,8 @@ public final class MysteriousRingDialogueOverlay implements LayeredDraw.Layer {
                int panelHeight = lines.size() * 11 + 14;
                int left = (graphics.guiWidth() - panelWidth) / 2;
                int top = Math.max(18, graphics.guiHeight() - 68 - panelHeight);
+               var position = HudLayout.place(graphics, HudElement.RING_DIALOGUE, left, top, panelWidth, panelHeight);
+               left = position.x(); top = position.y();
                int right = left + panelWidth;
                int bottom = top + panelHeight;
                float alpha = messageAlpha(now);
@@ -89,7 +93,7 @@ public final class MysteriousRingDialogueOverlay implements LayeredDraw.Layer {
                int fallbackColor = alphaByte << 24 | (activeMessage.elder() ? 16111754 : 14738919);
 
                for(FormattedCharSequence line : lines) {
-                  int textX = (graphics.guiWidth() - minecraft.font.width(line)) / 2;
+                  int textX = left + (panelWidth - minecraft.font.width(line)) / 2;
                   graphics.drawString(minecraft.font, line, textX, textY, fallbackColor, true);
                   textY += 11;
                }

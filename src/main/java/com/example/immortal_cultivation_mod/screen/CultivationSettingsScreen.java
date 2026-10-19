@@ -3,6 +3,7 @@ package com.example.immortal_cultivation_mod.screen;
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.client.ClientData;
+import com.example.immortal_cultivation_mod.client.ShaderPackCompatibility;
 import com.example.immortal_cultivation_mod.config.ModClientConfig;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -24,6 +25,7 @@ public class CultivationSettingsScreen extends FittedMenuScreen {
     private static final int CONTENT_TOP_TEXTURE_Y = 198;
     private static final int CONTENT_BOTTOM_TEXTURE_Y = 949;
     private int scroll;
+    private boolean showModSky;
     private final Map<AbstractWidget, Integer> rowWidgets = new LinkedHashMap<>();
     private Component status = Component.empty();
     private CultivationGuiButton autoChannelButton;
@@ -45,6 +47,7 @@ public class CultivationSettingsScreen extends FittedMenuScreen {
     @Override
     protected void initMenu() {
         rowWidgets.clear();
+        showModSky = ShaderPackCompatibility.isShaderModPresent();
         boolean showCreativeFlight = showCreativeFlightOption();
         int left = panelX();
         int top = panelY();
@@ -137,6 +140,10 @@ public class CultivationSettingsScreen extends FittedMenuScreen {
                     }));
         }
         int next = showCreativeFlight ? 12 : 11;
+        var recallButton=addRenderableWidget(new CultivationGuiButton(buttonX,buttonY(next,showCreativeFlight),buttonWidth,rowButtonHeight,
+                swordRecallLabel(),()->{ClientData.setFlyingSwordAutoRecall(!ClientData.flyingSwordAutoRecall());rebuildWidgets();}));
+        recallButton.setTooltip(net.minecraft.client.gui.components.Tooltip.create(Component.translatable(TRANSLATION_PREFIX+"flying_sword_auto_recall.description")));
+        next++;
         var aiButton = addRenderableWidget(new CultivationGuiButton(buttonX, buttonY(next, showCreativeFlight),
                 buttonWidth, rowButtonHeight, aiLabel(), () -> {
                     if (!RingAiSettingsScreen.hostMayConfigure()) return;
@@ -151,6 +158,25 @@ public class CultivationSettingsScreen extends FittedMenuScreen {
                 buttonWidth, rowButtonHeight, Component.translatable("ring.ai.settings"),
                 () -> minecraft.setScreen(new RingAiSettingsScreen(this))));
         apiButton.active = RingAiSettingsScreen.hostMayConfigure();
+        addRenderableWidget(new CultivationGuiButton(buttonX, buttonY(next + 2, showCreativeFlight),
+                buttonWidth, rowButtonHeight, Component.translatable("toxicity.config.title"),
+                () -> minecraft.setScreen(new PillToxicitySettingsScreen(this))))
+                .setTooltip(net.minecraft.client.gui.components.Tooltip.create(
+                        Component.translatable("toxicity.config.description")));
+        addRenderableWidget(new CultivationGuiButton(buttonX, buttonY(next + 3, showCreativeFlight),
+                buttonWidth, rowButtonHeight, Component.translatable("hud.layout.title"),
+                () -> minecraft.setScreen(new HudLayoutScreen(this))));
+        addRenderableWidget(new CultivationGuiButton(buttonX, buttonY(next + 4, showCreativeFlight),
+                buttonWidth, rowButtonHeight, Component.translatable("qi.vfx.settings"),
+                () -> minecraft.setScreen(new BlastQiSettingsScreen(this))));
+        if (showModSky) {
+            addRenderableWidget(new CultivationGuiButton(buttonX, buttonY(next + 5, showCreativeFlight),
+                    buttonWidth, rowButtonHeight, modSkyLabel(), () -> {
+                        ModClientConfig.setModSky(!ModClientConfig.enableModSky());
+                        rebuildWidgets();
+                    })).setTooltip(net.minecraft.client.gui.components.Tooltip.create(
+                            Component.translatable(TRANSLATION_PREFIX + "mod_sky.description")));
+        }
         for (var child : children()) if (child instanceof AbstractWidget widget) {
             if (widget instanceof CultivationGuiButton button) button.setTextScale(1.0F);
             rowWidgets.put(widget, widget.getY() + scroll);
@@ -325,8 +351,13 @@ public class CultivationSettingsScreen extends FittedMenuScreen {
     }
 
     private int rowCount(boolean showCreativeFlight) {
-        return showCreativeFlight ? 14 : 13;
+        return (showCreativeFlight ? 18 : 17) + (showModSky ? 1 : 0);
     }
+    private Component modSkyLabel() {
+        return Component.translatable(TRANSLATION_PREFIX + "mod_sky",
+                Component.translatable(TRANSLATION_PREFIX + (ModClientConfig.enableModSky() ? "on" : "off")));
+    }
+    private Component swordRecallLabel(){return Component.translatable(TRANSLATION_PREFIX+"flying_sword_auto_recall."+(ClientData.flyingSwordAutoRecall()?"on":"off"));}
 
     private int contentHeight() {
         return Math.max(1, contentBottom() - contentTop());

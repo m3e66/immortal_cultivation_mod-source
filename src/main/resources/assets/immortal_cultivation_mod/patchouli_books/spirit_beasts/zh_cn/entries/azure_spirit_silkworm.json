@@ -1,0 +1,23 @@
+{
+  "name": "青灵蚕",
+  "icon": "immortal_cultivation_mod:azure_spirit_silkworm_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "青灵蚕",
+      "text": "$(bold)境界：$()凡人至筑基"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《灵兽志》记载",
+      "text": "青灵蚕生于草木繁盛之地，以天地木灵之气为食。其身蕴淡青灵光，常栖于灵木枝叶之间，吐丝凝灵。虽无凶性，却是修士寻觅灵材时不可忽视之物。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻踪",
+      "text": "常见于森林、密林、竹林与繁茂洞穴，尤喜灵木、翠竹及茂密树叶附近。"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "name": "Refiner's Wisdom",
+  "icon": "immortal_cultivation_mod:dao",
+  "category": "immortal_cultivation_mod:volume_6",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Refiner's Wisdom",
+      "text": "The ancient refiners taught: A fine artifact is not born from expensive materials alone, nor is the fiercest flame always the best. True craftsmanship comes from balance, precision, and purity."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Choose the Proper Vessel",
+      "text": "Choose a cauldron with enough slots for every required ingredient."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Prepare Sufficient Spirit Stones",
+      "text": "Keep enough spirit stones available to sustain forging."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Examine Material Purity",
+      "text": "Purity affects both success probability and melting duration."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Control the Flame",
+      "text": "Aim for the target temperature rather than overheating."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Complete the Final Quench",
+      "text": "Remember that molded weapons require water quenching."
+    }
+  ]
+}

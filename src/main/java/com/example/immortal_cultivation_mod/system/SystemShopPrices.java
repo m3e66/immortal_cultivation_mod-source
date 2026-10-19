@@ -660,8 +660,99 @@ public final class SystemShopPrices {
         values.put(ImmortalCultivationMod.MODID + ":talisman_drawing_table", 1_000); // 画符台
         values.put(ImmortalCultivationMod.MODID + ":void_stone", 5); // 虚空石
 
+        // New cultivation content: explicit prices instead of rarity-only fallback.
+        putCultivation(values, 1_000, "flame_vessel");
+        putCultivation(values, 20_000, "crimson_flame_seed");
+        putCultivation(values, 40_000, "earth_flame_seed");
+        putCultivation(values, 100_000, "wood_flame_heart");
+        putCultivation(values, 200_000, "solar_flame_seed");
+        putCultivation(values, 350_000, "nether_flame_seed");
+        putCultivation(values, 1_000_000, "thunder_flame_seed");
+        putCultivation(values, 2_000_000, "dragon_flame_seed");
+        putCultivation(values, 5_000_000, "heavenly_flame_seed");
+        putCultivation(values, 8_000, "crimson_flame_seed_yujian");
+        putCultivation(values, 180_000, "dragon_flame_seed_yujian");
+
+        putCultivation(values, 5, "mortal_beast_meat");
+        putCultivation(values, 300, "weapon_shard");
+        putCultivation(values, 100, "spirit_devouring_rat_hide");
+        putCultivation(values, 350, "spirit_scent_whisker");
+        putCultivation(values, 200, "iron_scale_plate");
+        putCultivation(values, 300, "crimson_venom_sac");
+        putCultivation(values, 900, "scorpion_tail_stinger");
+        putCultivation(values, 1_200, "wind_feather", "ink_armor_plate", "mineral_marrow");
+        putCultivation(values, 3_000, "spirit_deer_antler");
+        putCultivation(values, 8_000, "profound_iron_armor_core");
+        putCultivation(values, 10_000, "ember_feather");
+        putCultivation(values, 20_000, "fire_owl_claw");
+        putCultivation(values, 50_000, "flame_radiance_bone");
+        putCultivation(values, 300_000, "xuanjin_seal");
+
+        putCultivation(values, 16_000, "black_iron_jian", "black_iron_greatsword",
+                "moon_crescent_halberd", "spirit_silk_whip");
+        putCultivation(values, 40_000, "soul_hook", "wind_feather_fan", "thunderwood_sword",
+                "flame_pattern_dao", "earthbreaker_hammer");
+        putCultivation(values, 100_000, "seven_star_sword");
+        putCultivation(values, 150, "cloth_sheath");
+        putCultivation(values, 800, "sword_sheath", "dao_sheath");
+        putCultivation(values, 500, "coin_mask", "hufu", "hechang", "fugu_tai");
+        putCultivation(values, 300, "shenyi", "doupeng", "yunjian", "fangkou_qiaojian_lv");
+        putCultivation(values, 3_000, "cultivation_fapao");
+        putCultivation(values, 5_000, "yuanling_pao");
+        putCultivation(values, 200, "miansha", "jiangpa", "futou", "wusha_hat", "song_wusha_hat",
+                "chanfu_jin", "embroidered_forehead_band", "veiled_douli");
+        for (var style : com.example.immortal_cultivation_mod.hair.HairStyle.values()) {
+            putCultivation(values, 250, style.id());
+        }
+        putCultivation(values, 100, "hair_ribbon", "decorative_hair_beads");
+        putCultivation(values, 400, "cultivation_hairpin", "jade_hair_ornament");
+        putCultivation(values, 800, "hair_crown", "hair_styling_table");
+
+        putCultivation(values, 1_500, "cu_tie_xiaoding");
+        putCultivation(values, 150_000, "chi_jin_sanyang_ding");
+        putCultivation(values, 20_000, "qingtong_yinhuo_ding_yujian");
+        putCultivation(values, 200_000, "chi_jin_sanyang_ding_yujian");
+        putCultivation(values, 400, "medicine_cabinet_small");
+        putCultivation(values, 1_200, "medicine_cabinet_large");
+        putCultivation(values, 100, "huanxia_si", "liujin_sand");
+        putCultivation(values, 300, "jade_pill_bottle");
+        putCultivation(values, 3_000, "jade_pill_bottle_yujian");
+        putCultivation(values, 30, "lingquan_leaf");
+        putCultivation(values, 80, "ningling_flower", "harmonizing_herb", "catalyst_blossom");
+
+        putCultivation(values, 1600, "qingling_pill", "bishui_pill");
+        putCultivation(values, 1200, "huichun_pill");
+        putCultivation(values, 1500, "chiyan_pill");
+        putCultivation(values, 2000, "bingxin_pill");
+        putCultivation(values, 3000, "guyuan_pill", "bixie_pill");
+        putCultivation(values, 6000, "yangshen_pill");
+        putCultivation(values, 8000, "juling_pill");
+        putCultivation(values, 1000, "mingmu_pill");
+        putCultivation(values, 4000, "dingshen_pill", "tiegu_pill");
+        putCultivation(values, 3500, "pozhang_pill");
+        putCultivation(values, 5000, "xumai_pill");
+        putCultivation(values, 2500, "ningqi_pill");
+        putCultivation(values, 3000, "qingdu_pill");
+        for (String pill : List.of("bigu", "body_tempering", "blood_qi", "enlightenment", "breakthrough",
+                "qingling", "huichun", "chiyan", "bingxin", "guyuan", "yangshen", "juling", "huiling",
+                "mingmu", "dingshen", "bishui", "pozhang", "xumai", "tiegu", "bixie", "ningqi", "qingdu")) {
+            String base = pill.equals("huiling") ? "qi_recovery" : pill;
+            putCultivation(values, values.get(ImmortalCultivationMod.MODID + ":" + base + "_pill") * 10,
+                    pill + "_formula");
+        }
+        putCultivation(values, 100, "jietian_duoyun_shu_scroll");
+        putCultivation(values, 100, "bijie_shu_scroll");
+        putCultivation(values, 100, "guanyun_shu_scroll");
+        putCultivation(values, 100, "yinfu_shu_scroll");
+        putCultivation(values, 100, "bihuo_jue_scroll");
 
         return Map.copyOf(values);
+    }
+
+    private static void putCultivation(Map<String, Integer> values, int price, String... paths) {
+        for (String path : paths) {
+            values.put(ImmortalCultivationMod.MODID + ":" + path, price);
+        }
     }
 
     private static void putVanilla(
@@ -689,9 +780,13 @@ public final class SystemShopPrices {
         if (item == Items.AIR) {
             return 0;
         }
+        ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
+        Integer base = id == null ? null : BASE_PRICES.get(id.toString());
+        if (base != null) {
+            return Mth.clamp(base, 0, MAX_PRICE);
+        }
         ItemStack stack = item.getDefaultInstance();
         int value = Math.max(1, CultivationItemRarity.giftValue(stack));
-        ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
         if (id != null && "minecraft".equals(id.getNamespace())) {
             value = Math.max(1, value / 2);
         }

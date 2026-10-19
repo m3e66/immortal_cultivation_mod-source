@@ -394,8 +394,8 @@ public final class NpcOptionScreen extends AbstractNpcScreen {
         Component gender = Component.translatable(
                 "screen." + ImmortalCultivationMod.MODID + ".npc.gender." + data.gender());
         graphics.drawString(font, tr("npc.about.gender", gender), left, y + 15, COLOR_INK, false);
-        graphics.drawString(font, tr("npc.about.body", data.bodyType()), right, y + 15, COLOR_INK, false);
-        graphics.drawString(font, tr("npc.about.roots", data.spiritRoots().isEmpty() ? "-" : String.join("/", data.spiritRoots())),
+        graphics.drawString(font, tr("npc.about.body", com.example.immortal_cultivation_mod.attachment.BodyTypes.displayName(data.bodyType())), right, y + 15, COLOR_INK, false);
+        graphics.drawString(font, tr("npc.about.roots", data.spiritRoots().isEmpty() ? Component.literal("-") : com.example.immortal_cultivation_mod.attachment.SpiritRoots.elementsDisplayName(data.spiritRoots())),
                 left, y + 30, COLOR_INK, false);
         graphics.drawString(font, tr("npc.about.health", Math.round(data.health()), Math.round(data.maxHealth())), left, y + 45, COLOR_INK, false);
         graphics.drawString(font, tr("npc.about.qi", data.qi(), data.maxQi()), right, y + 45, COLOR_INK, false);
@@ -409,7 +409,20 @@ public final class NpcOptionScreen extends AbstractNpcScreen {
 
         int relationY = y + 142;
         drawRelationLine(graphics, left, relationY);
-        String family = data.family().isEmpty() ? "-" : String.join("  ", data.family());
+        Component family = Component.empty();
+        for (String relative : data.family()) {
+            if (!family.getSiblings().isEmpty()) family = family.copy().append("  ");
+            String[] parts = relative.split("·", 2);
+            String role = switch (parts[0]) {
+                case "父亲" -> "father";
+                case "母亲" -> "mother";
+                case "同辈" -> "sibling";
+                default -> null;
+            };
+            family = family.copy().append(role == null || parts.length < 2
+                    ? Component.literal(relative) : tr("npc.family." + role, parts[1]));
+        }
+        if (data.family().isEmpty()) family = Component.literal("-");
         drawWrapped(graphics, tr("npc.about.family", family), left, relationY + 19, w, COLOR_INK, 3);
     }
 

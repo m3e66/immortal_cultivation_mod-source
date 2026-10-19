@@ -8,7 +8,6 @@ import com.example.immortal_cultivation_mod.effect.ModEffects;
 import com.example.immortal_cultivation_mod.entity.CultivationNpc;
 import com.example.immortal_cultivation_mod.entity.FlyingSwordEntity;
 import com.example.immortal_cultivation_mod.entity.NpcProfile;
-import com.example.immortal_cultivation_mod.entity.NpcSpellcasting;
 import com.example.immortal_cultivation_mod.network.CultivationFlightPayloads;
 import com.example.immortal_cultivation_mod.physics.CultivationFlightTrail;
 import java.util.Map;
@@ -29,8 +28,8 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 @EventBusSubscriber(modid=ImmortalCultivationMod.MODID)
 public final class CultivationFlightVisuals {
-    public static final float MIN_TRAIL_FLYING_SPEED = 0.05F * 5;
-    // Non-player glide movement has no ability slider: convert default x2 travel speed to x5.
+    public static final float MIN_TRAIL_FLYING_SPEED = 0.05F * 10;
+    // Non-player glide movement has no ability slider: convert default x2 travel speed to x10.
     public static final double MIN_TRAIL_TRAVEL_SPEED = JindanCreativeFlight.BASE_TRAVEL_SPEED
             * MIN_TRAIL_FLYING_SPEED / JindanCreativeFlight.defaultFlyingSpeed();
     private static final Map<LivingEntity, Motion> MOTION = new WeakHashMap<>();
@@ -45,13 +44,10 @@ public final class CultivationFlightVisuals {
     /** Shared by every flight skill, independent of Jindan flight ownership or realm. */
     public static boolean eligible(LivingEntity flyer) {
         if (!flyer.isAlive() || flyer.isInvisible() || flyer.isSpectator()) return false;
-        if (flyer.getVehicle() != null) {
-            // The rider's onGround flag can remain set while the sword is carrying them.
-            return flyer.getVehicle() instanceof FlyingSwordEntity sword && !sword.onGround();
-        }
+        if (flyer instanceof CultivationNpc) return false;
+        if (flyer instanceof Player player && FlyingSwordEntity.flightSword(player) != null) return false;
+        if (flyer.getVehicle() != null) return false;
         if (flyer.onGround()) return false;
-        if (flyer instanceof PathfinderMob mob && flyer instanceof CultivationNpc
-                && flyer.isNoGravity() && NpcSpellcasting.hasCreativeFlight(mob)) return true;
         if (flyer.hasEffect(ModEffects.YUFENG_JUE) || flyer.hasEffect(ModEffects.FROST_FLIGHT)) return true;
         if (flyer instanceof Player player) {
             // Also accepts other skills/mods granting survival flight, without decorating vanilla creative flight.
@@ -64,8 +60,6 @@ public final class CultivationFlightVisuals {
     public static boolean shouldEmit(LivingEntity flyer, double travelled) {
         if (!eligible(flyer) || !Double.isFinite(travelled) || travelled < 0
                 || travelled > CultivationFlightTrail.MAX_STEP) return false;
-        // NPCs keep their elemental wake at any flight speed, including a hovering aura.
-        if (flyer instanceof CultivationNpc) return true;
         if (travelled < .05) return false;
         if (flyer instanceof Player player && player.getAbilities().flying) {
             float speed = player.getAbilities().getFlyingSpeed();
@@ -121,7 +115,7 @@ public final class CultivationFlightVisuals {
         } else if (flyer instanceof PathfinderMob mob && flyer instanceof CultivationNpc npc) {
             roots = NpcProfile.spiritRootIds(mob, npc.npcArchetype());
             methodId = NpcProfile.methodId(mob, npc.npcArchetype());
-        } else if (UndeadControl.hasUndeadPowers(flyer)) return CultivationFlightTrail.color(SpiritRoots.DARK);
+        } else if (UndeadControl.hasUndeadPowers(flyer)) return CultivationFlightTrail.color(SpiritRoots.YIN);
         String element = roots.stream().filter(root -> !root.equals(SpiritRoots.NONE)).findFirst().orElse("");
         if (element.isBlank()) {
             var method = CultivationMethods.get(methodId);

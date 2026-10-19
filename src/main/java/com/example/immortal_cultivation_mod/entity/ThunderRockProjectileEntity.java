@@ -23,6 +23,7 @@ import net.minecraft.world.phys.Vec3;
 
 /** Electrically accelerated stone from 雷石飞射. */
 public final class ThunderRockProjectileEntity extends ThrowableItemProjectile {
+    // Visuals use synchronized BeastAttackVfx; server combat and sounds remain unchanged.
     private static final float DAMAGE = 32.0F;
     private UUID trackingTarget;
     private boolean predictive;
@@ -65,14 +66,7 @@ public final class ThunderRockProjectileEntity extends ThrowableItemProjectile {
         super.tick();
         if (level().isClientSide) {
             Vec3 motion = getDeltaMovement();
-            level().addParticle(ModParticles.METHOD_QI_EARTH.get(),
-                    getX(), getY(), getZ(),
-                    -motion.x * 0.03D, -motion.y * 0.03D, -motion.z * 0.03D);
-            if ((tickCount & 1) == 0) {
-                level().addParticle(ParticleTypes.ELECTRIC_SPARK,
-                        getX(), getY(), getZ(),
-                        -motion.x * 0.02D, -motion.y * 0.02D, -motion.z * 0.02D);
-            }
+
         } else if (tickCount > 80) {
             discard();
         }
@@ -122,12 +116,6 @@ public final class ThunderRockProjectileEntity extends ThrowableItemProjectile {
     }
 
     private void impact(ServerLevel level, Vec3 point) {
-        level.sendParticles(ParticleTypes.ELECTRIC_SPARK,
-                point.x, point.y, point.z,
-                9, 0.25D, 0.25D, 0.25D, 0.1D);
-        level.sendParticles(ModParticles.METHOD_QI_EARTH.get(),
-                point.x, point.y, point.z,
-                12, 0.28D, 0.28D, 0.28D, 0.08D);
         level.playSound(null, blockPosition(), SoundEvents.STONE_BREAK,
                 SoundSource.HOSTILE, 0.75F, 1.08F + random.nextFloat() * 0.2F);
     }

@@ -194,6 +194,11 @@ public final class CenterEffectSupport {
       return cast != null && caster != null && cast.playerId().equals(caster.getUUID()) ? cast.element() : "";
    }
 
+   public static boolean hasSpellContext(Entity caster) {
+      SpellCastContext cast = SPELL_CAST.get();
+      return cast != null && caster != null && cast.playerId().equals(caster.getUUID());
+   }
+
    public static int adjustSpellQiCost(Player player, int cost) {
       SpellCastContext cast = (SpellCastContext)SPELL_CAST.get();
       return cast != null && cast.playerId().equals(player.getUUID()) ? adjustSpellQiCost(player, cost, cast.spellId()) : Math.max(0, cost);
@@ -204,7 +209,7 @@ public final class CenterEffectSupport {
       if (adjusted != 0 && player instanceof ServerPlayer serverPlayer) {
          ModSpells.SpellDef spell = ModSpells.get(spellId);
          String element = spell == null ? "" : spell.element();
-         double multiplier = (double)1.0F;
+         double multiplier = com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.spellCostMultiplier(player, element);
          if ("regeneration".equals(spellId) || HealingTechniques.isTechnique(spellId)) {
             if (isInsideBeneficial(serverPlayer, MagicCenterTypeRegistry.SANCTUARY)) {
                multiplier *= (double)0.75F;
@@ -279,7 +284,7 @@ public final class CenterEffectSupport {
    public static int maxQi(LivingEntity entity) {
       if (entity instanceof ServerPlayer player) {
          ModAttachments.CultivationData data = ModAttachments.getData(player);
-         return Math.max(0, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
+         return Math.max(0, data.maxQi());
       } else if (entity instanceof CultivationNpc npc) {
          return npc.npcMaxQi();
       } else {
@@ -380,6 +385,7 @@ public final class CenterEffectSupport {
    }
 
    public static String realmName(LivingEntity entity) {
+      if (entity instanceof com.example.immortal_cultivation_mod.entity.RealmBeast beast) return beast.beastCultivationLevel();
       if (entity instanceof ServerPlayer player) {
          return ModAttachments.getData(player).cultivationLevel();
       } else if (entity instanceof CultivationNpc npc) {

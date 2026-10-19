@@ -1,0 +1,33 @@
+{
+  "name": "灵材助品",
+  "icon": "immortal_cultivation_mod:liujin_sand",
+  "category": "immortal_cultivation_mod:volume_5",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "炼器之妙，不止于鼎火。辅以特殊灵材，可使成器品质进一步提升。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "流金沙善融诸金，每添一份，可助器质提升。地肺火以厚重地气温养器胚，紫霄天火则以天焰淬炼精华，使上品之上，尚有更高境界。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "规则速查",
+      "text": "流金沙 / 每份 +5"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "规则速查",
+      "text": "地肺火 / +5"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "规则速查",
+      "text": "紫霄天火 / +25"
+    }
+  ]
+}

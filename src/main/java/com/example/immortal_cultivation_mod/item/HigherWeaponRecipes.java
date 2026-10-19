@@ -12,8 +12,6 @@ public final class HigherWeaponRecipes {
     }
     public static ForgingSystem.ForgingRecipe recipe(String id) {
         return switch(id) {
-            case "jin_hulu" -> new ForgingSystem.ForgingRecipe(id,item("weapon_mold"),4500,Map.of(item("liujin_sand"),5,item("jingtie_motherstone"),3,item("qiannian_lingmu_heart"),2,item("spirit_storage_crystal"),2,item("zhuji_yaodan"),1),false,64,"zhen_fire");
-            case "baota" -> new ForgingSystem.ForgingRecipe(id,item("weapon_mold"),4500,Map.of(item("jingtie_motherstone"),4,item("liujin_sand"),3,item("yunwen_silver_crystal"),3,item("qiannian_lingmu_heart"),2,item("zhuji_yaodan"),2),false,64,"zhen_fire");
             case "black_iron_jian" -> new ForgingSystem.ForgingRecipe(id,item("sword_mold"),4500,Map.of(item("jingtie_motherstone"),3,item("moxuan_iron"),4,item("yunwen_silver_crystal"),2,item("zhuji_yaodan"),1),false,64,"zhen_fire");
             case "black_iron_greatsword" -> new ForgingSystem.ForgingRecipe(id,item("sword_mold"),4500,Map.of(item("jingtie_motherstone"),5,item("moxuan_iron"),5,item("liujin_sand"),2,item("zhuji_yaodan"),2),false,64,"zhen_fire");
             case "moon_crescent_halberd" -> new ForgingSystem.ForgingRecipe(id,item("spear_mold"),4500,Map.of(item("jingtie_motherstone"),4,item("moxuan_iron"),4,item("yunwen_silver_crystal"),2,item("qiannian_lingmu_heart"),2,item("zhuji_yaodan"),1),false,64,"zhen_fire");

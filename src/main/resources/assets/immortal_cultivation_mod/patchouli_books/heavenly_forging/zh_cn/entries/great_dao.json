@@ -1,0 +1,23 @@
+{
+  "name": "天工大道",
+  "icon": "minecraft:book",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "天工大道",
+      "text": "修仙者以天地灵气淬炼己身，炼器师则以天地真火淬炼万物。二者看似不同，实则同归一理。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "天工大道",
+      "text": "炼身者求金丹不朽，炼器者求神兵不灭。灵材为骨，真火为血，阵纹为脉，灵气为魂。四者相合，方有一器通灵之机。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "天工大道",
+      "text": "须知，世间绝世神兵，并非皆成于最烈之火，亦非尽出于最贵之材。唯有知火、识材、通变、守心之人，方可窥见天工大道。"
+    }
+  ]
+}

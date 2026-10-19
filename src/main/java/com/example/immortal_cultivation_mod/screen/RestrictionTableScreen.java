@@ -1,5 +1,7 @@
 package com.example.immortal_cultivation_mod.screen;
 
+import com.example.immortal_cultivation_mod.client.FormationLayers;
+
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.item.WeaponRestrictionSystem;
 import com.example.immortal_cultivation_mod.network.RestrictionPayloads;
@@ -9,7 +11,6 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -41,17 +42,6 @@ public class RestrictionTableScreen extends AbstractContainerScreen<RestrictionT
     private static final int LEFT_COUNT_X = 48;
     private static final int RIGHT_COUNT_X = 311;
 
-    // Reuse the existing carved sigil artwork for the new defensive formations.
-    private ResourceLocation sigilFor(WeaponRestrictionSystem.RestrictionType type) {
-        return sigil(switch (type) {
-            case PROTECTION -> "sturdy";
-            case FIRE_PROTECTION -> "spirit_devouring";
-            case BLAST_PROTECTION -> "armor_breaking";
-            case PROJECTILE_PROTECTION -> "sharpness";
-            case FEATHER_FALLING -> "swift_flight";
-            default -> type.id();
-        });
-    }
 
     private List<WeaponRestrictionSystem.RestrictionType> visibleTypes() {
         return WeaponRestrictionSystem.availableTypes(menu.getSlot(0).getItem());
@@ -71,10 +61,6 @@ public class RestrictionTableScreen extends AbstractContainerScreen<RestrictionT
         titleLabelY = 0;
     }
 
-    private static ResourceLocation sigil(String name) {
-        return ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID,
-                "textures/gui/restriction/" + name + ".png");
-    }
 
     @Override
     protected void init() {
@@ -151,7 +137,7 @@ public class RestrictionTableScreen extends AbstractContainerScreen<RestrictionT
         CultivationGuiTextures.drawLandscape(graphics, x, y, imageWidth, imageHeight);
 
         for (int i = 0; i < visibleTypes().size(); i++) {
-            renderRestrictionRow(graphics, i, mouseX, mouseY);
+            renderRestrictionRow(graphics, i, mouseX, mouseY, partialTick);
         }
         renderCoreRow(graphics, mouseX, mouseY);
 
@@ -174,7 +160,7 @@ public class RestrictionTableScreen extends AbstractContainerScreen<RestrictionT
         renderInventorySlots(graphics, x, y);
     }
 
-    private void renderRestrictionRow(GuiGraphics graphics, int index, int mouseX, int mouseY) {
+    private void renderRestrictionRow(GuiGraphics graphics, int index, int mouseX, int mouseY, float partialTick) {
         int row = index < 4 ? index : index - 4;
         int panelX = index < 4 ? LEFT_PANEL_X : RIGHT_PANEL_X;
         int sigilX = index < 4 ? LEFT_SIGIL_X : RIGHT_SIGIL_X;
@@ -193,8 +179,18 @@ public class RestrictionTableScreen extends AbstractContainerScreen<RestrictionT
         graphics.renderOutline(leftPos + sigilX - 1, topPos + rowY,
                 SIGIL_FRAME_SIZE, SIGIL_FRAME_SIZE, border);
         graphics.setColor(0.19F, 0.35F, 0.31F, 1.0F);
-        graphics.blit(sigilFor(visibleTypes().get(index)), leftPos + sigilX, topPos + rowY + 1,
-                SIGIL_SIZE, SIGIL_SIZE, 0.0F, 0.0F, 128, 128, 128, 128);
+        var textures = FormationLayers.restriction(visibleTypes().get(index).id());
+        double ticks = minecraft.level == null ? System.nanoTime() / 50_000_000.0
+                : (double)minecraft.level.getGameTime() + partialTick;
+        for (int layer = 0; layer < FormationLayers.COUNT; layer++) {
+            graphics.pose().pushPose();
+            graphics.pose().translate(leftPos + sigilX + SIGIL_SIZE / 2.0F,
+                    topPos + rowY + 1 + SIGIL_SIZE / 2.0F, 0);
+            graphics.pose().mulPose(com.mojang.math.Axis.ZP.rotationDegrees(FormationLayers.angle(ticks, layer)));
+            graphics.blit(textures.get(layer), -SIGIL_SIZE / 2, -SIGIL_SIZE / 2,
+                    SIGIL_SIZE, SIGIL_SIZE, 0.0F, 0.0F, 512, 512, 512, 512);
+            graphics.pose().popPose();
+        }
         graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
         if (menu.active()) {
             graphics.fill(leftPos + panelX, topPos + rowY,

@@ -1,0 +1,23 @@
+{
+  "name": "The True Meaning of Alchemy",
+  "icon": "minecraft:book",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "The True Meaning of Alchemy",
+      "text": "Pills may restore the body, strengthen spiritual foundations, and assist breakthroughs, yet medicine remains an aid rather than the foundation of cultivation."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "The True Meaning of Alchemy",
+      "text": "The greatest alchemists are not those who produce the most pills, but those who understand the subtle relationships between ingredients. An imbalance of herbs may ruin even the rarest materials, while careful refinement can transform ordinary plants into extraordinary medicine."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "The True Meaning of Alchemy",
+      "text": "With herbs as the foundation, flames as the catalyst, and wisdom as the guiding force, the alchemist seeks to capture a fragment of heaven and earth's transformative power."
+    }
+  ]
+}

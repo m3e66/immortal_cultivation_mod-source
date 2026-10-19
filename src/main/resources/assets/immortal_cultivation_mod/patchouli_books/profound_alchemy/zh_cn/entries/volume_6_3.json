@@ -1,0 +1,18 @@
+{
+  "name": "淬体丹",
+  "icon": "immortal_cultivation_mod:body_tempering_pill",
+  "category": "immortal_cultivation_mod:volume_6",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "淬体丹可炼筋骨、壮气血，将药力化入肉身，永久增强体魄攻击之力。然凡躯承药终有极限，若服用过多，亦难再得增益。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹效",
+      "text": "每服一枚，永久提升一点物理攻击，最多生效十次。"
+    }
+  ]
+}

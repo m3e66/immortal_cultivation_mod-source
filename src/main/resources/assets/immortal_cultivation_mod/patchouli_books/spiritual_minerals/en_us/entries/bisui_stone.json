@@ -1,0 +1,23 @@
+{
+  "name": "Verdant Essence Stone",
+  "icon": "immortal_cultivation_mod:bisui_stone",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Verdant Essence Stone",
+      "text": "$(bold)Starting height: $()Y −32 to 48$(br2)$(bold)Attempt frequency: $()1/24 chunks"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Verdant Essence Stone forms where the spiritual energies of water and wood intertwine. Its smooth, jade-green surface carries gentle traces of natural energy. It is most frequently encountered in damp wetlands, overgrown caves, and regions rich in vegetation."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Found in swamps, mangrove swamps, rivers, and lush caves, with starting elevations between Y −32 and 48."
+    }
+  ]
+}

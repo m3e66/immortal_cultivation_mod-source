@@ -7,6 +7,7 @@ import net.minecraft.world.phys.Vec3;
 
 /** Connected six-sided leather tube; joint rings are shared, so bending opens no gaps. */
 public final class WhipMesh {
+    private static final double LASH_THICKNESS_SCALE = .8;
     public static void render(WhipRope rope,Vec3 origin,Vec3 socket,PoseStack poses,VertexConsumer buffer,int light,int overlay,int color) {
         Vec3[] points=new Vec3[WhipRope.SEGMENTS+1];
         Vec3 shift=socket.subtract(rope.point(0));
@@ -25,7 +26,7 @@ public final class WhipMesh {
             for(int j=0;j<6;j++) {
                 double angle=j*Math.PI/3;
                 normals[i][j]=side.scale(Math.cos(angle)).add(up.scale(Math.sin(angle)));
-                ring[i][j]=center.add(normals[i][j].scale(rope.radius(i)));
+                ring[i][j]=center.add(normals[i][j].scale(rope.radius(i) * LASH_THICKNESS_SCALE));
             }
         }
         for(int i=0;i<WhipRope.SEGMENTS;i++)for(int j=0;j<6;j++) {

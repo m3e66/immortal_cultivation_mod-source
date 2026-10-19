@@ -31,7 +31,7 @@ public class QiFireBurnEffect extends MobEffect {
         tag.putLong(stamp, now);
         if (entity instanceof ServerPlayer player && !player.isCreative() && !player.isSpectator()) {
             var data = ModAttachments.getData(player);
-            long maximum = Math.max(1L, (long) CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
+            long maximum = Math.max(1L, (long) data.maxQi());
             int drain = (int) Math.min(Integer.MAX_VALUE, Math.max(1L, (maximum + 49) / 50));
             ModAttachments.setData(player, data.withQi(Math.max(0, data.qi() - drain)));
             ServerEvents.syncPlayerData(player);

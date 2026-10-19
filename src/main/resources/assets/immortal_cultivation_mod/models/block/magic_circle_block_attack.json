@@ -1,6 +1,6 @@
 {
-  "parent": "minecraft:block/carpet",
   "textures": {
-    "wool": "immortal_cultivation_mod:block/magic_circle_attack"
-  }
+    "particle": "immortal_cultivation_mod:block/magic_circle_attack"
+  },
+  "elements": []
 }

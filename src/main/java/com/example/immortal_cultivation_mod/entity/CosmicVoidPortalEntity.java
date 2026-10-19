@@ -30,6 +30,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
@@ -65,6 +67,8 @@ public final class CosmicVoidPortalEntity extends Entity {
             "ImmortalCultivationCosmicVoidAnchorY";
     private static final String ANCHOR_Z_TAG =
             "ImmortalCultivationCosmicVoidAnchorZ";
+    private static final String ENTRY_X_TAG = "ImmortalCultivationCosmicVoidEntryX";
+    private static final String ENTRY_Z_TAG = "ImmortalCultivationCosmicVoidEntryZ";
 
     private static final EntityDataAccessor<Optional<UUID>> DATA_OWNER =
             SynchedEntityData.defineId(
@@ -198,6 +202,9 @@ public final class CosmicVoidPortalEntity extends Entity {
             BlockPos anchor = getOrCreateCosmicAnchor(player, target);
             storeReturnPoint(player);
             destination = Vec3.atBottomCenterOf(anchor);
+            // Record the actual arrival point, including a reused/safety-adjusted anchor.
+            player.getPersistentData().putDouble(ENTRY_X_TAG, destination.x);
+            player.getPersistentData().putDouble(ENTRY_Z_TAG, destination.z);
             yaw = player.getYRot();
             pitch = player.getXRot();
         }
@@ -351,9 +358,10 @@ public final class CosmicVoidPortalEntity extends Entity {
         data.putFloat(RETURN_PITCH_TAG, player.getXRot());
     }
 
-    private static ReturnPoint readReturnPoint(ServerPlayer player) {
+    static ReturnPoint readReturnPoint(ServerPlayer player) {
         CompoundTag data = player.getPersistentData();
         ServerLevel target = player.server.overworld();
+        double sourceScale = 1.0D;
         if (data.contains(RETURN_DIMENSION_TAG)) {
             ResourceLocation location = ResourceLocation.tryParse(
                     data.getString(RETURN_DIMENSION_TAG));
@@ -363,27 +371,77 @@ public final class CosmicVoidPortalEntity extends Entity {
                 if (savedLevel != null
                         && !savedLevel.dimension().equals(
                         CosmicVoidGravity.DIMENSION)) {
-                    target = savedLevel;
+                    sourceScale = DimensionType.getTeleportationScale(savedLevel.dimensionType(), target.dimensionType());
                 }
             }
         }
 
         BlockPos spawn = target.getSharedSpawnPos();
-        Vec3 position = new Vec3(
-                data.contains(RETURN_X_TAG)
-                        ? data.getDouble(RETURN_X_TAG)
-                        : spawn.getX() + 0.5D,
-                data.contains(RETURN_Y_TAG)
-                        ? data.getDouble(RETURN_Y_TAG)
-                        : spawn.getY(),
-                data.contains(RETURN_Z_TAG)
-                        ? data.getDouble(RETURN_Z_TAG)
-                        : spawn.getZ() + 0.5D);
+        Vec3 mapped = mapReturnPosition(data, player.position(),
+                Vec3.atBottomCenterOf(spawn), sourceScale);
+        BlockPos landing = findSafeOverworldLanding(target, mapped.x, mapped.z);
+        Vec3 position = Vec3.atBottomCenterOf(landing);
         float yaw = data.contains(RETURN_YAW_TAG)
                 ? data.getFloat(RETURN_YAW_TAG) : player.getYRot();
         float pitch = data.contains(RETURN_PITCH_TAG)
                 ? data.getFloat(RETURN_PITCH_TAG) : player.getXRot();
         return new ReturnPoint(target, position, yaw, pitch);
+    }
+
+    static Vec3 mapReturnPosition(CompoundTag data, Vec3 current, Vec3 spawn, double sourceScale) {
+        boolean hasOrigin = data.contains(RETURN_X_TAG) && data.contains(RETURN_Z_TAG);
+        double originX = hasOrigin ? data.getDouble(RETURN_X_TAG) * sourceScale : spawn.x;
+        double originZ = hasOrigin ? data.getDouble(RETURN_Z_TAG) * sourceScale : spawn.z;
+        // Legacy saves recorded the landing block instead of the exact entry position.
+        boolean hasEntry = data.contains(ENTRY_X_TAG) && data.contains(ENTRY_Z_TAG);
+        boolean hasAnchor = data.contains(ANCHOR_X_TAG) && data.contains(ANCHOR_Z_TAG);
+        double entryX = hasEntry ? data.getDouble(ENTRY_X_TAG)
+                : hasAnchor ? data.getInt(ANCHOR_X_TAG) + .5D : current.x;
+        double entryZ = hasEntry ? data.getDouble(ENTRY_Z_TAG)
+                : hasAnchor ? data.getInt(ANCHOR_Z_TAG) + .5D : current.z;
+        double x = originX + (current.x - entryX) / COSMIC_COORDINATE_SCALE;
+        double z = originZ + (current.z - entryZ) / COSMIC_COORDINATE_SCALE;
+        return new Vec3(Double.isFinite(x) ? x : spawn.x, spawn.y,
+                Double.isFinite(z) ? z : spawn.z);
+    }
+
+    static BlockPos findSafeOverworldLanding(ServerLevel level, double mappedX, double mappedZ) {
+        var border = level.getWorldBorder();
+        int x = Mth.floor(Mth.clamp(mappedX, Math.max(-29_999_000, border.getMinX() + 3),
+                Math.min(29_999_000, border.getMaxX() - 3)));
+        int z = Mth.floor(Mth.clamp(mappedZ, Math.max(-29_999_000, border.getMinZ() + 3),
+                Math.min(29_999_000, border.getMaxZ() - 3)));
+        // Load only the destination chunk, then probe loaded terrain. No broad generation sweep.
+        level.getChunk(x >> 4, z >> 4);
+        for (int radius = 0; radius <= 16; radius++) {
+            for (int dx = -radius; dx <= radius; dx++) {
+                for (int dz = -radius; dz <= radius; dz++) {
+                    if (radius > 0 && Math.abs(dx) != radius && Math.abs(dz) != radius) continue;
+                    BlockPos safe = safeSurfaceAt(level, x + dx, z + dz);
+                    if (safe != null) return safe;
+                }
+            }
+        }
+        BlockPos safe = findSafeSurface(level, x, z);
+        if (safe != null) return safe;
+
+        // Oceans/solid hazards get a small dry platform above the surface in this chunk.
+        int platformX = Mth.floor(Mth.clamp((x >> 4 << 4) + Mth.clamp(x & 15, 2, 13),
+                border.getMinX() + 3, border.getMaxX() - 3));
+        int platformZ = Mth.floor(Mth.clamp((z >> 4 << 4) + Mth.clamp(z & 15, 2, 13),
+                border.getMinZ() + 3, border.getMaxZ() - 3));
+        int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, platformX, platformZ) + 2;
+        return buildFallbackPlatform(level, platformX, platformZ, Math.max(FALLBACK_PLATFORM_Y, y),
+                Blocks.STONE.defaultBlockState());
+    }
+
+    @Nullable
+    private static BlockPos safeSurfaceAt(ServerLevel level, int x, int z) {
+        var chunk = level.getChunkSource().getChunkNow(x >> 4, z >> 4);
+        if (chunk == null) return null;
+        BlockPos feet = new BlockPos(x, chunk.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                x & 15, z & 15) + 1, z);
+        return isSafe(level, feet) ? feet : null;
     }
 
     private static BlockPos getOrCreateCosmicAnchor(
@@ -408,6 +466,11 @@ public final class CosmicVoidPortalEntity extends Entity {
         int centerZ = Mth.floor(Mth.clamp(
                 player.getZ() * COSMIC_COORDINATE_SCALE,
                 -29_999_000.0D, 29_999_000.0D));
+        // Keep the fallback's five-block footprint in a single chunk. Entry
+        // generates this one chunk; all other landing probes are non-loading.
+        centerX = (centerX >> 4 << 4) + 8;
+        centerZ = (centerZ >> 4 << 4) + 8;
+        level.getChunk(centerX >> 4, centerZ >> 4);
         BlockPos anchor = findSafeSurface(level, centerX, centerZ);
         if (anchor == null) {
             anchor = buildFallbackPlatform(level, centerX, centerZ);
@@ -436,12 +499,10 @@ public final class CosmicVoidPortalEntity extends Entity {
                     }
                     int x = centerX + xOffset;
                     int z = centerZ + zOffset;
-                    level.getChunk(x >> 4, z >> 4);
-                    int y = level.getHeight(
-                            Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                            x, z);
-                    BlockPos feet = new BlockPos(x, y, z);
-                    if (isSafe(level, feet)) {
+                    // Searching an empty void must not synchronously generate an
+                    // entire 9x9 area. Only inspect chunks already fully loaded.
+                    BlockPos feet = safeSurfaceAt(level, x, z);
+                    if (feet != null) {
                         return feet;
                     }
                 }
@@ -452,7 +513,13 @@ public final class CosmicVoidPortalEntity extends Entity {
 
     private static BlockPos buildFallbackPlatform(
             ServerLevel level, int centerX, int centerZ) {
-        int feetY = Mth.clamp(FALLBACK_PLATFORM_Y,
+        return buildFallbackPlatform(level, centerX, centerZ, FALLBACK_PLATFORM_Y,
+                ModBlocks.VOID_STONE.get().defaultBlockState());
+    }
+
+    private static BlockPos buildFallbackPlatform(ServerLevel level, int centerX, int centerZ,
+                                                   int requestedY, BlockState platform) {
+        int feetY = Mth.clamp(requestedY,
                 level.getMinBuildHeight() + 3,
                 level.getMaxBuildHeight() - 4);
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
@@ -461,7 +528,7 @@ public final class CosmicVoidPortalEntity extends Entity {
                 cursor.set(centerX + xOffset, feetY - 1,
                         centerZ + zOffset);
                 level.setBlockAndUpdate(cursor,
-                        ModBlocks.VOID_STONE.get().defaultBlockState());
+                        platform);
             }
         }
         for (int xOffset = -1; xOffset <= 1; xOffset++) {
@@ -487,11 +554,24 @@ public final class CosmicVoidPortalEntity extends Entity {
         BlockState body = level.getBlockState(feet);
         BlockState head = level.getBlockState(feet.above());
         return floor.isFaceSturdy(level, floorPos, Direction.UP)
+                && !hazard(floor) && !hazard(body) && !hazard(head)
                 && floor.getFluidState().isEmpty()
                 && body.getFluidState().isEmpty()
                 && head.getFluidState().isEmpty()
                 && body.getCollisionShape(level, feet).isEmpty()
-                && head.getCollisionShape(level, feet.above()).isEmpty();
+                && head.getCollisionShape(level, feet.above()).isEmpty()
+                && level.noCollision(new net.minecraft.world.phys.AABB(feet.getX() + .2, feet.getY(),
+                        feet.getZ() + .2, feet.getX() + .8, feet.getY() + 1.8, feet.getZ() + .8));
+    }
+
+    private static boolean hazard(BlockState state) {
+        return state.getBlock() instanceof com.example.immortal_cultivation_mod.block.LingFireBlock
+                || state.is(Blocks.MAGMA_BLOCK) || state.is(Blocks.CACTUS)
+                || state.is(Blocks.CAMPFIRE) || state.is(Blocks.SOUL_CAMPFIRE)
+                || state.is(Blocks.FIRE) || state.is(Blocks.SOUL_FIRE)
+                || state.is(Blocks.POWDER_SNOW) || state.is(Blocks.SWEET_BERRY_BUSH)
+                || state.is(Blocks.WITHER_ROSE) || state.is(Blocks.NETHER_PORTAL)
+                || state.is(Blocks.END_PORTAL);
     }
 
     private boolean isOwnedBy(ServerPlayer player) {
@@ -521,7 +601,7 @@ public final class CosmicVoidPortalEntity extends Entity {
                 .ifPresent(owner -> tag.putUUID("Owner", owner));
     }
 
-    private record ReturnPoint(
+    record ReturnPoint(
             ServerLevel level, Vec3 position, float yaw, float pitch) {
     }
 }

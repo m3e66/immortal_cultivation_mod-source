@@ -366,7 +366,7 @@ public final class DaoGuidanceScreen extends Screen {
         long requiredProgress =
                 CultivationLevels.getTotalQiNeeded(current);
         int maximumQi = Math.max(1,
-                level.maxQi() + data.maxQiBonus());
+                data.maxQi());
         boolean progressReady =
                 data.cultivationProgress() >= requiredProgress;
         boolean qiReady = data.qi() >= maximumQi;
@@ -453,7 +453,7 @@ public final class DaoGuidanceScreen extends Screen {
             case DaoGuidanceContent.CHARGED_SPELL -> Component.translatable(
                     key, ModKeyMappings.CAST_PREPARED_SPELL.get()
                             .getTranslatedKeyMessage());
-            case DaoGuidanceContent.ACTIVATE_SENSE -> Component.translatable(
+            case DaoGuidanceContent.ACTIVATE_SENSE, DaoGuidanceContent.DETECT_HIDDEN_LIVING -> Component.translatable(
                     key, ModKeyMappings.SPIRITUAL_SENSE.get()
                             .getTranslatedKeyMessage());
             case DaoGuidanceContent.WEAPON_ATTACK -> Component.translatable(

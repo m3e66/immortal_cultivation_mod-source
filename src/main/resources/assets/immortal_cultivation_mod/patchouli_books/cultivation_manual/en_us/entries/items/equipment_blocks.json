@@ -18,7 +18,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Flying Sword is a sword weapon with netherite durability and 10 base damage. Press X to release it as a flying sword entity, then use Yuqi Shu to control it."
+      "text": "All swords support release, Yuqi Shu control, sword-case storage and Golden Core sword flight. This includes vanilla swords and every cultivation sword. Sabers, spears and fans cannot fly.$(br2)The Flying Sword item itself has netherite durability and 10 base damage. Use Release / Recall Sword to release your held sword."
     },
     {
       "type": "patchouli:text",

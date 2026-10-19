@@ -25,11 +25,14 @@ public final class FireballTalismanProjectileRenderer extends ThrownItemRenderer
       if (entity.impacted()) {
          renderImpact(entity, partialTick, poseStack, buffer);
       } else {
+         poseStack.pushPose();
+         com.example.immortal_cultivation_mod.client.SpellProjectileVisuals.enlarge(poseStack);
          renderFlightTrail(entity, poseStack, buffer);
          float pulse = 1.28F + Mth.sin(((float)entity.tickCount + partialTick) * 0.72F) * 0.08F;
          poseStack.pushPose();
          poseStack.scale(pulse, pulse, pulse);
          super.render(entity, entityYaw, partialTick, poseStack, buffer, 15728880);
+         poseStack.popPose();
          poseStack.popPose();
       }
    }

@@ -8,9 +8,9 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
-public final class PhantomVeilFoxRenderer extends GeoEntityRenderer<PhantomVeilFoxEntity> {
+public final class PhantomVeilFoxRenderer extends BeastGeoRenderer<PhantomVeilFoxEntity> {
     public PhantomVeilFoxRenderer(EntityRendererProvider.Context context) {
-        this(context, 1.0F);
+        this(context, 2.0F);
     }
 
     public PhantomVeilFoxRenderer(EntityRendererProvider.Context context, float scale) {
@@ -20,10 +20,17 @@ public final class PhantomVeilFoxRenderer extends GeoEntityRenderer<PhantomVeilF
     }
 
     @Override
+    protected float getDeathMaxRotation(PhantomVeilFoxEntity animatable) {
+        // The death clip already rolls and settles the complete rig on the ground.
+        return animatable.deathTime > 0 ? 0.0F : super.getDeathMaxRotation(animatable);
+    }
+
+    @Override
     public RenderType getRenderType(PhantomVeilFoxEntity animatable,
                                     ResourceLocation texture,
                                     MultiBufferSource bufferSource,
                                     float partialTick) {
-        return RenderType.entityTranslucent(texture);
+        // Binary pixel cutouts retain solid depth at intersecting fur surfaces.
+        return RenderType.entityCutoutNoCull(texture);
     }
 }

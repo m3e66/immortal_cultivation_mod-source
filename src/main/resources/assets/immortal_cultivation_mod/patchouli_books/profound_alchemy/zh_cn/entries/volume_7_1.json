@@ -1,0 +1,18 @@
+{
+  "name": "开炉投药",
+  "icon": "immortal_cultivation_mod:qi_recovery_pill",
+  "category": "immortal_cultivation_mod:volume_7",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "炼丹之始，须备炼器之鼎、丹方玉简、所需灵草与灵石。依法置药，注入灵气，再以火候引出药材精华，使诸般药性逐渐相融。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "寻常丹方需灵石六十四枚，火候须达一千二百度。丹成即可取出，不必如铸器一般另行淬水。"
+    }
+  ]
+}

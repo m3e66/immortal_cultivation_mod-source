@@ -47,7 +47,7 @@ public final class CreativeSubtabs {
             "taomu_sword", "copper_coin_sword", "flying_sword", "dao",
             "jingtie_spear", "throwing_knife", "flying_needle", "tiegu_shan",
             "fuchen", "whip", "heavy_iron_bracer", "yaoyuan_fist_bone", "shihunfan",
-            "ritual_dagger", "jin_hulu", "baota", "black_iron_jian", "black_iron_greatsword", "moon_crescent_halberd", "spirit_silk_whip", "soul_hook", "wind_feather_fan", "thunderwood_sword", "flame_pattern_dao", "earthbreaker_hammer", "seven_star_sword");
+            "ritual_dagger", "black_iron_jian", "black_iron_greatsword", "moon_crescent_halberd", "spirit_silk_whip", "soul_hook", "wind_feather_fan", "thunderwood_sword", "flame_pattern_dao", "earthbreaker_hammer", "seven_star_sword");
     private static final Set<String> TOOLS = Set.of(
             "modou_line", "fog_revealing_mirror", "yinyang_compass", "zhenhun_bell",
             "yinhun_gong", "yuanhun_bottle",
@@ -56,11 +56,12 @@ public final class CreativeSubtabs {
             "low_saber_grindstone", "middle_saber_grindstone", "high_saber_grindstone");
     private static final Set<String> WEAPON_RECIPES = Set.of(
             "sword_mold", "saber_mold", "spear_mold", "weapon_mold",
+            "qingtong_yinhuo_ding_yujian", "chi_jin_sanyang_ding_yujian",
             "feijian_yujian", "dao_yujian", "jingtie_spear_yujian",
             "heavy_iron_bracer_yujian", "throwing_knife_yujian", "flying_needle_yujian",
             "tiegu_shan_yujian", "fuchen_yujian", "whip_yujian",
             "zhenhun_bell_yujian", "yinhun_gong_yujian", "fog_revealing_mirror_yujian",
-            "yinyang_compass_yujian", "yuanhun_bottle_yujian", "baota_yujian", "jin_hulu_yujian", "black_iron_jian_yujian", "black_iron_greatsword_yujian", "moon_crescent_halberd_yujian", "spirit_silk_whip_yujian", "soul_hook_yujian", "wind_feather_fan_yujian", "thunderwood_sword_yujian", "flame_pattern_dao_yujian", "earthbreaker_hammer_yujian", "seven_star_sword_yujian");
+            "yinyang_compass_yujian", "yuanhun_bottle_yujian", "black_iron_jian_yujian", "black_iron_greatsword_yujian", "moon_crescent_halberd_yujian", "spirit_silk_whip_yujian", "soul_hook_yujian", "wind_feather_fan_yujian", "thunderwood_sword_yujian", "flame_pattern_dao_yujian", "earthbreaker_hammer_yujian", "seven_star_sword_yujian");
     private static final Set<String> ACCESSORY_HEAD = Set.of(
             "blindfold", "blindfold2", "straw_hat", "noob_hat", "disguise_mask", "coin_mask", "miansha", "jiangpa", "futou", "wusha_hat", "song_wusha_hat", "chanfu_jin", "embroidered_forehead_band", "veiled_douli");
     private static final Set<String> ACCESSORY_BOOTS = Set.of("fangkou_qiaojian_lv");
@@ -70,7 +71,7 @@ public final class CreativeSubtabs {
     private static final Set<String> ACCESSORY_BACK = Set.of(
             "coffin", "flag", "cloth_sheath", "sword_sheath", "dao_sheath", "sword_case", "xiujian");
     private static final Set<String> ACCESSORY_WAIST = Set.of(
-            "jin_hulu", "jade_pendant", "protective_jade_pendant", "black_tortoise_heartguard_mirror",
+            "jade_pendant", "protective_jade_pendant", "black_tortoise_heartguard_mirror",
             "zhenhun_bell", "yinhun_gong");
     private static final Set<String> ACCESSORY_SYSTEM = Set.of("system");
     private static final Set<String> ACCESSORY_HAIR = Set.of(
@@ -98,7 +99,7 @@ public final class CreativeSubtabs {
             "chitong_sui", "hanpo_jade", "moxuan_iron", "liujin_sand",
             "bisui_stone", "star_dust_stone", "void_stone", "spirit_ore");
     private static final Set<String> BLOCK_TABLES = Set.of(
-            "cu_tie_xiaoding", "qingtong_yinhuo_ding", "restriction_table",
+            "cu_tie_xiaoding", "qingtong_yinhuo_ding", "chi_jin_sanyang_ding", "restriction_table",
             "talisman_drawing_table", "medicine_cabinet_small", "medicine_cabinet_large");
     private static final Set<String> CULTIVATOR_EGGS = Set.of(
             "lianqi_cultivator_spawn_egg", "zhuji_cultivator_spawn_egg",

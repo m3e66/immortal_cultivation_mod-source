@@ -1,0 +1,23 @@
+{
+  "name": "紫霄天火",
+  "icon": "immortal_cultivation_mod:heavenly_flame_seed",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 8,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "紫霄天火",
+      "text": "火候上限 ：12,000°C | 灵气消耗 ：55 | 品质增益 ：+25"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "紫霄天火，乃九火之极，紫焰之中隐现天威。其火力凌驾诸焰，足以熔炼化神乃至更高层次之兵器。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "此火不仅温度惊人，亦能于炼器之时助器物精华凝聚，使成器品质更上一层。然天火难驭，催动之时灵气消耗极甚。"
+    }
+  ]
+}

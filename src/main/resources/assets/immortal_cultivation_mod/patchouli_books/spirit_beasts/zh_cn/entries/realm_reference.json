@@ -1,0 +1,38 @@
+{
+  "name": "境界索引与警言",
+  "icon": "minecraft:book",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "境界索引",
+      "text": "青灵蚕：凡人至筑基$(br2)青纹噬灵鼠：凡人至筑基$(br2)幻面灵狐：筑基至元婴"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "境界索引",
+      "text": "赤背铁鳞蝎：凡人至筑基$(br2)空冥甲虫：炼气至金丹$(br2)雷角岩獾：炼气至金丹"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "境界索引",
+      "text": "墨甲吞石龟：炼气至金丹$(br2)霜脊穴熊：炼气至金丹$(br2)风翎崖鹿：炼气至金丹"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "境界索引",
+      "text": "赤鳞炎蜥：筑基至元婴$(br2)烬羽火鸮：筑基至元婴$(br2)赤霄炎蛟：金丹至化神"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "境界索引",
+      "text": "血猿妖将：金丹至化神"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "书末警言",
+      "text": "天地之大，妖兽无穷。境界高低不过衡量其威胁之一法，血脉、天赋与所处地势，皆可左右生死。修行之人，须知进退。"
+    }
+  ]
+}

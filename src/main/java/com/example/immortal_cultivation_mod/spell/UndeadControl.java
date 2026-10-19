@@ -847,7 +847,7 @@ public final class UndeadControl {
             default -> MODE_NORMAL;
         };
         entity.getPersistentData().putString(TAG_MODE, next);
-        player.displayClientMessage(Component.literal("Mode: " + next), true);
+        player.displayClientMessage(Component.translatable("message.immortal_cultivation_mod.undead.mode", Component.translatable("undead_mode.immortal_cultivation_mod." + next)), true);
         return InteractionResult.SUCCESS;
     }
 
@@ -874,7 +874,7 @@ public final class UndeadControl {
             entity.setHealth(entity.getMaxHealth());
         }
         if (!(entity instanceof Player)) {
-            entity.setCustomName(Component.literal(rank.name()));
+            entity.setCustomName(Component.translatable("zombie_rank.immortal_cultivation_mod." + rank.id()));
             entity.setCustomNameVisible(true);
         }
     }

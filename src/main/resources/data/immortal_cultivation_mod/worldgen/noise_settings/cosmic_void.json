@@ -21,7 +21,7 @@
     "erosion": {
       "type": "minecraft:cache_2d",
       "argument": {
-        "type": "minecraft:end_islands"
+        "type": "immortal_cultivation_mod:scaled_void_islands"
       }
     },
     "final_density": {
@@ -66,7 +66,7 @@
                       "argument2": {
                         "type": "minecraft:add",
                         "argument1": -0.80,
-                        "argument2": "minecraft:end/sloped_cheese"
+                        "argument2": "immortal_cultivation_mod:cosmic_void/sloped_cheese"
                       }
                       }
                     }
@@ -116,7 +116,7 @@
                   "argument2": {
                     "type": "minecraft:cache_2d",
                     "argument": {
-                      "type": "minecraft:end_islands"
+                      "type": "immortal_cultivation_mod:scaled_void_islands"
                     }
                   }
                 }

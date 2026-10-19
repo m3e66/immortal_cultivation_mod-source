@@ -48,7 +48,8 @@ import static com.example.immortal_cultivation_mod.entity.BoneHitboxAnimation.po
 import static com.example.immortal_cultivation_mod.entity.BoneHitboxAnimation.rotation;
 import static com.example.immortal_cultivation_mod.entity.BoneHitboxAnimation.scaleAndRotation;
 
-public final class AzureSpiritSilkwormEntity extends Animal implements GeoEntity {
+public final class AzureSpiritSilkwormEntity extends RealmBeastAnimal implements GeoEntity {
+    // Visuals use synchronized BeastAttackVfx; server combat and sounds remain unchanged.
     public static final float MODEL_SCALE = 0.65F;
 
     private static final EntityDataAccessor<Boolean> COCOONED =
@@ -198,13 +199,7 @@ public final class AzureSpiritSilkwormEntity extends Animal implements GeoEntity
         super.tick();
         updateBoneHitboxes();
         if (level().isClientSide) {
-            if (tickCount % 12 == 0 && random.nextBoolean()) {
-                level().addParticle(ParticleTypes.END_ROD,
-                        getX() + (random.nextDouble() - 0.5D) * 0.5D,
-                        getY() + 0.2D + random.nextDouble() * 0.25D,
-                        getZ() + (random.nextDouble() - 0.5D) * 0.5D,
-                        0.0D, 0.005D, 0.0D);
-            }
+
             return;
         }
         if (BeastDazeControl.blocksMoves(this)) {
@@ -348,11 +343,7 @@ public final class AzureSpiritSilkwormEntity extends Animal implements GeoEntity
         level().addFreshEntity(projectile);
         entityData.set(SPIT_TICKS, SPIT_ANIMATION_TICKS);
         spitCooldown = 70;
-        if (level() instanceof ServerLevel serverLevel) {
-            serverLevel.sendParticles(ParticleTypes.ENCHANT,
-                    getX(), getEyeY(), getZ(),
-                    12, 0.2D, 0.15D, 0.2D, 0.05D);
-        }
+
     }
 
     private void startCocoon() {
@@ -379,7 +370,9 @@ public final class AzureSpiritSilkwormEntity extends Animal implements GeoEntity
 
     @Override
     public AgeableMob getBreedOffspring(ServerLevel level, AgeableMob otherParent) {
-        return ModEntities.AZURE_SPIRIT_SILKWORM.get().create(level);
+        var child = ModEntities.AZURE_SPIRIT_SILKWORM.get().create(level);
+        if (child != null) child.setBeastRealm(beastRealm());
+        return child;
     }
 
     @Override

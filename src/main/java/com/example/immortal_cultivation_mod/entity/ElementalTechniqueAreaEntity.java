@@ -640,7 +640,7 @@ public final class ElementalTechniqueAreaEntity extends Entity implements Forcef
                 double angle = random.nextDouble() * Math.PI * 2.0D;
                 double radius = (0.2D + random.nextDouble() * 1.8D)
                         * (fullyCharged() ? 1.5D : 1.0D);
-                clientParticle(ModParticles.METHOD_QI_LIGHT.get(),
+                clientParticle(ModParticles.METHOD_QI_YANG.get(),
                         position().add(Math.cos(angle) * radius,
                                 random.nextDouble() * 2.2D, Math.sin(angle) * radius),
                         new Vec3(-Math.cos(angle) * 0.015D, 0.055D,
@@ -652,7 +652,7 @@ public final class ElementalTechniqueAreaEntity extends Entity implements Forcef
                 double angle = random.nextDouble() * Math.PI * 2.0D;
                 double radius = random.nextDouble() * (fullyCharged() ? 2.7D : 1.7D);
                 clientParticle(i % 4 == 0 ? ParticleTypes.END_ROD
-                                : ModParticles.METHOD_QI_LIGHT.get(),
+                                : ModParticles.METHOD_QI_YANG.get(),
                         position().add(Math.cos(angle) * radius, y,
                                 Math.sin(angle) * radius),
                         new Vec3(0.0D, -0.32D, 0.0D));
@@ -1275,7 +1275,7 @@ public final class ElementalTechniqueAreaEntity extends Entity implements Forcef
             float dealt = SpellDamageHelper.damage(owner,
                     SpellCharge.damage(amount, chargeScale()),
                     ModSpells.get(ModSpells.WULEI_HONGDING));
-            if (target.hurt(damageSources().indirectMagic(this, owner), dealt)) {
+            if (target.hurt(com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.spellSource(damageSources().indirectMagic(this, owner), ModSpells.WULEI_HONGDING), dealt)) {
                 com.example.immortal_cultivation_mod.spell.GangtingXiaokongLu
                         .maybeChainLightning(owner, target, dealt);
             }
@@ -1397,7 +1397,7 @@ public final class ElementalTechniqueAreaEntity extends Entity implements Forcef
                             22, target.getBbWidth() * 0.55D,
                             target.getBbHeight() * 0.45D,
                             target.getBbWidth() * 0.55D, 0.05D);
-                    level.sendParticles(ModParticles.METHOD_QI_LIGHT.get(),
+                    level.sendParticles(ModParticles.METHOD_QI_YANG.get(),
                             target.getX(), target.getY() + target.getBbHeight() * 0.5D, target.getZ(),
                             20, target.getBbWidth() * 0.50D,
                             target.getBbHeight() * 0.42D,
@@ -1406,7 +1406,7 @@ public final class ElementalTechniqueAreaEntity extends Entity implements Forcef
             }
             int destroyed = destroyLightColumnTerrain(level, owner, position());
             emitTerrainRupture(level, position(), destroyed,
-                    ModParticles.METHOD_QI_LIGHT.get(), Blocks.QUARTZ_BLOCK.defaultBlockState());
+                    ModParticles.METHOD_QI_YANG.get(), Blocks.QUARTZ_BLOCK.defaultBlockState());
             level.playSound(null, blockPosition(), SoundEvents.BEACON_ACTIVATE,
                     SoundSource.PLAYERS, 1.3F, 1.55F);
         }
@@ -1576,7 +1576,7 @@ public final class ElementalTechniqueAreaEntity extends Entity implements Forcef
             float amount = GangtingTechniques.damageWithSnapshot(
                     owner, 260.0F, ModSpells.JIUXIAO_FENGLEI_YU,
                     chargeScale(), momentumSnapshot());
-            if (target.hurt(damageSources().indirectMagic(this, owner), amount)) {
+            if (target.hurt(com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.spellSource(damageSources().indirectMagic(this, owner), ModSpells.JIUXIAO_FENGLEI_YU), amount)) {
                 target.addEffect(new MobEffectInstance(
                         MobEffects.MOVEMENT_SLOWDOWN, 24, 1,
                         false, true, true));
@@ -1620,7 +1620,7 @@ public final class ElementalTechniqueAreaEntity extends Entity implements Forcef
                 float amount = GangtingTechniques.damageWithSnapshot(
                         owner, 700.0F, ModSpells.JIUXIAO_FENGLEI_YU,
                         chargeScale(), momentumSnapshot());
-                target.hurt(damageSources().indirectMagic(this, owner), amount);
+                target.hurt(com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.spellSource(damageSources().indirectMagic(this, owner), ModSpells.JIUXIAO_FENGLEI_YU), amount);
             }
             GangtingTechniques.thunderGust(
                     level, owner, center, finalRadius, 1.05D, 0.0F);
@@ -1691,7 +1691,7 @@ public final class ElementalTechniqueAreaEntity extends Entity implements Forcef
             }
             case TIANGUANG_GUANSHA -> {
                 SpellImpactParticles.shockRing(level, position().add(0.0D, 0.10D, 0.0D),
-                        ModParticles.METHOD_QI_LIGHT.get(), 0.8D, 32, 0.23D);
+                        ModParticles.METHOD_QI_YANG.get(), 0.8D, 32, 0.23D);
                 level.sendParticles(ParticleTypes.END_ROD,
                         getX(), getY() + 0.2D, getZ(),
                         24, 1.5D, 0.25D, 1.5D, 0.05D);
@@ -1782,7 +1782,7 @@ public final class ElementalTechniqueAreaEntity extends Entity implements Forcef
     }
 
     private boolean damage(LivingEntity owner, LivingEntity target, float base, String spellId) {
-        return target.hurt(damageSources().indirectMagic(this, owner),
+        return target.hurt(com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.spellSource(damageSources().indirectMagic(this, owner), spellId),
                 SpellDamageHelper.damage(owner,
                         SpellCharge.damage(base, chargeScale()), ModSpells.get(spellId)));
     }
@@ -1812,12 +1812,12 @@ public final class ElementalTechniqueAreaEntity extends Entity implements Forcef
             return true;
         }
         if (target instanceof Player player) {
-            return ModAttachments.getData(player).spiritRoots().contains(SpiritRoots.DARK);
+            return ModAttachments.getData(player).spiritRoots().contains(SpiritRoots.YIN);
         }
         return target instanceof net.minecraft.world.entity.PathfinderMob mob
                 && target instanceof CultivationNpc npc
                 && NpcProfile.spiritRootIds(mob, npc.npcArchetype())
-                .contains(SpiritRoots.DARK);
+                .contains(SpiritRoots.YIN);
     }
 
     private int duration() {

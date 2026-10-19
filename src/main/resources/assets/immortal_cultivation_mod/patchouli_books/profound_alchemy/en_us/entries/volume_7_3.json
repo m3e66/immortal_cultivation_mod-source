@@ -1,0 +1,18 @@
+{
+  "name": "The Art of Herbal Additives",
+  "icon": "immortal_cultivation_mod:qi_recovery_pill",
+  "category": "immortal_cultivation_mod:volume_7",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Scripture Account",
+      "text": "Alchemy recipes may be modified by adding extra herbs, allowing a single formula to produce variations in potency, duration, stability, and toxicity."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Scripture Account",
+      "text": "A maximum of 64 herbs may be used in a batch. However, incompatible additives or excessive chemical conflict can cause the entire refinement to fail."
+    }
+  ]
+}

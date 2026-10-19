@@ -1,5 +1,7 @@
 package com.example.immortal_cultivation_mod.client;
 
+import com.example.immortal_cultivation_mod.client.hud.HudLayout;
+import com.example.immortal_cultivation_mod.config.HudElement;
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.fate.DebugEyeDiagnostics;
 import com.example.immortal_cultivation_mod.network.DebugEyePayloads;
@@ -44,6 +46,8 @@ public final class DebugEyeClient {
             for (Component line : latest.hud()) lines.addAll(mc.font.split(line, width - 10));
         }
         int count = Math.min(lines.size(), Math.max(3, (graphics.guiHeight() - 65) / 10));
+        var position = HudLayout.place(graphics, HudElement.DEBUG_EYE, x, y, width, count * 10 + 8);
+        x = position.x(); y = position.y();
         graphics.fill(x, y, x + width, y + count * 10 + 8, 0xD010151B);
         for (int i = 0; i < count; i++) graphics.drawString(mc.font, lines.get(i), x + 5, y + 4 + i * 10,
                 i == 0 ? 0xFFE5C888 : i == 1 ? 0xFF9AAABA : 0xFFE0E5EA, false);

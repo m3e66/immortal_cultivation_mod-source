@@ -1,0 +1,38 @@
+{
+  "name": "服丹禁忌",
+  "icon": "immortal_cultivation_mod:qi_recovery_pill",
+  "category": "immortal_cultivation_mod:volume_8",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "服丹禁忌",
+      "text": "丹药虽可补益修为、疗伤护体，终究并非毫无约束。修士服丹，当明其效，知其限，不可一味贪多。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹药收纳",
+      "text": "同类丹药每叠最多十六枚。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "服丹间隔",
+      "text": "新式丹药右击服用一枚，所有新式丹药共用一秒服丹间隔。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "药力覆盖",
+      "text": "同一种持续药效再次服用，会覆盖旧药力，而非叠加。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "异效并存",
+      "text": "不同丹效可同时发挥作用。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "回元之量",
+      "text": "气血、灵气及念头的百分比恢复，均按各自上限计算，而非当前亏损量。"
+    }
+  ]
+}

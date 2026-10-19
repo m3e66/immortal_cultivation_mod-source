@@ -7,7 +7,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
-public final class CrimsonScaleFlameLizardRenderer extends GeoEntityRenderer<CrimsonScaleFlameLizardEntity> {
+public final class CrimsonScaleFlameLizardRenderer extends BeastGeoRenderer<CrimsonScaleFlameLizardEntity> {
    public CrimsonScaleFlameLizardRenderer(EntityRendererProvider.Context context) {
       super(context, new CrimsonScaleFlameLizardModel());
       this.withScale(1.18F);

@@ -1,0 +1,23 @@
+{
+  "name": "风翎崖鹿",
+  "icon": "immortal_cultivation_mod:wind_feather_cliff_deer_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 8,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "风翎崖鹿",
+      "text": "$(bold)境界：$()炼气至金丹"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《灵兽志》记载",
+      "text": "风翎崖鹿姿态轻盈，身蕴清风之息，善行于高山悬崖。其踪迹多现于晨曦初露之时，迎风而立，宛若山间精灵。此鹿警觉异常，欲近其身，须收敛气息。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻踪",
+      "text": "狂风山丘、草甸、山间林地与高耸石峰。仅现于九十格以上、天光无遮的高地，喜晨昏交替之晨及白昼。"
+    }
+  ]
+}

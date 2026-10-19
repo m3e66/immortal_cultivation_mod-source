@@ -31,7 +31,8 @@ public class SpellDamageHelper {
             }
 
         } else if (owner instanceof PathfinderMob mob && mob instanceof CultivationNpc npc) {
-            damage += (float) mob.getAttributeValue(Attributes.ATTACK_DAMAGE);
+            damage += mob instanceof com.example.immortal_cultivation_mod.entity.TrainingDummyEntity dummy
+                    ?dummy.magicAttack:(float) mob.getAttributeValue(Attributes.ATTACK_DAMAGE);
             if (spell != null && SpiritRoots.matchesAny(
                     NpcProfile.spiritRootIds(mob, npc.npcArchetype()), spell.element())) {
                 damage *= 2.0F;
@@ -42,6 +43,6 @@ public class SpellDamageHelper {
             damage *= 1.5F;
         }
 
-        return damage * (float) com.example.immortal_cultivation_mod.pagoda.GourdSystem.multiplier(owner);
+        return damage;
     }
 }

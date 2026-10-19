@@ -1,0 +1,13 @@
+{
+  "name": "序言",
+  "icon": "minecraft:book",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "天地灵矿录",
+      "text": "天地有灵，地脉藏珍。山川万载，灵气凝聚，化凡石为异矿，孕地髓而生奇珍。或藏于深渊，或显于山巅，或沐星辰之辉，或受寒霜之炼。修士欲铸法器、炼灵宝，当先识天地矿脉。"
+    }
+  ]
+}

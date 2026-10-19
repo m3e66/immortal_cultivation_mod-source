@@ -2,6 +2,8 @@ package com.example.immortal_cultivation_mod.attachment;
 
 import com.example.immortal_cultivation_mod.spell.ModSpells;
 import net.minecraft.util.RandomSource;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,8 +18,8 @@ public final class SpiritRoots {
     public static final String THUNDER = "\u96f7";
     public static final String ICE = "\u51b0";
     public static final String WIND = "\u98ce";
-    public static final String LIGHT = "\u5149";
-    public static final String DARK = "\u6697";
+    public static final String YANG = "\u9633";
+    public static final String YIN = "\u9634";
     public static final String NONE = "\u65e0\u7075\u6839";
 
     public static final String GRADE_HEAVEN = "\u5929";
@@ -26,10 +28,37 @@ public final class SpiritRoots {
     public static final String GRADE_YELLOW = "\u9ec4";
 
     public static final List<String> NORMAL_ELEMENTS = List.of(METAL, WOOD, WATER, FIRE, EARTH);
-    public static final List<String> ALL_ELEMENTS = List.of(METAL, WOOD, WATER, FIRE, EARTH, THUNDER, WIND, ICE, LIGHT, DARK);
+    public static final List<String> ALL_ELEMENTS = List.of(METAL, WOOD, WATER, FIRE, EARTH, THUNDER, WIND, ICE, YANG, YIN);
     public static final List<String> GRADES = List.of(GRADE_HEAVEN, GRADE_EARTH, GRADE_MYSTIC, GRADE_YELLOW);
 
     private SpiritRoots() {
+    }
+
+    /** Canonicalizes saved pre-Yin/Yang element names without changing other affinities. */
+    public static String normalizeElement(String element) {
+        if (element == null) return "";
+        return switch (element.trim()) {
+            case "光", "light", "LIGHT", "yang", "YANG" -> YANG;
+            case "暗", "dark", "DARK", "yin", "YIN" -> YIN;
+            default -> element.trim();
+        };
+    }
+
+    public static String normalizeElementSpec(String elementSpec) {
+        if (elementSpec == null) return "";
+        return java.util.Arrays.stream(elementSpec.split(","))
+                .map(SpiritRoots::normalizeElement).collect(java.util.stream.Collectors.joining(","));
+    }
+
+    public static List<String> migrateRootList(List<String> roots) {
+        if (roots == null || roots.isEmpty()) return List.of();
+        // Preserve no-root and other saved entries; only merge duplicate renamed elements.
+        for (int i = 0; i < roots.size(); i++) {
+            String root = roots.get(i);
+            if (!java.util.Objects.equals(root, normalizeElement(root)) || roots.indexOf(root) < i)
+                return roots.stream().map(SpiritRoots::normalizeElement).distinct().toList();
+        }
+        return List.copyOf(roots);
     }
 
     public static RootData random(RandomSource random) {
@@ -63,10 +92,75 @@ public final class SpiritRoots {
     }
 
     public static String format(List<String> roots, String grade) {
+        roots = migrateRootList(roots);
         if (roots == null || roots.isEmpty()) {
             return NONE + "/" + GRADE_YELLOW;
         }
         return rootTypeName(roots) + "/" + String.join("", roots) + "/" + sanitizeGrade(grade);
+    }
+
+    /** Display components stay translatable; saved root identifiers remain unchanged. */
+    public static Component displayName(List<String> roots, String grade) {
+        roots = migrateRootList(roots);
+        boolean rootless = roots.isEmpty() || roots.contains(NONE);
+        return Component.translatable("cultivation.immortal_cultivation_mod.roots.format",
+                Component.translatable("cultivation.immortal_cultivation_mod.roots." + (rootless ? 0 : roots.size())),
+                rootless ? elementDisplayName(NONE) : elementsDisplayName(roots), gradeDisplayName(grade));
+    }
+
+    public static Component gradeDisplayName(String grade) {
+        String suffix = switch (sanitizeGrade(grade)) {
+            case GRADE_HEAVEN -> "heaven";
+            case GRADE_EARTH -> "earth";
+            case GRADE_MYSTIC -> "mystic";
+            default -> "yellow";
+        };
+        return Component.translatable("cultivation.immortal_cultivation_mod.root_grade." + suffix);
+    }
+
+    /** Chart distance reflects the existing grade; absent elements are exactly at the center. */
+    public static float elementStrength(List<String> roots, String grade, String element) {
+        if (!matchesAny(roots, element)) return 0;
+        return switch (sanitizeGrade(grade)) {
+            case GRADE_HEAVEN -> 1F;
+            case GRADE_EARTH -> .75F;
+            case GRADE_MYSTIC -> .5F;
+            default -> .25F;
+        };
+    }
+
+    public static Component elementDisplayName(String element) {
+        String normalized = normalizeElement(element);
+        String suffix = switch (normalized) {
+            case METAL -> "metal";
+            case WOOD -> "wood";
+            case WATER -> "water";
+            case FIRE -> "fire";
+            case EARTH -> "earth";
+            case THUNDER -> "thunder";
+            case ICE -> "ice";
+            case WIND -> "wind";
+            case YANG -> "yang";
+            case YIN -> "yin";
+            case NONE, "none", "any", "" -> "none";
+            default -> null;
+        };
+        return suffix == null ? Component.literal(normalized)
+                : Component.translatable("screen.immortal_cultivation_mod.trajectory.element." + suffix);
+    }
+
+    public static Component elementsDisplayName(List<String> elements) {
+        MutableComponent result = Component.empty();
+        for (String element : elements) {
+            if (!result.getSiblings().isEmpty()) result.append(" / ");
+            result.append(elementDisplayName(element));
+        }
+        return result;
+    }
+
+    public static Component elementSpecDisplayName(String elements) {
+        if (elements == null || elements.isBlank()) return elementDisplayName(NONE);
+        return elementsDisplayName(java.util.Arrays.asList(elements.split(",")));
     }
 
     public static String rootTypeName(List<String> roots) {
@@ -91,6 +185,7 @@ public final class SpiritRoots {
         }
         List<String> clean = new ArrayList<>();
         for (String root : roots) {
+            root = normalizeElement(root);
             if (ALL_ELEMENTS.contains(root) && !clean.contains(root) && clean.size() < 5) {
                 clean.add(root);
             }
@@ -110,8 +205,9 @@ public final class SpiritRoots {
             return false;
         }
         for (String element : elementSpec.split(",")) {
-            String clean = element.trim();
-            if (!clean.isEmpty() && !NONE.equals(clean) && available.contains(clean)) {
+            String clean = normalizeElement(element);
+            if (!clean.isEmpty() && !NONE.equals(clean)
+                    && available.stream().map(SpiritRoots::normalizeElement).anyMatch(clean::equals)) {
                 return true;
             }
         }
@@ -123,7 +219,7 @@ public final class SpiritRoots {
             return false;
         }
         for (String candidate : elementSpec.split(",")) {
-            if (element.equals(candidate.trim())) {
+            if (normalizeElement(element).equals(normalizeElement(candidate))) {
                 return true;
             }
         }
@@ -135,7 +231,7 @@ public final class SpiritRoots {
             return "";
         }
         for (String candidate : elementSpec.split(",")) {
-            String clean = candidate.trim();
+            String clean = normalizeElement(candidate);
             if (ALL_ELEMENTS.contains(clean)) {
                 return clean;
             }
@@ -173,6 +269,7 @@ public final class SpiritRoots {
     }
 
     public static List<String> nextRootSet(List<String> current, int direction) {
+        current = migrateRootList(current);
         List<List<String>> options = List.of(
                 List.of(NONE),
                 List.of(METAL),
@@ -183,8 +280,8 @@ public final class SpiritRoots {
                 List.of(THUNDER),
                 List.of(ICE),
                 List.of(WIND),
-                List.of(LIGHT),
-                List.of(DARK),
+                List.of(YANG),
+                List.of(YIN),
                 List.of(METAL, WOOD),
                 List.of(WATER, FIRE),
                 List.of(WOOD, EARTH, WATER),

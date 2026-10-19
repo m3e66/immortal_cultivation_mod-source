@@ -1,0 +1,23 @@
+{
+  "name": "Spirit-Converging Flower",
+  "icon": "immortal_cultivation_mod:ningling_flower",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Spirit-Converging Flower",
+      "text": "$(bold)Spawn attempt frequency: $()1/8"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "The Spirit-Converging Flower naturally gathers traces of spiritual energy from its surroundings. When blooming, a gentle radiance appears within its petals, as though the surrounding essence has settled into its center. It flourishes in vibrant fields and flowering woodland."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Flower forests, meadows, and cherry groves."
+    }
+  ]
+}

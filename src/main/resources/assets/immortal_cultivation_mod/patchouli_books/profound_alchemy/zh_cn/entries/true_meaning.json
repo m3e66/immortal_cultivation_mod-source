@@ -1,0 +1,23 @@
+{
+  "name": "丹道真解",
+  "icon": "minecraft:book",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "丹道真解",
+      "text": "世人皆言，灵丹能夺天地造化，补气血，固根基，助修行，破桎梏。然丹药终究是外物，修行之本仍在己身。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹道真解",
+      "text": "上乘丹师，不在于所炼丹药何其繁多，而在于明辨药性，知其相生相克。火候差之毫厘，药性可失之千里；灵材虽贵，配伍失衡亦不过一炉灰烬。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹道真解",
+      "text": "以草木为材，以灵火为引，以神识辨其变化，以丹鼎纳其精华。如此，方可于万千药性之间，求得一线造化。"
+    }
+  ]
+}

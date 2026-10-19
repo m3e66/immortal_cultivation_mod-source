@@ -2,6 +2,7 @@ package com.example.immortal_cultivation_mod.client;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.entity.CultivationNpc;
+import com.example.immortal_cultivation_mod.entity.FlyingSwordEntity;
 import com.example.immortal_cultivation_mod.network.CultivationFlightPayloads;
 import com.example.immortal_cultivation_mod.physics.CultivationFlightTrail;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -55,6 +56,10 @@ public final class CultivationFlightTrailRenderer {
     public static void accept(CultivationFlightPayloads.Trail packet) {
         var level = Minecraft.getInstance().level;
         if (!useLevel(level) || !level.dimension().location().equals(packet.dimension()) || !Float.isFinite(packet.strength())) return;
+        Entity entity = level.getEntity(packet.entityId());
+        if (entity != null && entity.getUUID().equals(packet.uuid()) && suppressed(entity)) {
+            WAKES.remove(packet.uuid());return;
+        }
         Wake wake = WAKES.get(packet.uuid());
         if (wake == null) {
             if (packet.strength() <= 0 || WAKES.size() >= MAX_TRAILS) return;
@@ -73,12 +78,17 @@ public final class CultivationFlightTrailRenderer {
         WAKES.entrySet().removeIf(entry -> {
             Wake wake = entry.getValue();
             Entity entity = world.getEntity(wake.entityId);
-            if (entity == null || !entity.getUUID().equals(wake.uuid) || !entity.isAlive() || entity.isInvisible()) return true;
+            if (entity == null || !entity.getUUID().equals(wake.uuid) || !entity.isAlive() || entity.isInvisible() || suppressed(entity)) return true;
             if (wake.active && now < wake.until) wake.path.sample(anchor(entity, 1), now);
             else wake.active = false;
             wake.path.prune(now);
             return !wake.active && wake.path.opacity(now) <= 0;
         });
+    }
+
+    private static boolean suppressed(Entity entity) {
+        return entity instanceof CultivationNpc
+                || entity instanceof Player player && FlyingSwordEntity.flightSword(player) != null;
     }
 
     private static Vec3 anchor(Entity entity, float partial) {
@@ -97,7 +107,7 @@ public final class CultivationFlightTrailRenderer {
     public static boolean shouldHidePlayer(Player player) {
         var mc = Minecraft.getInstance();
         if (world == null || world != mc.level || player.level() != world
-                || !player.isAlive() || player.isInvisible() || player.isSpectator()) return false;
+                || !player.isAlive() || player.isInvisible() || player.isSpectator() || suppressed(player)) return false;
         Wake wake = WAKES.get(player.getUUID());
         long now = world.getGameTime();
         if (wake == null || wake.entityId != player.getId() || !wake.active || now >= wake.until) return false;
@@ -117,15 +127,11 @@ public final class CultivationFlightTrailRenderer {
 
     private static boolean drawable(Wake wake, Vec3 camera, double time, float partial) {
         Entity entity = world.getEntity(wake.entityId);
-        return entity != null && entity.getUUID().equals(wake.uuid) && entity.isAlive() && !entity.isInvisible()
+        return entity != null && entity.getUUID().equals(wake.uuid) && entity.isAlive() && !entity.isInvisible() && !suppressed(entity)
                 && entity.distanceToSqr(camera) < DRAW_DISTANCE_SQUARED
-                && (npcAura(wake, entity) || wake.path.connectedTo(anchor(entity, 1))
+                && (wake.path.connectedTo(anchor(entity, 1))
                 && wake.path.size() > 1 && wake.path.opacity(time) > 0
                 && wake.path.hasVisibleSegment(wake.active ? anchor(entity, partial) : null));
-    }
-
-    private static boolean npcAura(Wake wake, Entity entity) {
-        return entity instanceof CultivationNpc && wake.active && world.getGameTime() < wake.until;
     }
 
     private static int compareDistance(Wake first, Wake second, Vec3 camera) {
@@ -156,23 +162,8 @@ public final class CultivationFlightTrailRenderer {
         var mc = Minecraft.getInstance();
         Entity entity = world.getEntity(wake.entityId);
         List<Vec3> centers = wake.path.points(wake.active ? anchor(entity, partial) : null);
-        if (npcAura(wake, entity) && !wake.path.connectedTo(anchor(entity, 1))) {
-            centers = List.of(anchor(entity, partial));
-        }
         float fade = wake.path.opacity(time);
         float r = ((wake.color >> 16) & 255) / 255F, g = ((wake.color >> 8) & 255) / 255F, b = (wake.color & 255) / 255F;
-        // A hovering NPC has no path segment. Keep the leading glow visible while its
-        // old tail fades naturally, instead of manufacturing a trail through empty space.
-        if (npcAura(wake, entity) && (centers.size() < 2 || fade < 1)) {
-            Vec3 right = new Vec3(new Vector3f(1, 0, 0).rotate(event.getCamera().rotation()));
-            Vec3 up = new Vec3(new Vector3f(0, 1, 0).rotate(event.getCamera().rotation()));
-            Vec3 head = anchor(entity, partial);
-            float alpha = centers.size() < 2 ? 1 : 1 - fade;
-            double pulse = 1 + Math.sin(time * .38) * .035;
-            halo(vertices, matrix, head, camera, right, up, 1.35 * pulse, r, g, b, alpha * .20F);
-            halo(vertices, matrix, head, camera, right, up, .68 * pulse, r, g, b, alpha * .55F);
-            halo(vertices, matrix, head, camera, right, up, .24, 1, 1, 1, alpha * .95F);
-        }
         if (centers.size() < 2 || fade <= 0) return;
         boolean firstPerson = entity == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
         ParticleStatus quality = mc.options.particles().get();

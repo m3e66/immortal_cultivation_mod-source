@@ -1,0 +1,33 @@
+{
+  "name": "Crimson Sky Flame Jiao",
+  "icon": "immortal_cultivation_mod:crimson_sky_flame_flood_dragon_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_4",
+  "sortnum": 11,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Crimson Sky Flame Jiao",
+      "text": "$(bold)Realm: $()Golden Core – Spirit Transformation"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "The Crimson Sky Flame Jiao is a mighty fire-born beast said to emerge from the deepest veins of molten earth. Dwelling near vast pools of lava, it absorbs immense quantities of fire essence. Its terrifying presence can shake the surrounding caverns. Only powerful cultivators should dare approach its lair."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Can appear in any Overworld or Nether biome at Y ≤ 40, near lava. Extremely rare, with an additional 1-in-100 spawn check."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Spirit and Rewards",
+      "text": "All dragon realm variants release a spirit when defeated. The body grants no dragon loot. Defeat or capture the spirit before it revives after 10 seconds. Scales, bones, blood, horn, meat and beast core are rewarded once from the spirit, at the original realm. Its weapon-care bonus also comes from the spirit."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Capturing the Spirit",
+      "text": "Use a glass bottle or Spirit Storage Crystal to capture the escaped spirit. The beast core enters your inventory; other loot drops nearby. Defeating or capturing the spirit has a 1-in-64 chance to release Dragon Flame. Capture that special flame separately with an empty Flame Vessel."
+    }
+  ]
+}

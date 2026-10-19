@@ -45,7 +45,6 @@ public final class TribulationDollItem extends Item implements ICurioItem {
 
     @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.HIGHEST)
     public static void preventDeath(net.neoforged.neoforge.event.entity.living.LivingDeathEvent event) {
-        if (com.example.immortal_cultivation_mod.pagoda.PagodaSystem.adminKill(event.getEntity(),event.getSource())) return;
         if (!event.isCanceled() && event.getEntity() instanceof ServerPlayer player
                 && trySubstitute(player, event.getSource())) {
             event.setCanceled(true);

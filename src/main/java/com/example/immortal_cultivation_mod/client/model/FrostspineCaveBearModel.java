@@ -29,6 +29,8 @@ public final class FrostspineCaveBearModel extends GeoModel<FrostspineCaveBearEn
          int ridgeIndex = i;
          this.getBone("ridge_" + ridgeIndex).ifPresent((bone) -> bone.setHidden(!animatable.hasRidge(ridgeIndex)));
       }
+      this.getBone("ridge_0_head").ifPresent((bone) -> bone.setHidden(!animatable.hasRidge(0)));
+      this.getBone("ridge_0_neck").ifPresent((bone) -> bone.setHidden(!animatable.hasRidge(0)));
 
    }
 

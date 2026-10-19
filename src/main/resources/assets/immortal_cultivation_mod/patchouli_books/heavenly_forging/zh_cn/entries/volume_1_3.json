@@ -1,0 +1,23 @@
+{
+  "name": "三阳鼎",
+  "icon": "immortal_cultivation_mod:chi_jin_sanyang_ding",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "三阳鼎",
+      "text": "容纳材料 ：20 格"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "三阳鼎，取三阳汇聚之意，乃炼器之道中更为宽广的熔炼之器。其鼎腹可纳众多灵材，鼎盖启闭自如，适用于配料繁复的炼器之法。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "然鼎器精良，并不意味着必能炼成神兵。真正决定器物成败者，仍在灵材、火候与炼器者的掌控。"
+    }
+  ]
+}

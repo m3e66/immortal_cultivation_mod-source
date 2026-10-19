@@ -68,7 +68,7 @@ public class CoffinItem extends ArmorItem implements GeoItem, ICurioItem {
         root.putLong(TAG_LAST_STORE_TICK, player.level().getGameTime());
         stack.set(DataComponents.CUSTOM_DATA, CustomData.of(root));
         target.discard();
-        player.displayClientMessage(Component.literal("Stored undead"), true);
+        player.displayClientMessage(Component.translatable("message.immortal_cultivation_mod.coffin.stored"), true);
         return InteractionResult.SUCCESS;
     }
 
@@ -156,7 +156,7 @@ public class CoffinItem extends ArmorItem implements GeoItem, ICurioItem {
         root.remove(TAG_ENTITY_ID);
         root.remove(TAG_LAST_STORE_TICK);
         stack.set(DataComponents.CUSTOM_DATA, CustomData.of(root));
-        player.displayClientMessage(Component.literal("Released undead"), true);
+        player.displayClientMessage(Component.translatable("message.immortal_cultivation_mod.coffin.released"), true);
         return true;
     }
 }

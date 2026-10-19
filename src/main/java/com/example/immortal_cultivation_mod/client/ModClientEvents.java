@@ -76,6 +76,12 @@ import java.util.List;
 import java.util.UUID;
 
 public class ModClientEvents {
+    @SubscribeEvent
+    public static void clearShieldDisplay(net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut event) {
+        ClientData.updateShield(0,0);
+    }
+    private static boolean wasSwordRideKeyDown;
+    private static boolean wasQiBlastDown;
     private static boolean wasSpellKeyDown = false;
     private static boolean wasAttackKeyDown = false;
     private static boolean wasUseKeyDown = false;
@@ -110,6 +116,8 @@ public class ModClientEvents {
     private static Boolean formationPlatePaymentSyncedValue = null;
     private static UUID qiUseParticlesSyncedPlayer = null;
     private static Boolean qiUseParticlesSyncedValue = null;
+    private static UUID swordRecallSyncedPlayer;
+    private static Boolean swordRecallSyncedValue;
     private static UUID droughtDomainSyncedPlayer = null;
     private static Boolean droughtDomainSyncedValue = null;
     private static final DustParticleOptions GONG_LASER =
@@ -143,9 +151,21 @@ public class ModClientEvents {
     private static void onMouseScrolling(InputEvent.MouseScrollingEvent event) {
         Minecraft mc = Minecraft.getInstance();
         double scrollDelta = event.getScrollDeltaY();
+        if (mc.screen == null && mc.player != null && mc.getConnection() != null
+                && mc.player.isShiftKeyDown() && ClientData.combatActive()
+                && QiAuraRenderer.isBlasting(mc.player.getUUID()) && Double.isFinite(scrollDelta) && scrollDelta != 0) {
+            event.setCanceled(true);
+            externalQiScroll += scrollDelta;
+            int steps = Math.clamp((int) externalQiScroll, -4, 4);
+            if (steps != 0) {
+                externalQiScroll -= steps;
+                PacketDistributor.sendToServer(new com.example.immortal_cultivation_mod.network.QiAuraPayloads.Action(steps));
+            }
+            return;
+        }
         if (ModClientConfig.enableExternalQiSizeMouseWheel()
                 && mc.screen == null && mc.player != null && mc.getConnection() != null
-                && !mc.player.isSpectator() && !mc.player.isShiftKeyDown()
+                && !mc.player.isSpectator() && mc.player.isShiftKeyDown()
                 && com.example.immortal_cultivation_mod.item.QiInfusedWeapon.isWeapon(mc.player.getMainHandItem())
                 && Double.isFinite(scrollDelta) && scrollDelta != 0) {
             event.setCanceled(true);
@@ -169,8 +189,7 @@ public class ModClientEvents {
                 || !mc.player.getAbilities().flying
                 || mc.player.isCreative()
                 || mc.player.isSpectator()
-                || mc.player.hasEffect(ModEffects.YUFENG_JUE)
-                || mc.player.getVehicle() instanceof FlyingSwordEntity) {
+                || mc.player.hasEffect(ModEffects.YUFENG_JUE)) {
             jindanFlightScrollAccumulator = 0.0D;
             return;
         }
@@ -251,7 +270,10 @@ public class ModClientEvents {
 
     public static void onClientTickPre(ClientTickEvent.Pre event) {
         Minecraft mc = Minecraft.getInstance();
+        if (!mc.isWindowActive()) ModHotkeyGuard.reset();
         if (mc.player == null) {
+            wasSwordRideKeyDown = false;
+            wasQiBlastDown = false;
             return;
         }
 
@@ -285,6 +307,7 @@ public class ModClientEvents {
             formationPlatePaymentSyncedValue = null;
             qiUseParticlesSyncedPlayer = null;
             qiUseParticlesSyncedValue = null;
+            swordRecallSyncedPlayer=null;swordRecallSyncedValue=null;
             droughtDomainSyncedPlayer = null;
             droughtDomainSyncedValue = null;
             preparedChargeTicks = 0;
@@ -305,15 +328,23 @@ public class ModClientEvents {
         syncCombatSetting(mc);
         syncFormationPlatePaymentSetting(mc);
         syncQiUseParticlesSetting(mc);
+        boolean recall=ClientData.flyingSwordAutoRecall();
+        if(mc.getConnection()!=null&&(!mc.player.getUUID().equals(swordRecallSyncedPlayer)||swordRecallSyncedValue==null||swordRecallSyncedValue!=recall)){
+            PacketDistributor.sendToServer(new ModPayloads.ServerboundFlyingSwordAutoRecallPayload(recall));
+            swordRecallSyncedPlayer=mc.player.getUUID();swordRecallSyncedValue=recall;
+        }
         syncDroughtDomainSetting(mc);
 
         var key = ModKeyMappings.OPEN_SPELL_WHEEL.get();
-        boolean isHeld = InputConstants.isKeyDown(mc.getWindow().getWindow(), key.getKey().getValue());
+        boolean isHeld = ModHotkeyGuard.allow(key)
+                && InputConstants.isKeyDown(mc.getWindow().getWindow(), key.getKey().getValue());
 
         boolean typing = mc.screen instanceof ChatScreen
                 || mc.screen instanceof com.example.immortal_cultivation_mod.hair.client.HairScreen hairScreen && hairScreen.isEditingText();
 
         if (typing) {
+            wasSwordRideKeyDown = ModKeyMappings.RIDE_FLYING_SWORD.get().isDown();
+            wasQiBlastDown = ModKeyMappings.BLAST_QI.get().isDown();
             if(mc.screen instanceof com.example.immortal_cultivation_mod.hair.client.HairScreen)
                 net.minecraft.client.KeyMapping.releaseAll();
             wasSpellKeyDown = false;
@@ -352,7 +383,7 @@ public class ModClientEvents {
 
         boolean spellWheelOpen = mc.screen instanceof SpellWheelScreen;
         boolean normalWorldView = mc.screen == null || spellWheelOpen;
-        if (normalWorldView) {
+        if (normalWorldView && ModHotkeyGuard.allow(key) && mc.isWindowActive()) {
             if (isHeld && !wasSpellKeyDown && mc.screen == null) {
                 mc.setScreen(new SpellWheelScreen());
             }
@@ -362,6 +393,7 @@ public class ModClientEvents {
                     String spell = sws.getSelectedSpell();
                     if (spell != null && mc.getConnection() != null) {
                         if (isRCastSpell(spell)) {
+                            cancelPreparedCharge();
                             ClientData.setPreparedSpellId(spell);
                         } else {
                             cancelPreparedCharge();
@@ -380,13 +412,14 @@ public class ModClientEvents {
 
             wasSpellKeyDown = isHeld;
         } else {
+            if (spellWheelOpen) mc.setScreen(null);
             wasSpellKeyDown = false;
         }
 
         while (ModKeyMappings.OPEN_STAT_MENU.get().consumeClick()) {
             if (mc.screen instanceof StatMenuScreen) {
                 mc.setScreen(null);
-            } else {
+            } else if (mc.screen == null) {
                 mc.setScreen(new StatMenuScreen());
             }
         }
@@ -412,13 +445,13 @@ public class ModClientEvents {
         while (ModKeyMappings.OPEN_SPELL_SELECTION.get().consumeClick()) {
             if (mc.screen instanceof SpellSelectionScreen) {
                 mc.setScreen(null);
-            } else {
+            } else if (mc.screen == null) {
                 mc.setScreen(new SpellSelectionScreen());
             }
         }
 
         while (ModKeyMappings.MEDITATE.get().consumeClick()) {
-            PacketDistributor.sendToServer(new ModPayloads.ServerboundMeditatePayload());
+            if (mc.screen == null) PacketDistributor.sendToServer(new ModPayloads.ServerboundMeditatePayload());
         }
 
         while (ModKeyMappings.INJECT_QI.get().consumeClick()) {
@@ -434,11 +467,21 @@ public class ModClientEvents {
             }
         }
 
-        while (ModKeyMappings.TARGET_LOCK.get().consumeClick()) {
-            ClientTargetLock.toggleLookingAt(mc);
-        }
+        boolean qiBlastDown = ModKeyMappings.BLAST_QI.get().isDown();
+        if (qiBlastDown && !wasQiBlastDown && mc.screen == null && mc.isWindowActive()
+                && ModHotkeyGuard.allow(ModKeyMappings.BLAST_QI.get()))
+            PacketDistributor.sendToServer(new com.example.immortal_cultivation_mod.network.QiAuraPayloads.Action(0));
+        wasQiBlastDown = qiBlastDown;
+        while (ModKeyMappings.BLAST_QI.get().consumeClick()) { }
+
 
         tickReleaseWeaponKey(mc);
+        boolean swordRideDown = ModKeyMappings.RIDE_FLYING_SWORD.get().isDown();
+        if (swordRideDown && !wasSwordRideKeyDown && mc.screen == null && mc.isWindowActive()
+                && ModHotkeyGuard.allow(ModKeyMappings.RIDE_FLYING_SWORD.get())) {
+            PacketDistributor.sendToServer(new ModPayloads.ServerboundFlyingSwordInteractPayload(true));
+        }
+        wasSwordRideKeyDown = swordRideDown;
 
         while (ModKeyMappings.DEBUG_EYE.get().consumeClick()) {
             if (net.minecraft.client.gui.screens.Screen.hasShiftDown() && ClientData.debugEyeEnabled()) {
@@ -448,7 +491,6 @@ public class ModClientEvents {
 
         tickPreparedSpellCharge(mc);
 
-        ClientTargetLock.tickCamera(mc);
         spawnGongLaser(mc);
 
         if (mc.player.onGround() || !mc.player.hasEffect(ModEffects.WIND_STEP)) {
@@ -485,7 +527,9 @@ public class ModClientEvents {
             if (HeavyIronBracerItem.isRealStack(mc.player.getMainHandItem())) {
                 HeavyIronBracerItem.forceClientOffhandSwing(mc.player);
             }
-            PacketDistributor.sendToServer(new ModPayloads.ServerboundFlyingSwordInteractPayload(mc.player.isShiftKeyDown()));
+            if (!mc.player.isShiftKeyDown() && FlyingSwordEntity.flightSword(mc.player) == null) {
+                PacketDistributor.sendToServer(new ModPayloads.ServerboundFlyingSwordInteractPayload(false));
+            }
         }
         wasUseKeyDown = useDown;
     }
@@ -622,6 +666,12 @@ public class ModClientEvents {
     }
 
     private static void tickReleaseWeaponKey(Minecraft mc) {
+        if (!ModHotkeyGuard.allow(ModKeyMappings.SWORD_CASE.get()) || !mc.isWindowActive()) {
+            wasSwordCaseKeyDown = false;
+            swordCaseChargeTicks = 0;
+            swordCaseReleaseTriggered = false;
+            ClientData.resetSwordCaseCharge();
+        }
         boolean releaseKeyDown = ModKeyMappings.RELEASE_WEAPON.get().isDown();
         boolean swordCaseKeyDown = ModKeyMappings.SWORD_CASE.get().isDown();
         boolean worldView = mc.screen == null;
@@ -667,16 +717,35 @@ public class ModClientEvents {
 
     private static void tickPreparedSpellCharge(Minecraft mc) {
         var preparedCastKey = ModKeyMappings.CAST_PREPARED_SPELL.get();
-        boolean preparedCastDown = InputConstants.isKeyDown(mc.getWindow().getWindow(), preparedCastKey.getKey().getValue());
+        boolean preparedCastDown = ModHotkeyGuard.allow(preparedCastKey)
+                && InputConstants.isKeyDown(mc.getWindow().getWindow(), preparedCastKey.getKey().getValue());
         String preparedSpell = ClientData.preparedSpellId();
         boolean canUse = mc.screen == null
                 && mc.getConnection() != null
+                && mc.isWindowActive()
+                && ModHotkeyGuard.allow(preparedCastKey)
                 && !preparedSpell.isEmpty()
                 && !ClientData.postureBroken();
         int requiredChargeTicks = mc.player != null
                 && mc.player.hasEffect(ModEffects.SPIRIT_SEAL)
                 ? (int) Math.ceil(PREPARED_CHARGE_TICKS / 0.75D)
                 : PREPARED_CHARGE_TICKS;
+        if (ModSpells.ZIBAO.equals(ModSpells.normalizeId(preparedSpell))) {
+            // One confirmation per physical rising edge. Holding R never repeats it.
+            if (preparedCastDown && !wasPreparedCastKeyDown && canUse && mc.isWindowActive()) {
+                PacketDistributor.sendToServer(new ModPayloads.ServerboundSpellPreparationPayload(preparedSpell, true));
+                PacketDistributor.sendToServer(new ModPayloads.ServerboundCastSpellPayload(preparedSpell, 1.0F, false));
+                preparedStateSent = true;
+            } else if ((!canUse || !mc.isWindowActive()) && preparedStateSent) {
+                resetPreparedCharge(true);
+            }
+            ClientData.resetPreparedCharge();
+            wasPreparedCastKeyDown = preparedCastDown;
+            return;
+        }
+        if (preparedStateSent && preparedChargeTicks == 0 && !wasPreparedCastKeyDown) {
+            resetPreparedCharge(true);
+        }
         if (preparedCastInterrupted) {
             resetPreparedCharge(false);
             wasPreparedCastKeyDown = preparedCastDown;
@@ -782,19 +851,24 @@ public class ModClientEvents {
             float multiplier = reserve >= 80.0F ? 0.85F : reserve >= 60.0F ? 0.90F : 1.0F;
             cost = Math.max(1, (int)Math.ceil(cost * multiplier));
         }
+        if (cost > 0 && data != null) cost = Math.max(1, (int)Math.ceil(cost
+                * com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.spellCostMultiplier(
+                data, spell == null ? "" : spell.element())));
+        if(cost>0 && Minecraft.getInstance().player!=null)cost=(int)Math.min(Integer.MAX_VALUE,Math.ceil(cost
+                * com.example.immortal_cultivation_mod.alchemy.PillToxicity.multiplier(Minecraft.getInstance().player,"Cost")));
         return cost;
     }
 
     private static int basePreparedSpellCost(String spellId) {
         String normalized = ModSpells.normalizeId(spellId);
         if (ModSpells.HANJING_SUOZHUA.equals(normalized)) {
-            return Math.max(1, clientMaxQi() * 3 / 100);
+            return Math.max(1, (int)((long)clientMaxQi() * 3 / 100));
         }
         if (ModSpells.SHUANGTIAN_QI.equals(normalized)) {
-            return Math.max(1, clientMaxQi() * 5 / 100);
+            return Math.max(1, (int)((long)clientMaxQi() * 5 / 100));
         }
         if (ModSpells.LIANSHEN_SHU.equals(normalized)) {
-            return Math.max(1, clientMaxQi() * 75 / 100);
+            return Math.max(1, (int)((long)clientMaxQi() * 75 / 100));
         }
         ModSpells.SpellDef spell = ModSpells.get(normalized);
         return spell == null ? 0 : Math.max(0, spell.qiCost());
@@ -803,7 +877,7 @@ public class ModClientEvents {
     private static int clientMaxQi() {
         var data = ClientData.cultivationData;
         var levelDef = com.example.immortal_cultivation_mod.attachment.CultivationLevels.getLevelDef(data.cultivationLevel());
-        return Math.max(1, levelDef.maxQi() + data.maxQiBonus());
+        return Math.max(1, data.maxQi());
     }
 
     private static int chargedCost(int baseCost, float chargeScale) {

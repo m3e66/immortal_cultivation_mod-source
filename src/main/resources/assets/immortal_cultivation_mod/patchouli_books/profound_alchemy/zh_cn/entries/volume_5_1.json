@@ -1,0 +1,23 @@
+{
+  "name": "续脉丹",
+  "icon": "immortal_cultivation_mod:xumai_pill",
+  "category": "immortal_cultivation_mod:volume_5",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "续脉丹乃危急之时护命之丹。服下之后，药力潜伏于经脉之中，平时不显。若气血骤降、命悬一线，丹力便自行化开，缓缓滋养受损经脉，挽回一线生机。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "然一丹之力仅可发动一次，修士不可因此轻视生死。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹效",
+      "text": "当气血低于上限的百分之二十时，自动于四十五息内恢复气血上限的百分之二十。每次服丹仅触发一次。"
+    }
+  ]
+}

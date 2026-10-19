@@ -1,0 +1,18 @@
+{
+  "name": "Barrier-Breaking Pill",
+  "icon": "immortal_cultivation_mod:pozhang_pill",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Scripture Account",
+      "text": "The Barrier-Breaking Pill concentrates offensive energy into a single decisive strike. The next successful melee attack deals additional damage, but the effect disappears after one hit or when its short duration ends."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Effect",
+      "text": "The next successful melee hit deals 25% additional damage. Expires after 30 seconds."
+    }
+  ]
+}

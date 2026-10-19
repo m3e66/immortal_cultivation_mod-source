@@ -1,0 +1,63 @@
+{
+  "name": "Controls and Readability",
+  "icon": "immortal_cultivation_mod:cultivation_manual",
+  "category": "immortal_cultivation_mod:basics",
+  "sortnum": 39,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Watch the Charge",
+      "text": "Weapon, spell, and other charges share the circular meter near the crosshair. Read the meter before releasing your action. The Qi bar remains visible when full. Keybindings can be changed in Minecraft Controls."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "External Qi Controls",
+      "text": "Open cultivation settings with Period by default. External Qi size scrolling is disabled by default; once enabled, hold Shift while scrolling. This controls external Qi size. Blast Qi intensity has its own Shift-scroll interaction while blasting."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Adjust the Display",
+      "text": "Settings include Qi quality, particle budget, opacity, dice speed, the toxicity overlay, and HUD positions. Without AsteorBar, health appears as current/max HP and a compact bar. Move it through the Health entry in the HUD layout editor."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "A New Life at Zero",
+      "text": "Use /cultivationdebug set <player> age 0 to end that player's current life and reset cultivation, methods and spells through the existing new-life rules. The cultivation debug editor also starts a new life when its age-minus control reaches zero or below. Positive values only adjust remaining lifespan."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Read the Colors of Protection",
+      "text": "Shield colors follow their source: Body-Protecting Qi pearl white; Dielang blue; Solid Stone brown; Blood Qi Pill pink; Mystic Stone amber; Flowing Wind mint; Bloodfiend crimson; Spirit Mirror lavender; Primordial Barrier cyan; Black Tortoise Mirror teal; bone ivory. Thin Gold talismans are yellow, Golden Body orange, and old untyped talismans muted violet."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Read the Colors of Protection",
+      "text": "Stacked shields retain separate colored sections with one total. Damage drains its own section; broken or expired sections disappear."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Training and Control",
+      "text": "Get a Training Dummy and Dummy Control Stick from the creative inventory or /give. Place the dummy, then Shift-right-click it with the stick to bind. Right-click air for controls. Edit realm, maximum HP/Qi, physical/spell attack, armor and speed; choose exact learned methods and spells, method proficiency and active method."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Training and Control",
+      "text": "Golden Core or higher can open a real domain; passive effects need 500 proficiency and obey domain clashes. Spells keep their normal realm, method, target, Qi and cooldown rules. Left-click or right-click a creature to set the practice opponent. Selection causes no damage: NPCs and neutral mobs target the bound dummy, not the controller."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Training and Control",
+      "text": "Right-click a block to walk there, or Shift-right-click a block to teleport. Prevent death and unlimited Qi start enabled but can be disabled. Reset restores vitals, cooldowns and status. Binding survives saves. Only the owner or an operator holding the bound stick can control a loaded dummy in the same dimension within 96 blocks."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Switch Methods",
+      "text": "Click a learned method at the bottom of spell selection to activate it without closing the screen. A green border and check mark identify the active method. Use the arrows or scroll over the method area to reach more learned methods. Right-click or double-click a name to read its description and return."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Switch Methods",
+      "text": "Switching preserves each method's proficiency and your spell-wheel order; active aura and domain follow the new method. Unlearned methods are not listed."
+    }
+  ]
+}

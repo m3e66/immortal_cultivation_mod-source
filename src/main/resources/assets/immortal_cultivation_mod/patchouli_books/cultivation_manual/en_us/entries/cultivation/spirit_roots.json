@@ -6,7 +6,7 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Spirit roots are generated randomly and can contain one or more elements.$(br2)Five elements: metal, wood, water, fire, earth.$(br)Special roots: thunder, ice, wind, light, dark.$(br)No root or pseudo root cultivates extremely slowly."
+      "text": "Spirit roots are generated randomly and can contain one or more elements.$(br2)Five elements: metal, wood, water, fire, earth.$(br)Special roots: thunder, ice, wind, Yang, Yin.$(br)No root or pseudo root cultivates extremely slowly."
     },
     {
       "type": "patchouli:text",

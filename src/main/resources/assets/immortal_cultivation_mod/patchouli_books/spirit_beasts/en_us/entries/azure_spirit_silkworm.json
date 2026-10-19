@@ -1,0 +1,23 @@
+{
+  "name": "Azure Spirit Silkworm",
+  "icon": "immortal_cultivation_mod:azure_spirit_silkworm_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Azure Spirit Silkworm",
+      "text": "$(bold)Realm: $()Mortal – Foundation Establishment"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "The Azure Spirit Silkworm dwells where vegetation flourishes, feeding upon the spiritual essence of wood. Often found among spirit trees and thick foliage, it produces silk infused with faint spiritual energy. Though harmless by nature, it is valued by cultivators seeking rare materials."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Found in forests, jungles, bamboo jungles, and lush caves, particularly near Spirit Wood, bamboo, or dense leaves."
+    }
+  ]
+}

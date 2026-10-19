@@ -1,0 +1,18 @@
+{
+  "name": "Infuse Qi and Raise the Flame",
+  "icon": "immortal_cultivation_mod:dao",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Forging begins with an initial cost of 100 Qi and consumes another 100 Qi per second while operating, in addition to the Qi used by individual heat pulses."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Each heat pulse from a listed flame adds 250°C. However, temperature continuously decreases by 35°C per game tick. If the cultivator lacks sufficient Qi, spirit stones in the inventory may help cover the shortage."
+    }
+  ]
+}

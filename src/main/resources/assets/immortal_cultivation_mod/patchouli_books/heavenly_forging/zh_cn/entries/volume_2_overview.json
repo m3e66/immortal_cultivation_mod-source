@@ -1,0 +1,13 @@
+{
+  "name": "九火总论",
+  "icon": "immortal_cultivation_mod:crimson_flame_seed",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": -1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "九火篇",
+      "text": "凡火熔铁，灵火炼精，真火锻魂，天火铸神。世间火焰虽同为火，其灵性、火力与耗气却有天壤之别。炼器者不但要寻得良火，更须知何火可炼何器。"
+    }
+  ]
+}

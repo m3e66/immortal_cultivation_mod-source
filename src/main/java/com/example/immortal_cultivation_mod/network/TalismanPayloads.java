@@ -206,8 +206,7 @@ public final class TalismanPayloads {
             String message = payload.message().trim();
             if (name.isEmpty() || message.isEmpty()) {
                 sender.displayClientMessage(
-                        net.minecraft.network.chat.Component.literal(
-                                "必须填写目标名字与传音内容。"), true);
+                        net.minecraft.network.chat.Component.translatable("message.immortal_cultivation_mod.talisman_message.required"), true);
                 return;
             }
             UtilityTalismanItem.Kind expected = payload.longRange()
@@ -216,32 +215,28 @@ public final class TalismanPayloads {
             InteractionHand hand = matchingHand(sender, expected);
             if (hand == null) {
                 sender.displayClientMessage(
-                        net.minecraft.network.chat.Component.literal(
-                                "手中没有对应的传音符。"), true);
+                        net.minecraft.network.chat.Component.translatable("message.immortal_cultivation_mod.talisman_message.missing"), true);
                 return;
             }
             ServerPlayer target = sender.server.getPlayerList()
                     .getPlayerByName(name);
             if (target == null || target == sender) {
                 sender.displayClientMessage(
-                        net.minecraft.network.chat.Component.literal(
-                                "找不到该传音目标。"), true);
+                        net.minecraft.network.chat.Component.translatable("message.immortal_cultivation_mod.talisman_message.target_missing"), true);
                 return;
             }
             double range = payload.longRange() ? 1_000.0D : 100.0D;
             if (target.serverLevel() != sender.serverLevel()
                     || target.distanceToSqr(sender) > range * range) {
                 sender.displayClientMessage(
-                        net.minecraft.network.chat.Component.literal(
-                                "目标超出传音范围。"), true);
+                        net.minecraft.network.chat.Component.translatable("message.immortal_cultivation_mod.talisman_message.out_of_range"), true);
                 return;
             }
             if (!TalismanMessageEntity.spawn(
                     sender.serverLevel(), sender, target,
                     message, payload.longRange())) {
                 sender.displayClientMessage(
-                        net.minecraft.network.chat.Component.literal(
-                                "传音符未能激活。"), true);
+                        net.minecraft.network.chat.Component.translatable("message.immortal_cultivation_mod.talisman_message.activation_failed"), true);
                 return;
             }
             ItemStack stack = sender.getItemInHand(hand);

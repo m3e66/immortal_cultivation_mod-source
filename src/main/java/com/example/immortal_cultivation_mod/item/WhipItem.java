@@ -108,7 +108,7 @@ public class WhipItem extends SwordItem implements GeoItem {
 
     public static boolean performNormalAttack(ServerPlayer player) {
         ItemStack stack = player.getMainHandItem();
-        if (!(stack.getItem() instanceof WhipItem)) {
+        if (!(stack.getItem() instanceof WhipItem) || !WeaponBinding.checkUse(stack, player)) {
             return false;
         }
         triggerCrackAnimation(player);
@@ -129,7 +129,7 @@ public class WhipItem extends SwordItem implements GeoItem {
 
     public static boolean performHeavyAttack(ServerPlayer player) {
         ItemStack stack = player.getMainHandItem();
-        if (!(stack.getItem() instanceof WhipItem)) {
+        if (!(stack.getItem() instanceof WhipItem) || !WeaponBinding.checkUse(stack, player)) {
             return false;
         }
         triggerCrackAnimation(player);
@@ -162,7 +162,7 @@ public class WhipItem extends SwordItem implements GeoItem {
                             player.getUUID(),
                             Math.max(1.0F, damage * 0.5F),
                             gameTime,
-                            gameTime + 24L));
+                            gameTime + 24L, stack.copy()));
             CombatStateManager.recordHostileAction(player, target);
         }
 
@@ -203,7 +203,7 @@ public class WhipItem extends SwordItem implements GeoItem {
         ServerPlayer owner = level.getServer().getPlayerList()
                 .getPlayer(impact.ownerId());
         WALL_IMPACTS.remove(target.getUUID());
-        if (owner == null || !owner.isAlive()) {
+        if (owner == null || !owner.isAlive() || !WeaponBinding.canUse(impact.weapon(), owner)) {
             return;
         }
 
@@ -214,12 +214,10 @@ public class WhipItem extends SwordItem implements GeoItem {
         target.addEffect(new MobEffectInstance(
                 MobEffects.MOVEMENT_SLOWDOWN,
                 30, 10, false, true, true));
-        CombatStateManager.hurtAsHeavy(
-                owner,
-                target,
-                damageSource(owner),
-                armorPenetratingRawDamage(
-                        target, impact.bonusDamage(), 0.30F));
+        var impactSource = damageSource(owner);
+        WeaponBinding.withWeapon(impact.weapon(), impactSource, () -> CombatStateManager.hurtAsHeavy(
+                owner, target, impactSource,
+                armorPenetratingRawDamage(target, impact.bonusDamage(), 0.30F)));
         spawnQiBurst(
                 level,
                 owner,
@@ -279,14 +277,20 @@ public class WhipItem extends SwordItem implements GeoItem {
             float rawDamage,
             float qiDamage,
             boolean firstHit) {
+        return hitFromQiLine(player, target, rawDamage, qiDamage, firstHit, player.getMainHandItem());
+    }
+
+    public static boolean hitFromQiLine(ServerPlayer player, LivingEntity target,
+            float rawDamage, float qiDamage, boolean firstHit, ItemStack launchWeapon) {
         ItemStack stack = player.getMainHandItem();
         if (!(stack.getItem() instanceof WhipItem)
-                || !canHit(player, target)) {
+                || !WeaponBinding.checkUse(launchWeapon, player) || !canHit(player, target)) {
             return false;
         }
 
         float damage = adjustedDamage(stack, target, rawDamage);
-        if (!target.hurt(damageSource(player), damage)) {
+        var source = damageSource(player);
+        if (!WeaponBinding.withWeapon(launchWeapon, source, () -> target.hurt(source, damage))) {
             return false;
         }
 
@@ -299,8 +303,12 @@ public class WhipItem extends SwordItem implements GeoItem {
         return true;
     }
 
-    public static void createQiContactPop(
-            ServerPlayer player, Vec3 center) {
+    public static void createQiContactPop(ServerPlayer player, Vec3 center) {
+        createQiContactPop(player, center, player.getMainHandItem());
+    }
+
+    public static void createQiContactPop(ServerPlayer player, Vec3 center, ItemStack launchWeapon) {
+        if (!WeaponBinding.canUse(launchWeapon, player)) return;
         ServerLevel level = player.serverLevel();
         double radius = 1.75D;
         AABB area = new AABB(center, center).inflate(radius);
@@ -315,7 +323,7 @@ public class WhipItem extends SwordItem implements GeoItem {
                                 .distanceToSqr(center)
                         <= radius * radius)) {
             target.invulnerableTime = 0;
-            if (!target.hurt(pulseSource, 10.0F)) {
+            if (!WeaponBinding.withWeapon(launchWeapon, pulseSource, () -> target.hurt(pulseSource, 10.0F))) {
                 continue;
             }
 
@@ -743,6 +751,6 @@ public class WhipItem extends SwordItem implements GeoItem {
             UUID ownerId,
             float bonusDamage,
             long launchedAt,
-            long expiresAt) {
+            long expiresAt, ItemStack weapon) {
     }
 }

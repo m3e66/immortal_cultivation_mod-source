@@ -1,0 +1,537 @@
+{
+  "parent": "minecraft:block/block",
+  "loader": "neoforge:composite",
+  "textures": {
+    "glass": "minecraft:block/glass",
+    "cap": "immortal_cultivation_mod:block/sealed_cradle_cap",
+    "child": "immortal_cultivation_mod:block/sealed_cradle_child",
+    "particle": "minecraft:block/glass"
+  },
+  "children": {
+    "vessel": {
+      "parent": "minecraft:block/block",
+      "render_type": "minecraft:translucent",
+      "textures": {
+        "glass": "minecraft:block/glass",
+        "cap": "immortal_cultivation_mod:block/sealed_cradle_cap",
+        "child": "immortal_cultivation_mod:block/sealed_cradle_child",
+        "particle": "minecraft:block/glass"
+      },
+      "elements": [
+        {
+          "from": [
+            2.5,
+            0,
+            2.5
+          ],
+          "to": [
+            13.5,
+            0.75,
+            13.5
+          ],
+          "faces": {
+            "north": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                0,
+                8,
+                8
+              ]
+            },
+            "south": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                0,
+                8,
+                8
+              ]
+            },
+            "east": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                0,
+                8,
+                8
+              ]
+            },
+            "west": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                0,
+                8,
+                8
+              ]
+            },
+            "up": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                0,
+                8,
+                8
+              ]
+            },
+            "down": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                0,
+                8,
+                8
+              ]
+            }
+          }
+        },
+        {
+          "from": [
+            2.5,
+            0.75,
+            2.5
+          ],
+          "to": [
+            13.5,
+            11.25,
+            13.5
+          ],
+          "faces": {
+            "north": {
+              "texture": "#glass",
+              "uv": [
+                0,
+                0,
+                16,
+                16
+              ]
+            },
+            "south": {
+              "texture": "#glass",
+              "uv": [
+                0,
+                0,
+                16,
+                16
+              ]
+            },
+            "east": {
+              "texture": "#glass",
+              "uv": [
+                0,
+                0,
+                16,
+                16
+              ]
+            },
+            "west": {
+              "texture": "#glass",
+              "uv": [
+                0,
+                0,
+                16,
+                16
+              ]
+            }
+          }
+        },
+        {
+          "from": [
+            4.35,
+            13.25,
+            4.35
+          ],
+          "to": [
+            11.65,
+            13.85,
+            11.65
+          ],
+          "faces": {
+            "north": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                0,
+                8,
+                8
+              ]
+            },
+            "south": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                0,
+                8,
+                8
+              ]
+            },
+            "east": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                0,
+                8,
+                8
+              ]
+            },
+            "west": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                0,
+                8,
+                8
+              ]
+            },
+            "up": {
+              "texture": "#cap",
+              "uv": [
+                8,
+                0,
+                16,
+                8
+              ]
+            },
+            "down": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                0,
+                8,
+                8
+              ]
+            }
+          }
+        },
+        {
+          "from": [
+            4.75,
+            13.85,
+            4.75
+          ],
+          "to": [
+            11.25,
+            15.1,
+            11.25
+          ],
+          "faces": {
+            "north": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                0,
+                8,
+                8
+              ]
+            },
+            "south": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                0,
+                8,
+                8
+              ]
+            },
+            "east": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                0,
+                8,
+                8
+              ]
+            },
+            "west": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                0,
+                8,
+                8
+              ]
+            },
+            "up": {
+              "texture": "#cap",
+              "uv": [
+                8,
+                0,
+                16,
+                8
+              ]
+            },
+            "down": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                0,
+                8,
+                8
+              ]
+            }
+          }
+        },
+        {
+          "from": [
+            6.75,
+            15.1,
+            6.75
+          ],
+          "to": [
+            9.25,
+            16,
+            9.25
+          ],
+          "faces": {
+            "north": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                8,
+                8,
+                16
+              ]
+            },
+            "south": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                8,
+                8,
+                16
+              ]
+            },
+            "east": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                8,
+                8,
+                16
+              ]
+            },
+            "west": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                8,
+                8,
+                16
+              ]
+            },
+            "up": {
+              "texture": "#cap",
+              "uv": [
+                8,
+                8,
+                16,
+                16
+              ]
+            },
+            "down": {
+              "texture": "#cap",
+              "uv": [
+                0,
+                8,
+                8,
+                16
+              ]
+            }
+          }
+        },
+        {
+          "from": [
+            5.9,
+            7.5,
+            6.2
+          ],
+          "to": [
+            10.1,
+            11.1,
+            10.3
+          ],
+          "faces": {
+            "north": {
+              "texture": "#child",
+              "uv": [
+                0,
+                0,
+                8,
+                8
+              ]
+            },
+            "south": {
+              "texture": "#child",
+              "uv": [
+                0,
+                8,
+                8,
+                13
+              ]
+            },
+            "east": {
+              "texture": "#child",
+              "uv": [
+                0,
+                8,
+                8,
+                16
+              ]
+            },
+            "west": {
+              "texture": "#child",
+              "uv": [
+                0,
+                8,
+                8,
+                16
+              ]
+            },
+            "up": {
+              "texture": "#child",
+              "uv": [
+                0,
+                8,
+                8,
+                12
+              ]
+            },
+            "down": {
+              "texture": "#child",
+              "uv": [
+                0,
+                8,
+                8,
+                16
+              ]
+            }
+          }
+        },
+        {
+          "from": [
+            5.6,
+            1.8,
+            6
+          ],
+          "to": [
+            10.4,
+            7.65,
+            10.2
+          ],
+          "faces": {
+            "north": {
+              "texture": "#child",
+              "uv": [
+                8,
+                0,
+                16,
+                8
+              ]
+            },
+            "south": {
+              "texture": "#child",
+              "uv": [
+                8,
+                8,
+                16,
+                16
+              ]
+            },
+            "east": {
+              "texture": "#child",
+              "uv": [
+                8,
+                8,
+                16,
+                16
+              ]
+            },
+            "west": {
+              "texture": "#child",
+              "uv": [
+                8,
+                8,
+                16,
+                16
+              ]
+            },
+            "up": {
+              "texture": "#child",
+              "uv": [
+                8,
+                8,
+                16,
+                16
+              ]
+            },
+            "down": {
+              "texture": "#child",
+              "uv": [
+                8,
+                8,
+                16,
+                16
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "neck": {
+      "loader": "neoforge:obj",
+      "model": "immortal_cultivation_mod:models/block/sealed_cradle_neck.obj",
+      "render_type": "minecraft:translucent",
+      "textures": {
+        "glass": "minecraft:block/glass",
+        "cap": "immortal_cultivation_mod:block/sealed_cradle_cap",
+        "child": "immortal_cultivation_mod:block/sealed_cradle_child",
+        "particle": "minecraft:block/glass"
+      },
+      "automatic_culling": false,
+      "shade_quads": true,
+      "flip_v": false,
+      "emissive_ambient": false
+    }
+  },
+  "item_render_order": [
+    "vessel",
+    "neck"
+  ],
+  "display": {
+    "gui": {
+      "rotation": [
+        25,
+        225,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.78,
+        0.78,
+        0.78
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        45,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.55,
+        0.55,
+        0.55
+      ]
+    }
+  }
+}

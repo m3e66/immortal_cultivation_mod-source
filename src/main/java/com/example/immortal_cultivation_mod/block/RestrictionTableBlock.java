@@ -20,35 +20,30 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class RestrictionTableBlock extends Block implements EntityBlock {
+    // Matches all 22 structural cuboids, including GeckoLib's reflected X coordinates.
     private static final VoxelShape SHAPE = Shapes.or(
-            // Low plinth and layered cabinet base.
-            Block.box(0.15D, 0.0D, 0.15D, 15.85D, 2.3D, 15.85D),
-
-            // Four cabinet corner posts.
-            Block.box(0.5D, 1.85D, 0.5D, 3.0D, 6.65D, 3.0D),
-            Block.box(13.0D, 1.85D, 0.5D, 15.5D, 6.65D, 3.0D),
-            Block.box(0.5D, 1.85D, 13.0D, 3.0D, 6.65D, 15.5D),
-            Block.box(13.0D, 1.85D, 13.0D, 15.5D, 6.65D, 15.5D),
-
-            // Framed cabinet sides between the posts.
-            Block.box(2.8D, 2.15D, 0.68D, 13.2D, 5.85D, 1.68D),
-            Block.box(2.8D, 2.15D, 14.32D, 13.2D, 5.85D, 15.32D),
-            Block.box(0.68D, 2.15D, 2.8D, 1.68D, 5.85D, 13.2D),
-            Block.box(14.32D, 2.15D, 2.8D, 15.32D, 5.85D, 13.2D),
-
-            // Main tabletop slab.
-            Block.box(0.25D, 6.4D, 0.25D, 15.75D, 7.8D, 15.75D),
-
-            // Raised outer rim and central restriction plate.
-            Block.box(2.5D, 7.6D, 0.25D, 13.5D, 9.1D, 1.75D),
-            Block.box(2.5D, 7.6D, 14.25D, 13.5D, 9.1D, 15.75D),
-            Block.box(0.25D, 7.6D, 2.5D, 1.75D, 9.1D, 13.5D),
-            Block.box(14.25D, 7.6D, 2.5D, 15.75D, 9.1D, 13.5D),
-            Block.box(2.75D, 7.52D, 2.75D, 13.25D, 8.52D, 13.25D),
-
-            // Front control housing protruding slightly beyond the cabinet.
-            Block.box(4.3D, 2.7D, -0.02D, 11.7D, 5.3D, 0.98D),
-            Block.box(6.75D, 4.05D, -0.58D, 9.25D, 6.25D, 0.42D)
+            Block.box(2.82500D, 0.00000D, 1.70000D, 13.17500D, 1.20000D, 15.30000D),
+            Block.box(3.12500D, 1.20000D, 2.10000D, 12.87500D, 1.90000D, 14.90000D),
+            Block.box(3.65000D, 1.90000D, 3.65000D, 12.35000D, 3.10000D, 14.15000D),
+            Block.box(4.51250D, 3.10000D, 4.80000D, 11.48750D, 4.00000D, 13.00000D),
+            Block.box(5.33750D, 4.00000D, 5.55000D, 10.66250D, 5.10000D, 12.25000D),
+            Block.box(5.93750D, 5.10000D, 6.00000D, 10.06250D, 8.50000D, 11.80000D),
+            Block.box(5.52500D, 8.47500D, 5.65000D, 10.47500D, 9.12500D, 12.15000D),
+            Block.box(5.07500D, 9.10000D, 5.30000D, 10.92500D, 10.30000D, 12.50000D),
+            Block.box(4.73750D, 10.25000D, 6.05000D, 11.26250D, 13.55000D, 12.75000D),
+            Block.box(4.55000D, 13.43000D, 6.03750D, 11.26250D, 13.65000D, 12.75000D),
+            Block.box(4.73750D, 11.25000D, 12.75000D, 11.26250D, 13.55000D, 13.65000D),
+            Block.box(4.73750D, 11.25000D, 14.70000D, 11.26250D, 13.55000D, 15.80000D),
+            Block.box(7.13750D, 11.25000D, 13.65000D, 11.26250D, 13.55000D, 14.70000D),
+            Block.box(4.73750D, 11.25000D, 13.65000D, 6.31250D, 13.55000D, 14.70000D),
+            Block.box(6.31250D, 11.25000D, 13.65000D, 7.13750D, 11.41000D, 14.70000D),
+            Block.box(5.64383D, 10.72568D, 1.22321D, 10.35617D, 13.30669D, 2.80535D),
+            Block.box(6.11139D, 10.92843D, 0.10893D, 9.88861D, 13.08289D, 1.69107D),
+            Block.box(6.61531D, 11.22974D, -1.00536D, 9.38468D, 12.90358D, 0.57678D),
+            Block.box(7.18108D, 11.64946D, -2.11964D, 8.81892D, 12.74518D, -0.53750D),
+            Block.box(7.51056D, 11.94393D, -2.67679D, 8.48944D, 12.67123D, -2.09465D),
+            Block.box(4.73750D, 10.25000D, 4.05000D, 11.26250D, 13.55000D, 6.05000D),
+            Block.box(5.42000D, 10.69583D, 2.33750D, 10.58000D, 13.50000D, 5.10000D)
     ).optimize();
 
     public RestrictionTableBlock(Properties properties) {

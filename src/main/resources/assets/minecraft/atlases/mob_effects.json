@@ -1,0 +1,24 @@
+{
+  "sources": [
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/lingbeng", "sprite": "immortal_cultivation_mod:lingbeng" },
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/earth_escape", "sprite": "immortal_cultivation_mod:earth_escape" },
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/qi_gathering", "sprite": "immortal_cultivation_mod:qi_gathering" },
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/huti_qi", "sprite": "immortal_cultivation_mod:huti_qi" },
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/wind_step", "sprite": "immortal_cultivation_mod:wind_step" },
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/yufeng_jue", "sprite": "immortal_cultivation_mod:yufeng_jue" },
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/spirit_sight", "sprite": "immortal_cultivation_mod:spirit_sight" },
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/weiya", "sprite": "immortal_cultivation_mod:weiya" },
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/weiya", "sprite": "immortal_cultivation_mod:weiya_suppressed" },
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/dingshen", "sprite": "immortal_cultivation_mod:dingshen" },
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/fengya", "sprite": "immortal_cultivation_mod:fengya" },
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/hanjing_suozhua", "sprite": "immortal_cultivation_mod:frozen_qi" },
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/shuangtian_qi", "sprite": "immortal_cultivation_mod:frozen" },
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/suishuang_lingxiao", "sprite": "immortal_cultivation_mod:frost_flight" },
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/muling_shengxi", "sprite": "immortal_cultivation_mod:muling_shengxi" },
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/xue_guiyuan_shu", "sprite": "immortal_cultivation_mod:xue_guiyuan_recovery" },
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/xue_guiyuan_shu", "sprite": "immortal_cultivation_mod:stabilized" },
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/xuying_ta", "sprite": "immortal_cultivation_mod:xuying_ta" },
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/jinhuo_xinliao", "sprite": "immortal_cultivation_mod:xinliao" },
+    { "type": "minecraft:single", "resource": "immortal_cultivation_mod:spell/shixu_chiliu", "sprite": "immortal_cultivation_mod:shixu_chiliu" }
+  ]
+}

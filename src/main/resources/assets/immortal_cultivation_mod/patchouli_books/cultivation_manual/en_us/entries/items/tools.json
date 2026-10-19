@@ -10,7 +10,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "The pouch GUI shows the entire real block volume at once. Left-drag rotates, right-drag pans, and the wheel zooms. Drag blocks or flying weapons onto visible surfaces; blocks stack naturally up to the five-block ceiling. Single-click a utility block to open its real menu and double-click to recover it. Ordinary items belong inside placed storage blocks. A linked flying weapon left within 50 blocks of its owner returns after 10 seconds.$(br2)Mystic Bronze Mirror: right-click to spend 50 Qi and scan nearby hidden formations, ambient Qi, and spirit-vein centers for 3 seconds."
+      "text": "The pouch GUI shows the entire real block volume at once. Left-drag rotates, right-drag pans, and the wheel zooms. Drag blocks or flying weapons onto visible surfaces; blocks stack naturally up to the five-block ceiling. Single-click a utility block to open its real menu and double-click to recover it. Ordinary items belong inside placed storage blocks. Flying weapons support automatic recall; inspect Sword Flight and Recall for the current controls.$(br2)Mystic Bronze Mirror: right-click to spend 50 Qi and scan nearby hidden formations, ambient Qi, and spirit-vein centers for 3 seconds."
     },
     {
       "type": "patchouli:text",

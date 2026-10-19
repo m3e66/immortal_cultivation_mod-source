@@ -1,0 +1,18 @@
+{
+  "name": "凡火",
+  "icon": "minecraft:fire_charge",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "凡火",
+      "text": "火候上限 ：4,000°C | 灵气消耗 ：10"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "凡火取于寻常柴薪炉灶，虽不蕴天地异力，却能熔炼基础金石。其火力有限，难以炼化高阶灵材，然修士初涉炼器，常由此火入门。"
+    }
+  ]
+}

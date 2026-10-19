@@ -1,0 +1,13 @@
+{
+  "name": "序言",
+  "icon": "minecraft:book",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "天工炼器录",
+      "text": "天地为炉，阴阳为炭，五行为材，灵气为引。凡铁经千锤可成利刃，灵矿受真火方化神兵。炼器之道，非徒以烈焰熔金、重锤锻铁，更须明火候、辨材质、通灵机、掌淬炼。"
+    }
+  ]
+}

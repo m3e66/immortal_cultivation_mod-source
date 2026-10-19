@@ -1,0 +1,23 @@
+{
+  "name": "The Great Dao of Forging",
+  "icon": "minecraft:book",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "The Great Dao of Forging",
+      "text": "Cultivators refine their bodies with spiritual energy, while artifact masters refine the treasures of the world with heavenly flames. Though their paths differ, both seek transformation beyond mortal limits."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "The Great Dao of Forging",
+      "text": "Materials form the bones, flames become the blood, spiritual patterns serve as the meridians, and Qi gives the artifact its spirit."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "The Great Dao of Forging",
+      "text": "The greatest weapons are not necessarily forged with the fiercest fire or the rarest metals. They are born through knowledge, patience, and perfect mastery of the refining process."
+    }
+  ]
+}

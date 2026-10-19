@@ -568,7 +568,12 @@ public final class ElementalTechniqueProjectileEntity extends ThrowableItemProje
     }
 
     private float baseDamage() {
-        return switch (kind()) {
+        return baseDamage(kind());
+    }
+
+    /** Shared unchanged projectile baseline for simulated technique cards. */
+    public static float baseDamage(Kind kind) {
+        return switch (kind) {
             case JINFENG_ZHI -> 28.0F;
             case WANREN_CHUANXIN -> 110.0F;
             case YANBAO_DAN -> 65.0F;

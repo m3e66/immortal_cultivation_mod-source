@@ -1,0 +1,18 @@
+{
+  "name": "冰心丹",
+  "icon": "immortal_cultivation_mod:bingxin_pill",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "冰心丹性清寒，药力入体，如冰泉洗脉。可平息附身烈焰，并于短时间内形成一缕寒意护体，减轻外来火气侵害。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹效",
+      "text": "立即熄灭身上火焰，并于六十息内减少百分之五的火焰伤害。"
+    }
+  ]
+}

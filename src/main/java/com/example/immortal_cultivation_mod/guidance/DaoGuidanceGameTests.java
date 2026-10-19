@@ -25,7 +25,7 @@ public final class DaoGuidanceGameTests {
 
     @GameTest(template = "fate_test", templateNamespace = "immortal_cultivation_guidance")
     public static void allBranchesRegisteredWithUniqueIds(GameTestHelper helper) {
-        helper.assertTrue(DaoGuidanceContent.chapters().size() == 31, "All 13 side chapters join the existing 18 chapters");
+        helper.assertTrue(DaoGuidanceContent.chapters().size() == 42, "All existing chapters and nine current-feature readings are registered");
         var ids = new HashSet<String>();
         for (var chapter : DaoGuidanceContent.chapters()) {
             helper.assertTrue(ids.add(chapter.id()) && DaoGuidanceContent.chapter(chapter.id()) == chapter,
@@ -107,6 +107,56 @@ public final class DaoGuidanceGameTests {
         helper.assertTrue(!state(player).getCompound("Completed").getBoolean("life_simulation"), "Settlement alone cannot claim rewards");
         DaoGuidanceObservations.record(player, "life_finished");
         helper.assertTrue(state(player).getCompound("Completed").getBoolean("life_simulation"), "Actual reward claim completes the lesson");
+        helper.succeed();
+    }
+
+    @GameTest(template = "fate_test", templateNamespace = "immortal_cultivation_guidance")
+    public static void currentReadingsUnlockWithoutCompletingThemselves(GameTestHelper helper) {
+        var player = player(helper);
+        DaoGuidanceObservations.record(player, "life_started");
+        for (String id : java.util.List.of("annual_plans", "life_card_battle", "life_inheritance")) {
+            helper.assertTrue(state(player).getCompound("Discovered").getBoolean(id) && index(player, id) == 0,
+                    "Starting a life discovers its new readings without acknowledging them");
+        }
+        DaoGuidanceSystem.acknowledge(player, "read:life_card_battle:step_3");
+        helper.assertTrue(index(player, "life_card_battle") == 0, "An out-of-order acknowledgement cannot skip the first reading");
+        DaoGuidanceSystem.acknowledge(player, "read:life_card_battle:step_1");
+        DaoGuidanceObservations.record(player, "life_started");
+        helper.assertTrue(index(player, "life_card_battle") == 1, "Repeated saturated gameplay observations retain reading progress");
+        helper.succeed();
+    }
+
+    @GameTest(template = "fate_test", templateNamespace = "immortal_cultivation_guidance")
+    public static void everyCurrentReadingCanBeAcknowledgedInOrder(GameTestHelper helper) {
+        var player = player(helper);
+        helper.assertTrue(DaoGuidanceUpdates.chapters().size() == 9, "All nine current topics are present");
+        for (var chapter : DaoGuidanceUpdates.chapters()) {
+            DaoGuidanceSystem.discover(player, chapter.id());
+            for (var objective : chapter.objectives()) {
+                helper.assertTrue(DaoGuidanceExpansion.isReading(objective.action())
+                                && DaoGuidanceExpansion.chapterFor(objective.action()).equals(chapter.id()),
+                        "Reading actions resolve to their actual chapter");
+                DaoGuidanceSystem.acknowledge(player, objective.action());
+            }
+            helper.assertTrue(state(player).getCompound("Completed").getBoolean(chapter.id()),
+                    "Every new chapter can complete through its real acknowledgement path");
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = "fate_test", templateNamespace = "immortal_cultivation_guidance")
+    public static void existingPlayersDiscoverEquipmentAndRealmReadings(GameTestHelper helper) {
+        var player = player(helper);
+        com.example.immortal_cultivation_mod.attachment.ModAttachments.setData(player,
+                com.example.immortal_cultivation_mod.attachment.ModAttachments.getData(player)
+                        .withCultivationLevel(com.example.immortal_cultivation_mod.attachment.CultivationLevels.REALM_JINDAN
+                                + com.example.immortal_cultivation_mod.attachment.CultivationLevels.STAGE_EARLY));
+        player.getInventory().items.set(0, new net.minecraft.world.item.ItemStack(
+                com.example.immortal_cultivation_mod.item.ModItems.YINYANG_COMPASS.get()));
+        DaoGuidanceObservations.tick(player);
+        helper.assertTrue(state(player).getCompound("Discovered").getBoolean("qi_blast")
+                        && state(player).getCompound("Discovered").getBoolean("exploration_tools"),
+                "Existing Golden Core players and compass owners discover relevant readings without repeating old quests");
         helper.succeed();
     }
 }

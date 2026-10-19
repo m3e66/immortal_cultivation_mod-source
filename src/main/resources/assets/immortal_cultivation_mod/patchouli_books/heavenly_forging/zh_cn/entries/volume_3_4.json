@@ -1,0 +1,43 @@
+{
+  "name": "熔炼灵材",
+  "icon": "immortal_cultivation_mod:dao",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "灵材有清浊之分，纯者易炼，杂者难熔。鼎中诸材，其最浊者往往拖累整炉进程。故炼器之前，当仔细辨其纯度，莫以劣材坏一炉灵宝。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "规则速查",
+      "text": "20 / 81 秒"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "规则速查",
+      "text": "50 / 51 秒"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "规则速查",
+      "text": "80 / 21 秒"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "规则速查",
+      "text": "95 / 6 秒"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "规则速查",
+      "text": "100 / 1 second"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "熔炼时间",
+      "text": "熔炼时间（秒）= max(1, 101 − 最低纯度)。"
+    }
+  ]
+}

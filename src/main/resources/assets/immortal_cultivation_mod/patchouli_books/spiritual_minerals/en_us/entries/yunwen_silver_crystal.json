@@ -1,0 +1,23 @@
+{
+  "name": "Cloud-Veined Silver Crystal",
+  "icon": "immortal_cultivation_mod:yunwen_silver_crystal",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Cloud-Veined Silver Crystal",
+      "text": "$(bold)Starting height: $()Y 80 to 256$(br2)$(bold)Attempt frequency: $()1/28 chunks"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Cloud-Veined Silver Crystal forms upon towering mountains, where thin clouds and powerful winds carry pure spiritual energy. Its silver-white body contains delicate patterns resembling drifting clouds. These crystals favor lofty peaks and windswept ridges far above the lowlands."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Search jagged, frozen, and stony peaks, as well as windswept hills and forests, between Y 80 and 256."
+    }
+  ]
+}

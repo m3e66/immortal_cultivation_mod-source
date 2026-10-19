@@ -74,6 +74,8 @@ public final class NpcProfile {
     public static final String LIANQI = "lianqi";
     public static final String ZHUJI = "zhuji";
     public static final String JINDAN = "jindan";
+    public static final String MERCHANT = "recipe_merchant";
+    public static final String SPELL_MERCHANT = "spell_merchant";
 
     private static final String TAG = "ImmortalCultivationNpc";
     private static final int PROFILE_VERSION = 19;
@@ -240,6 +242,7 @@ public final class NpcProfile {
         profile.putInt("MaxQi", maxQi);
         profile.putInt("Qi", realmChanged ? maxQi : Mth.clamp(currentQi, 0, maxQi));
         syncMethodSpecialSpells(profile);
+        if (!mob.level().isClientSide) ensureDomainMastery(mob,profile);
         refreshWantedOrder(mob, profile);
 
         if (mob instanceof CultivationNpc npc) {
@@ -267,11 +270,22 @@ public final class NpcProfile {
     }
 
     public static void ensure(PathfinderMob mob, String archetype) {
+        if(mob instanceof TrainingDummyEntity dummy){dummy.ensureProfile();return;}
         if (!(mob instanceof CultivationNpc)) {
             clearAccidentalVanillaProfile(mob);
             return;
         }
         CompoundTag profile = profile(mob);
+        if (profile.contains("SpiritRoots")) {
+            var savedRoots = strings(profile.getList("SpiritRoots", 8));
+            var migratedRoots = SpiritRoots.migrateRootList(savedRoots);
+            if (!savedRoots.equals(migratedRoots)) profile.put("SpiritRoots", stringList(migratedRoots));
+        }
+        if (profile.contains("BodyType")) {
+            String savedBody = profile.getString("BodyType");
+            String migratedBody = com.example.immortal_cultivation_mod.attachment.BodyTypes.normalize(savedBody);
+            if (!savedBody.equals(migratedBody)) profile.putString("BodyType", migratedBody);
+        }
         boolean initialized = profile.getBoolean("Initialized");
         int previousVersion = profile.getInt("ProfileVersion");
         int seed = mob.getUUID().hashCode();
@@ -322,18 +336,25 @@ public final class NpcProfile {
             normalizedIdentity = mob instanceof HotelNpcEntity
                     ? "hotelkeeper"
                     : "village_mortal";
+        } else if (mob instanceof StockedCultivationMerchant) {
+            normalizedIdentity = archetype;
         } else if (!CULTIVATOR_IDENTITIES.contains(normalizedIdentity)) {
             normalizedIdentity = selectIdentity(archetype, seed);
         }
         profile.putString("Identity", normalizedIdentity);
 
         if (!mob.level().isClientSide) {
-            ensureFirstQuestRewardStock(mob, profile);
-            NpcPillStock.ensure(mob, profile, archetype);
+            if (mob instanceof StockedCultivationMerchant merchant) {
+                merchant.ensureMerchantStock(profile);
+            } else {
+                ensureFirstQuestRewardStock(mob, profile);
+                NpcPillStock.ensure(mob, profile, archetype);
+            }
         }
         syncMethodSpecialSpells(profile);
         refreshWantedOrder(mob, profile);
         profile.putInt("ProfileVersion", PROFILE_VERSION);
+        if (!mob.level().isClientSide) ensureDomainMastery(mob,profile);
         if (!mob.level().isClientSide && mob instanceof CultivationNpc npc) {
             npc.setNpcSkinId(profile.getString("Skin"));
             applyRealmStats(mob, profile.getString("Realm"), !initialized || previousVersion < PROFILE_VERSION);
@@ -342,6 +363,36 @@ public final class NpcProfile {
             mob.setCustomName(Component.literal(profile.getString("Name")));
             mob.setCustomNameVisible(false);
         }
+    }
+
+    /** Stable per-person, per-method aptitude: 50%, 35%, 12%, 2.5%, 0.5% across ascending tiers. */
+    public static int naturalMethodProficiency(UUID npc,String method) {
+        var random=new Random(npc.getMostSignificantBits()^Long.rotateLeft(npc.getLeastSignificantBits(),23)
+                ^((long)method.hashCode()*0x9E3779B97F4A7C15L));
+        int roll=random.nextInt(10000);
+        if(roll<5000)return random.nextInt(100);
+        if(roll<8500)return 100+random.nextInt(400);
+        if(roll<9700)return 500+random.nextInt(500);
+        if(roll<9950)return 1000+random.nextInt(1000);
+        return 2000+random.nextInt(8001);
+    }
+
+    /** Replace the old automatic 500 once, preserving explicit overrides and earned proficiency. */
+    private static void ensureDomainMastery(PathfinderMob mob,CompoundTag profile) {
+        String method=profile.getString("Method");
+        if(CultivationMethods.get(method)==null)return;
+        var values=profile.getCompound("MethodProficiencies");
+        int version=profile.getInt("DomainMasteryVersion");
+        if(version>=2&&values.contains(method))return;
+        boolean explicit=profile.contains("MethodProficiency");
+        if(version==1&&!explicit)for(String id:new ArrayList<>(values.getAllKeys())) {
+            if(CultivationMethods.get(id)!=null&&values.getInt(id)==500)
+                values.putInt(id,naturalMethodProficiency(mob.getUUID(),id));
+        }
+        if(!values.contains(method))values.putInt(method,explicit?Math.clamp(profile.getInt("MethodProficiency"),0,10000)
+                :naturalMethodProficiency(mob.getUUID(),method));
+        profile.put("MethodProficiencies",values);
+        profile.putInt("DomainMasteryVersion",2);
     }
 
     /**
@@ -484,7 +535,10 @@ public final class NpcProfile {
             return;
         }
         tickThoughts(mob, profile);
-        chooseBestKnownMethod(profile);
+        // Keep the art already driving an active fight, including long buildup effects.
+        // Re-evaluate the best training method once combat ends.
+        if (mob.getTarget()==null || !mob.getTarget().isAlive()
+                || CultivationMethods.get(profile.getString("Method"))==null) chooseBestKnownMethod(profile);
         int maxQi = profile.getInt("MaxQi");
         int qiRegen = switch (archetype) {
             case JINDAN -> 18;
@@ -502,7 +556,7 @@ public final class NpcProfile {
         }
         qiRegen = UndeadAbilitySystem.adjustQiRegen(mob, qiRegen);
         qiRegen = CultivationBestiaryBeastEntity.adjustQiRegeneration(mob, qiRegen);
-        profile.putInt("Qi", (int) Math.min(maxQi, (long) profile.getInt("Qi") + qiRegen));
+        profile.putInt("Qi", (int) Math.min(maxQi, profile.getInt("Qi") + 2L * qiRegen));
     }
 
     /** Internal training state shares the NPC profile's existing save/load lifecycle. */
@@ -516,6 +570,23 @@ public final class NpcProfile {
         int multiplier = methodMultiplierPercent(CultivationMethods.get(methodId),
                 strings(profile.getList("SpiritRoots", 8)));
         return CultivationLevels.getTotalQiNeeded(realm) / seconds * multiplier / 100.0;
+    }
+
+    static boolean hasBreakthroughPill(PathfinderMob mob) {
+        return inventory(mob).stream().anyMatch(stack -> stack.is(ModItems.BREAKTHROUGH_PILL.get()));
+    }
+
+    static boolean consumeBreakthroughPill(PathfinderMob mob) {
+        List<ItemStack> inventory = inventory(mob);
+        for (ItemStack stack : inventory) {
+            if (stack.is(ModItems.BREAKTHROUGH_PILL.get())) {
+                stack.shrink(1);
+                writeInventory(mob, profile(mob), inventory);
+                mob.playSound(net.minecraft.sounds.SoundEvents.GENERIC_EAT, 1, 1);
+                return true;
+            }
+        }
+        return false;
     }
 
     static boolean completeAutonomousBreakthrough(PathfinderMob mob, String expectedRealm) {
@@ -664,7 +735,7 @@ public final class NpcProfile {
         CompoundTag profile = profile(mob);
         if (profile.hasUUID("SparPlayer")) {
             Player player = mob.level().getPlayerByUUID(profile.getUUID("SparPlayer"));
-            if (player == null || !player.isAlive() || player.level() != mob.level()
+            if (player == null || !player.isAlive() || isNonCombatPlayer(player) || player.level() != mob.level()
                     || mob.getHealth() <= 1.0F || player.getHealth() <= 1.0F) {
                 endSpar(mob);
                 return;
@@ -696,12 +767,14 @@ public final class NpcProfile {
             // main action can be issued per decision tick.
             return;
         }
+        // Social scans and queued retaliation must not replace an ongoing fight.
+        if (NpcCombatBrain.hasValidCombatTarget(mob)) return;
         if (mob.level() instanceof ServerLevel serverLevel) {
             if (profile.hasUUID("RetaliationPlayer")) {
                 Player retaliationTarget = serverLevel.getPlayerByUUID(profile.getUUID("RetaliationPlayer"));
                 if (retaliationTarget instanceof ServerPlayer retaliationPlayer && retaliationPlayer.isAlive()
                         && shouldAttackPlayer(mob, retaliationPlayer)) {
-                    mob.setTarget(retaliationPlayer);
+                    NpcCombatBrain.acquireCombatTarget(mob, retaliationPlayer);
                 } else {
                     profile.remove("RetaliationPlayer");
                 }
@@ -711,6 +784,7 @@ public final class NpcProfile {
                 double closest = 32.0D * 32.0D;
                 boolean cultivator = !FANREN.equals(archetypeOf(mob));
                 for (ServerPlayer candidate : serverLevel.players()) {
+                    if (isNonCombatPlayer(candidate)) continue;
                     double distance = mob.distanceToSqr(candidate);
                     boolean exposedLivingCorpse = cultivator
                             && CultivationAccessoryItem.isLivingCorpse(candidate)
@@ -724,7 +798,7 @@ public final class NpcProfile {
                     }
                 }
                 if (hatedPlayer != null) {
-                    mob.setTarget(hatedPlayer);
+                    NpcCombatBrain.acquireCombatTarget(mob, hatedPlayer);
                 }
             }
             if (mob.getTarget() instanceof ServerPlayer targetPlayer) {
@@ -733,6 +807,7 @@ public final class NpcProfile {
                     return;
                 }
                 mob.setTarget(null);
+                mob.getNavigation().stop();
             }
         }
         if (mob.getTarget() instanceof LivingEntity combatTarget && combatTarget.isAlive()) {
@@ -791,8 +866,9 @@ public final class NpcProfile {
         long now = mob.level().getGameTime();
         if (relation.getInt("Hatred") >= 100
                 || relation.getBoolean("PermanentEnemy") || relation.getLong("RefuseUntil") > now) {
-            if (relation.getInt("Hatred") >= 100 || relation.getBoolean("PermanentEnemy")) {
-                mob.setTarget(player);
+            if (!isNonCombatPlayer(player) && !NpcCombatBrain.hasValidCombatTarget(mob)
+                    && (relation.getInt("Hatred") >= 100 || relation.getBoolean("PermanentEnemy"))) {
+                NpcCombatBrain.acquireCombatTarget(mob, player);
             }
             player.sendSystemMessage(Component.translatable(
                     "message." + ImmortalCultivationMod.MODID + ".npc_refuses_interaction"));
@@ -907,13 +983,16 @@ public final class NpcProfile {
         if (startSpar) {
             releaseInteraction(mob);
             beginSpar(mob, player);
-        } else if (retaliate) {
+        } else if (retaliate && !isNonCombatPlayer(player) && !NpcCombatBrain.hasValidCombatTarget(mob)) {
             releaseInteraction(mob);
-            mob.setTarget(player);
+            NpcCombatBrain.acquireCombatTarget(mob, player);
         }
     }
 
     private static String requestSpar(PathfinderMob mob, ServerPlayer player) {
+        if (isNonCombatPlayer(player)) {
+            return "npc.status.spar_survival_required";
+        }
         if (isSparring(mob) || sparPartner(player) != null) {
             return "npc.status.spar_busy";
         }
@@ -1073,7 +1152,8 @@ public final class NpcProfile {
     }
 
     public static void defendDaoCompanion(ServerPlayer player, net.minecraft.world.entity.LivingEntity attacker) {
-        if (!(player.level() instanceof ServerLevel level) || sparPartner(player) != null) {
+        if (!(player.level() instanceof ServerLevel level) || sparPartner(player) != null
+                || isNonCombatPlayer(attacker)) {
             return;
         }
         AABB area = player.getBoundingBox().inflate(48.0D);
@@ -1082,14 +1162,14 @@ public final class NpcProfile {
             CompoundTag npcProfile = profile(mob);
             if (!npcProfile.hasUUID("DaoCompanionPlayer")
                     || !npcProfile.getUUID("DaoCompanionPlayer").equals(player.getUUID())
-                    || mob == attacker) {
+                    || mob == attacker || NpcCombatBrain.hasValidCombatTarget(mob)) {
                 continue;
             }
             if (isInteracting(mob)) {
                 releaseInteraction(mob);
             }
             mob.setNoAi(false);
-            mob.setTarget(attacker);
+            NpcCombatBrain.acquireCombatTarget(mob, attacker);
             mob.getNavigation().stop();
         }
     }
@@ -1180,7 +1260,7 @@ public final class NpcProfile {
         return randomDialogue(mob, dialogueKey);
     }
 
-    private static String identityDialogue(PathfinderMob mob, String identity, String topic) {
+    static String identityDialogue(PathfinderMob mob, String identity, String topic) {
         int first;
         int count;
         switch (topic) {
@@ -1538,8 +1618,7 @@ public final class NpcProfile {
             return true;
         }
         if (first instanceof PathfinderMob firstNpc && first instanceof CultivationNpc) {
-            ensure(firstNpc, archetypeOf(firstNpc));
-            CompoundTag firstProfile = profile(firstNpc);
+            CompoundTag firstProfile = combatProfile(firstNpc);
             if (second instanceof Player player
                     && (matchesPlayerBond(firstProfile, "DaoCompanionPlayer", player)
                     || matchesPlayerBond(firstProfile, "FollowingPlayer", player)
@@ -1547,9 +1626,8 @@ public final class NpcProfile {
                 return true;
             }
             if (second instanceof PathfinderMob secondNpc && second instanceof CultivationNpc) {
-                ensure(secondNpc, archetypeOf(secondNpc));
-                CompoundTag secondProfile = profile(secondNpc);
-                return isSocialAlly(firstNpc, secondNpc)
+                CompoundTag secondProfile = combatProfile(secondNpc);
+                return (!(firstNpc instanceof TrainingDummyEntity)&&!(secondNpc instanceof TrainingDummyEntity)&&isSocialAlly(firstProfile, secondProfile))
                         || sameBond(firstProfile, secondProfile, "DaoCompanionPlayer")
                         || sameBond(firstProfile, secondProfile, "SectLeader");
             }
@@ -1609,6 +1687,11 @@ public final class NpcProfile {
         return attacker instanceof CultivationNpc && !isCombatEnemy(attacker, target);
     }
 
+    /** Creative and spectator players never participate as NPC combat targets. */
+    public static boolean isNonCombatPlayer(LivingEntity entity) {
+        return entity instanceof Player player && (player.isCreative() || player.isSpectator());
+    }
+
     /** Shared actor-neutral hostility rule for NPC-owned area and weapon effects. */
     public static boolean isCombatEnemy(LivingEntity attacker, LivingEntity target) {
         if (attacker == target || !target.isAlive() || areCombatAllies(attacker, target)) {
@@ -1617,6 +1700,7 @@ public final class NpcProfile {
         if (!(attacker instanceof PathfinderMob mob) || !(attacker instanceof CultivationNpc)) {
             return !attacker.isAlliedTo(target);
         }
+        if (isNonCombatPlayer(target)) return false;
         LivingEntity primary = mob.getTarget();
         if (target == primary || target == mob.getLastHurtByMob() || isSparPair(attacker, target)) {
             return true;
@@ -1642,13 +1726,17 @@ public final class NpcProfile {
 
     private static boolean isSocialAlly(PathfinderMob first, PathfinderMob second) {
         ensure(second, archetypeOf(second));
-        String firstIdentity = profile(first).getString("Identity");
-        String secondIdentity = profile(second).getString("Identity");
+        return isSocialAlly(profile(first), profile(second));
+    }
+
+    private static boolean isSocialAlly(CompoundTag first, CompoundTag second) {
+        String firstIdentity = first.getString("Identity");
+        String secondIdentity = second.getString("Identity");
         if (!firstIdentity.isBlank() && firstIdentity.equals(secondIdentity)) {
             return true;
         }
-        String firstName = profile(first).getString("Name");
-        String secondName = profile(second).getString("Name");
+        String firstName = first.getString("Name");
+        String secondName = second.getString("Name");
         return !firstName.isBlank() && !secondName.isBlank()
                 && firstName.codePointAt(0) == secondName.codePointAt(0);
     }
@@ -1659,7 +1747,7 @@ public final class NpcProfile {
         return variant == 0 ? baseKey : baseKey + "." + variant;
     }
 
-    private static String exchangeTrade(PathfinderMob mob, ServerPlayer player, int index) {
+    static String exchangeTrade(PathfinderMob mob, ServerPlayer player, int index) {
         if (relationshipValue(mob, player, "Hatred") >= 50) {
             return "npc.status.hatred_refusal";
         }
@@ -1695,7 +1783,9 @@ public final class NpcProfile {
         if (stock.isEmpty()) {
             inventory.set(offer.inventorySlot(), ItemStack.EMPTY);
         }
-        insertInventory(inventory, new ItemStack(costItem, offer.price()));
+        var paymentSlots = mob instanceof StockedCultivationMerchant merchant
+                ? inventory.subList(0, inventory.size() - merchant.stockSlotCount()) : inventory;
+        insertInventory(paymentSlots, new ItemStack(costItem, offer.price()));
         writeInventory(mob, profile(mob), inventory);
         giveToPlayer(player, purchased);
         changeRelationship(mob, player, 1, 1, 0, 0);
@@ -1968,6 +2058,11 @@ public final class NpcProfile {
         if (npcSpells.contains(spellId)) {
             return "npc.status.npc_spell_known";
         }
+        if (!ModSpells.isRandomRewardEligible(spellId)) {
+            // Method arts are supplied by teaching the actual method, not by
+            // reporting a successful lesson for an art this NPC cannot retain.
+            return "npc.status.teaching_invalid";
+        }
         npcSpells.add(spellId);
         profile(mob).put("Spells", stringList(npcSpells));
         changeRelationship(mob, player, 2, 2, 0, 0);
@@ -2028,7 +2123,9 @@ public final class NpcProfile {
         }
         List<ItemStack> inventory = inventory(mob);
         ItemStack deposited = held.copyWithCount(1);
-        if (!insertInventory(inventory, deposited)) {
+        var depositSlots = mob instanceof StockedCultivationMerchant merchant
+                ? inventory.subList(0, inventory.size() - merchant.stockSlotCount()) : inventory;
+        if (!insertInventory(depositSlots, deposited)) {
             return "npc.status.inventory_full";
         }
         if (!player.getAbilities().instabuild) {
@@ -2087,6 +2184,7 @@ public final class NpcProfile {
     }
 
     public static void recordPlayerAttack(PathfinderMob mob, ServerPlayer player) {
+        if (isNonCombatPlayer(player)) return;
         ensure(mob, archetypeOf(mob));
         if (isSparPair(mob, player)) {
             return;
@@ -2101,7 +2199,7 @@ public final class NpcProfile {
             relation.putLong("RetaliateUntil", now + 600L);
             saveRelationship(mob, player, relation);
             profile(mob).putUUID("RetaliationPlayer", player.getUUID());
-            mob.setTarget(player);
+            NpcCombatBrain.acquireCombatTarget(mob, player);
             return;
         }
         long[] previousAttackTicks = relation.getLongArray("AttackTicks");
@@ -2129,12 +2227,13 @@ public final class NpcProfile {
             }
             mob.setNoAi(false);
             profile(mob).putUUID("RetaliationPlayer", player.getUUID());
-            mob.setTarget(player);
+            NpcCombatBrain.acquireCombatTarget(mob, player);
         }
         saveRelationship(mob, player, relation);
     }
 
     public static boolean shouldAttackPlayer(PathfinderMob mob, ServerPlayer player) {
+        if (isNonCombatPlayer(player) || !player.isAlive() || player.level() != mob.level()) return false;
         CompoundTag relation = relationship(mob, player);
         return !FANREN.equals(archetypeOf(mob))
                 && CultivationAccessoryItem.isLivingCorpse(player)
@@ -2422,9 +2521,10 @@ public final class NpcProfile {
         for (int slot = 0; slot < inventory.size(); slot++) {
             ItemStack stack = inventory.get(slot);
             if (stack.isEmpty()
+                    || mob instanceof StockedCultivationMerchant merchant && !merchant.sellsStock(stack)
                     || isCurrencyItem(stack.getItem())
                     || isIdentityProtectedTradeItem(mob, stack)
-                    || requiresHighTrustTrade(stack) && trust < INVENTORY_TRUST_REQUIRED) {
+                    || !(mob instanceof StockedCultivationMerchant) && requiresHighTrustTrade(stack) && trust < INVENTORY_TRUST_REQUIRED) {
                 continue;
             }
             String resultId = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
@@ -2661,6 +2761,7 @@ public final class NpcProfile {
     }
 
     private static NpcTradePrice tradePriceFor(PathfinderMob mob, ItemStack stack) {
+        if (mob instanceof StockedCultivationMerchant) return systemShopTradePrice(mob, stack);
         ResourceLocation key = BuiltInRegistries.ITEM.getKey(stack.getItem());
         NpcTradePrice listedPrice = key == null ? null : NPC_TRADE_PRICES.get(key.toString());
         if (listedPrice == null && key != null
@@ -2924,37 +3025,14 @@ public final class NpcProfile {
     }
 
     static List<ItemStack> inventory(PathfinderMob mob) {
-        List<ItemStack> inventory = new ArrayList<>(INVENTORY_SIZE);
-        for (int i = 0; i < INVENTORY_SIZE; i++) {
-            inventory.add(ItemStack.EMPTY);
-        }
-        ListTag list = profile(mob).getList("Inventory", 10);
-        for (int i = 0; i < list.size(); i++) {
-            CompoundTag entry = list.getCompound(i);
-            int slot = entry.getInt("Slot");
-            if (slot >= 0 && slot < INVENTORY_SIZE && entry.contains("Stack")) {
-                inventory.set(slot, ItemStack.parseOptional(mob.registryAccess(), entry.getCompound("Stack")));
-            }
-        }
-        return inventory;
+        return NpcInventoryCache.read(mob, profile(mob));
     }
 
     static void writeInventory(PathfinderMob mob, CompoundTag profile, List<ItemStack> inventory) {
-        ListTag list = new ListTag();
-        for (int i = 0; i < Math.min(INVENTORY_SIZE, inventory.size()); i++) {
-            ItemStack stack = inventory.get(i);
-            if (stack.isEmpty()) {
-                continue;
-            }
-            CompoundTag entry = new CompoundTag();
-            entry.putInt("Slot", i);
-            entry.put("Stack", stack.saveOptional(mob.registryAccess()));
-            list.add(entry);
-        }
-        profile.put("Inventory", list);
+        NpcInventoryCache.write(mob, profile, inventory);
     }
 
-    private static boolean insertInventory(List<ItemStack> inventory, ItemStack stack) {
+    static boolean insertInventory(List<ItemStack> inventory, ItemStack stack) {
         for (int i = 0; i < inventory.size(); i++) {
             ItemStack existing = inventory.get(i);
             if (!existing.isEmpty() && ItemStack.isSameItemSameComponents(existing, stack)
@@ -3096,6 +3174,13 @@ public final class NpcProfile {
         }
         Random random = new Random(seed);
         int slot = 0;
+
+        if (MERCHANT.equals(archetype) || SPELL_MERCHANT.equals(archetype)) {
+            inventory.set(0, new ItemStack(ModItems.FLYING_SWORD.get()));
+            inventory.set(1, new ItemStack(ModItems.QI_RECOVERY_PILL.get(), 4));
+            inventory.set(2, new ItemStack(item(MEDIUM_SPIRIT_STONE), 16));
+            return inventory;
+        }
 
         switch (archetype) {
             case JINDAN -> {
@@ -3785,6 +3870,7 @@ public final class NpcProfile {
     }
 
     public static void load(PathfinderMob mob, CompoundTag tag) {
+        NpcInventoryCache.invalidate(mob);
         if (tag.contains(TAG)) {
             mob.getPersistentData().put(TAG, tag.getCompound(TAG).copy());
         }
@@ -3804,8 +3890,13 @@ public final class NpcProfile {
     }
 
     public static ResourceLocation skinTexture(PathfinderMob mob, String archetype) {
-        ensure(mob, archetype);
         String skin = mob instanceof CultivationNpc npc ? npc.getNpcSkinId() : "";
+        // The renderer already receives the authoritative synced skin. Profile
+        // migration belongs to the NPC tick, not every draw of every model.
+        if (!mob.level().isClientSide || skin == null || skin.isBlank()) {
+            ensure(mob, archetype);
+            skin = mob instanceof CultivationNpc npc ? npc.getNpcSkinId() : "";
+        }
         if (skin == null || skin.isBlank()) {
             skin = profile(mob).getString("Skin");
         }
@@ -3861,6 +3952,8 @@ public final class NpcProfile {
             return false;
         }
         profile.putInt("Qi", currentQi - cost);
+        if (mob instanceof CultivationNpc && cost > 0)
+            com.example.immortal_cultivation_mod.combat.QiDomainSystem.qiUsed(mob, profile.getString("Method"), cost);
         if (mob.hasEffect(ModEffects.SPIRIT_SEAL)
                 && cost * 4 >= Math.max(1, profile.getInt("MaxQi"))) {
             mob.removeEffect(ModEffects.SPIRIT_SEAL);
@@ -4208,6 +4301,16 @@ public final class NpcProfile {
         return data.getCompound(TAG);
     }
 
+    /** Collision predicates read current bonds without rebuilding stock, spells or realm stats. */
+    private static CompoundTag combatProfile(PathfinderMob mob) {
+        CompoundTag saved = profile(mob);
+        if (!saved.getBoolean("Initialized")
+                || !(mob instanceof TrainingDummyEntity) && saved.getInt("ProfileVersion") < PROFILE_VERSION) {
+            ensure(mob, archetypeOf(mob));
+        }
+        return profile(mob);
+    }
+
     private static String archetypeOf(PathfinderMob mob) {
         if (mob instanceof CultivationNpc npc) {
             return npc.npcArchetype();
@@ -4216,6 +4319,7 @@ public final class NpcProfile {
     }
 
     private static String selectIdentity(String archetype, int seed) {
+        if (MERCHANT.equals(archetype) || SPELL_MERCHANT.equals(archetype)) return archetype;
         if (FANREN.equals(archetype)) {
             return "village_mortal";
         }
@@ -4252,6 +4356,8 @@ public final class NpcProfile {
             case "通缉犯", "wanted", "wanted_criminal" -> "wanted";
             case "凡人", "村中凡人", "mortal", "village_resident", "village_mortal" -> "village_mortal";
             case "掌柜", "客栈掌柜", "hotelkeeper", "innkeeper" -> "hotelkeeper";
+            case "商人", "游商", "配方商人", "merchant", "recipe_merchant" -> MERCHANT;
+            case "术法商人", "法术商人", "spell_merchant", "spell_trader" -> SPELL_MERCHANT;
             case "sect_zhuji", "wandering_jindan" -> normalized;
             default -> "";
         };
@@ -4286,6 +4392,7 @@ public final class NpcProfile {
             case JINDAN -> CultivationLevels.REALM_JINDAN + stage;
             case ZHUJI -> CultivationLevels.REALM_ZHUJI + stage;
             case LIANQI -> CultivationLevels.REALM_LIANQI + stage;
+            case MERCHANT, SPELL_MERCHANT -> RecipeMerchantStock.startingRealm(seed) + stage;
             default -> CultivationLevels.REALM_MORTAL;
         };
     }
@@ -4321,7 +4428,7 @@ public final class NpcProfile {
         return switch (archetype) {
             case JINDAN -> List.of(SpiritRoots.THUNDER, SpiritRoots.WIND);
             case ZHUJI -> List.of(SpiritRoots.FIRE, SpiritRoots.WATER);
-            case LIANQI -> List.of(SpiritRoots.METAL, SpiritRoots.WOOD);
+            case LIANQI, MERCHANT, SPELL_MERCHANT -> List.of(SpiritRoots.METAL, SpiritRoots.WOOD);
             default -> List.of();
         };
     }
@@ -4627,6 +4734,7 @@ public final class NpcProfile {
     private static boolean isRealmValidNpcSpell(String spellId, String realm) {
         ModSpells.SpellDef spell = ModSpells.get(spellId);
         return spell != null
+                && ModSpells.isRandomRewardEligible(spellId)
                 && ModSpells.meetsRequirement(realm, spell);
     }
 
@@ -4665,7 +4773,7 @@ public final class NpcProfile {
 
     private static void syncMethodSpecialSpells(CompoundTag profile) {
         List<String> existing = strings(profile.getList("Spells", 8));
-        LinkedHashSet<String> spells = new LinkedHashSet<>(existing);
+        LinkedHashSet<String> spells = new LinkedHashSet<>();
         for (String methodId : knownMethodIds(profile)) {
             switch (methodId) {
                 case CultivationMethods.REINCARNATION_TRUE_ART -> spells.add(ModSpells.ABSORB_CULTIVATION);
@@ -4696,8 +4804,16 @@ public final class NpcProfile {
                 }
             }
         }
-        if (spells.size() != existing.size()) {
-            profile.put("Spells", stringList(List.copyOf(spells)));
+        // Old random loadouts also included method-exclusive arts. Retain all
+        // ordinary learned spells, but source supported method arts from the
+        // NPC's actual known methods instead of allowing them on every NPC.
+        LinkedHashSet<String> merged = existing.stream()
+                .filter(id -> ModSpells.isRandomRewardEligible(id)
+                        || !NpcSpellcasting.isNpcSupportedSpell(id) || spells.contains(id))
+                .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
+        merged.addAll(spells);
+        if (!List.copyOf(merged).equals(existing)) {
+            profile.put("Spells", stringList(List.copyOf(merged)));
         }
     }
 
@@ -4781,6 +4897,8 @@ public final class NpcProfile {
     }
 
     private static NpcSkinCatalog.Skin selectSkin(String archetype, int seed) {
+        if (MERCHANT.equals(archetype)) return new NpcSkinCatalog.Skin(MERCHANT, NpcSkinCatalog.MALE);
+        if (SPELL_MERCHANT.equals(archetype)) return new NpcSkinCatalog.Skin(SpellMerchantStock.SKIN, NpcSkinCatalog.MALE);
         List<NpcSkinCatalog.Skin> skins = switch (archetype) {
             case JINDAN, ZHUJI, LIANQI -> CULTIVATOR_SKINS;
             default -> FANREN_SKINS;

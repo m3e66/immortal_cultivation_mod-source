@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.Mth;
 
 public final class CrimsonSkyFlameFloodDragonRenderer
-        extends GeoEntityRenderer<CrimsonSkyFlameFloodDragonEntity> {
+        extends BeastGeoRenderer<CrimsonSkyFlameFloodDragonEntity> {
     public CrimsonSkyFlameFloodDragonRenderer(EntityRendererProvider.Context context) {
         super(context, new CrimsonSkyFlameFloodDragonModel());
         withScale(CrimsonSkyFlameFloodDragonEntity.MODEL_SCALE);

@@ -1,0 +1,23 @@
+{
+  "name": "Nine-Leaf Immortal Orchid",
+  "icon": "immortal_cultivation_mod:jiuye_xianlan",
+  "category": "immortal_cultivation_mod:volume_4",
+  "sortnum": 11,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Nine-Leaf Immortal Orchid",
+      "text": "$(bold)Spawn attempt frequency: $()1/12"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "The Nine-Leaf Immortal Orchid is an elegant spiritual herb distinguished by its nine leaves. Ancient tales claim that each leaf holds a separate thread of pure natural essence. It grows in peaceful, flourishing environments and is treasured by cultivators for its refined spiritual nature."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Cherry groves, meadows, lush caves, and flower forests."
+    }
+  ]
+}

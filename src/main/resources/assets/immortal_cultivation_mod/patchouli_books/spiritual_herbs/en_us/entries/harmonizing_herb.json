@@ -1,0 +1,23 @@
+{
+  "name": "Harmony Grass",
+  "icon": "immortal_cultivation_mod:harmonizing_herb",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Harmony Grass",
+      "text": "$(bold)Spawn attempt frequency: $()1/6"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Harmony Grass thrives in fertile lands with mild climates. Its spiritual essence is gentle and balanced, neither excessively cold nor hot. Alchemists associate this herb with the principle of harmony, believing that successful refinement requires different medicinal energies to coexist without conflict."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Plains, sunflower plains, forests, and birch forests."
+    }
+  ]
+}

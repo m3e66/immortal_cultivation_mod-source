@@ -1,0 +1,23 @@
+{
+  "name": "Crimson-Scaled Flame Lizard",
+  "icon": "immortal_cultivation_mod:crimson_scale_flame_lizard_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_4",
+  "sortnum": 9,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Crimson-Scaled Flame Lizard",
+      "text": "$(bold)Realm: $()Foundation Establishment – Nascent Soul"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "The Crimson-Scaled Flame Lizard is a ferocious fire-aligned beast covered in burning red scales. It thrives where molten rock flows, absorbing heat to strengthen its body. Capable of unleashing scorching breath, it is equally dangerous in close combat."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Found in badlands and the Nether. Favors netherrack, basalt, blackstone, magma blocks, terracotta, red sand, or locations near lava."
+    }
+  ]
+}

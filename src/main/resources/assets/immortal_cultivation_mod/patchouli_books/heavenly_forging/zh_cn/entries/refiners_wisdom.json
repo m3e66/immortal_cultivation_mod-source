@@ -1,0 +1,43 @@
+{
+  "name": "炼器心得",
+  "icon": "immortal_cultivation_mod:dao",
+  "category": "immortal_cultivation_mod:volume_6",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "炼器心得",
+      "text": "古之炼器师有言："
+    },
+    {
+      "type": "patchouli:text",
+      "title": "炼器心得",
+      "text": "“器不在贵，贵在得法；火不在烈，贵在得度；材不在多，贵在精纯。”"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "选鼎有度",
+      "text": "材料繁复者，须选容量充足之鼎。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "灵石备足",
+      "text": "灵气不足，炉火难继。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "辨材清浊",
+      "text": "纯度既定成败，亦影响熔炼所需时间。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "守火如守心",
+      "text": "火候宜近目标，不可贪高。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "淬炼有序",
+      "text": "需模具之兵器，须经水淬方得成形。"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "序言",
+  "icon": "minecraft:book",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "山海灵兽志",
+      "text": "天地有灵，山川孕兽。凡有灵气汇聚之地，必有异兽潜藏。或温顺通灵，或凶残嗜血，更有上古异种，非大能者不可近之。"
+    }
+  ]
+}

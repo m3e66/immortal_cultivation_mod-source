@@ -22,10 +22,9 @@ public final class BodyCultivationItems {
         public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
             ItemStack stack = player.getItemInHand(hand);
             if (!level.isClientSide && player instanceof ServerPlayer serverPlayer
-                    && BodyCultivation.useBodyTemperingPill(serverPlayer)
-                    && !player.getAbilities().instabuild) {
+                    && BodyCultivation.useBodyTemperingPill(serverPlayer)) {
                 com.example.immortal_cultivation_mod.fate.FateCrafting.consumedPill(serverPlayer, stack);
-                stack.shrink(1);
+                if(!player.getAbilities().instabuild)stack.shrink(1);
             }
             return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
         }
@@ -41,8 +40,8 @@ public final class BodyCultivationItems {
         public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
             ItemStack stack = player.getItemInHand(hand);
             if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
-                BloodQiShield.grant(serverPlayer);
                 com.example.immortal_cultivation_mod.fate.FateCrafting.consumedPill(serverPlayer, stack);
+                BloodQiShield.grant(serverPlayer);
                 if (!player.getAbilities().instabuild) {
                     stack.shrink(1);
                 }

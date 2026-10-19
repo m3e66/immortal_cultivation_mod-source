@@ -1,0 +1,23 @@
+{
+  "name": "Jiao Dragon Flame",
+  "icon": "immortal_cultivation_mod:dragon_flame_seed",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 7,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Jiao Dragon Flame",
+      "text": "Maximum temperature: 10,000°C"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Jiao Dragon Flame",
+      "text": "Qi per pulse: 45"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Jiao Dragon Flame carries the fierce fire essence associated with powerful dragon-like beasts. Its overwhelming heat can refine materials that resist lesser spiritual flames, making it one of the strongest fires below heavenly flame."
+    }
+  ]
+}

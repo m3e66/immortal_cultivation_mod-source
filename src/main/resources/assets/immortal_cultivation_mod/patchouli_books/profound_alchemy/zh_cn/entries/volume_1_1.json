@@ -1,0 +1,18 @@
+{
+  "name": "回灵丹",
+  "icon": "immortal_cultivation_mod:qi_recovery_pill",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "回灵丹乃修士恢复灵气之常用丹药。丹入腹中，药力徐徐化开，沿经脉流转，补充丹田所耗灵气。其性温和，适合斗法之后调息服用。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹效",
+      "text": "十息之内，恢复灵气上限的百分之五。"
+    }
+  ]
+}

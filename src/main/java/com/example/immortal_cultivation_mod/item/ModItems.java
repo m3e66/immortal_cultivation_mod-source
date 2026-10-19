@@ -43,7 +43,28 @@ import java.util.function.Supplier;
 
 public class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ImmortalCultivationMod.MODID);
+    static {
+        for (String old : java.util.List.of("zhuji_vault_guardian_spawn_egg", "jindan_vault_guardian_spawn_egg")) {
+            ITEMS.addAlias(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, old),
+                    net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "vault_guardian_spawn_egg"));
+        }
+        for (String old : java.util.List.of("zhuji_phantom_veil_fox_spawn_egg", "jindan_phantom_veil_fox_spawn_egg")) {
+            ITEMS.addAlias(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, old),
+                    net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "phantom_veil_fox_spawn_egg"));
+        }
+    }
+
     private static final Map<String, DeferredItem<Item>> TALISMAN_FORMULAS = new LinkedHashMap<>();
+
+    public static final DeferredItem<Item> RECIPE_MERCHANT_SPAWN_EGG = registerItem("recipe_merchant_spawn_egg",
+            () -> new net.neoforged.neoforge.common.DeferredSpawnEggItem(
+                    com.example.immortal_cultivation_mod.entity.ModEntities.RECIPE_MERCHANT,
+                    0x52334A, 0xD7AB53, new Item.Properties()));
+
+    public static final DeferredItem<Item> SPELL_MERCHANT_SPAWN_EGG = registerItem("spell_merchant_spawn_egg",
+            () -> new net.neoforged.neoforge.common.DeferredSpawnEggItem(
+                    com.example.immortal_cultivation_mod.entity.ModEntities.SPELL_MERCHANT,
+                    0x543876, 0xB7E4CD, new Item.Properties()));
 
     public static final DeferredItem<Item> FIREBALL_SCROLL = registerItem("fireball_scroll",
             () -> new SpellScrollItem(new Item.Properties().stacksTo(1), ModSpells.FIREBALL));
@@ -275,13 +296,13 @@ public class ModItems {
 
     public static final DeferredItem<Item> CRIMSON_SCALE_FLAME_LIZARD_SPAWN_EGG =
             registerItem("crimson_scale_flame_lizard_spawn_egg",
-                    () -> new SpawnEggItem(
+                    () -> new BeastSpawnEggItem(
                             com.example.immortal_cultivation_mod.entity.ModEntities.CRIMSON_SCALE_FLAME_LIZARD.get(),
                             0x8A1E18, 0xFF8C24, new Item.Properties()));
 
     public static final DeferredItem<Item> CRIMSON_SKY_FLAME_FLOOD_DRAGON_SPAWN_EGG =
             registerItem("crimson_sky_flame_flood_dragon_spawn_egg",
-                    () -> new SpawnEggItem(
+                    () -> new BeastSpawnEggItem(
                             com.example.immortal_cultivation_mod.entity.ModEntities
                                     .CRIMSON_SKY_FLAME_FLOOD_DRAGON.get(),
                             0x3A0704, 0xFF5A0A, new Item.Properties()));
@@ -294,97 +315,75 @@ public class ModItems {
 
     public static final DeferredItem<Item> BLOOD_APE_DEMON_GENERAL_SPAWN_EGG =
             registerItem("blood_ape_demon_general_spawn_egg",
-                    () -> new SpawnEggItem(
+                    () -> new BeastSpawnEggItem(
                             com.example.immortal_cultivation_mod.entity.ModEntities
                                     .BLOOD_APE_DEMON_GENERAL.get(),
                             0x35100D, 0xB83228, new Item.Properties()));
 
-    public static final DeferredItem<Item> ZHUJI_VAULT_GUARDIAN_SPAWN_EGG =
-            registerItem("zhuji_vault_guardian_spawn_egg",
-                    () -> new SpawnEggItem(
-                            com.example.immortal_cultivation_mod.entity.ModEntities
-                                    .ZHUJI_VAULT_GUARDIAN.get(),
-                            0x17191C, 0xB54A27, new Item.Properties()));
-
-    public static final DeferredItem<Item> JINDAN_VAULT_GUARDIAN_SPAWN_EGG =
-            registerItem("jindan_vault_guardian_spawn_egg",
-                    () -> new SpawnEggItem(
-                            com.example.immortal_cultivation_mod.entity.ModEntities
-                                    .JINDAN_VAULT_GUARDIAN.get(),
+    public static final DeferredItem<Item> VAULT_GUARDIAN_SPAWN_EGG =
+            registerItem("vault_guardian_spawn_egg",
+                    () -> new BeastSpawnEggItem(
+                            com.example.immortal_cultivation_mod.entity.ModEntities.VAULT_GUARDIAN.get(),
                             0x111315, 0xFF8A24, new Item.Properties()));
 
     public static final DeferredItem<Item> AZURE_SPIRIT_SILKWORM_SPAWN_EGG =
             registerItem("azure_spirit_silkworm_spawn_egg",
-                    () -> new SpawnEggItem(
+                    () -> new BeastSpawnEggItem(
                             com.example.immortal_cultivation_mod.entity.ModEntities.AZURE_SPIRIT_SILKWORM.get(),
                             0x66DDE0, 0xE8FFFF, new Item.Properties()));
 
     public static final DeferredItem<Item> KONGMING_BEETLE_SPAWN_EGG =
             registerItem("kongming_beetle_spawn_egg",
-                    () -> new SpawnEggItem(
+                    () -> new BeastSpawnEggItem(
                             com.example.immortal_cultivation_mod.entity.ModEntities.KONGMING_BEETLE.get(),
                             0x252633, 0x7654D8, new Item.Properties()));
 
     public static final DeferredItem<Item> THUNDERHORN_ROCK_BADGER_SPAWN_EGG =
             registerItem("thunderhorn_rock_badger_spawn_egg",
-                    () -> new SpawnEggItem(
+                    () -> new BeastSpawnEggItem(
                             com.example.immortal_cultivation_mod.entity.ModEntities
                                     .THUNDERHORN_ROCK_BADGER.get(),
                             0x242421, 0xE2A53E, new Item.Properties()));
 
     public static final DeferredItem<Item> FROSTSPINE_CAVE_BEAR_SPAWN_EGG =
             registerItem("frostspine_cave_bear_spawn_egg",
-                    () -> new SpawnEggItem(
+                    () -> new BeastSpawnEggItem(
                             com.example.immortal_cultivation_mod.entity.ModEntities
                                     .FROSTSPINE_CAVE_BEAR.get(),
                             0x1C2631, 0x8FDFFF, new Item.Properties()));
 
     public static final DeferredItem<Item> GREEN_PATTERNED_SPIRIT_DEVOURING_RAT_SPAWN_EGG =
             registerItem("green_patterned_spirit_devouring_rat_spawn_egg",
-                    () -> new SpawnEggItem(com.example.immortal_cultivation_mod.entity.ModEntities
+                    () -> new BeastSpawnEggItem(com.example.immortal_cultivation_mod.entity.ModEntities
                             .GREEN_PATTERNED_SPIRIT_DEVOURING_RAT.get(),
                             0x171A18, 0x55D83E, new Item.Properties()));
 
     public static final DeferredItem<Item> RED_BACKED_IRON_SCALE_SCORPION_SPAWN_EGG =
             registerItem("red_backed_iron_scale_scorpion_spawn_egg",
-                    () -> new SpawnEggItem(com.example.immortal_cultivation_mod.entity.ModEntities
+                    () -> new BeastSpawnEggItem(com.example.immortal_cultivation_mod.entity.ModEntities
                             .RED_BACKED_IRON_SCALE_SCORPION.get(),
                             0x161616, 0xE13A1C, new Item.Properties()));
 
     public static final DeferredItem<Item> WIND_FEATHER_CLIFF_DEER_SPAWN_EGG =
             registerItem("wind_feather_cliff_deer_spawn_egg",
-                    () -> new SpawnEggItem(com.example.immortal_cultivation_mod.entity.ModEntities
+                    () -> new BeastSpawnEggItem(com.example.immortal_cultivation_mod.entity.ModEntities
                             .WIND_FEATHER_CLIFF_DEER.get(),
                             0xC8C8BE, 0x56C6C3, new Item.Properties()));
 
     public static final DeferredItem<Item> INK_ARMORED_STONE_DEVOURING_TORTOISE_SPAWN_EGG =
             registerItem("ink_armored_stone_devouring_tortoise_spawn_egg",
-                    () -> new SpawnEggItem(com.example.immortal_cultivation_mod.entity.ModEntities
+                    () -> new BeastSpawnEggItem(com.example.immortal_cultivation_mod.entity.ModEntities
                             .INK_ARMORED_STONE_DEVOURING_TORTOISE.get(),
                             0x1B1B1B, 0xB38A3F, new Item.Properties()));
 
     public static final DeferredItem<Item> EMBER_FEATHER_FIRE_OWL_SPAWN_EGG =
             registerItem("ember_feather_fire_owl_spawn_egg",
-                    () -> new SpawnEggItem(com.example.immortal_cultivation_mod.entity.ModEntities
+                    () -> new BeastSpawnEggItem(com.example.immortal_cultivation_mod.entity.ModEntities
                             .EMBER_FEATHER_FIRE_OWL.get(),
                             0x171414, 0xFF5A16, new Item.Properties()));
-    public static final DeferredItem<Item> ZHUJI_PHANTOM_VEIL_FOX_SPAWN_EGG =
-            registerItem("zhuji_phantom_veil_fox_spawn_egg",
-                    () -> new SpawnEggItem(
-                            com.example.immortal_cultivation_mod.entity.ModEntities
-                                    .ZHUJI_PHANTOM_VEIL_FOX.get(),
-                            0x8E929D, 0x7774A8, new Item.Properties()));
-
-    public static final DeferredItem<Item> JINDAN_PHANTOM_VEIL_FOX_SPAWN_EGG =
-            registerItem("jindan_phantom_veil_fox_spawn_egg",
-                    () -> new SpawnEggItem(
-                            com.example.immortal_cultivation_mod.entity.ModEntities
-                                    .JINDAN_PHANTOM_VEIL_FOX.get(),
-                            0x9EA1AF, 0x8860BD, new Item.Properties()));
-
     public static final DeferredItem<Item> PHANTOM_VEIL_FOX_SPAWN_EGG =
             registerItem("phantom_veil_fox_spawn_egg",
-                    () -> new SpawnEggItem(
+                    () -> new BeastSpawnEggItem(
                             com.example.immortal_cultivation_mod.entity.ModEntities
                                     .PHANTOM_VEIL_FOX.get(),
                             0xAAA8B5, 0x995CD3, new Item.Properties()));
@@ -411,6 +410,10 @@ public class ModItems {
 
     public static final DeferredItem<Item> DEBUG_TIME_CONTROLLER = registerItem("debug_time_controller",
             () -> new DebugTimeControllerItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> TRAINING_DUMMY = registerItem("training_dummy",
+            () -> new TrainingDummyItem(new Item.Properties().stacksTo(16)));
+    public static final DeferredItem<Item> DUMMY_CONTROL_STICK = registerItem("dummy_control_stick",
+            () -> new DummyControlStickItem(new Item.Properties().stacksTo(1)));
 
     public static final DeferredItem<Item> RESTRICTION_INSIGHT = registerItem("restriction_insight",
             () -> new RestrictionInsightItem(new Item.Properties().stacksTo(16)));
@@ -655,10 +658,10 @@ public class ModItems {
             () -> new ForgingYujianItem(new Item.Properties().stacksTo(1)));
 
     public static final DeferredItem<Item> CHI_LIN = registerItem("chi_lin",
-            () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON), 3));
 
     public static final DeferredItem<Item> HUO_XI_BLOOD = registerItem("huo_xi_blood",
-            () -> new Item(new Item.Properties().stacksTo(64)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(64), 3));
 
     public static final DeferredItem<Item> LIANQI_YAODAN = registerItem("lianqi_yaodan",
             () -> new Item(new Item.Properties().stacksTo(16).rarity(Rarity.UNCOMMON)));
@@ -667,7 +670,7 @@ public class ModItems {
             () -> new Item(new Item.Properties().stacksTo(16).rarity(Rarity.RARE)));
 
     public static final DeferredItem<Item> CHIYAN_BONE = registerItem("chiyan_bone",
-            () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.RARE)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(64).rarity(Rarity.RARE), 3));
 
     public static final DeferredItem<Item> YUANYING_YAODAN = registerItem("yuanying_yaodan",
             () -> new Item(new Item.Properties().stacksTo(16).rarity(Rarity.EPIC)));
@@ -688,65 +691,70 @@ public class ModItems {
             () -> new Item(new Item.Properties().stacksTo(16).rarity(Rarity.EPIC)));
 
     public static final DeferredItem<Item> YANJIAO_HORN = registerItem("yanjiao_horn",
-            () -> new Item(new Item.Properties().stacksTo(16).rarity(Rarity.RARE)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(16).rarity(Rarity.RARE), 4));
 
     public static final DeferredItem<Item> YAOYUAN_BONE = registerItem("yaoyuan_bone",
-            () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.RARE)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(64).rarity(Rarity.RARE), 4));
 
     public static final DeferredItem<Item> XUESHA_HIDE = registerItem("xuesha_hide",
-            () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.RARE)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(64).rarity(Rarity.RARE), 4));
 
     public static final DeferredItem<Item> PHANTOM_VEIL_FUR = registerItem("phantom_veil_fur",
             () -> new PhantomVeilFurItem(new Item.Properties().stacksTo(64).rarity(Rarity.EPIC)));
 
     public static final DeferredItem<Item> KONGMING_STONE = registerItem("kongming_stone",
-            () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.RARE)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(64).rarity(Rarity.RARE), 2));
 
     public static final DeferredItem<Item> ROCK_BADGER_HIDE = registerItem("rock_badger_hide",
-            () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON), 2));
 
     public static final DeferredItem<Item> THUNDER_PATTERNED_ROCK_PLATE =
             registerItem("thunder_patterned_rock_plate",
-                    () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON)));
+                    () -> new BeastMaterialItem(new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON), 2));
 
     public static final DeferredItem<Item> ZHUJI_YAODAN = registerItem("zhuji_yaodan",
             () -> new Item(new Item.Properties().stacksTo(16).rarity(Rarity.RARE)));
 
     public static final DeferredItem<Item> THUNDER_HORN = registerItem("thunder_horn",
-            () -> new Item(new Item.Properties().stacksTo(16).rarity(Rarity.RARE)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(16).rarity(Rarity.RARE), 2));
 
     public static final DeferredItem<Item> FROSTSPINE_HIDE = registerItem("frostspine_hide",
-            () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON), 2));
 
     public static final DeferredItem<Item> SPIRIT_DEVOURING_RAT_HIDE =
             registerItem("spirit_devouring_rat_hide",
-                    () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.COMMON)));
+                    () -> new BeastMaterialItem(new Item.Properties().stacksTo(64).rarity(Rarity.COMMON), 1));
     public static final DeferredItem<Item> SPIRIT_SCENT_WHISKER =
             registerItem("spirit_scent_whisker",
-                    () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON)));
+                    () -> new BeastMaterialItem(new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON), 1));
     public static final DeferredItem<Item> IRON_SCALE_PLATE = registerItem("iron_scale_plate",
-            () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON), 1));
     public static final DeferredItem<Item> CRIMSON_VENOM_SAC = registerItem("crimson_venom_sac",
-            () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON), 1));
     public static final DeferredItem<Item> SCORPION_TAIL_STINGER = registerItem("scorpion_tail_stinger",
-            () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON), 1));
     public static final DeferredItem<Item> WIND_FEATHER = registerItem("wind_feather",
-            () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.RARE)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(64).rarity(Rarity.RARE), 2));
     public static final DeferredItem<Item> SPIRIT_DEER_ANTLER = registerItem("spirit_deer_antler",
-            () -> new Item(new Item.Properties().stacksTo(32).rarity(Rarity.RARE)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(32).rarity(Rarity.RARE), 2));
     public static final DeferredItem<Item> INK_ARMOR_PLATE = registerItem("ink_armor_plate",
-            () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.RARE)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(64).rarity(Rarity.RARE), 2));
     public static final DeferredItem<Item> MINERAL_MARROW = registerItem("mineral_marrow",
-            () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.RARE)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(64).rarity(Rarity.RARE), 2));
     public static final DeferredItem<Item> PROFOUND_IRON_ARMOR_CORE =
             registerItem("profound_iron_armor_core",
-                    () -> new Item(new Item.Properties().stacksTo(16).rarity(Rarity.EPIC)));
+                    () -> new BeastMaterialItem(new Item.Properties().stacksTo(16).rarity(Rarity.EPIC), 2));
     public static final DeferredItem<Item> EMBER_FEATHER = registerItem("ember_feather",
-            () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.RARE)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(64).rarity(Rarity.RARE), 3));
     public static final DeferredItem<Item> FIRE_OWL_CLAW = registerItem("fire_owl_claw",
-            () -> new Item(new Item.Properties().stacksTo(32).rarity(Rarity.RARE)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(32).rarity(Rarity.RARE), 3));
     public static final DeferredItem<Item> FLAME_RADIANCE_BONE = registerItem("flame_radiance_bone",
-            () -> new Item(new Item.Properties().stacksTo(16).rarity(Rarity.EPIC)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(16).rarity(Rarity.EPIC), 3));
+    public static final DeferredItem<Item> MORTAL_BEAST_MEAT = registerItem("mortal_beast_meat",
+            () -> new Item(new Item.Properties().stacksTo(64).food(
+                    new FoodProperties.Builder().nutrition(6)
+                            .saturationModifier(0.55F).build())));
+
     public static final DeferredItem<Item> LIANQI_BEAST_MEAT = registerItem("lianqi_beast_meat",
             () -> new Item(new Item.Properties().stacksTo(64).food(
                     new FoodProperties.Builder().nutrition(6)
@@ -793,7 +801,7 @@ public class ModItems {
                             .saturationModifier(0.55F).build())));
 
     public static final DeferredItem<Item> COLD_MARROW = registerItem("cold_marrow",
-            () -> new Item(new Item.Properties().stacksTo(16).rarity(Rarity.RARE)));
+            () -> new BeastMaterialItem(new Item.Properties().stacksTo(16).rarity(Rarity.RARE), 2));
 
     public static final DeferredItem<Item> XUANDUAN_IRON_SHARD = registerItem(
             "xuanduan_iron_shard",
@@ -1105,6 +1113,8 @@ public class ModItems {
 
     public static final DeferredItem<Item> FEIJIAN_YUJIAN = registerItem("feijian_yujian",
             () -> new ForgingYujianItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> QINGTONG_YINHUO_DING_YUJIAN = registerItem("qingtong_yinhuo_ding_yujian",
+            () -> new ForgingYujianItem(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> CHI_JIN_SANYANG_DING_YUJIAN = registerItem("chi_jin_sanyang_ding_yujian",
             () -> new ForgingYujianItem(new Item.Properties().stacksTo(1)));
 
@@ -1205,14 +1215,6 @@ public class ModItems {
 
     public static final DeferredItem<Item> BLACK_IRON_JIAN = registerItem("black_iron_jian",
             () -> new HigherWeaponItem(HigherWeaponSpec.BLACK_IRON_JIAN,new Item.Properties().stacksTo(1)));
-    public static final DeferredItem<Item> JIN_HULU = registerItem("jin_hulu",
-            () -> new com.example.immortal_cultivation_mod.pagoda.GoldenGourdItem(new Item.Properties()));
-    public static final DeferredItem<Item> JIN_HULU_YUJIAN = registerItem("jin_hulu_yujian",
-            () -> new ForgingYujianItem(new Item.Properties().stacksTo(1)));
-    public static final DeferredItem<Item> BAOTA = registerItem("baota",
-            () -> new com.example.immortal_cultivation_mod.pagoda.PagodaItem(new Item.Properties()));
-    public static final DeferredItem<Item> BAOTA_YUJIAN = registerItem("baota_yujian",
-            () -> new ForgingYujianItem(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> BLACK_IRON_JIAN_YUJIAN = registerItem("black_iron_jian_yujian",
             () -> new ForgingYujianItem(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> BLACK_IRON_GREATSWORD = registerItem("black_iron_greatsword",
@@ -1456,8 +1458,8 @@ public class ModItems {
                 case SpiritRoots.THUNDER -> ChatFormatting.LIGHT_PURPLE;
                 case SpiritRoots.ICE -> ChatFormatting.BLUE;
                 case SpiritRoots.WIND -> ChatFormatting.DARK_AQUA;
-                case SpiritRoots.LIGHT -> ChatFormatting.WHITE;
-                case SpiritRoots.DARK -> ChatFormatting.DARK_PURPLE;
+                case SpiritRoots.YANG -> ChatFormatting.WHITE;
+                case SpiritRoots.YIN -> ChatFormatting.DARK_PURPLE;
                 default -> ChatFormatting.GRAY;
             };
         }
@@ -1499,7 +1501,7 @@ public class ModItems {
             if (!level.isClientSide && player instanceof net.minecraft.server.level.ServerPlayer sp) {
                 var data = ModAttachments.getData(sp);
                 long need = CultivationLevels.getTotalQiNeeded(data.cultivationLevel());
-                long progress = fillToRequirement ? need : Math.min(need, data.cultivationProgress() + progressAmount);
+                long progress = fillToRequirement ? need : Math.min(need, data.cultivationProgress() + com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.cultivationGain(sp, progressAmount));
                 ModAttachments.setData(sp, data.withCultivationProgress(progress));
                 if (!sp.getAbilities().instabuild) {
                     stack.shrink(1);

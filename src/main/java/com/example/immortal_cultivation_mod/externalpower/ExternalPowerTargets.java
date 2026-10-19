@@ -11,6 +11,7 @@ public final class ExternalPowerTargets {
     private ExternalPowerTargets() {}
     /** Negative means this entity has no cultivation-realm contract and must remain untouched. */
     public static int realm(LivingEntity target) {
+        if (target instanceof RealmBeast beast) return beast.beastRealm();
         if(target instanceof Player p)return CultivationLevels.getRealmIndex(ModAttachments.getData(p).cultivationLevel());
         if(target instanceof CultivationNpc npc)return CultivationLevels.getRealmIndex(npc.npcRealm());
         if(target instanceof PhantomVeilFoxEntity fox)return CultivationLevels.getRealmIndex(fox.cultivationRealm());

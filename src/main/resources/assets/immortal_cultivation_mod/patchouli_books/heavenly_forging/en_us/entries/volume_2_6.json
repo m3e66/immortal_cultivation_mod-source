@@ -1,0 +1,23 @@
+{
+  "name": "Netherworld Yin Flame",
+  "icon": "immortal_cultivation_mod:nether_flame_seed",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Netherworld Yin Flame",
+      "text": "Maximum temperature: 8,000°C"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Netherworld Yin Flame",
+      "text": "Qi per pulse: 30"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Netherworld Yin Flame is a mysterious fire associated with dark and cold spiritual energy. Though its appearance may seem subdued, it possesses tremendous refining power and can reach temperatures far beyond conventional flames."
+    }
+  ]
+}

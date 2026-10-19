@@ -36,6 +36,7 @@ public final class QiInfusedWeapon {
     }
 
     public static void inject(ServerPlayer player) {
+        if (!WeaponBinding.checkUse(player.getMainHandItem(), player)) return;
         ItemStack stack = player.getMainHandItem();
         if (stack.isEmpty()) {
             player.displayClientMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".qi_inject_need_weapon"), true);
@@ -47,7 +48,7 @@ public final class QiInfusedWeapon {
         }
 
         var data = ModAttachments.getData(player);
-        int maxQi = Math.max(1, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
+        int maxQi = Math.max(1, data.maxQi());
         int cost = Math.max(1, maxQi / 100);
         if (data.qi() < cost) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
@@ -129,7 +130,7 @@ public final class QiInfusedWeapon {
         }
 
         ItemStack stack = player.getMainHandItem();
-        if (!canAutoChannel(stack)) {
+        if (!canAutoChannel(stack) || !WeaponBinding.canUse(stack, player)) {
             return;
         }
 
@@ -143,7 +144,7 @@ public final class QiInfusedWeapon {
         }
 
         var data = ModAttachments.getData(player);
-        int maxQi = Math.max(1, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
+        int maxQi = Math.max(1, data.maxQi());
         int transfer = Math.min(data.qi(), Math.max(1, maxQi / 100));
         if (transfer <= 0) {
             return;
@@ -281,7 +282,7 @@ public final class QiInfusedWeapon {
     }
 
     public static boolean isFistWeapon(ItemStack stack) {
-        return HeavyIronBracerItem.isRealStack(stack) || stack.getItem() instanceof com.example.immortal_cultivation_mod.pagoda.GoldenGourdItem;
+        return HeavyIronBracerItem.isRealStack(stack);
     }
 
     public static boolean supportsOutwardQi(ItemStack stack) {

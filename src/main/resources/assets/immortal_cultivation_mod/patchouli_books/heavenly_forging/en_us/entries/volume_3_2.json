@@ -1,0 +1,33 @@
+{
+  "name": "Insert Materials and Spirit Stones",
+  "icon": "immortal_cultivation_mod:dao",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Open the cauldron and insert the required materials, recipe jade slip, and spirit stones."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": " Complete weapon-shard sets may be reforged without a recipe jade slip. The output slot must be empty before forging begins."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Rule Reference",
+      "text": "Standard Forging / 64"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Rule Reference",
+      "text": "Crimson Flame Seed / 8"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Rule Reference",
+      "text": "Weapon Shard Reforging / 128"
+    }
+  ]
+}

@@ -6,6 +6,18 @@ import java.util.List;
 public final class DaoGuidanceExpansion {
     private DaoGuidanceExpansion() {}
     private static final List<DaoGuidanceContent.Chapter> CHAPTERS = List.of(
+            new DaoGuidanceContent.Chapter("learning_puzzles", true, List.of(
+                    new DaoGuidanceContent.Objective("step_1", "read:learning_puzzles:step_1", 1),
+                    new DaoGuidanceContent.Objective("step_2", "read:learning_puzzles:step_2", 1),
+                    new DaoGuidanceContent.Objective("step_3", "read:learning_puzzles:step_3", 1),
+                    new DaoGuidanceContent.Objective("step_4", "read:learning_puzzles:step_4", 1),
+                    new DaoGuidanceContent.Objective("step_5", "read:learning_puzzles:step_5", 1))),
+            new DaoGuidanceContent.Chapter("pill_toxicity",true,List.of(
+                    new DaoGuidanceContent.Objective("step_1","read:pill_toxicity:step_1",1),
+                    new DaoGuidanceContent.Objective("step_2","read:pill_toxicity:step_2",1),
+                    new DaoGuidanceContent.Objective("step_3","read:pill_toxicity:step_3",1),
+                    new DaoGuidanceContent.Objective("step_4","read:pill_toxicity:step_4",1),
+                    new DaoGuidanceContent.Objective("step_5","read:pill_toxicity:step_5",1))),
             new DaoGuidanceContent.Chapter("special_flames", true, List.of(
                     new DaoGuidanceContent.Objective("step_1", "guide_flame_seen", 1),
                     new DaoGuidanceContent.Objective("step_2", "read:special_flames:step_2", 1),
@@ -92,14 +104,16 @@ public final class DaoGuidanceExpansion {
                     new DaoGuidanceContent.Objective("step_4", "guide_pendant_triggered", 1),
                     new DaoGuidanceContent.Objective("step_5", "guide_leaf_triggered", 1),
                     new DaoGuidanceContent.Objective("step_6", "read:accessories:step_6", 1))));
-    public static List<DaoGuidanceContent.Chapter> chapters() { return CHAPTERS; }
+    private static final List<DaoGuidanceContent.Chapter> ALL_CHAPTERS = java.util.stream.Stream.concat(
+            CHAPTERS.stream(), DaoGuidanceUpdates.chapters().stream()).toList();
+    public static List<DaoGuidanceContent.Chapter> chapters() { return ALL_CHAPTERS; }
     public static boolean isReading(String action) {
         return action != null && action.startsWith("read:")
                 && DaoGuidanceContent.chapters().stream().flatMap(c -> c.objectives().stream())
                 .anyMatch(o -> o.action().equals(action));
     }
     public static String chapterFor(String action) {
-        return CHAPTERS.stream().filter(c -> c.objectives().stream()
+        return ALL_CHAPTERS.stream().filter(c -> c.objectives().stream()
                 .anyMatch(o -> o.action().equals(action))).map(DaoGuidanceContent.Chapter::id)
                 .findFirst().orElse("");
     }

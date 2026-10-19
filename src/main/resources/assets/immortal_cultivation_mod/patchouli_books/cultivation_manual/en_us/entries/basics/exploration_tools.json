@@ -1,0 +1,23 @@
+{
+  "name": "Seeking Veins and Spiritwood",
+  "icon": "immortal_cultivation_mod:yinyang_compass",
+  "category": "immortal_cultivation_mod:basics",
+  "sortnum": 37,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Read the Compass",
+      "text": "The Yin-Yang Compass shows Yin Qi and spiritual Qi. Compare numeric readings rather than color alone. Map locations have coordinates and can be pinned as targets; keep the compass in hand to see your position and navigation on the HUD."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Follow the Bearing",
+      "text": "After pinning a point, follow its X/Z, bearing, distance, and coordinate offsets while moving. There is no need to reopen the map every few steps. Pins belong to the current world; confirm a new target after changing dimension or save."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Spiritwood Groves",
+      "text": "Natural Spirit Wood Trees gather in Overworld Spiritwood Groves. Search newly generated temperate forest terrain; explored land does not change biome automatically. Collected saplings may be planted, subject to their growth conditions."
+    }
+  ]
+}

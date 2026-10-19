@@ -1,0 +1,23 @@
+{
+  "name": "赤鳞炎蜥",
+  "icon": "immortal_cultivation_mod:crimson_scale_flame_lizard_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_4",
+  "sortnum": 9,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "赤鳞炎蜥",
+      "text": "$(bold)境界：$()筑基至元婴"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《灵兽志》记载",
+      "text": "赤鳞炎蜥乃火属凶兽，遍体赤鳞，血脉炽热。常盘踞于熔岩流淌之地，以地火温养肉身。其性暴烈，吐息可化烈焰，近身亦凶险万分。低阶修士遇之，宜避其锋芒。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻踪",
+      "text": "出没于恶地与下界火域，喜地狱岩、玄武岩、黑石、岩浆块、赤沙及陶土之地，亦常见于熔岩附近。"
+    }
+  ]
+}

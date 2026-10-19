@@ -396,7 +396,7 @@ public final class MethodTechniqueAreaEntity extends Entity
         if (tickCount == 1) {
             createTemporaryGrowth(level, radius);
             ring(level, ModParticles.METHOD_QI_WOOD.get(), radius, 72, 0.16D);
-            ring(level, ModParticles.METHOD_QI_LIGHT.get(), radius * 0.72D, 48, 0.11D);
+            ring(level, ModParticles.METHOD_QI_YANG.get(), radius * 0.72D, 48, 0.11D);
         }
         if (tickCount % 5 == 0) {
             double expanding = Math.min(radius, 1.0D + tickCount * 0.15D);
@@ -503,7 +503,7 @@ public final class MethodTechniqueAreaEntity extends Entity
                         0.08D + Math.sin(t * Math.PI) * 0.07D,
                         Math.sin(angle) * radius * t);
                 level.sendParticles(segment % 3 == 0
-                                ? ModParticles.METHOD_QI_LIGHT.get()
+                                ? ModParticles.METHOD_QI_YANG.get()
                                 : ModParticles.METHOD_QI_WOOD.get(),
                         point.x, point.y, point.z, 1,
                         0.0D, 0.008D, 0.0D, 0.0D);
@@ -578,7 +578,7 @@ public final class MethodTechniqueAreaEntity extends Entity
     }
 
     private boolean damage(LivingEntity owner, LivingEntity target, float base, String spellId) {
-        return target.hurt(damageSources().indirectMagic(this, owner),
+        return target.hurt(com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.spellSource(damageSources().indirectMagic(this, owner), spellId),
                 SpellDamageHelper.damage(owner, SpellCharge.damage(base, chargeScale()),
                         ModSpells.get(spellId)));
     }

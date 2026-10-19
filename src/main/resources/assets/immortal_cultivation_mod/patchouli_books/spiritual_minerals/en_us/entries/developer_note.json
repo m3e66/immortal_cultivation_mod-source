@@ -1,0 +1,13 @@
+{
+  "name": "Developer Note",
+  "icon": "minecraft:bedrock",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Developer Note",
+      "text": "Current Spirit Stone vein centers can be selected below the world's minimum height, causing some attempts to fail. Actual vein frequency may therefore be lower than the configured 1-in-4 chunk attempt rate. The vein code's height selection also overrides the Y 80–120 setting in the placement configuration."
+    }
+  ]
+}

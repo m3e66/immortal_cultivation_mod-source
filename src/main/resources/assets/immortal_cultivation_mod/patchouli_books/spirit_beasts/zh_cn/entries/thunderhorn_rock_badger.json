@@ -1,0 +1,23 @@
+{
+  "name": "雷角岩獾",
+  "icon": "immortal_cultivation_mod:thunderhorn_rock_badger_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "雷角岩獾",
+      "text": "$(bold)境界：$()炼气至金丹"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《灵兽志》记载",
+      "text": "雷角岩獾生于高山险地，额生雷角，性情刚烈。常穿行于峭壁碎岩之间，体内隐蕴雷霆之气。山间风雷交错之处，偶可见其身影。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻踪",
+      "text": "多见于狂风山地、石峰、尖峭雪峰、草甸、山间林地及钟乳石洞穴，须有坚实地面。"
+    }
+  ]
+}

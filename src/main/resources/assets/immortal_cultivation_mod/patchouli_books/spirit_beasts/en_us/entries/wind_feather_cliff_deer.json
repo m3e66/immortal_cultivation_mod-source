@@ -1,0 +1,23 @@
+{
+  "name": "Windfeather Cliff Deer",
+  "icon": "immortal_cultivation_mod:wind_feather_cliff_deer_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 8,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Windfeather Cliff Deer",
+      "text": "$(bold)Realm: $()Qi Refining – Golden Core"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Graceful and swift, the Windfeather Cliff Deer moves effortlessly across mountain ridges and steep cliffs. It is most often seen beneath the morning sun or in daylight, standing where mountain winds flow freely. Its keen senses make approaching it difficult."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Found in windswept hills, meadows, groves, and jagged or stony peaks. Requires Y > 90, open sky, and daytime or dawn."
+    }
+  ]
+}

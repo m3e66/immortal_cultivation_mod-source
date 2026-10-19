@@ -24,8 +24,6 @@ import org.joml.Vector3f;
  */
 public final class CosmicVoidDynamicVfxRenderer {
     private static final float TAU = (float) (Math.PI * 2.0D);
-    private static final int COMPATIBILITY_SPHERE_RINGS = 8;
-    private static final int COMPATIBILITY_SPHERE_SEGMENTS = 32;
     private static final ResourceLocation STAR_GLOW = ResourceLocation.fromNamespaceAndPath(
             ImmortalCultivationMod.MODID, "textures/environment/void_star_glow.png");
     private static final ResourceLocation COMET_TEXTURE = ResourceLocation.fromNamespaceAndPath(
@@ -543,7 +541,7 @@ public final class CosmicVoidDynamicVfxRenderer {
 
     private static void ringVertex(BufferBuilder buffer, Matrix4f matrix, Vector3f point,
                                    float u, float v, float alpha) {
-        buffer.addVertex(matrix, point.x, point.y, point.z)
+        VfxVertexWriter.vertex(buffer, matrix, point.x, point.y, point.z)
                 .setUv(u, v)
                 .setColor(1.0F, 1.0F, 1.0F, alpha);
     }
@@ -1029,9 +1027,9 @@ public final class CosmicVoidDynamicVfxRenderer {
     private static void triangle(BufferBuilder buffer, Matrix4f matrix,
                                  Vector3f first, Vector3f second, Vector3f third,
                                  float red, float green, float blue, float alpha) {
-        buffer.addVertex(matrix, first.x, first.y, first.z).setColor(red, green, blue, alpha);
-        buffer.addVertex(matrix, second.x, second.y, second.z).setColor(red, green, blue, alpha);
-        buffer.addVertex(matrix, third.x, third.y, third.z).setColor(red, green, blue, alpha);
+        VfxVertexWriter.vertex(buffer, matrix, first.x, first.y, first.z).setColor(red, green, blue, alpha);
+        VfxVertexWriter.vertex(buffer, matrix, second.x, second.y, second.z).setColor(red, green, blue, alpha);
+        VfxVertexWriter.vertex(buffer, matrix, third.x, third.y, third.z).setColor(red, green, blue, alpha);
     }
 
     private static void addPlaneQuad(BufferBuilder buffer, Matrix4f matrix,
@@ -1077,18 +1075,18 @@ public final class CosmicVoidDynamicVfxRenderer {
 
     private static void addShard(BufferBuilder buffer, Matrix4f matrix, float size,
                                  float red, float green, float blue, float alpha) {
-        buffer.addVertex(matrix, -size * 0.74F, -size * 0.22F, 0.0F)
+        VfxVertexWriter.vertex(buffer, matrix, -size * 0.74F, -size * 0.22F, 0.0F)
                 .setColor(red * 0.66F, green * 0.66F, blue * 0.72F, alpha);
-        buffer.addVertex(matrix, size * 0.86F, 0.0F, 0.0F)
+        VfxVertexWriter.vertex(buffer, matrix, size * 0.86F, 0.0F, 0.0F)
                 .setColor(red, green, blue, alpha);
-        buffer.addVertex(matrix, -size * 0.31F, size * 0.30F, size * 0.18F)
+        VfxVertexWriter.vertex(buffer, matrix, -size * 0.31F, size * 0.30F, size * 0.18F)
                 .setColor(red * 0.82F, green * 0.82F, blue, alpha);
 
-        buffer.addVertex(matrix, -size * 0.54F, 0.0F, -size * 0.13F)
+        VfxVertexWriter.vertex(buffer, matrix, -size * 0.54F, 0.0F, -size * 0.13F)
                 .setColor(red * 0.58F, green * 0.58F, blue * 0.68F, alpha);
-        buffer.addVertex(matrix, size * 0.70F, size * 0.13F, 0.0F)
+        VfxVertexWriter.vertex(buffer, matrix, size * 0.70F, size * 0.13F, 0.0F)
                 .setColor(red, green, blue, alpha);
-        buffer.addVertex(matrix, -size * 0.17F, -size * 0.34F, size * 0.19F)
+        VfxVertexWriter.vertex(buffer, matrix, -size * 0.17F, -size * 0.34F, size * 0.19F)
                 .setColor(red * 0.76F, green * 0.76F, blue * 0.94F, alpha);
     }
 
@@ -1153,75 +1151,34 @@ public final class CosmicVoidDynamicVfxRenderer {
     private static void addCompatibleSphere(
             BufferBuilder buffer, Matrix4f matrix, Vector3f center, Basis basis,
             float halfSize, float red, float green, float blue, float alpha) {
-        for (int ring = 1; ring <= COMPATIBILITY_SPHERE_RINGS; ring++) {
-            float innerRadius = (ring - 1) / (float) COMPATIBILITY_SPHERE_RINGS;
-            float outerRadius = ring / (float) COMPATIBILITY_SPHERE_RINGS;
-            for (int segment = 0;
-                 segment < COMPATIBILITY_SPHERE_SEGMENTS; segment++) {
-                float angle0 = segment * TAU / COMPATIBILITY_SPHERE_SEGMENTS;
-                float angle1 = (segment + 1) * TAU
-                        / COMPATIBILITY_SPHERE_SEGMENTS;
-                if (ring == 1) {
-                    addCompatibleSphereVertex(buffer, matrix, center, basis,
-                            halfSize, 0.0F, 0.0F, red, green, blue, alpha);
-                    addCompatibleSphereVertex(buffer, matrix, center, basis,
-                            halfSize, outerRadius, angle0, red, green, blue, alpha);
-                    addCompatibleSphereVertex(buffer, matrix, center, basis,
-                            halfSize, outerRadius, angle1, red, green, blue, alpha);
-                } else {
-                    addCompatibleSphereVertex(buffer, matrix, center, basis,
-                            halfSize, innerRadius, angle0, red, green, blue, alpha);
-                    addCompatibleSphereVertex(buffer, matrix, center, basis,
-                            halfSize, outerRadius, angle0, red, green, blue, alpha);
-                    addCompatibleSphereVertex(buffer, matrix, center, basis,
-                            halfSize, outerRadius, angle1, red, green, blue, alpha);
-
-                    addCompatibleSphereVertex(buffer, matrix, center, basis,
-                            halfSize, innerRadius, angle0, red, green, blue, alpha);
-                    addCompatibleSphereVertex(buffer, matrix, center, basis,
-                            halfSize, outerRadius, angle1, red, green, blue, alpha);
-                    addCompatibleSphereVertex(buffer, matrix, center, basis,
-                            halfSize, innerRadius, angle1, red, green, blue, alpha);
-                }
-            }
-        }
-    }
-
-    private static void addCompatibleSphereVertex(
-            BufferBuilder buffer, Matrix4f matrix, Vector3f center, Basis basis,
-            float halfSize, float radius, float angle,
-            float red, float green, float blue, float alpha) {
-        float normalX = radius * (float) Math.cos(angle);
-        float normalY = radius * (float) Math.sin(angle);
-        float normalZ = (float) Math.sqrt(Math.max(0.0F,
-                1.0F - radius * radius));
         float bodyRadius = halfSize * 0.94F;
-        Vector3f point = new Vector3f(center)
-                .fma(normalX * bodyRadius, basis.right)
-                .fma(normalY * bodyRadius, basis.up);
-        float u = 0.5F + (float) Math.atan2(normalZ, normalX) / TAU;
-        float v = 0.5F - (float) Math.asin(normalY) / (float) Math.PI;
-        buffer.addVertex(matrix, point.x, point.y, point.z)
-                .setUv(u, v)
-                .setColor(red, green, blue, alpha);
+        float[] mesh = CosmicSkyMeshes.HEMISPHERE;
+        for (int vertex = 0; vertex < mesh.length; vertex += 4) {
+            float right = mesh[vertex] * bodyRadius;
+            float up = mesh[vertex + 1] * bodyRadius;
+            VfxVertexWriter.vertex(buffer, matrix,
+                            center.x + right * basis.right.x + up * basis.up.x,
+                            center.y + right * basis.right.y + up * basis.up.y,
+                            center.z + right * basis.right.z + up * basis.up.z)
+                    .setUv(mesh[vertex + 2], mesh[vertex + 3])
+                    .setColor(red, green, blue, alpha);
+        }
     }
 
     private static void addBillboardRect(BufferBuilder buffer, Matrix4f matrix,
                                          Vector3f center, Vector3f right, Vector3f up,
                                          float halfWidth, float halfHeight,
                                          float red, float green, float blue, float alpha) {
-        Vector3f lowerLeft = new Vector3f(center).fma(-halfWidth, right).fma(-halfHeight, up);
-        Vector3f lowerRight = new Vector3f(center).fma(halfWidth, right).fma(-halfHeight, up);
-        Vector3f upperRight = new Vector3f(center).fma(halfWidth, right).fma(halfHeight, up);
-        Vector3f upperLeft = new Vector3f(center).fma(-halfWidth, right).fma(halfHeight, up);
-        buffer.addVertex(matrix, lowerLeft.x, lowerLeft.y, lowerLeft.z)
-                .setUv(0.0F, 1.0F).setColor(red, green, blue, alpha);
-        buffer.addVertex(matrix, lowerRight.x, lowerRight.y, lowerRight.z)
-                .setUv(1.0F, 1.0F).setColor(red, green, blue, alpha);
-        buffer.addVertex(matrix, upperRight.x, upperRight.y, upperRight.z)
-                .setUv(1.0F, 0.0F).setColor(red, green, blue, alpha);
-        buffer.addVertex(matrix, upperLeft.x, upperLeft.y, upperLeft.z)
-                .setUv(0.0F, 0.0F).setColor(red, green, blue, alpha);
+        for (int corner = 0; corner < 4; corner++) {
+            float horizontal = corner == 0 || corner == 3 ? -halfWidth : halfWidth;
+            float vertical = corner < 2 ? -halfHeight : halfHeight;
+            float x = org.joml.Math.fma(vertical, up.x, org.joml.Math.fma(horizontal, right.x, center.x));
+            float y = org.joml.Math.fma(vertical, up.y, org.joml.Math.fma(horizontal, right.y, center.y));
+            float z = org.joml.Math.fma(vertical, up.z, org.joml.Math.fma(horizontal, right.z, center.z));
+            VfxVertexWriter.vertex(buffer, matrix, x, y, z)
+                    .setUv(corner == 0 || corner == 3 ? 0 : 1, corner < 2 ? 1 : 0)
+                    .setColor(red, green, blue, alpha);
+        }
     }
 
     private static void addTrailRibbon(
@@ -1247,8 +1204,8 @@ public final class CosmicVoidDynamicVfxRenderer {
     private static void line(BufferBuilder buffer, Matrix4f matrix,
                              Vector3f start, Vector3f end,
                              float red, float green, float blue, float alpha) {
-        buffer.addVertex(matrix, start.x, start.y, start.z).setColor(red, green, blue, alpha);
-        buffer.addVertex(matrix, end.x, end.y, end.z).setColor(red, green, blue, alpha);
+        VfxVertexWriter.vertex(buffer, matrix, start.x, start.y, start.z).setColor(red, green, blue, alpha);
+        VfxVertexWriter.vertex(buffer, matrix, end.x, end.y, end.z).setColor(red, green, blue, alpha);
     }
 
     private static void drawIfNotEmpty(BufferBuilder buffer) {

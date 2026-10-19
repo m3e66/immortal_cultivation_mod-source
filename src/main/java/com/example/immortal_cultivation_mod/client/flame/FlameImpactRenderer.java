@@ -6,10 +6,14 @@ import com.example.immortal_cultivation_mod.client.ShaderPackCompatibility;
 import com.example.immortal_cultivation_mod.flame.ChargedFlameShape;
 import com.example.immortal_cultivation_mod.flame.FlameImpactShape;
 import com.example.immortal_cultivation_mod.flame.FlameKind;
+import com.example.immortal_cultivation_mod.flame.FlameAftermathStyle;
+import com.example.immortal_cultivation_mod.flame.FlameAftermathFaces;
+import com.example.immortal_cultivation_mod.flame.FlameAftermathMesh;
 import com.example.immortal_cultivation_mod.network.FlameImpactPayload;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +21,9 @@ import java.util.UUID;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.ParticleStatus;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ClipContext;
@@ -46,6 +52,28 @@ public final class FlameImpactRenderer {
 
     private record Surface(Vec3 point, Vec3 normal) { }
     private record Fragment(Vec3 velocity, float size, float spin) { }
+    private record Coating(BlockPos pos, BlockPos exposedNeighbor, BlockState original) { }
+
+    private static final class CoatingTile {
+        final FlameAftermathMesh.Tile mesh;
+        final Coating[] cells = new Coating[FlameAftermathMesh.TILE_SIZE * FlameAftermathMesh.TILE_SIZE];
+        final Vec3 offset;
+        final AABB bounds;
+        final int color;
+
+        CoatingTile(FlameAftermathMesh.Tile mesh, Impact impact) {
+            this.mesh = mesh;
+            BlockPos pos = mesh.origin();
+            offset = Vec3.atLowerCornerOf(pos).subtract(impact.data.center());
+            Direction.Axis axis = mesh.direction().getAxis();
+            int size = FlameAftermathMesh.TILE_SIZE;
+            bounds = new AABB(pos.getX(), pos.getY(), pos.getZ(),
+                    pos.getX() + (axis == Direction.Axis.X ? 1 : size),
+                    pos.getY() + (axis == Direction.Axis.Y ? 1 : size),
+                    pos.getZ() + (axis == Direction.Axis.Z ? 1 : size)).inflate(.003);
+            color = FlameAftermathStyle.color(impact.kind, pos, impact.data.seed());
+        }
+    }
 
     private static final class Impact {
         final FlameImpactPayload data;
@@ -54,6 +82,11 @@ public final class FlameImpactRenderer {
         final long start;
         final List<Surface> surfaces = new ArrayList<>();
         final List<Fragment> fragments = new ArrayList<>();
+        final FlameAftermathMesh coatingMesh = new FlameAftermathMesh();
+        final Map<FlameAftermathMesh.Tile, CoatingTile> coatingTiles = new HashMap<>();
+        final List<CoatingTile> coatings = new ArrayList<>();
+        final FlameAftermathFaces coatingFaces;
+        int coatingValidation;
         int probes;
         boolean resampled;
 
@@ -62,6 +95,7 @@ public final class FlameImpactRenderer {
             this.kind = FlameKind.fromId(data.flame());
             this.debris = Block.stateById(data.terrainState());
             this.start = start;
+            coatingFaces = new FlameAftermathFaces(data.center(), data.radius(), data.seed());
             var random = RandomSource.create(data.seed());
             for (int i = 0; i < 18; i++) {
                 double angle = random.nextDouble() * Math.PI * 2;
@@ -118,21 +152,56 @@ public final class FlameImpactRenderer {
         use(mc.level);
         if (world == null || mc.isPaused()) return;
         long now = world.getGameTime();
-        IMPACTS.values().removeIf(impact -> impact.age(0) >= FlameImpactShape.EXPIRE);
+        IMPACTS.values().removeIf(impact -> impact.age(0) >= FlameImpactShape.REVEAL_END);
         SEEN.values().removeIf(start -> now - start > FlameImpactShape.EXPIRE + 40);
-        int probes = 24;
-        for (Impact impact : visible(mc.gameRenderer.getMainCamera().getPosition())) {
-            float age = impact.age(0);
-            // Chunk updates arrive after the impact event. Sample after the flash, then refresh once
-            // the reveal starts, instead of projecting scars onto the old pre-impact surface.
-            if (impact.data.terrainDamaged() && age >= 6 && probes > 0) {
-                if (age >= 24 && !impact.resampled) {
-                    impact.surfaces.clear(); impact.probes = 0; impact.resampled = true;
-                }
-                int allowance = Math.min(6, probes);
-                probes -= sample(impact, allowance);
+        // Only the initial expansion/reveal survives; no terrain scans or persistent aftermath.
+    }
+
+    /** Scan only crater boundary faces in loaded chunks, spread across ticks. */
+    private static int sampleCoatings(Impact impact, int budget) {
+        int used = 0;
+        while (used < budget && impact.coatingMesh.faceCount() < FlameAftermathMesh.MAX_FACES
+                && impact.coatingFaces.hasNext()) {
+            var candidate = impact.coatingFaces.next();
+            BlockPos pos = candidate.pos(), neighbor = candidate.exposedNeighbor();
+            used++;
+            if (world.isOutsideBuildHeight(pos) || !world.hasChunkAt(pos) || !world.hasChunkAt(neighbor)
+                    || !world.getBlockState(neighbor).isAir()) continue;
+            BlockState state = world.getBlockState(pos);
+            if (state.hasBlockEntity() || !state.getFluidState().isEmpty() || state.getDestroySpeed(world, pos) < 0
+                    || !state.isCollisionShapeFullBlock(world, pos)) continue;
+            var mesh = impact.coatingMesh.add(candidate);
+            var tile = impact.coatingTiles.get(mesh);
+            if (tile == null) {
+                tile = new CoatingTile(mesh, impact);
+                impact.coatingTiles.put(mesh, tile);
+                impact.coatings.add(tile);
+            }
+            tile.cells[mesh.index(pos)] = new Coating(pos, neighbor, state);
+        }
+        return used;
+    }
+
+    /** Validate edited blocks on a tick budget, rather than reading every face every frame. */
+    private static int validateCoatings(Impact impact, int budget) {
+        int total = impact.coatings.size() * 16;
+        int scanned = 0, used = 0;
+        while (scanned < Math.min(total, budget * 16) && used < budget) {
+            int index = impact.coatingValidation++ % total;
+            scanned++;
+            var tile = impact.coatings.get(index / 16);
+            int cell = index % 16;
+            var coating = tile.cells[cell];
+            if (coating == null) continue;
+            used++;
+            if (!world.hasChunkAt(coating.pos) || !world.hasChunkAt(coating.exposedNeighbor)
+                    || world.getBlockState(coating.pos) != coating.original
+                    || !world.getBlockState(coating.exposedNeighbor).isAir()) {
+                tile.cells[cell] = null;
+                tile.mesh.remove(cell);
             }
         }
+        return used;
     }
 
     private static int sample(Impact impact, int budget) {
@@ -175,7 +244,7 @@ public final class FlameImpactRenderer {
             if (!event.getFrustum().isVisible(new AABB(impact.data.center(), impact.data.center())
                     .inflate(impact.data.radius() * 2 + 8))) continue;
             float age = impact.age(partial);
-            if (age < 0 || age >= FlameImpactShape.EXPIRE) continue;
+            if (age < 0 || age >= FlameImpactShape.REVEAL_END) continue;
             poses.pushPose();
             Vec3 relative = impact.data.center().subtract(camera);
             poses.translate(relative.x, relative.y, relative.z);
@@ -185,20 +254,55 @@ public final class FlameImpactRenderer {
             var bounded = FlameImpactShape.withinRadius(sink(out, matrix), impact.data.radius());
             FlameImpactShape.emit(impact.kind, age, impact.data.radius(), impact.data.seed(), detail(),
                     bounded);
-            debris(impact, age, bounded);
-            surfaces(impact, age, out, matrix, bounded);
             poses.popPose();
             if (age < 160 && impact.kind != FlameKind.NETHER)
                 FlameHeatHaze.observeCharge(impact.kind, impact.data.center(),
                         .8F * (1 - age / 160), Math.min(24, impact.data.radius() * 2));
-            if (age >= 30 && impact.kind != FlameKind.NETHER) {
-                float warmth = .3F * (1 - age / FlameImpactShape.EXPIRE);
-                for (int i = 0; i < Math.min(16, impact.surfaces.size()); i += 4)
-                    FlameHeatHaze.observeCharge(impact.kind, impact.data.center().add(impact.surfaces.get(i).point),
-                            warmth, 2 + impact.data.radius() * .08F);
-            }
+
         }
         buffers.endBatch(FlameRenderTypes.energy());
+    }
+
+    /** Alpha blended over existing textures; tint fades away without ever touching block states. */
+    private static void coatings(Impact impact, float age, VertexConsumer out, Matrix4f matrix,
+            Vec3 camera, Frustum frustum) {
+        for (CoatingTile tile : impact.coatings) {
+            if (tile.mesh.empty() || !frustum.isVisible(tile.bounds)) continue;
+            BlockPos pos = tile.mesh.origin();
+            Direction face = tile.mesh.direction();
+            if (!world.hasChunkAt(pos) || !world.hasChunkAt(pos.relative(face))) continue;
+            double towardCamera = switch (face.getAxis()) {
+                case X -> (camera.x - pos.getX() - (face.getStepX() > 0 ? 1 : 0)) * face.getStepX();
+                case Y -> (camera.y - pos.getY() - (face.getStepY() > 0 ? 1 : 0)) * face.getStepY();
+                case Z -> (camera.z - pos.getZ() - (face.getStepZ() > 0 ? 1 : 0)) * face.getStepZ();
+            };
+            if (towardCamera <= 0) continue;
+            float alpha = FlameAftermathStyle.opacity(age, pos, impact.data.seed());
+            if (alpha <= .002F) continue;
+            Vec3 p = tile.offset;
+            Direction.Axis axis = face.getAxis();
+            for (var quad : tile.mesh.quads()) {
+                // Coplanar neighbors share a quad, with a tiny outward offset to prevent z-fighting.
+                double x = p.x + (axis == Direction.Axis.X ? .5 + face.getStepX() * .502 : quad.u() + .001);
+                double y = p.y + (axis == Direction.Axis.Y ? .5 + face.getStepY() * .502 : quad.v() + .001);
+                double z = p.z + (axis == Direction.Axis.Z ? .5 + face.getStepZ() * .502
+                        : (axis == Direction.Axis.X ? quad.u() : quad.v()) + .001);
+                double ux = axis == Direction.Axis.X ? 0 : quad.width() - .002;
+                double uz = axis == Direction.Axis.X ? quad.width() - .002 : 0;
+                double vy = axis == Direction.Axis.Y ? 0 : quad.height() - .002;
+                double vz = axis == Direction.Axis.Y ? quad.height() - .002 : 0;
+                coatingVertex(out, matrix, x, y, z, tile.color, alpha);
+                coatingVertex(out, matrix, x, y + vy, z + vz, tile.color, alpha);
+                coatingVertex(out, matrix, x + ux, y + vy, z + uz + vz, tile.color, alpha);
+                coatingVertex(out, matrix, x + ux, y, z + uz, tile.color, alpha);
+            }
+        }
+    }
+
+    private static void coatingVertex(VertexConsumer out, Matrix4f matrix, double x, double y, double z,
+            int color, float alpha) {
+        out.addVertex(matrix, (float)x, (float)y, (float)z).setColor(color >> 16 & 255, color >> 8 & 255,
+                color & 255, Math.round(alpha * 255));
     }
 
     private static ChargedFlameShape.Sink sink(VertexConsumer out, Matrix4f matrix) {

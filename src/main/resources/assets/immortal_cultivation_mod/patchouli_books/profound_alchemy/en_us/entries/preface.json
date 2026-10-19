@@ -1,0 +1,18 @@
+{
+  "name": "Preface",
+  "icon": "minecraft:book",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Profound Alchemy",
+      "text": "Heaven and earth form the furnace, yin and yang provide the flame, spiritual herbs become the medicine, and Qi guides their transformation. Countless plants possess extraordinary properties, capable of restoring vitality, nourishing the spirit, strengthening the body, or assisting cultivation. Yet true alchemy requires more than gathering ingredients. One must understand the nature of herbs, the balance of spiritual energies,"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Profound Alchemy",
+      "text": "and the art of refinement."
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "赤背铁鳞蝎",
+  "icon": "immortal_cultivation_mod:red_backed_iron_scale_scorpion_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "赤背铁鳞蝎",
+      "text": "$(bold)境界：$()凡人至筑基"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《灵兽志》记载",
+      "text": "赤背铁鳞蝎生于荒漠岩窟，背甲赤红，坚若精铁。白昼多隐于砂石缝隙，待夜色降临方出穴觅食。其尾钩锐利，行事凶狠，低阶修士不可轻视。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻踪",
+      "text": "荒漠、恶地、风蚀恶地及钟乳石洞穴。常伏于沙土、陶土、砂砾与滴水石之上，夜间或天光被遮蔽时出没。"
+    }
+  ]
+}

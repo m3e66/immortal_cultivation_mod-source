@@ -1,0 +1,48 @@
+{
+  "name": "Melt and Refine the Materials",
+  "icon": "immortal_cultivation_mod:dao",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "The time required to melt materials depends on the lowest purity among the consumed ingredients. Impure materials demand longer refinement, while highly purified materials melt much faster."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Melting time in seconds = max(1, 101 - lowest purity)."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "For example:"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Rule Reference",
+      "text": "20 / 81 seconds"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Rule Reference",
+      "text": "50 / 51 seconds"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Rule Reference",
+      "text": "80 / 21 seconds"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Rule Reference",
+      "text": "95 / 6 seconds"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Rule Reference",
+      "text": "100 / 1 second"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Spirit Wood Tree",
+  "icon": "immortal_cultivation_mod:lingmu",
+  "category": "immortal_cultivation_mod:volume_5",
+  "sortnum": 14,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Spirit Wood Tree",
+      "text": "$(bold)Natural habitat: $()Spiritwood Grove. Six tree attempts per chunk, with a 20% chance of two extra attempts. Suitable ground and space are required."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Spirit Wood Trees arise where wood essence gathers into secluded groves. Their trunks and leaves carry spiritual energy. Natural trees and vein-fed saplings grow in Spiritwood Groves; saplings can also be collected and planted."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Look for Spiritwood Groves among temperate forests in newly generated Overworld terrain. /locate biome immortal_cultivation_mod:spiritwood_grove can locate one."
+    }
+  ]
+}

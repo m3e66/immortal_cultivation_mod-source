@@ -1,0 +1,18 @@
+{
+  "name": "回春丹",
+  "icon": "immortal_cultivation_mod:huichun_pill",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "回春丹蕴生机之气，善于滋养血肉，修复伤损。丹药入体，温润药力渐行周身，使亏损气血缓缓恢复。修士负伤之时，可借此丹稳定伤势。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹效",
+      "text": "六息之内，恢复气血上限的百分之六。"
+    }
+  ]
+}

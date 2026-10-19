@@ -14,6 +14,8 @@ import top.theillusivec4.curios.api.CuriosApi;
 public final class OuterSystemData {
     public static final String ROOT_TAG = "ImmortalCultivationOuterSystem";
     public static final String EVER_BOUND = "EverBound";
+    /** A system acquired from an item does not depend on the player's body type. */
+    public static final String PICKUP_BOUND = "PickupBound";
     public static final String DESTROYED = "Destroyed";
     public static final String TYPE = "Type";
     public static final String PREVIOUS_TYPE = "PreviousType";
@@ -48,10 +50,18 @@ public final class OuterSystemData {
 
     public static Optional<ItemStack> equipped(Player player) {
         return CuriosApi.getCuriosInventory(player)
-                .flatMap(handler -> handler.findFirstCurio(ModItems.SYSTEM.get()))
-                .filter(result -> OuterSystemItem.SLOT.equals(
-                        result.slotContext().identifier()))
-                .map(result -> result.stack());
+                .flatMap(handler -> handler.getStacksHandler(OuterSystemItem.SLOT))
+                .flatMap(handler -> {
+                    // Curios searches cache results for a tick; pickup needs the live slot.
+                    var stacks = handler.getStacks();
+                    for (int slot = 0; slot < stacks.getSlots(); slot++) {
+                        ItemStack stack = stacks.getStackInSlot(slot);
+                        if (stack.is(ModItems.SYSTEM.get())) {
+                            return Optional.of(stack);
+                        }
+                    }
+                    return Optional.empty();
+                });
     }
 
     public static void ensureSlot(Player player) {

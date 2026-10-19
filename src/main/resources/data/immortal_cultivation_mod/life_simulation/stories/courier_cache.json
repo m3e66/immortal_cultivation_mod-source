@@ -1,0 +1,215 @@
+{
+  "stories": [
+    {
+      "id": "life_story_courier_cache",
+      "version": 1,
+      "replacement": true,
+      "loot_encounter": true,
+      "repeat": true,
+      "category": "adventure",
+      "minimum_age": 16,
+      "minimum_realm": 0,
+      "maximum_realm": 27,
+      "start_node": "start",
+      "title_key": "life.loot.title",
+      "cast": [
+        {
+          "role": "courier",
+          "name": "许砚",
+          "age": 46,
+          "realm": 1,
+          "occupation": "merchant",
+          "gender": "male"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "start",
+          "text_key": "life.loot.start.title",
+          "parts": [
+            {
+              "text_key": "life.loot.start.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.loot.start.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.loot.start.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.loot.start.3",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "recover",
+              "text_key": "life.loot.recover",
+              "next": "cache",
+              "check": {
+                "purpose": "insight",
+                "dc": 12,
+                "attribute": "Comprehension",
+                "proficiency": "Medical"
+              },
+              "failure": "E4"
+            },
+            {
+              "id": "leave",
+              "text_key": "life.loot.leave",
+              "next": "E4"
+            }
+          ],
+          "seen_roles": [
+            "courier"
+          ]
+        },
+        {
+          "id": "cache",
+          "text_key": "life.loot.cache.title",
+          "parts": [
+            {
+              "text_key": "life.loot.cache.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.loot.cache.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.loot.cache.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.loot.cache.3",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "pill",
+              "text_key": "life.loot.pick_pill",
+              "next": "E_pill",
+              "loot_kind": "pill"
+            },
+            {
+              "id": "spell",
+              "text_key": "life.loot.pick_spell",
+              "next": "E_spell",
+              "loot_kind": "spell"
+            },
+            {
+              "id": "method",
+              "text_key": "life.loot.pick_method",
+              "next": "E_method",
+              "loot_kind": "method"
+            }
+          ]
+        },
+        {
+          "id": "E_pill",
+          "text_key": "life.loot.E_pill.title",
+          "parts": [
+            {
+              "text_key": "life.loot.E_pill.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.loot.E_pill.1",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.loot.pill.finish",
+              "next": "E_pill",
+              "ending": true
+            }
+          ],
+          "loot_kind": "pill",
+          "effects": [
+            "story_loot:pill"
+          ],
+          "followup_key": "life.loot.pill.follow"
+        },
+        {
+          "id": "E_spell",
+          "text_key": "life.loot.E_spell.title",
+          "parts": [
+            {
+              "text_key": "life.loot.E_spell.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.loot.E_spell.1",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.loot.spell.finish",
+              "next": "E_spell",
+              "ending": true
+            }
+          ],
+          "loot_kind": "spell",
+          "effects": [
+            "story_loot:spell"
+          ],
+          "followup_key": "life.loot.spell.follow"
+        },
+        {
+          "id": "E_method",
+          "text_key": "life.loot.E_method.title",
+          "parts": [
+            {
+              "text_key": "life.loot.E_method.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.loot.E_method.1",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.loot.method.finish",
+              "next": "E_method",
+              "ending": true
+            }
+          ],
+          "loot_kind": "method",
+          "effects": [
+            "story_loot:method"
+          ],
+          "followup_key": "life.loot.method.follow"
+        },
+        {
+          "id": "E4",
+          "text_key": "life.loot.E4.title",
+          "parts": [
+            {
+              "text_key": "life.loot.E4.0",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.loot.withdraw.finish",
+              "next": "E4",
+              "ending": true
+            }
+          ],
+          "followup_key": "life.loot.withdraw.follow"
+        }
+      ]
+    }
+  ]
+}

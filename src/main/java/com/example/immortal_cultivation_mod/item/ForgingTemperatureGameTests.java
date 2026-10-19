@@ -36,8 +36,6 @@ public final class ForgingTemperatureGameTests {
         for (HigherWeaponSpec spec : HigherWeaponSpec.values()) {
             assertNativeRecipe(helper, spec.id, spec == HigherWeaponSpec.SEVEN_STAR_SWORD ? 6500 : 4500);
         }
-        assertNativeRecipe(helper, "baota", 4500);
-        assertNativeRecipe(helper, "jin_hulu", 4500);
         helper.assertTrue(ForgingSystem.canUseFire(ForgingSystem.recipeById("shihunfan"), "ling_fire")
                         && ForgingSystem.canUseFire(ForgingSystem.recipeById("shihunfan"), "zhen_fire"),
                 "True fire can service older spirit-fire recipes without replacing spirit fire");
@@ -171,7 +169,7 @@ public final class ForgingTemperatureGameTests {
     public static void shardReforgeUsesSerializedNativeWeaponDespiteRestrictionRank(GameTestHelper helper) {
         var recipe = ForgingSystem.recipeById(WeaponShardSystem.REFORGE);
         helper.assertTrue(recipe.averageTemp() == 3500, "Generic shard recipe retains its fallback heat");
-        for (String id : List.of("black_iron_jian", "seven_star_sword", "baota", "jin_hulu", "whip", "dao")) {
+        for (String id : List.of("black_iron_jian", "seven_star_sword", "whip", "dao")) {
             int expected = switch (id) {
                 case "seven_star_sword" -> 6500;
                 case "whip" -> 2400;

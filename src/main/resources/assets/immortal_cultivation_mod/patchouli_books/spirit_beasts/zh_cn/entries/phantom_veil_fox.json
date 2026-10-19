@@ -1,0 +1,23 @@
+{
+  "name": "幻面灵狐",
+  "icon": "immortal_cultivation_mod:phantom_veil_fox_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "幻面灵狐",
+      "text": "$(bold)境界：$()筑基至元婴"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《灵兽志》记载",
+      "text": "幻面灵狐乃山林异种，灵性极高，善于变幻形貌、迷惑心神。传闻有修士深山遇狐，所见之景虚实难辨，待清醒之时，已不知身在何处。此兽不拘昼夜，行踪飘忽，切莫仅凭双眼辨其真身。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻踪",
+      "text": "栖于暗林、古老针叶林、山间林地及樱花林。昼夜皆可能现身。"
+    }
+  ]
+}

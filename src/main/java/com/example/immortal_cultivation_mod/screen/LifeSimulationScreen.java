@@ -1,9 +1,12 @@
 package com.example.immortal_cultivation_mod.screen;
 
 import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
+import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
+import com.example.immortal_cultivation_mod.client.OuterSystemClient;
 import com.example.immortal_cultivation_mod.network.OuterSystemPayloads;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
 import com.example.immortal_cultivation_mod.system.LifeSimulationWorldMap;
+import com.example.immortal_cultivation_mod.system.LifeSimulationSystem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -31,17 +34,36 @@ public class LifeSimulationScreen extends Screen {
     private static final float DEFAULT_SCALE = 0.82F;
     private static final int CONTENT_Y = 68;
     private static final int CONTENT_H = 274;
-    private static final int HISTORY_VISIBLE_LINES = 15;
+    private static final int HISTORY_VISIBLE_LINES = 14;
     private static final int TAB_WIDTH = 80;
     private static final int TAB_STEP = 83;
+    private static final int FOOTER_Y = 350;
 
     private CompoundTag state;
+    private final java.util.IdentityHashMap<ListTag, java.util.Map<Integer, List<FormattedCharSequence>>> historyLayouts =
+            new java.util.IdentityHashMap<>();
+    private net.minecraft.locale.Language historyLanguage;
+    private net.minecraft.client.gui.Font historyFont;
     private Tab selectedTab = Tab.LIFE;
     private int selectedRelationship;
     private int historyScroll;
+    private int diaryScroll;
+    private int selectedMemory;
+    private static final int RELATIONSHIP_VISIBLE = 6;
+    private static final int RELATIONSHIP_ROW_HEIGHT = 38;
+    private static final int RELATIONSHIP_ROWS_Y = 34;
+    private static final int RELATIONSHIP_DETAIL_VISIBLE = 4;
+    private LifeRelationshipFilter relationshipFilter = LifeRelationshipFilter.ALL;
     private int relationshipScroll;
+    private int relationshipDetailScroll;
     private int cultivationScroll;
+    private int methodScroll;
     private int assetScroll;
+    private String inheritancePicker = "";
+    private int inheritancePage;
+    private boolean inheritanceWaiting;
+    private long inheritanceWaitingRevision;
+    private static final int INHERITANCE_PAGE_SIZE = 6;
     private MapLayer mapLayer = MapLayer.TERRAIN;
     private String travelMethod = "foot";
     private final SystemWindowState windowState =
@@ -62,18 +84,35 @@ public class LifeSimulationScreen extends Screen {
     }
 
     public void updateState(CompoundTag updated) {
+        if (inheritanceWaiting && updated.getLong("LifeActionRevision") != inheritanceWaitingRevision) inheritanceWaiting = false;
+        if (!life().getBoolean("Finished") && updated.getCompound("LifeSimulation").getBoolean("Finished")) {
+            selectedTab = Tab.LIFE;
+        }
+        if (!java.util.Objects.equals(life().get("SimulationId"),
+                updated.getCompound("LifeSimulation").get("SimulationId"))) {
+            diaryScroll = 0;
+            inheritancePicker = "";
+            inheritanceWaiting = false;
+        }
         state = updated.copy();
+        if (life().getBoolean("RewardClaimed") || hasPendingInheritance(life())) inheritancePicker = "";
+        historyLayouts.clear();
         clampScrolls();
         rebuildWidgets();
     }
 
     @Override
     protected void init() {
+        historyLayouts.clear();
         mainWindowButtons.clear();
         detachedWindowButtons.clear();
         widgetLayer = WindowLayer.MAIN;
         windowState.initializeCentered(desktopWidth(), desktopHeight());
         CompoundTag life = life();
+        if (life.getBoolean("Finished")) {
+            detachedTab = null;
+            detachedWindow = null;
+        }
 
         if (!windowState.isMinimized()) {
             initMainWindowWidgets(left(), top(), life);
@@ -130,8 +169,17 @@ public class LifeSimulationScreen extends Screen {
                     life.getInt("Attempts") > 0);
             return;
         }
+        if (selectedTab == Tab.RECORD) {
+            initMemoryWidgets(x, y, life);
+        }
         if (life.getBoolean("Finished")) {
-            initFinishedWidgets(x, y, life);
+            if (selectedTab == Tab.LIFE) {
+                initFinishedWidgets(x, y, life);
+            } else {
+                addWindowButton(new SystemGuiButton(x + 478, y + FOOTER_Y, 124, 22,
+                        Component.translatable("screen.immortal_cultivation_mod.life.view_inheritance"),
+                        () -> { selectedTab = Tab.LIFE; rebuildWidgets(); }));
+            }
             return;
         }
         if (!life.getBoolean("Active") || !life.getBoolean("Alive")) {
@@ -145,12 +193,16 @@ public class LifeSimulationScreen extends Screen {
             return;
         }
         initTabWidgets(selectedTab, x, y, life);
+        addWindowButton(new SystemGuiButton(x + 18, y + FOOTER_Y, 90, 22, Component.translatable("life.expansion.routine"),
+                () -> OuterSystemClient.transitionTo(new LifePlanningScreen(state, false))));
+        addWindowButton(new SystemGuiButton(x + 112, y + FOOTER_Y, 90, 22, Component.translatable("life.expansion.journal"),
+                () -> OuterSystemClient.transitionTo(new LifePlanningScreen(state, true))));
         addActionButton(
-                x + 475,
-                y + 350,
-                126,
+                x + 510,
+                y + FOOTER_Y,
+                92,
                 "screen.immortal_cultivation_mod.life.settle",
-                "settle",
+                "settle_confirm",
                 true);
     }
 
@@ -168,6 +220,8 @@ public class LifeSimulationScreen extends Screen {
             initMapWidgets(x, y, life);
         } else if (tab == Tab.ASSETS) {
             initUpgradeWidgets(x, y, life);
+        } else if (tab == Tab.RECORD && widgetLayer == WindowLayer.DETACHED) {
+            initMemoryWidgets(x, y, life);
         }
     }
 
@@ -224,9 +278,9 @@ public class LifeSimulationScreen extends Screen {
             String methodId = method.id();
             SystemGuiButton button = addWindowButton(new SystemGuiButton(
                     x + 411 + column * 91,
-                    y + 214 + row * 21,
+                    y + 208 + row * 20,
                     86,
-                    18,
+                    17,
                     name,
                     () -> {
                         travelMethod = methodId;
@@ -237,13 +291,13 @@ public class LifeSimulationScreen extends Screen {
         }
 
         if (LifeSimulationWorldMap.hasPendingArrival(life)) {
-            addMapActionButton(x + 411, y + 284, 58, "arrival.stay",
+            addMapActionButton(x + 411, y + 286, 58, "arrival.stay",
                     "arrival:stay", true);
-            addMapActionButton(x + 472, y + 284, 58, "arrival.settle",
+            addMapActionButton(x + 472, y + 286, 58, "arrival.settle",
                     "arrival:settle", life.getLong("Wealth") >= 100L);
             CompoundTag currentState = LifeSimulationWorldMap.locationState(
                     map, map.getString(LifeSimulationWorldMap.CURRENT_LOCATION));
-            addMapActionButton(x + 533, y + 284, 58, "arrival.cave",
+            addMapActionButton(x + 533, y + 286, 58, "arrival.cave",
                     "arrival:cave", life.getInt("Realm") >= 7
                             && life.getLong("Wealth") >= 5_000L
                             && currentState.getInt("LocalReputation") >= 20);
@@ -253,28 +307,30 @@ public class LifeSimulationScreen extends Screen {
         if (!LifeSimulationWorldMap.hasActiveJourney(life)) {
             CompoundTag local = LifeSimulationWorldMap.locationState(
                     map, map.getString(LifeSimulationWorldMap.CURRENT_LOCATION));
-            addMapActionButton(x + 411, y + 279, 86, "local_activity",
+            addMapActionButton(x + 411, y + 273, 86, "local_activity",
                     "local_activity", canAct(life));
-            addMapActionButton(x + 502, y + 279, 89, "main_quest",
+            addMapActionButton(x + 502, y + 273, 89, "main_quest",
                     "quest", !life.contains("CurrentEvent", Tag.TAG_COMPOUND)
-                            && !local.getBoolean("MainQuestCompleted"));
+                            && com.example.immortal_cultivation_mod.system.LifeAuthoredStories.remaining(life)
+                            && com.example.immortal_cultivation_mod.system.LifeAuthoredStories.conscious(life)
+                            && life.getInt("Age")>=16);
 
             LifeSimulationWorldMap.TravelPreview preview =
                     LifeSimulationWorldMap.preview(
                             life,
                             map.getString(LifeSimulationWorldMap.SELECTED_DESTINATION),
                             travelMethod);
-            addMapActionButton(x + 411, y + 304, 180, "travel",
+            addMapActionButton(x + 411, y + 297, 180, "travel",
                     "travel:" + travelMethod, preview.available());
 
             ListTag teleports = map.getList(
                     LifeSimulationWorldMap.REGISTERED_TELEPORTS, Tag.TAG_STRING);
             String current = map.getString(LifeSimulationWorldMap.CURRENT_LOCATION);
-            addMapActionButton(x + 411, y + 329, 86, "register_teleport",
+            addMapActionButton(x + 411, y + 321, 86, "register_teleport",
                     "register_teleport", local.getBoolean("TeleportationActive")
                             && !containsString(teleports, current)
                             && life.getLong("Wealth") >= 500L);
-            addMapActionButton(x + 502, y + 329, 89, "buy_mount",
+            addMapActionButton(x + 502, y + 321, 89, "buy_mount",
                     "buy_mount", !map.getBoolean("HasMount")
                             && life.getLong("Wealth") >= 800L);
         }
@@ -291,7 +347,7 @@ public class LifeSimulationScreen extends Screen {
                 x,
                 y,
                 width,
-                20,
+                18,
                 Component.translatable(
                         "screen.immortal_cultivation_mod.life.map."
                                 + translationSuffix),
@@ -300,42 +356,36 @@ public class LifeSimulationScreen extends Screen {
     }
 
     private void initLifeWidgets(int x, int y, CompoundTag life) {
-        CompoundTag event = life.getCompound("CurrentEvent");
-        ListTag choices = event.getList("Choices", Tag.TAG_COMPOUND);
-        for (int i = 0; i < choices.size(); i++) {
-            CompoundTag choice = choices.getCompound(i);
-            int column = i % 2;
-            int row = i / 2;
-            addWindowButton(new SystemGuiButton(
-                    x + 224 + column * 184,
-                    y + 190 + row * 25,
-                    176,
-                    20,
-                    choiceLabel(choice),
-                    () -> send("choice:" + choice.getString("Id"))));
+        if (!life.getCompound("CurrentEvent").isEmpty()) {
+            addWindowButton(new SystemGuiButton(x+224,y+186,360,28,
+                    Component.translatable("life.battle.title"),
+                    ()->OuterSystemClient.transitionTo(new LifeEncounterScreen(state))));
         }
-        if (choices.isEmpty()) {
+        if (life.getCompound("CurrentEvent").isEmpty()) {
             addActionButton(
-                    x + 211,
-                    y + 350,
-                    126,
+                    x + 310,
+                    y + FOOTER_Y,
+                    90,
                     "screen.immortal_cultivation_mod.life.advance",
                     "advance",
-                    true);
+                    canAdvance(life));
             boolean fast = hasUpgrade(life, "continuous_memory");
             addActionButton(
-                    x + 343,
-                    y + 350,
-                    126,
+                    x + 406,
+                    y + FOOTER_Y,
+                    98,
                     "screen.immortal_cultivation_mod.life.advance_five",
                     "advance_5",
-                    fast);
+                    fast && canAdvance(life));
         }
+        addActionButton(x+206,y+FOOTER_Y,98,"life.expansion.routine.run",
+                life.hasUUID("SimulationId")?"routine:run:"+life.getUUID("SimulationId")+":"+life.getInt("Age"):"routine:run",
+                LifeSimulationSystem.canRunPlannedYear(life));
         if (life.getInt("Age") == 0) {
             addActionButton(
-                    x + 22,
-                    y + 350,
-                    164,
+                    x + 27,
+                    y + 292,
+                    166,
                     "screen.immortal_cultivation_mod.life.reroll",
                     "reroll",
                     !life.getBoolean("BirthRerolled")
@@ -344,19 +394,34 @@ public class LifeSimulationScreen extends Screen {
     }
 
     private void initRelationshipWidgets(int x, int y, CompoundTag life) {
+        addWindowButton(new SystemGuiButton(x + 24, y + CONTENT_Y + 5, 344, 22,
+                relationshipFilter.label(), () -> {
+                    relationshipFilter = relationshipFilter.next();
+                    relationshipScroll = 0; relationshipDetailScroll = 0;
+                    rebuildWidgets();
+                }));
         ListTag relationships = life.getList("Relationships", Tag.TAG_COMPOUND);
-        if (relationships.isEmpty()) {
+        List<Integer> known = knownRelationshipIndices(life);
+        if (known.isEmpty()) {
             return;
         }
-        selectedRelationship = Mth.clamp(
-                selectedRelationship, 0, relationships.size() - 1);
+        if (!known.contains(selectedRelationship)) selectedRelationship = known.getFirst();
         int baseX = x + 409;
         CompoundTag person = relationships.getCompound(selectedRelationship);
-        boolean canInteract = canAct(life) && person.getBoolean("Alive");
+        boolean canInteract = canAct(life) && person.getBoolean("Alive") && !person.getBoolean("Captive");
         addRelationshipButton(baseX, y + 240, "talk", canInteract);
         addRelationshipButton(baseX, y + 265, "gift",
                 canInteract && life.getLong("Wealth") >= 50L);
         addRelationshipButton(baseX, y + 290, "help", canInteract);
+        String[] advanced = {"friend", "breakup", "protector", "nemesis"};
+        for (int i = 0; i < advanced.length; i++) {
+            String action = advanced[i];
+            if (action.equals("friend") && LifeSimulationSystem.isParent(person)) continue;
+            SystemGuiButton button = addWindowButton(new SystemGuiButton(baseX + i % 2 * 88, y + 184 + i / 2 * 24, 84, 20,
+                    Component.translatable("life.expansion.npc." + action), () -> send("relationship:" + relationshipTarget() + ":" + action)));
+            button.active = canInteract && (!action.equals("friend") || person.getInt("Affinity") >= 30)
+                    && (!action.equals("protector") || person.getBoolean("Friend") && person.getInt("Trust") >= 40);
+        }
     }
 
     private void addRelationshipButton(
@@ -369,8 +434,16 @@ public class LifeSimulationScreen extends Screen {
                 Component.translatable(
                         "screen.immortal_cultivation_mod.life.relationship."
                                 + action),
-                () -> send("relationship:" + selectedRelationship + ":" + action)));
+                () -> send("relationship:" + relationshipTarget() + ":" + action)));
         button.active = active;
+    }
+
+    private String relationshipTarget() {
+        ListTag people = life().getList("Relationships", Tag.TAG_COMPOUND);
+        if (people.isEmpty()) return "-1";
+        CompoundTag person = people.getCompound(Mth.clamp(selectedRelationship, 0, people.size() - 1));
+        return person.hasUUID("Id") ? person.getUUID("Id").toString()
+                : Integer.toString(person.contains("ServerIndex") ? person.getInt("ServerIndex") : selectedRelationship);
     }
 
     private void initCultivationWidgets(int x, int y, CompoundTag life) {
@@ -379,7 +452,7 @@ public class LifeSimulationScreen extends Screen {
         if (!"none".equals(life.getString("Sect"))) {
             actions.add("sect_mission");
         }
-        int buttonY = y + 315;
+        int buttonY = y + 314;
         int buttonX = x + 218;
         int gap = 6;
         int availableWidth = 376;
@@ -396,17 +469,13 @@ public class LifeSimulationScreen extends Screen {
     }
 
     private void initActivityWidgets(int x, int y, CompoundTag life) {
-        String[] activities = {
-                "study", "exercise", "family", "explore", "work",
-                "socialize", "rest", "cultivate", "practice",
-                "sect_mission", "seclusion"
-        };
+        String[] activities = LifeSimulationSystem.ACTIVITIES.stream().filter(action -> !action.equals("keep_oath")).toArray(String[]::new);
         for (int i = 0; i < activities.length; i++) {
             int column = i % 3;
             int row = i / 3;
             addActivityButton(
                     x + 36 + column * 184,
-                    y + 107 + row * 43,
+                    y + 106 + row * 38,
                     164,
                     activities[i],
                     life);
@@ -429,6 +498,12 @@ public class LifeSimulationScreen extends Screen {
                                 + activity),
                 () -> send("activity:" + activity)));
         button.active = activityAvailable(life, activity);
+        if (!button.active) button.setTooltip(net.minecraft.client.gui.components.Tooltip.create(activityBlockedReason(life,activity)));
+    }
+
+    private Component activityBlockedReason(CompoundTag life,String activity) {
+        String reason=LifeSimulationSystem.activityUnavailable(life,activity);
+        return Component.translatable("life.expansion.activity_blocked."+reason);
     }
 
     private void initUpgradeWidgets(int x, int y, CompoundTag life) {
@@ -444,9 +519,9 @@ public class LifeSimulationScreen extends Screen {
             boolean owned = hasUpgrade(life, id);
             SystemGuiButton button = addWindowButton(new SystemGuiButton(
                     x + 394,
-                    y + 91 + i * 35,
+                    y + 110 + i * 34,
                     188,
-                    22,
+                    20,
                     owned
                             ? Component.translatable(
                                     "screen.immortal_cultivation_mod.life.upgrade.owned")
@@ -458,18 +533,124 @@ public class LifeSimulationScreen extends Screen {
         }
     }
 
+    private void initMemoryWidgets(int x, int y, CompoundTag life) {
+        int count = life.getList("Memories", Tag.TAG_COMPOUND).size();
+        SystemGuiButton previous = addWindowButton(new SystemGuiButton(
+                x + 26, y + CONTENT_Y + 9, 28, 20, Component.literal("<"),
+                () -> { selectedMemory++; historyScroll = 0; rebuildWidgets(); }));
+        previous.active = selectedMemory < count;
+        SystemGuiButton next = addWindowButton(new SystemGuiButton(
+                x + WINDOW_W - 54, y + CONTENT_Y + 9, 28, 20, Component.literal(">"),
+                () -> { selectedMemory--; historyScroll = 0; rebuildWidgets(); }));
+        next.active = selectedMemory > 0;
+    }
+
+    private CompoundTag memoryLife(CompoundTag life) {
+        ListTag memories = life.getList("Memories", Tag.TAG_COMPOUND);
+        selectedMemory = Mth.clamp(selectedMemory, 0, memories.size());
+        return selectedMemory == 0 ? life : memories.getCompound(memories.size() - selectedMemory);
+    }
+
+    private List<FormattedCharSequence> memoryLines(CompoundTag life) {
+        return historyLines(memoryLife(life), WINDOW_W - 82);
+    }
+
+    private List<FormattedCharSequence> historyLines(CompoundTag life, int width) {
+        ListTag history = life.getList("History", Tag.TAG_COMPOUND);
+        if (history.isEmpty()) return List.of();
+        var language = net.minecraft.locale.Language.getInstance();
+        if (historyLanguage != language || historyFont != font) {
+            historyLayouts.clear(); historyLanguage = language; historyFont = font;
+        }
+        var widths = historyLayouts.computeIfAbsent(history, ignored -> new java.util.HashMap<>());
+        var cached = widths.get(width);
+        if (cached != null) return cached;
+        List<FormattedCharSequence> lines = new ArrayList<>();
+        for (int i = 0; i < history.size(); i++) {
+            CompoundTag entry = history.getCompound(i);
+            lines.addAll(font.split(Component.translatable(
+                    "screen.immortal_cultivation_mod.life.log_line", entry.getInt("Age"),
+                    Component.translatable(entry.getString("Key"))), width));
+        }
+        List<FormattedCharSequence> layout = List.copyOf(lines);
+        widths.put(width, layout);
+        return layout;
+    }
+
+    private Component inheritanceDetail(CompoundTag preview) {
+        String prefix = "screen.immortal_cultivation_mod.life.inherit.detail.";
+        return switch (preview.getString("Kind")) {
+            case "materials" -> {
+                ResourceLocation id = ResourceLocation.tryParse(preview.getString("Item"));
+                Item item = id == null ? Items.AIR : BuiltInRegistries.ITEM.get(id);
+                Component name = item == Items.AIR ? Component.translatable("life.expansion.unknown_item") : item.getDescription();
+                yield Component.translatable(prefix + "materials", name, preview.getInt("Count"));
+            }
+            case "progress" -> Component.translatable(prefix + "progress", preview.getLong("Gain"));
+            case "spell", "proficiency" -> {
+                ModSpells.SpellDef spell = ModSpells.get(preview.getString("Spell"));
+                yield Component.translatable(prefix + preview.getString("Kind"),
+                        spell == null ? Component.translatable("life.expansion.unknown_spell") : spell.name(), preview.getInt("Gain"));
+            }
+            case "blessing" -> Component.translatable(prefix + "blessing", preview.getInt("Minutes"));
+            case "none" -> Component.translatable("life.expansion.inherit." + preview.getString("Reason"));
+            default -> Component.translatable(prefix + "unknown");
+        };
+    }
+
     private void initFinishedWidgets(int x, int y, CompoundTag life) {
+        if (!inheritancePicker.isEmpty() && !life.getBoolean("RewardClaimed") && !hasPendingInheritance(life)) {
+            initInheritancePicker(x, y, life);
+            return;
+        }
         if (!life.getBoolean("RewardClaimed")) {
+            CompoundTag pending = life.getCompound("PendingInheritance");
+            boolean reserved = hasPendingInheritance(life);
             ListTag rewards = life.getList("InheritanceRewards", Tag.TAG_COMPOUND);
+            int gap = 8;
+            int buttonWidth = (WINDOW_W - 56 - gap * Math.max(0, rewards.size() - 1)) / Math.max(1, rewards.size());
             for (int i = 0; i < rewards.size(); i++) {
                 CompoundTag reward = rewards.getCompound(i);
-                addWindowButton(new SystemGuiButton(
-                        x + 48 + i * 142,
-                        y + 300,
-                        132,
+                boolean chosen = reserved && reward.getString("Id").equals(pending.getString("RewardId"));
+                SystemGuiButton button = addWindowButton(new SystemGuiButton(
+                        x + 28 + i * (buttonWidth + gap),
+                        y + (reserved ? 295 : 300),
+                        buttonWidth,
                         24,
-                        rewardLabel(reward),
-                        () -> send("inherit:" + reward.getString("Id"))));
+                        !reserved && List.of("spell", "materials").contains(reward.getString("Id"))
+                                ? Component.translatable("life.expansion.inherit.select." + reward.getString("Id"))
+                                : rewardLabel(chosen ? pending.getCompound("Selected") : reward),
+                        () -> {
+                            String category = reward.getString("Id");
+                            if (List.of("spell", "materials").contains(category)) {
+                                inheritancePicker = category;
+                                inheritancePage = reward.getInt("ChoiceIndex") / INHERITANCE_PAGE_SIZE;
+                                rebuildWidgets();
+                            } else send("inherit:" + category);
+                        }));
+                CompoundTag preview = chosen ? pending.getCompound("Receipt") : reward.getCompound("Preview");
+                button.active = !reserved && !"none".equals(preview.getString("Kind"));
+                Component tooltip = inheritanceDetail(preview);
+                if (reward.getString("Id").equals("progress") && !"none".equals(preview.getString("Kind"))) {
+                    tooltip = tooltip.copy().append("\n").append(Component.translatable("life.expansion.inherit.progress_source",
+                            reward.getLong("SourceCultivation"), reward.getInt("Percent")))
+                            .append("\n").append(Component.translatable("life.expansion.inherit.destination",
+                                    CultivationLevels.displayName(preview.getString("DestinationLevel")),
+                                    preview.getLong("DestinationProgress"),
+                                    CultivationLevels.getTotalQiNeeded(preview.getString("DestinationLevel"))));
+                }
+                button.setTooltip(net.minecraft.client.gui.components.Tooltip.create(tooltip));
+            }
+            if (!reserved && rewards.stream().allMatch(t -> "none".equals(((CompoundTag)t).getCompound("Preview").getString("Kind")))) {
+                addWindowButton(new SystemGuiButton(x + WINDOW_W / 2 - 90, y + FOOTER_Y, 180, 22,
+                        Component.translatable("life.expansion.inherit.continue_empty"), () -> send("inherit:none")));
+            }
+            if (reserved) {
+                SystemGuiButton retry = addWindowButton(new SystemGuiButton(x + WINDOW_W / 2 - 82, y + FOOTER_Y,
+                        164, 22, Component.translatable("life.expansion.inherit.retry"),
+                        () -> send("inherit:" + pending.getString("RewardId"))));
+                retry.active = !pending.getString("RewardId").isBlank();
+                retry.setTooltip(net.minecraft.client.gui.components.Tooltip.create(Component.translatable("life.expansion.inherit.space")));
             }
         } else {
             addActionButton(
@@ -482,6 +663,78 @@ public class LifeSimulationScreen extends Screen {
         }
     }
 
+    private CompoundTag pickerReward(CompoundTag life) {
+        for (var tag : life.getList("InheritanceRewards", Tag.TAG_COMPOUND)) {
+            var reward = (CompoundTag) tag;
+            if (reward.getString("Id").equals(inheritancePicker)) return reward;
+        }
+        return new CompoundTag();
+    }
+
+    private void initInheritancePicker(int x, int y, CompoundTag life) {
+        var reward = pickerReward(life);
+        var options = reward.getList("Choices", Tag.TAG_COMPOUND);
+        int pages = Math.max(1, (options.size() + INHERITANCE_PAGE_SIZE - 1) / INHERITANCE_PAGE_SIZE);
+        inheritancePage = Mth.clamp(inheritancePage, 0, pages - 1);
+        for (int row = 0; row < INHERITANCE_PAGE_SIZE; row++) {
+            int index = inheritancePage * INHERITANCE_PAGE_SIZE + row;
+            if (index >= options.size()) break;
+            var option = options.getCompound(index);
+            boolean selected = index == reward.getInt("ChoiceIndex");
+            Component label = inheritanceDetail(option.getCompound("Preview"));
+            if (selected) label = Component.translatable("life.expansion.inherit.picker.selected", label);
+            var choice = addWindowButton(new SystemGuiButton(x + 44, y + 113 + row * 27, WINDOW_W - 88, 24, label, () -> {
+                if (inheritanceWaiting) return;
+                inheritanceWaiting = true;
+                inheritanceWaitingRevision = state.getLong("LifeActionRevision");
+                send("inherit_select:" + inheritancePicker + ":" + index);
+                rebuildWidgets();
+            }));
+            choice.active = !inheritanceWaiting;
+            choice.setTooltip(net.minecraft.client.gui.components.Tooltip.create(inheritanceDetail(option.getCompound("Preview"))));
+        }
+        var previous = addWindowButton(new SystemGuiButton(x + 44, y + 282, 70, 20, Component.literal("<"), () -> {
+            inheritancePage--; rebuildWidgets();
+        }));
+        previous.active = inheritancePage > 0 && !inheritanceWaiting;
+        var next = addWindowButton(new SystemGuiButton(x + WINDOW_W - 114, y + 282, 70, 20, Component.literal(">"), () -> {
+            inheritancePage++; rebuildWidgets();
+        }));
+        next.active = inheritancePage + 1 < pages && !inheritanceWaiting;
+        var back = addWindowButton(new SystemGuiButton(x + 44, y + 348, 112, 24,
+                Component.translatable("life.battle.back"), () -> { inheritancePicker = ""; rebuildWidgets(); }));
+        back.active = !inheritanceWaiting;
+        var confirm = addWindowButton(new SystemGuiButton(x + 170, y + 348, WINDOW_W - 214, 24,
+                Component.translatable("life.expansion.inherit.picker.claim", inheritanceDetail(reward.getCompound("Preview"))),
+                () -> {
+                    if (inheritanceWaiting) return;
+                    inheritanceWaiting = true;
+                    inheritanceWaitingRevision = state.getLong("LifeActionRevision");
+                    send("inherit:" + inheritancePicker);
+                    rebuildWidgets();
+                }));
+        confirm.active = !inheritanceWaiting && !options.isEmpty() && !"none".equals(reward.getCompound("Preview").getString("Kind"));
+        confirm.setTooltip(net.minecraft.client.gui.components.Tooltip.create(inheritanceDetail(reward.getCompound("Preview"))));
+    }
+
+    private void renderInheritancePicker(GuiGraphics graphics, int x, int y, CompoundTag life) {
+        SystemGuiTextures.drawInsetPanel(graphics, x + 28, y + 76, WINDOW_W - 56, 260);
+        var reward = pickerReward(life);
+        int count = reward.getList("Choices", Tag.TAG_COMPOUND).size();
+        graphics.drawCenteredString(font, Component.translatable("life.expansion.inherit.select." + inheritancePicker),
+                x + WINDOW_W / 2, y + 88, 0xFF17325E);
+        graphics.drawCenteredString(font, Component.translatable("life.expansion.inherit.picker.page",
+                        inheritancePage + 1, Math.max(1, (count + INHERITANCE_PAGE_SIZE - 1) / INHERITANCE_PAGE_SIZE), count),
+                x + WINDOW_W / 2, y + 287, 0xFF17325E);
+        graphics.drawCenteredString(font, Component.translatable("life.expansion.inherit.picker.help"),
+                x + WINDOW_W / 2, y + 315, 0xFF404040);
+    }
+
+    private boolean hasPendingInheritance(CompoundTag life) {
+        return "pending".equals(life.getString("ClaimTransaction"))
+                && life.contains("PendingInheritance", Tag.TAG_COMPOUND) && !life.getBoolean("RewardClaimed");
+    }
+
     private Component rewardLabel(CompoundTag reward) {
         return switch (reward.getString("Id")) {
             case "progress" -> Component.translatable(
@@ -489,9 +742,9 @@ public class LifeSimulationScreen extends Screen {
                     reward.getInt("Percent"));
             case "spell" -> {
                 ModSpells.SpellDef spell = ModSpells.get(reward.getString("Spell"));
-                yield Component.translatable(
+                yield spell == null ? Component.translatable("life.expansion.inherit.no_spell_title") : Component.translatable(
                         "screen.immortal_cultivation_mod.life.inherit.spell",
-                        spell == null ? Component.literal("?") : spell.name());
+                        spell == null ? Component.translatable("life.expansion.unknown_spell") : spell.name());
             }
             case "blessing" -> Component.translatable(
                     "screen.immortal_cultivation_mod.life.inherit.blessing");
@@ -518,6 +771,10 @@ public class LifeSimulationScreen extends Screen {
     }
 
     private void send(String action) {
+        if (action.equals("settle_confirm")) {
+            com.example.immortal_cultivation_mod.client.OuterSystemClient.showLifeConfirmation(this, () -> send("settle"));
+            return;
+        }
         PacketDistributor.sendToServer(
                 new OuterSystemPayloads.ServerboundLifeAction(action));
     }
@@ -567,6 +824,7 @@ public class LifeSimulationScreen extends Screen {
         }
         restoreButtonVisibility();
         graphics.pose().popPose();
+        SystemGuiButton.keepTooltipOnScreen(this);
     }
 
     private void renderMainWindowLayer(
@@ -612,9 +870,9 @@ public class LifeSimulationScreen extends Screen {
         graphics.pose().scale(layout.scale(), layout.scale(), 1.0F);
         if (!hasGeneratedLife(life)) {
             renderEmpty(graphics, x, y, life);
-        } else if (life.getBoolean("Finished")) {
+        } else if (life.getBoolean("Finished") && selectedTab == Tab.LIFE) {
             renderFinished(graphics, x, y, life);
-        } else if (!life.getBoolean("Active")) {
+        } else if (!life.getBoolean("Active") && !life.getBoolean("Finished")) {
             renderEmpty(graphics, x, y, life);
         } else {
             renderTab(
@@ -706,9 +964,7 @@ public class LifeSimulationScreen extends Screen {
             drawMapDetailLine(graphics, sideX + 10, y + 110, "terrain",
                     Component.translatable(destination.typeKey()));
             drawMapDetailLine(graphics, sideX + 10, y + 126, "faction",
-                    Component.translatable(
-                            "screen.immortal_cultivation_mod.life.map.faction."
-                                    + local.getString("ControllingFaction")));
+                    translatedValue("screen.immortal_cultivation_mod.life.map.faction.", local.getString("ControllingFaction")));
             drawMapDetailLine(graphics, sideX + 10, y + 142, "qi",
                     Component.literal(String.valueOf(
                             local.getInt("SpiritualDensity"))));
@@ -757,14 +1013,14 @@ public class LifeSimulationScreen extends Screen {
                     sideW - 20,
                     0xFF17325E);
         } else if (local.getBoolean("MainQuestCompleted")) {
-            drawCenteredWrapped(
+            drawTrimmed(
                     graphics,
                     Component.translatable(
                             "screen.immortal_cultivation_mod.life.map.quest_complete",
-                            local.getString("MainQuestEnding")),
-                    sideX + sideW / 2,
-                    y + 258,
-                    sideW - 20,
+                            mapEndingName(selected, local.getString("MainQuestEnding"))),
+                    mapX + 9,
+                    mapY + mapH - 32,
+                    mapW - 18,
                     0xFF31533A);
         }
 
@@ -804,6 +1060,11 @@ public class LifeSimulationScreen extends Screen {
                 : Component.translatable(location.nameKey());
     }
 
+    private Component mapEndingName(String locationId, String endingId) {
+        String key = "life.immortal_cultivation_mod.map.quest." + locationId + ".ending." + endingId + ".choice";
+        return Component.translatable(I18n.exists(key) ? key : "screen.immortal_cultivation_mod.life.none");
+    }
+
     private static int mapNodeX(
             int windowX, LifeSimulationWorldMap.LocationDefinition location) {
         return windowX + 39 + Math.round(location.mapX() * 1.04F);
@@ -811,7 +1072,7 @@ public class LifeSimulationScreen extends Screen {
 
     private static int mapNodeY(
             int windowY, LifeSimulationWorldMap.LocationDefinition location) {
-        return windowY + 105 + Math.round(location.mapY() * 0.66F);
+        return windowY + 109 + Math.round(location.mapY() * 0.90F);
     }
 
     private static void drawMapLine(
@@ -958,38 +1219,13 @@ public class LifeSimulationScreen extends Screen {
         int panelW = 392;
         SystemGuiTextures.drawInsetPanel(
                 graphics, panelX, y + CONTENT_Y, panelW, CONTENT_H);
-        CompoundTag event = life.getCompound("CurrentEvent");
-        if (!event.isEmpty()) {
-            drawLabel(
-                    graphics,
-                    "screen.immortal_cultivation_mod.life.current_event",
-                    panelX + 12,
-                    y + CONTENT_Y + 12,
-                    0xFF17325E);
-            drawWrapped(
-                    graphics,
-                    Component.translatable(event.getString("TextKey")),
-                    panelX + 12,
-                    y + CONTENT_Y + 34,
-                    panelW - 24,
-                    0xFF202020,
-                    8);
-        } else {
-            drawLabel(
-                    graphics,
-                    "screen.immortal_cultivation_mod.life.diary",
-                    panelX + 12,
-                    y + CONTENT_Y + 12,
-                    0xFF17325E);
-            renderHistory(
-                    graphics,
-                    life,
-                    panelX + 12,
-                    y + CONTENT_Y + 33,
-                    panelW - 24,
-                    17,
-                    true);
+        if(!life.getCompound("CurrentEvent").isEmpty()){
+            drawLabel(graphics,"life.battle.title",panelX+12,y+CONTENT_Y+12,0xFF17325E);
+            return;
         }
+        drawLabel(graphics,"screen.immortal_cultivation_mod.life.diary",
+                panelX+12,y+CONTENT_Y+12,0xFF17325E);
+        renderHistory(graphics,life,panelX+12,y+CONTENT_Y+33,panelW-40,16);
     }
 
     private void renderProfile(
@@ -1013,9 +1249,7 @@ public class LifeSimulationScreen extends Screen {
                 font,
                 Component.translatable(
                         "screen.immortal_cultivation_mod.life.gender_value",
-                        Component.translatable(
-                                "screen.immortal_cultivation_mod.life.gender."
-                                        + life.getString("Gender"))),
+                        translatedValue("screen.immortal_cultivation_mod.life.gender.", life.getString("Gender"))),
                 x + 10,
                 lineY,
                 0xFF202020,
@@ -1025,9 +1259,7 @@ public class LifeSimulationScreen extends Screen {
                 graphics,
                 Component.translatable(
                         "screen.immortal_cultivation_mod.life.birthplace_value",
-                        Component.translatable(
-                                "screen.immortal_cultivation_mod.life.birthplace."
-                                        + life.getString("Birthplace"))),
+                        translatedValue("screen.immortal_cultivation_mod.life.birthplace.", life.getString("Birthplace"))),
                 x + 10,
                 lineY,
                 width - 20,
@@ -1082,32 +1314,32 @@ public class LifeSimulationScreen extends Screen {
         int listW = 372;
         SystemGuiTextures.drawInsetPanel(graphics, listX, listY, listW, CONTENT_H);
         ListTag relationships = life.getList("Relationships", Tag.TAG_COMPOUND);
-        int visible = 9;
+        List<Integer> known = knownRelationshipIndices(life);
+        if (!known.isEmpty() && !known.contains(selectedRelationship)) selectedRelationship = known.getFirst();
+        int visible = RELATIONSHIP_VISIBLE;
+        relationshipScroll = Mth.clamp(relationshipScroll, 0, Math.max(0, known.size() - visible));
         for (int row = 0; row < visible; row++) {
-            int index = relationshipScroll + row;
-            if (index >= relationships.size()) {
+            int visibleIndex = relationshipScroll + row;
+            if (visibleIndex >= known.size()) {
                 break;
             }
+            int index = known.get(visibleIndex);
             CompoundTag person = relationships.getCompound(index);
-            int rowY = listY + 8 + row * 28;
+            int rowY = listY + RELATIONSHIP_ROWS_Y + row * RELATIONSHIP_ROW_HEIGHT;
             boolean hovered = mouseX >= listX + 6 && mouseX < listX + listW - 18
-                    && mouseY >= rowY && mouseY < rowY + 25;
+                    && mouseY >= rowY && mouseY < rowY + 35;
             SystemGuiTextures.drawListRow(
                     graphics,
                     listX + 6,
                     rowY,
                     listW - 28,
-                    25,
+                    35,
                     index == selectedRelationship,
                     hovered);
             int color = index == selectedRelationship ? 0xFFFFFFFF : 0xFF202020;
-            graphics.drawString(
-                    font,
-                    Component.literal(person.getString("Name")),
-                    listX + 12,
-                    rowY + 4,
-                    color,
-                    index == selectedRelationship);
+            drawRelationshipPortrait(graphics, person, listX + 9, rowY + 1, 32);
+            drawTrimmed(graphics, npcName(person), listX + 48, rowY + 5, 96,
+                    color, index == selectedRelationship);
             drawTrimmed(
                     graphics,
                     Component.translatable(
@@ -1115,9 +1347,9 @@ public class LifeSimulationScreen extends Screen {
                             relationName(person.getString("Relation")),
                             person.getInt("Age"),
                             person.getInt("Affinity")),
-                    listX + 139,
-                    rowY + 4,
-                    listW - 162,
+                    listX + 150,
+                    rowY + 5,
+                    listW - 173,
                     color,
                     index == selectedRelationship);
             graphics.drawString(
@@ -1125,52 +1357,58 @@ public class LifeSimulationScreen extends Screen {
                     Component.translatable(person.getBoolean("Alive")
                             ? "screen.immortal_cultivation_mod.life.alive"
                             : "screen.immortal_cultivation_mod.life.deceased"),
-                    listX + 12,
-                    rowY + 14,
+                    listX + 48,
+                    rowY + 20,
                     color,
                     index == selectedRelationship);
         }
         SystemGuiTextures.drawVerticalScrollbar(
                 graphics,
                 listX + listW - 17,
-                listY + 5,
+                listY + RELATIONSHIP_ROWS_Y,
                 12,
-                CONTENT_H - 10,
+                CONTENT_H - RELATIONSHIP_ROWS_Y - 6,
                 relationshipScroll,
                 visible,
-                relationships.size());
+                known.size());
 
         int detailX = x + 400;
         int detailW = 202;
         SystemGuiTextures.drawInsetPanel(
                 graphics, detailX, listY, detailW, CONTENT_H);
-        if (!relationships.isEmpty()) {
+        if (!known.isEmpty()) {
             CompoundTag person = relationships.getCompound(Mth.clamp(
                     selectedRelationship, 0, relationships.size() - 1));
-            graphics.drawCenteredString(
-                    font,
-                    Component.literal(person.getString("Name")),
-                    detailX + detailW / 2,
-                    listY + 15,
-                    0xFF17325E);
-            drawWrapped(
-                    graphics,
-                    Component.translatable(
-                            "screen.immortal_cultivation_mod.life.relationship.detail",
-                            Component.translatable(
-                                    "screen.immortal_cultivation_mod.life.personality."
-                                            + person.getString("Personality")),
-                            Component.translatable(
-                                    "screen.immortal_cultivation_mod.life.occupation."
-                                            + person.getString("Occupation")),
-                            person.getInt("Health"),
-                            person.getInt("Affinity")),
-                    detailX + 12,
-                    listY + 41,
-                    detailW - 24,
-                    0xFF202020,
-                    10);
-        }
+            drawRelationshipPortrait(graphics, person, detailX + 8, listY + 8, 54);
+            drawTrimmed(graphics, npcName(person), detailX + 68, listY + 12, detailW - 78, 0xFF17325E, false);
+            drawTrimmed(graphics, Component.translatable(person.getBoolean("Alive")
+                    ? "screen.immortal_cultivation_mod.life.alive" : "screen.immortal_cultivation_mod.life.deceased"),
+                    detailX + 68, listY + 27, detailW - 78, 0xFF404040, false);
+            drawTrimmed(graphics, realmName(person.getInt("Realm")), detailX + 68, listY + 42, detailW - 78, 0xFF404040, false);
+            List<FormattedCharSequence> detailLines = relationshipDetailLines(person);
+            relationshipDetailScroll = Mth.clamp(relationshipDetailScroll, 0, Math.max(0, detailLines.size() - RELATIONSHIP_DETAIL_VISIBLE));
+            for (int row = 0; row < Math.min(RELATIONSHIP_DETAIL_VISIBLE, detailLines.size() - relationshipDetailScroll); row++) {
+                graphics.drawString(font, detailLines.get(relationshipDetailScroll + row),
+                        detailX + 12, listY + 66 + row * 13, 0xFF202020, false);
+            }
+            SystemGuiTextures.drawVerticalScrollbar(graphics, detailX + detailW - 17,
+                    listY + 65, 12, 52, relationshipDetailScroll, RELATIONSHIP_DETAIL_VISIBLE, detailLines.size());
+        } else graphics.drawString(font, Component.translatable("life.relationship.filter.empty"),
+                listX + 12, listY + RELATIONSHIP_ROWS_Y + 8, 0xFF606060, false);
+    }
+
+    private void drawRelationshipPortrait(GuiGraphics graphics, CompoundTag person, int x, int y, int size) {
+        var sprite = com.example.immortal_cultivation_mod.system.LifeSimulationSprites.person(person);
+        int pixels = sprite.pixels();
+        graphics.blit(sprite.texture(), x, y, size, size, 0, 0, pixels, pixels, pixels, pixels);
+    }
+
+    private List<FormattedCharSequence> relationshipDetailLines(CompoundTag person) {
+        return font.split(Component.translatable(
+                "screen.immortal_cultivation_mod.life.relationship.detail",
+                translatedValue("screen.immortal_cultivation_mod.life.personality.", person.getString("Personality")),
+                translatedValue("screen.immortal_cultivation_mod.life.occupation.", person.getString("Occupation")),
+                person.getInt("Health"), person.getInt("Affinity")), 162);
     }
 
     private void renderCultivation(
@@ -1207,9 +1445,7 @@ public class LifeSimulationScreen extends Screen {
         int detailY = y + CONTENT_Y + 105;
         int leftDetailX = panelX + 18;
         drawDetailLine(graphics, leftDetailX, detailY, "root",
-                Component.translatable(
-                        "screen.immortal_cultivation_mod.life.root."
-                                + life.getString("SpiritualRoot")));
+                translatedValue("screen.immortal_cultivation_mod.life.root.", life.getString("SpiritualRoot")));
         drawDetailLine(graphics, leftDetailX, detailY + 18, "stability",
                 Component.literal(Integer.toString(life.getInt("CultivationStability"))));
         drawDetailLine(graphics, leftDetailX, detailY + 36, "combat",
@@ -1259,7 +1495,7 @@ public class LifeSimulationScreen extends Screen {
             }
             ModSpells.SpellDef spell = ModSpells.get(spells.getString(index));
             Component name = spell == null
-                    ? Component.literal(spells.getString(index))
+                    ? Component.translatable("life.expansion.unknown_spell")
                     : spell.name();
             drawTrimmed(
                     graphics,
@@ -1288,20 +1524,23 @@ public class LifeSimulationScreen extends Screen {
                 0xFF17325E,
                 false);
         ListTag methods = life.getList("LearnedMethods", Tag.TAG_STRING);
-        for (int row = 0; row < Math.min(3, methods.size()); row++) {
-            String methodId = methods.getString(row);
+        methodScroll = Mth.clamp(methodScroll, 0, Math.max(0, methods.size() - 3));
+        for (int row = 0; row < Math.min(3, methods.size() - methodScroll); row++) {
+            String methodId = methods.getString(methodScroll + row);
             CultivationMethods.MethodDef learned = CultivationMethods.get(methodId);
             Component name = learned == null
-                    ? Component.literal(methodId)
+                    ? Component.translatable("life.expansion.unknown_method")
                     : Component.translatable(learned.nameKey());
             drawTrimmed(
                     graphics,
                     name,
                     spellX + 6,
                     detailY + 100 + row * 15,
-                    157,
+                    145,
                     0xFF202020);
         }
+        SystemGuiTextures.drawVerticalScrollbar(graphics, panelX + panelW - 17,
+                detailY + 97, 12, 45, methodScroll, 3, methods.size());
     }
 
     private void renderActivities(
@@ -1321,8 +1560,8 @@ public class LifeSimulationScreen extends Screen {
                 Component.translatable(
                         "screen.immortal_cultivation_mod.life.activities_help"),
                 x + WINDOW_W / 2,
-                y + CONTENT_Y + 205,
-                500,
+                y + 295,
+                520,
                 0xFF4A4A4A);
     }
 
@@ -1335,13 +1574,9 @@ public class LifeSimulationScreen extends Screen {
         drawDetailLine(graphics, x + 35, lineY, "wealth",
                 Component.literal(String.format(Locale.ROOT, "%,d", life.getLong("Wealth"))));
         drawDetailLine(graphics, x + 35, lineY + 17, "occupation",
-                Component.translatable(
-                        "screen.immortal_cultivation_mod.life.occupation."
-                                + life.getString("Occupation")));
+                translatedValue("screen.immortal_cultivation_mod.life.occupation.", life.getString("Occupation")));
         drawDetailLine(graphics, x + 35, lineY + 34, "sect",
-                Component.translatable(
-                        "screen.immortal_cultivation_mod.life.sect."
-                                + life.getString("Sect")));
+                translatedValue("screen.immortal_cultivation_mod.life.sect.", life.getString("Sect")));
         drawDetailLine(graphics, x + 35, lineY + 51, "morality",
                 Component.literal(Integer.toString(life.getInt("Morality"))));
         drawDetailLine(graphics, x + 35, lineY + 68, "reputation",
@@ -1351,9 +1586,7 @@ public class LifeSimulationScreen extends Screen {
         drawDetailLine(graphics, x + 35, lineY + 102, "alchemy",
                 Component.literal(Integer.toString(life.getInt("Alchemy"))));
         drawDetailLine(graphics, x + 35, lineY + 119, "family",
-                Component.translatable(
-                        "screen.immortal_cultivation_mod.life.family."
-                                + life.getString("Family")));
+                translatedValue("screen.immortal_cultivation_mod.life.family.", life.getString("Family")));
 
         ListTag inventory = life.getList("Inventory", Tag.TAG_COMPOUND);
         graphics.drawString(
@@ -1375,7 +1608,7 @@ public class LifeSimulationScreen extends Screen {
             ResourceLocation id = ResourceLocation.tryParse(entry.getString("Id"));
             Item item = id == null ? Items.AIR : BuiltInRegistries.ITEM.get(id);
             Component itemName = item == Items.AIR
-                    ? Component.literal(entry.getString("Id"))
+                    ? Component.translatable("life.expansion.unknown_item")
                     : Component.translatable(item.getDescriptionId());
             int itemY = lineY + 160 + row * 18;
             if (item != Items.AIR) {
@@ -1394,7 +1627,7 @@ public class LifeSimulationScreen extends Screen {
                 x + 346,
                 lineY + 156,
                 12,
-                109,
+                104,
                 assetScroll,
                 6,
                 inventory.size());
@@ -1419,7 +1652,7 @@ public class LifeSimulationScreen extends Screen {
                             "screen.immortal_cultivation_mod.life.upgrade."
                                     + upgrades[i]),
                     x + 394,
-                    panelY + 37 + i * 35,
+                    y + 99 + i * 34,
                     188,
                     hasUpgrade(life, upgrades[i]) ? 0xFF1F6A2D : 0xFF202020);
         }
@@ -1431,53 +1664,57 @@ public class LifeSimulationScreen extends Screen {
         int panelY = y + CONTENT_Y;
         SystemGuiTextures.drawInsetPanel(
                 graphics, panelX, panelY, WINDOW_W - 36, CONTENT_H);
-        renderHistory(
-                graphics,
-                life,
-                panelX + 15,
-                panelY + 14,
-                WINDOW_W - 66,
-                HISTORY_VISIBLE_LINES,
-                false);
-        ListTag history = life.getList("History", Tag.TAG_COMPOUND);
-        SystemGuiTextures.drawVerticalScrollbar(
-                graphics,
-                panelX + WINDOW_W - 57,
-                panelY + 7,
-                12,
-                CONTENT_H - 14,
-                historyScroll,
-                HISTORY_VISIBLE_LINES,
-                history.size());
+        CompoundTag memory = memoryLife(life);
+        graphics.drawCenteredString(font, Component.translatable(
+                "screen.immortal_cultivation_mod.life.memory_title", memory.getString("Name"),
+                selectedMemory + 1, life.getList("Memories", Tag.TAG_COMPOUND).size() + 1),
+                x + WINDOW_W / 2, panelY + 14, 0xFF17325E);
+        Component summary = Component.translatable(
+                "screen.immortal_cultivation_mod.life.memory_summary", memory.getInt("Age"),
+                realmName(memory.getInt("HighestRealm")));
+        if (!memory.getString("Ending").isBlank()) {
+            summary = summary.copy().append(" · ").append(
+                    translatedValue("screen.immortal_cultivation_mod.life.ending.", memory.getString("Ending")));
+        }
+        drawTrimmed(graphics, summary, panelX + 15, panelY + 32, WINDOW_W - 82, 0xFF202020);
+        Component receipt = memory.contains("InheritanceReceipt", Tag.TAG_COMPOUND)
+                ? Component.translatable("screen.immortal_cultivation_mod.life.memory_inheritance",
+                        inheritanceDetail(memory.getCompound("InheritanceReceipt")))
+                : Component.translatable(memory.getBoolean("RewardClaimed")
+                        ? "screen.immortal_cultivation_mod.life.inherit.detail.unknown"
+                        : "screen.immortal_cultivation_mod.life.memory_unclaimed");
+        drawTrimmed(graphics, receipt, panelX + 15, panelY + 46, WINDOW_W - 82, 0xFF3B3B3B);
+        List<FormattedCharSequence> lines = memoryLines(life);
+        int start = Mth.clamp(historyScroll, 0, Math.max(0, lines.size() - HISTORY_VISIBLE_LINES));
+        for (int i = start; i < Math.min(lines.size(), start + HISTORY_VISIBLE_LINES); i++) {
+            graphics.drawString(font, lines.get(i), panelX + 15,
+                    panelY + 64 + (i - start) * 14, 0xFF202020, false);
+        }
+        SystemGuiTextures.drawVerticalScrollbar(graphics, panelX + WINDOW_W - 57,
+                panelY + 60, 12, CONTENT_H - 68, historyScroll, HISTORY_VISIBLE_LINES, lines.size());
+        drawTrimmed(graphics, Component.translatable("screen.immortal_cultivation_mod.life.memory_hint"),
+                x + 33, y + 327, WINDOW_W - 82, 0xFF3B3B3B);
     }
 
     private void renderHistory(
-            GuiGraphics graphics,
-            CompoundTag life,
-            int x,
-            int y,
-            int width,
-            int visible,
-            boolean newest) {
-        ListTag history = life.getList("History", Tag.TAG_COMPOUND);
-        int start = newest
-                ? Math.max(0, history.size() - visible)
-                : Mth.clamp(historyScroll, 0, Math.max(0, history.size() - visible));
-        int end = Math.min(history.size(), start + visible);
-        int lineY = y;
-        for (int i = start; i < end; i++) {
-            CompoundTag entry = history.getCompound(i);
-            Component line = Component.translatable(
-                    "screen.immortal_cultivation_mod.life.log_line",
-                    entry.getInt("Age"),
-                    Component.translatable(entry.getString("Key")));
-            drawTrimmed(graphics, line, x, lineY, width, 0xFF202020);
-            lineY += 14;
+            GuiGraphics graphics, CompoundTag life, int x, int y, int width, int visible) {
+        List<FormattedCharSequence> lines = historyLines(life, width);
+        int maximum = Math.max(0, lines.size() - visible);
+        diaryScroll = Mth.clamp(diaryScroll, 0, maximum);
+        int start = Math.max(0, lines.size() - visible - diaryScroll);
+        for (int i = start; i < Math.min(lines.size(), start + visible); i++) {
+            graphics.drawString(font, lines.get(i), x, y + (i - start) * 14, 0xFF202020, false);
         }
+        SystemGuiTextures.drawVerticalScrollbar(graphics, x + width + 4, y, 12,
+                visible * 14, start, visible, lines.size());
     }
 
     private void renderFinished(
             GuiGraphics graphics, int x, int y, CompoundTag life) {
+        if (!inheritancePicker.isEmpty() && !life.getBoolean("RewardClaimed") && !hasPendingInheritance(life)) {
+            renderInheritancePicker(graphics, x, y, life);
+            return;
+        }
         int panelX = x + 54;
         int panelY = y + 76;
         int panelW = WINDOW_W - 108;
@@ -1491,13 +1728,11 @@ public class LifeSimulationScreen extends Screen {
                 0xFF17325E);
         graphics.drawCenteredString(
                 font,
-                Component.translatable(
-                        "screen.immortal_cultivation_mod.life.ending."
-                                + life.getString("Ending")),
+                translatedValue("screen.immortal_cultivation_mod.life.ending.", life.getString("Ending")),
                 x + WINDOW_W / 2,
                 panelY + 39,
                 0xFF7A201D);
-        int leftX = panelX + 42;
+        int leftX = panelX + 16;
         int valueY = panelY + 69;
         drawSummary(graphics, leftX, valueY, "age", life.getInt("Age"));
         drawSummaryComponent(graphics, leftX, valueY + 22, "highest_realm",
@@ -1506,14 +1741,46 @@ public class LifeSimulationScreen extends Screen {
         drawSummary(graphics, leftX, valueY + 66, "score", life.getLong("Score"));
         drawSummary(graphics, leftX, valueY + 88, "insight_earned",
                 life.getInt("InsightEarned"));
+        drawTrimmed(graphics, Component.translatable("life.expansion.score", life.getLong("ScoreRealm"), life.getLong("ScoreStories"),
+                life.getLong("ScoreLegacy"), life.getLong("ScoreReputation")), panelX + 16, panelY + 176, panelW - 32, 0xFF17325E);
+        ListTag rewards = life.getList("InheritanceRewards", Tag.TAG_COMPOUND);
+        CompoundTag pending = life.getCompound("PendingInheritance");
+        boolean reserved = hasPendingInheritance(life);
+        int detailX = panelX + 244;
+        for (int i = 0; i < rewards.size(); i++) {
+            CompoundTag reward = rewards.getCompound(i);
+            boolean chosen = reserved && reward.getString("Id").equals(pending.getString("RewardId"));
+            CompoundTag preview = chosen ? pending.getCompound("Receipt") : reward.getCompound("Preview");
+            drawTrimmed(graphics, rewardLabel(chosen ? pending.getCompound("Selected") : reward),
+                    detailX, panelY + 65 + i * 28, 250, chosen ? 0xFF1F6A2D : 0xFF17325E);
+            drawTrimmed(graphics, inheritanceDetail(preview),
+                    detailX, panelY + 76 + i * 28, 250, 0xFF202020);
+        }
+        if (!reserved && life.contains("InheritanceReceipt", Tag.TAG_COMPOUND)) {
+            drawTrimmed(graphics, Component.translatable(
+                    "screen.immortal_cultivation_mod.life.memory_inheritance",
+                    inheritanceDetail(life.getCompound("InheritanceReceipt"))),
+                    panelX + 16, y + 334, panelW - 32, 0xFF1F6A2D);
+        }
+        Component claimInstruction = reserved
+                ? Component.translatable("life.expansion.inherit.pending").append(": ").append(rewardLabel(pending.getCompound("Selected")))
+                : Component.translatable(life.getBoolean("RewardClaimed")
+                        ? "screen.immortal_cultivation_mod.life.reward_claimed"
+                        : rewards.stream().allMatch(t -> "none".equals(((CompoundTag)t).getCompound("Preview").getString("Kind")))
+                                ? "life.expansion.inherit.empty_instruction"
+                                : "screen.immortal_cultivation_mod.life.choose_inheritance");
         graphics.drawCenteredString(
                 font,
-                Component.translatable(life.getBoolean("RewardClaimed")
-                        ? "screen.immortal_cultivation_mod.life.reward_claimed"
-                        : "screen.immortal_cultivation_mod.life.choose_inheritance"),
+                claimInstruction,
                 x + WINDOW_W / 2,
-                panelY + 181,
+                panelY + 197,
                 0xFF3B3B3B);
+        if (reserved) {
+            List<FormattedCharSequence> spaceLines = font.split(Component.translatable("life.expansion.inherit.space"), WINDOW_W - 56);
+            for (int row = 0; row < Math.min(2, spaceLines.size()); row++) {
+                graphics.drawCenteredString(font, spaceLines.get(row), x + WINDOW_W / 2, y + 323 + row * 12, 0xFF7A201D);
+            }
+        }
     }
 
     private void drawSummary(
@@ -1526,33 +1793,18 @@ public class LifeSimulationScreen extends Screen {
                 Component.literal(String.format(Locale.ROOT, "%,d", value)));
     }
 
-    private Component choiceLabel(CompoundTag choice) {
-        Component label = Component.translatable(choice.getString("TextKey"));
-        if (choice.contains("Danger", Tag.TAG_INT)) {
-            label = label.copy()
-                    .append(" ")
-                    .append(Component.translatable(
-                            "screen.immortal_cultivation_mod.life.danger."
-                                    + choice.getInt("Danger")));
-        }
-        return label;
-    }
-
     private void drawSummaryComponent(
             GuiGraphics graphics,
             int x,
             int y,
             String key,
             Component value) {
-        graphics.drawString(
-                font,
-                Component.translatable(
-                        "screen.immortal_cultivation_mod.life.summary." + key,
-                        value),
-                x,
-                y,
-                0xFF202020,
-                false);
+        // Reserve the reward column; long translated realm names fit in two lines.
+        List<FormattedCharSequence> lines = font.split(Component.translatable(
+                "screen.immortal_cultivation_mod.life.summary." + key, value), 214);
+        for (int row = 0; row < Math.min(2, lines.size()); row++) {
+            graphics.drawString(font, lines.get(row), x, y + row * 11, 0xFF202020, false);
+        }
     }
 
     private void drawValue(
@@ -1647,11 +1899,12 @@ public class LifeSimulationScreen extends Screen {
         if (I18n.exists(key)) {
             return Component.translatable(key);
         }
-        String readable = relation.replace('_', ' ').trim();
-        if (readable.isEmpty()) {
-            readable = "Unknown";
-        }
-        return Component.literal(readable);
+        return Component.translatable("screen.immortal_cultivation_mod.life.relation.unknown");
+    }
+
+    private Component translatedValue(String prefix, String id) {
+        String key = prefix + id;
+        return Component.translatable(I18n.exists(key) ? key : "screen.immortal_cultivation_mod.life.none");
     }
 
     private Component realmName(int realm) {
@@ -1690,33 +1943,51 @@ public class LifeSimulationScreen extends Screen {
         return life.getBoolean("Active")
                 && life.getBoolean("Alive")
                 && !life.contains("CurrentEvent", Tag.TAG_COMPOUND)
+                && !life.contains("Story", Tag.TAG_COMPOUND)
+                && !life.contains("Battle", Tag.TAG_COMPOUND)
                 && life.getInt("AnnualActionPoints") > 0;
     }
 
+    private boolean canAdvance(CompoundTag life) {
+        return life.getBoolean("Active") && life.getBoolean("Alive")
+                && !life.getBoolean("Finished")
+                && !life.contains("CurrentEvent", Tag.TAG_COMPOUND)
+                && !life.contains("Story", Tag.TAG_COMPOUND)
+                && !life.contains("Battle", Tag.TAG_COMPOUND);
+    }
+
     private boolean activityAvailable(CompoundTag life, String activity) {
-        if (!canAct(life)) {
-            return false;
+        return LifeSimulationSystem.activityUnavailable(life,activity).isBlank();
+    }
+
+    private Component npcName(CompoundTag person) {
+        var name = person.getString("NameKey").isBlank() || !I18n.exists(person.getString("NameKey"))
+                ? Component.literal(person.getString("Name")) : Component.translatable(person.getString("NameKey"));
+        return person.getBoolean("Alive") ? name : name.copy().withStyle(style -> style.withColor(0xB43434));
+    }
+
+    private List<Integer> knownRelationshipIndices(CompoundTag life) {
+        List<Integer> indices = new ArrayList<>();
+        ListTag people = life.getList("Relationships", Tag.TAG_COMPOUND);
+        for (int index = 0; index < people.size(); index++) {
+            CompoundTag person = people.getCompound(index);
+            if ((!person.contains("Observed") || person.getBoolean("Observed")) && relationshipFilter.matches(person)) indices.add(index);
         }
-        return switch (activity) {
-            case "work" -> life.getInt("Age") >= 12;
-            case "cultivate", "seclusion" -> life.getInt("Realm") > 0
-                    && !life.getString("ActiveMethod").isBlank();
-            case "practice" -> life.getInt("Realm") > 0;
-            case "sect_mission" -> !"none".equals(life.getString("Sect"));
-            default -> true;
-        };
+        return indices;
     }
 
     private void clampScrolls() {
         CompoundTag life = life();
-        ListTag history = life.getList("History", Tag.TAG_COMPOUND);
-        historyScroll = Mth.clamp(
-                historyScroll, 0, Math.max(0, history.size() - HISTORY_VISIBLE_LINES));
+        int historyLines = font == null ? memoryLife(life).getList("History", Tag.TAG_COMPOUND).size()
+                : memoryLines(life).size();
+        historyScroll = Mth.clamp(historyScroll, 0, Math.max(0, historyLines - HISTORY_VISIBLE_LINES));
         ListTag relationships = life.getList("Relationships", Tag.TAG_COMPOUND);
+        List<Integer> known = knownRelationshipIndices(life);
         relationshipScroll = Mth.clamp(
-                relationshipScroll, 0, Math.max(0, relationships.size() - 9));
+                relationshipScroll, 0, Math.max(0, known.size() - RELATIONSHIP_VISIBLE));
         selectedRelationship = Mth.clamp(
                 selectedRelationship, 0, Math.max(0, relationships.size() - 1));
+        if (!known.isEmpty() && !known.contains(selectedRelationship)) selectedRelationship = known.getFirst();
     }
 
     private float uiScale() {
@@ -2051,17 +2322,20 @@ public class LifeSimulationScreen extends Screen {
         int x = window.x();
         int y = window.y();
         int listX = x + 24;
-        int listY = y + CONTENT_Y + 8;
+        int listY = y + CONTENT_Y + RELATIONSHIP_ROWS_Y;
         if (mouseX < listX || mouseX >= listX + 344
-                || mouseY < listY || mouseY >= listY + 9 * 28) {
+                || mouseY < listY || mouseY >= listY + RELATIONSHIP_VISIBLE * RELATIONSHIP_ROW_HEIGHT) {
             return false;
         }
-        int row = (int) ((mouseY - listY) / 28);
-        int index = relationshipScroll + row;
-        if (index >= life().getList("Relationships", Tag.TAG_COMPOUND).size()) {
+        int row = (int) ((mouseY - listY) / RELATIONSHIP_ROW_HEIGHT);
+        if ((mouseY - listY) % RELATIONSHIP_ROW_HEIGHT >= 35) return false;
+        int visibleIndex = relationshipScroll + row;
+        List<Integer> known = knownRelationshipIndices(life());
+        if (visibleIndex >= known.size()) {
             return false;
         }
-        selectedRelationship = index;
+        selectedRelationship = known.get(visibleIndex);
+        relationshipDetailScroll = 0;
         rebuildWidgets();
         return true;
     }
@@ -2081,22 +2355,52 @@ public class LifeSimulationScreen extends Screen {
         Tab scrollTab = scrollWindow == WindowLayer.DETACHED
                 ? detachedTab
                 : selectedTab;
+        SystemWindowState scrollOwner = scrollWindow == WindowLayer.DETACHED ? detachedWindow : windowState;
+        SystemWindowState.ContentLayout scrollLayout = contentLayout(scrollOwner);
+        double contentX = scrollLayout.virtualX(mouseX) - scrollOwner.x();
+        double contentY = scrollLayout.virtualY(mouseY) - scrollOwner.y();
+        if (scrollTab == Tab.LIFE && !inheritancePicker.isEmpty()) {
+            int count = pickerReward(life()).getList("Choices", Tag.TAG_COMPOUND).size();
+            if (!inheritanceWaiting) {
+                inheritancePage = Mth.clamp(inheritancePage - (int) Math.signum(scrollY), 0,
+                        Math.max(0, (count - 1) / INHERITANCE_PAGE_SIZE));
+                rebuildWidgets();
+            }
+            return true;
+        }
+        if (scrollTab == Tab.LIFE && !life().getBoolean("Finished")
+                && life().getCompound("CurrentEvent").isEmpty()) {
+            int maximum = Math.max(0, historyLines(life(), 352).size() - 16);
+            diaryScroll = Mth.clamp(diaryScroll + (int) Math.signum(scrollY), 0, maximum);
+            return true;
+        }
         if (scrollTab == Tab.RECORD) {
             int maximum = Math.max(0,
-                    life().getList("History", Tag.TAG_COMPOUND).size()
-                            - HISTORY_VISIBLE_LINES);
+                    memoryLines(life()).size() - HISTORY_VISIBLE_LINES);
             historyScroll = Mth.clamp(
                     historyScroll - (int) Math.signum(scrollY), 0, maximum);
             return true;
         }
         if (scrollTab == Tab.RELATIONSHIPS) {
+            ListTag people = life().getList("Relationships", Tag.TAG_COMPOUND);
+            if (contentX >= 400 && contentY >= CONTENT_Y + 65 && contentY < 184 && !people.isEmpty()) {
+                int maximum = Math.max(0, relationshipDetailLines(people.getCompound(
+                        Mth.clamp(selectedRelationship, 0, people.size() - 1))).size() - RELATIONSHIP_DETAIL_VISIBLE);
+                relationshipDetailScroll = Mth.clamp(relationshipDetailScroll - (int) Math.signum(scrollY), 0, maximum);
+                return true;
+            }
             int maximum = Math.max(0,
-                    life().getList("Relationships", Tag.TAG_COMPOUND).size() - 9);
+                    knownRelationshipIndices(life()).size() - RELATIONSHIP_VISIBLE);
             relationshipScroll = Mth.clamp(
                     relationshipScroll - (int) Math.signum(scrollY), 0, maximum);
             return true;
         }
         if (scrollTab == Tab.CULTIVATION) {
+            if (contentX >= 419 && contentY >= 255) {
+                int maximum = Math.max(0, life().getList("LearnedMethods", Tag.TAG_STRING).size() - 3);
+                methodScroll = Mth.clamp(methodScroll - (int) Math.signum(scrollY), 0, maximum);
+                return true;
+            }
             int maximum = Math.max(0,
                     life().getList("DiscoveredSpells", Tag.TAG_STRING).size() - 4);
             cultivationScroll = Mth.clamp(
@@ -2172,7 +2476,8 @@ public class LifeSimulationScreen extends Screen {
 
     @Override
     public void removed() {
-        if (minecraft != null && minecraft.player != null) {
+        if (!com.example.immortal_cultivation_mod.client.OuterSystemClient.isTransitioning()
+                && minecraft != null && minecraft.player != null) {
             PacketDistributor.sendToServer(
                     new OuterSystemPayloads.ServerboundClose());
         }

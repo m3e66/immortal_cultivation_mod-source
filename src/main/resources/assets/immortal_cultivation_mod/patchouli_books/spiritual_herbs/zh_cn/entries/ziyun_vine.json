@@ -1,0 +1,23 @@
+{
+  "name": "紫云藤",
+  "icon": "immortal_cultivation_mod:ziyun_vine",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 7,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "紫云藤",
+      "text": "$(bold)生成尝试频率：$()1/5"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《百草录》记载",
+      "text": "紫云藤喜阴湿，藤身缠绕，细枝间隐有紫色灵纹。久生于幽林洞府，吸纳湿土与阴木之气。传闻灵气浓郁之时，其藤叶间可见淡紫雾华，远观如云霞缭绕。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻药",
+      "text": "丛林、竹林、暗林、繁茂洞穴及钟乳石洞穴。"
+    }
+  ]
+}

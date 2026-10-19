@@ -273,7 +273,7 @@ public final class TianyunFenchengMeteorEntity extends Projectile
             float baseDamage = (central ? 1600.0F : 700.0F) * scale;
             float damage = SpellDamageHelper.damage(owner, baseDamage,
                     ModSpells.get(ModSpells.TIANYUN_FENCHENG));
-            target.hurt(damageSources().indirectMagic(this, owner), damage);
+            target.hurt(com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.spellSource(damageSources().indirectMagic(this, owner), ModSpells.TIANYUN_FENCHENG), damage);
             target.igniteForSeconds(fullyCharged() ? 12.0F : 8.0F);
 
             Vec3 radial = new Vec3(

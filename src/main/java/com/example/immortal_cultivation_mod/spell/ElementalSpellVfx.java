@@ -60,7 +60,7 @@ public final class ElementalSpellVfx {
                     level, caster.position(), ModParticles.METHOD_QI_ICE.get(), 6.8D, 28);
             case ModSpells.YAOGUANG_SHAN -> lightOrbCast(level, caster, look, right, up);
             case ModSpells.TIANGUANG_GUANSHA -> groundSpiral(
-                    level, aim, ModParticles.METHOD_QI_LIGHT.get(), 1.9D, 20);
+                    level, aim, ModParticles.METHOD_QI_YANG.get(), 1.9D, 20);
             case ModSpells.YINGXI -> shadowGather(level, caster);
             case ModSpells.TIANFENG_ZHUI -> windCompression(level, aim);
             default -> {
@@ -168,7 +168,7 @@ public final class ElementalSpellVfx {
     private static void lightOrbCast(
             ServerLevel level, LivingEntity caster, Vec3 look, Vec3 right, Vec3 up) {
         Vec3 center = caster.getEyePosition().add(look.scale(0.55D));
-        orientedRing(level, center, right, up, ModParticles.METHOD_QI_LIGHT.get(), 0.30D, 16);
+        orientedRing(level, center, right, up, ModParticles.METHOD_QI_YANG.get(), 0.30D, 16);
         for (int ray = 0; ray < 8; ray++) {
             double angle = Math.PI * 2.0D * ray / 8.0D;
             Vec3 direction = right.scale(Math.cos(angle)).add(up.scale(Math.sin(angle)));
@@ -184,7 +184,7 @@ public final class ElementalSpellVfx {
             double radius = 0.35D + (i % 4) * 0.10D;
             Vec3 point = feet.add(Math.cos(angle) * radius,
                     i * caster.getBbHeight() / 18.0D, Math.sin(angle) * radius);
-            directed(level, ModParticles.METHOD_QI_DARK.get(), point,
+            directed(level, ModParticles.METHOD_QI_YIN.get(), point,
                     feet.add(0.0D, caster.getBbHeight() * 0.45D, 0.0D)
                             .subtract(point).scale(0.06D));
         }

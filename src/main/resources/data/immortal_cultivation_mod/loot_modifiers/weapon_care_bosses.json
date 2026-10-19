@@ -4,9 +4,30 @@
     {
       "condition": "minecraft:any_of",
       "terms": [
-        { "condition": "neoforge:loot_table_id", "loot_table_id": "immortal_cultivation_mod:entities/blood_ape_demon_general" },
-        { "condition": "neoforge:loot_table_id", "loot_table_id": "immortal_cultivation_mod:entities/jindan_vault_guardian" },
-        { "condition": "neoforge:loot_table_id", "loot_table_id": "immortal_cultivation_mod:entities/crimson_sky_flame_flood_dragon" }
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "immortal_cultivation_mod:entities/blood_ape_demon_general"
+        },
+        {
+          "condition": "minecraft:all_of",
+          "terms": [
+            {
+              "condition": "neoforge:loot_table_id",
+              "loot_table_id": "immortal_cultivation_mod:entities/vault_guardian"
+            },
+            {
+              "condition": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "nbt": "{BeastRealm:3}"
+              }
+            }
+          ]
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "immortal_cultivation_mod:entities/escaped_yuanying_core"
+        }
       ]
     }
   ],

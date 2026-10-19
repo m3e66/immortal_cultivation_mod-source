@@ -32,8 +32,8 @@ public class ProficiencyMenuScreen extends FittedMenuScreen {
             new ElementRow(SpiritRoots.THUNDER, 614),
             new ElementRow(SpiritRoots.ICE, 684),
             new ElementRow(SpiritRoots.WIND, 754),
-            new ElementRow(SpiritRoots.LIGHT, 824),
-            new ElementRow(SpiritRoots.DARK, 894)
+            new ElementRow(SpiritRoots.YANG, 824),
+            new ElementRow(SpiritRoots.YIN, 894)
     );
 
     private static final List<CraftRow> CRAFT_ROWS = List.of(

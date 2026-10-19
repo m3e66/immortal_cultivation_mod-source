@@ -1,0 +1,23 @@
+{
+  "name": "赤焰花",
+  "icon": "immortal_cultivation_mod:chiyan_flower",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "赤焰花",
+      "text": "$(bold)生成尝试频率：$()1/5"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《百草录》记载",
+      "text": "赤焰花生于炎热燥土，花瓣赤红如火，花心蕴有炽热之息。越是地火旺盛之处，越易见其踪迹。采摘之时须防火气侵体，修为浅薄者不宜久握。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻药",
+      "text": "各类恶地、沙漠、下界荒地及玄武岩三角洲。"
+    }
+  ]
+}

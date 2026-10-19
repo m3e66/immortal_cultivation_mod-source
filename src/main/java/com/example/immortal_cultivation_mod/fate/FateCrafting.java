@@ -74,15 +74,16 @@ public final class FateCrafting {
     }
     public static int pillRate(ItemStack stack, int baseRate) { return Math.round(baseRate * (1 + .15F * tags(stack).getInt(PILL))); }
     public static void consumedPill(ServerPlayer player, ItemStack stack) {
+        com.example.immortal_cultivation_mod.alchemy.PillToxicity.consumed(player,stack);
         com.example.immortal_cultivation_mod.guidance.DaoGuidanceObservations.record(player, "pill_used");
         if (stack.getItem() instanceof com.example.immortal_cultivation_mod.alchemy.LegacyPillItem) { com.example.immortal_cultivation_mod.guidance.DaoGuidanceObservations.record(player, "pill_effect"); }
         var tag = tags(stack);
         int quality = Math.max(0, Math.min(3, tag.getInt(PILL)));
-        if (quality > 0) player.heal(player.getMaxHealth() * .005F * quality);
+        if (quality > 0) player.heal((float)(player.getMaxHealth() * .005F * quality * com.example.immortal_cultivation_mod.alchemy.PillToxicity.multiplier(player,"Restore")));
         if (tag.getBoolean(PATTERN)) {
             var stats = ModAttachments.getData(player);
-            int max = com.example.immortal_cultivation_mod.attachment.CultivationLevels.getLevelDef(stats.cultivationLevel()).maxQi() + stats.maxQiBonus();
-            ModAttachments.setData(player, stats.withQi(Math.min(max, stats.qi() + Math.max(1, max / 50))));
+            int max = stats.maxQi();
+            ModAttachments.setData(player, stats.withQi(Math.min(max, stats.qi() + (int)(Math.max(1, max / 50)*com.example.immortal_cultivation_mod.alchemy.PillToxicity.multiplier(player,"Restore")))));
         }
     }
     @SubscribeEvent(priority = EventPriority.LOWEST)

@@ -1,0 +1,33 @@
+{
+  "name": "Battles Within a Life",
+  "icon": "immortal_cultivation_mod:cultivation_manual",
+  "category": "immortal_cultivation_mod:worldly",
+  "sortnum": 33,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Before the Encounter",
+      "text": "Travel, encounters, and story choices can lead to battles when their conditions are met. In preparation, choose Deck or Support. Current selections appear on the left and replacement choices on the right. Spells and supplies must belong to the simulated life."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Fifteen Regular Cards",
+      "text": "The regular deck contains fifteen cards. Select a slot on the left, then a replacement on the right. Copy limits apply; each spell card may appear only once. An illegal deck cannot enter battle. Inspect each card's cost, target, and effect."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Supplies and Companions",
+      "text": "Support offers five single-use item slots and a companion with offensive, defensive, or supportive behavior. Drawing an item card does not spend the item; playing it consumes the simulated inventory supply. Companions must come from this life's relationships."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Drag a Card to Its Target",
+      "text": "Cards are drawn automatically at turn start. Drag an attack card onto an enemy and release to play it on a legal target, or select the card and target before confirming. Each turn has three Energy; some cards also cost Qi. Hand, resource, and target requirements still apply."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Read the Dice",
+      "text": "Battle dice drop, tumble, and settle on their committed results, remaining visible for an extra second. Revealing or skipping animation does not reroll them. Before ending your turn, check enemy intentions, shields, companions, and battlefield objectives."
+    }
+  ]
+}

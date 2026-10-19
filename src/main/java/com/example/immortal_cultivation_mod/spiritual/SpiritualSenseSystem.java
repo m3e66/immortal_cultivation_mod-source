@@ -467,6 +467,8 @@ public final class SpiritualSenseSystem {
                         level, viewer.blockPosition(), environmentRadius);
         List<Detected> result = new ArrayList<>();
         Set<Long> veinPositions = new HashSet<>();
+        List<BlockEntity> formationNodes = blockEntities.stream()
+                .filter(MagicCircleBlockEntity.class::isInstance).toList();
 
         for (BlockEntity blockEntity : blockEntities) {
             if (!(blockEntity instanceof MagicCenterBlockEntity center)) continue;
@@ -513,16 +515,16 @@ public final class SpiritualSenseSystem {
                 int nodes = 0;
                 double centerRadiusSquared = center.getRadius()
                         * (double) center.getRadius();
-                for (BlockEntity candidate : blockEntities) {
-                    if (!(candidate instanceof MagicCircleBlockEntity)) continue;
+                for (BlockEntity candidate : formationNodes) {
+                    if (nodes >= 28) break;
                     BlockPos nodePos = candidate.getBlockPos();
                     if (nodePos.distToCenterSqr(
                             centerPos.getX() + 0.5D,
                             centerPos.getY() + 0.5D,
-                            centerPos.getZ() + 0.5D) > centerRadiusSquared
-                            || nodes++ >= 28) {
+                            centerPos.getZ() + 0.5D) > centerRadiusSquared) {
                         continue;
                     }
+                    nodes++;
                     Vec3 node = Vec3.atCenterOf(nodePos);
                     Signature nodeSignature = new Signature(
                             blockId(nodePos), group,
@@ -689,8 +691,7 @@ public final class SpiritualSenseSystem {
         if (target instanceof ServerPlayer player) {
             ModAttachments.CultivationData data = ModAttachments.getData(player);
             int maxQi = Math.max(1,
-                    CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi()
-                            + data.maxQiBonus());
+                    data.maxQi());
             return new TargetInfo(data.cultivationLevel(), data.qi(), maxQi,
                     String.join("/", data.spiritRoots()),
                     data.activeCultivationMethod(), data.mentalAttack());
@@ -700,22 +701,10 @@ public final class SpiritualSenseSystem {
                     npc.npcSpiritRoots(), npc.npcCultivationMethod(), 0);
         }
         String beastRealm = switch (target) {
-            case CrimsonSkyFlameFloodDragonEntity ignored ->
-                    CultivationLevels.REALM_YUANYING + CultivationLevels.STAGE_MID;
-            case BloodApeDemonGeneralEntity ignored ->
-                    CultivationLevels.REALM_YUANYING + CultivationLevels.STAGE_EARLY;
-            case KongmingBeetleEntity ignored ->
-                    CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE;
-            case ThunderhornRockBadgerEntity badger -> badger.cultivationRealm();
-            case FrostspineCaveBearEntity bear -> bear.cultivationRealm();
-            case PhantomVeilFoxEntity fox -> fox.cultivationRealm();
-            case CrimsonScaleFlameLizardEntity ignored ->
-                    CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_EARLY;
-            case EscapedYuanyingCoreEntity ignored ->
-                    CultivationLevels.REALM_YUANYING + CultivationLevels.STAGE_MID;
+            case com.example.immortal_cultivation_mod.entity.RealmBeast beast -> beast.beastCultivationLevel();
+            case EscapedYuanyingCoreEntity core -> com.example.immortal_cultivation_mod.entity.BeastRealms.level(core.coreRealm());
             case JindanEntity ignored ->
                     CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_EARLY;
-            case VaultGuardianEntity guardian -> guardian.cultivationRealm();
             default -> "";
         };
         return new TargetInfo(beastRealm, -1, -1, "", "", 0);
@@ -945,7 +934,8 @@ public final class SpiritualSenseSystem {
             ServerPlayer viewer, Vec3 target) {
         Vec3 origin = viewer.getEyePosition();
         if (origin.distanceToSqr(target) < 1.0D) return Interference.NONE;
-        BlockHitResult hit = viewer.serverLevel().clip(new ClipContext(
+        LoadedSightView terrain = new LoadedSightView(viewer.serverLevel());
+        BlockHitResult hit = terrain.clip(new ClipContext(
                 origin, target, ClipContext.Block.COLLIDER,
                 ClipContext.Fluid.NONE, viewer));
         if (hit.getType() == HitResult.Type.MISS
@@ -954,7 +944,7 @@ public final class SpiritualSenseSystem {
         }
 
         BlockPos position = hit.getBlockPos();
-        BlockState state = viewer.serverLevel().getBlockState(position);
+        BlockState state = terrain.getBlockState(position);
         if (state.isAir()) return Interference.NONE;
         ResourceLocation id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
         String path = id == null ? "" : id.getPath();
@@ -966,8 +956,7 @@ public final class SpiritualSenseSystem {
                         || path.contains("magic_circle")
                         || path.contains("magic_center"));
         float resistance = state.getBlock().getExplosionResistance();
-        float destroySpeed = state.getDestroySpeed(
-                viewer.serverLevel(), position);
+        float destroySpeed = state.getDestroySpeed(terrain, position);
         boolean dense = spiritBlocking || destroySpeed < 0.0F
                 || resistance >= 6.0F;
         int flags = FLAG_INTERFERENCE

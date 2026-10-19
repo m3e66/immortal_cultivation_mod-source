@@ -459,10 +459,10 @@ public final class FateSpellScrollItems {
             case SpiritRoots.WIND ->
                     ChatFormatting.DARK_AQUA;
 
-            case SpiritRoots.LIGHT ->
+            case SpiritRoots.YANG ->
                     ChatFormatting.WHITE;
 
-            case SpiritRoots.DARK ->
+            case SpiritRoots.YIN ->
                     ChatFormatting.DARK_PURPLE;
 
             default ->

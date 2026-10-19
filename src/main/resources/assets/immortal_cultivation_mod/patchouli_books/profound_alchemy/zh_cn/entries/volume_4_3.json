@@ -1,0 +1,18 @@
+{
+  "name": "避水丹",
+  "icon": "immortal_cultivation_mod:bishui_pill",
+  "category": "immortal_cultivation_mod:volume_4",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "避水丹蕴水灵调息之理。服之可使修士于水下自由呼吸，不受寻常溺水之患。探水府、入深潭、寻水脉灵材，皆可用之。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹效",
+      "text": "一百八十息内，可于水下呼吸。"
+    }
+  ]
+}

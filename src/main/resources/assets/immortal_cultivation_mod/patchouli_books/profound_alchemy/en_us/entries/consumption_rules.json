@@ -1,0 +1,38 @@
+{
+  "name": "Rules of Pill Consumption",
+  "icon": "immortal_cultivation_mod:qi_recovery_pill",
+  "category": "immortal_cultivation_mod:volume_8",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Consumption Rules",
+      "text": "Pills can restore vitality, enhance cultivation, and protect the body, but their powers follow distinct limitations. A wise cultivator understands when to consume them and when another dose would be wasted."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Storage",
+      "text": "Pills have a maximum stack size of 16."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Consumption Interval",
+      "text": "Right-click to consume one new alchemy pill, subject to a shared 1-second cooldown."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Effect Replacement",
+      "text": "Repeated doses of the same timed effect replace the previous effect rather than stacking."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Different Effects",
+      "text": "Different pill effects can coexist."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Recovery Calculation",
+      "text": "Percentage recovery is calculated from maximum HP, Qi, or Thought Energy, not the missing amount."
+    }
+  ]
+}

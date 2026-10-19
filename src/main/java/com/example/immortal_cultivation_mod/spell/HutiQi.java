@@ -37,18 +37,33 @@ public final class HutiQi {
     private static final String SHIELD_SOURCE = "huti_qi";
     private static final int COST = 10;
     private static final float CAPACITY = 20.0F;
+    private static final int QI_PER_SECOND = 1;
+    // This entry tracks the toggle independently of the current shield capacity.
+    private static final Map<UUID, Long> NEXT_PAYMENT_DUE = new ConcurrentHashMap<>();
     private static final Map<UUID, Float> SHIELDS = new ConcurrentHashMap<>();
 
     private HutiQi() {
     }
 
     public static boolean cast(ServerPlayer player) {
-        var data = ModAttachments.getData(player);
-        if (!ServerEvents.spendSpellQiOrBlood(player, data, COST)) {
+        if (isActive(player)) {
+            clear(player);
+            return true;
+        }
+        if (!formShield(player)) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return false;
         }
+        return true;
+    }
+
+    private static boolean formShield(ServerPlayer player) {
+        if (!ServerEvents.spendSpellQiOrBlood(player, ModAttachments.getData(player), COST)) {
+            return false;
+        }
         SHIELDS.put(player.getUUID(), CAPACITY);
+        NEXT_PAYMENT_DUE.put(player.getUUID(), player.level().getGameTime() + 20);
+        refreshEffect(player);
         PlayerShieldManager.set(player, SHIELD_SOURCE, CAPACITY, CAPACITY);
         if (player.level() instanceof ServerLevel level) {
             level.sendParticles(ParticleTypes.CLOUD,
@@ -62,17 +77,54 @@ public final class HutiQi {
         return true;
     }
 
+    public static boolean isActive(ServerPlayer player) {
+        return NEXT_PAYMENT_DUE.containsKey(player.getUUID());
+    }
+
+    public static void tick(ServerPlayer player) {
+        if (!isActive(player)) return;
+        if (!player.isAlive() || player.isSpectator()) {
+            clear(player);
+            return;
+        }
+        long now = player.level().getGameTime();
+        if (now >= NEXT_PAYMENT_DUE.getOrDefault(player.getUUID(), now)) {
+            if (!SHIELDS.containsKey(player.getUUID())) {
+                if (!formShield(player)) {
+                    // Stay enabled while waiting for enough Qi. Retry without message spam.
+                    NEXT_PAYMENT_DUE.put(player.getUUID(), now + 20);
+                }
+            } else if (ServerEvents.spendSustainedSpellQiOrBlood(player,
+                    ModAttachments.getData(player), QI_PER_SECOND, ModSpells.HUTI_QI)) {
+                NEXT_PAYMENT_DUE.put(player.getUUID(), now + 20);
+                ServerEvents.syncPlayerData(player);
+            } else {
+                removeShield(player);
+                NEXT_PAYMENT_DUE.put(player.getUUID(), now + 20);
+            }
+        }
+        refreshEffect(player);
+    }
+
+    private static void refreshEffect(ServerPlayer player) {
+        player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                com.example.immortal_cultivation_mod.effect.ModEffects.HUTI_QI, 40, 0, false, false, true));
+    }
+
     public static float absorb(ServerPlayer player, DamageSource source, float damage) {
         Float shield = SHIELDS.get(player.getUUID());
         if (shield == null || shield <= 0.0F || damage <= 0.0F || isCultivatorSpellDamage(source)) {
             return damage;
         }
 
-        float absorbed = Math.min(damage, shield);
+        float multiplier = com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.shieldMultiplier(source);
+        float absorbed = Math.min(damage * multiplier, shield);
         float remainingShield = shield - absorbed;
-        float remainingDamage = damage - absorbed;
+        float remainingDamage = damage - absorbed / multiplier;
         if (remainingShield <= 0.0F) {
-            clear(player);
+            removeShield(player);
+            // Finish this hit against the old shield; never absorb overflow with a free refill.
+            NEXT_PAYMENT_DUE.put(player.getUUID(), player.level().getGameTime() + 1);
         } else {
             SHIELDS.put(player.getUUID(), remainingShield);
             PlayerShieldManager.set(player, SHIELD_SOURCE, remainingShield, CAPACITY);
@@ -86,6 +138,12 @@ public final class HutiQi {
     }
 
     public static void clear(ServerPlayer player) {
+        NEXT_PAYMENT_DUE.remove(player.getUUID());
+        player.removeEffect(com.example.immortal_cultivation_mod.effect.ModEffects.HUTI_QI);
+        removeShield(player);
+    }
+
+    private static void removeShield(ServerPlayer player) {
         SHIELDS.remove(player.getUUID());
         PlayerShieldManager.clear(player, SHIELD_SOURCE);
     }

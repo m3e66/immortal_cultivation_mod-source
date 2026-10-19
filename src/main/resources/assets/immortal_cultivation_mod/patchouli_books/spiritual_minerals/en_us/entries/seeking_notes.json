@@ -1,0 +1,38 @@
+{
+  "name": "Notes for Mineral Seekers",
+  "icon": "minecraft:iron_pickaxe",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Notes for Mineral Seekers",
+      "text": "Mineral seeking requires patience and an understanding of the land. Search scorched wastelands for fire-aligned minerals, frozen regions for icy jade, towering peaks for celestial crystals, and subterranean caverns for profound metals. To uncover Spirit Stone veins, follow the signs of spiritual vegetation."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Generation Notes",
+      "text": "Ordinary minerals form small exposed patches in air or replaceable space above solid, dry ground."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Generation Notes",
+      "text": "Most minerals receive 3 placement tries per successful frequency check; Flowing Golden Sand receives 6."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Generation Notes",
+      "text": "Listed Y ranges represent starting heights, and actual deposits may extend beyond them."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Generation Notes",
+      "text": "Generation attempt frequencies do not guarantee a deposit."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Closing Words",
+      "text": "The treasures of heaven and earth reveal themselves to those who know where to seek, yet even the wisest cultivator cannot command the earth to surrender its riches."
+    }
+  ]
+}

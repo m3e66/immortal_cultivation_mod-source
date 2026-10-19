@@ -1,0 +1,23 @@
+{
+  "name": "赤铜髓",
+  "icon": "immortal_cultivation_mod:chitong_sui",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "赤铜髓",
+      "text": "$(bold)起始高度：$()Y −32 至 64$(br2)$(bold)尝试频率：$()1/24 区块"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《灵矿录》记载",
+      "text": "赤铜髓，生于燥热地脉之中，受地火千载熏炼而成。其色赤红，隐泛金芒，内藏精纯火金之气。常见于赤土荒原与下界火域，零星裸露于焦土岩石之间。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻脉",
+      "text": "恶地、风蚀恶地及其他恶地地貌，亦见于下界荒地与玄武岩三角洲。多在 Y −32 至 64 一带寻得。"
+    }
+  ]
+}

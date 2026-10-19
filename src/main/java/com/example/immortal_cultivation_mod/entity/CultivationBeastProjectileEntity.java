@@ -26,6 +26,7 @@ import net.minecraft.world.phys.Vec3;
 
 /** Shared physical projectile for deer feathers, tortoise pellets, and owl fire feathers. */
 public final class CultivationBeastProjectileEntity extends ThrowableItemProjectile {
+    // Visuals use synchronized BeastAttackVfx; server combat and sounds remain unchanged.
     public enum Kind { WIND_FEATHER, STONE_PELLET, FIRE_FEATHER }
 
     private static final EntityDataAccessor<Integer> DATA_KIND =
@@ -79,21 +80,7 @@ public final class CultivationBeastProjectileEntity extends ThrowableItemProject
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) {
-            Vec3 motion = getDeltaMovement();
-            switch (projectileKind()) {
-                case WIND_FEATHER -> level().addParticle(ModParticles.METHOD_QI_WIND.get(),
-                        getX(), getY(), getZ(), -motion.x * 0.03D, -motion.y * 0.03D, -motion.z * 0.03D);
-                case STONE_PELLET -> level().addParticle(new BlockParticleOption(
-                                ParticleTypes.BLOCK, Blocks.DEEPSLATE.defaultBlockState()),
-                        getX(), getY(), getZ(), -motion.x * 0.02D, -motion.y * 0.02D, -motion.z * 0.02D);
-                case FIRE_FEATHER -> {
-                    level().addParticle(ParticleTypes.FLAME, getX(), getY(), getZ(),
-                            -motion.x * 0.04D, -motion.y * 0.04D, -motion.z * 0.04D);
-                    level().addParticle(ParticleTypes.SMOKE, getX(), getY(), getZ(), 0.0D, 0.0D, 0.0D);
-                }
-            }
-        } else if (tickCount > 100) {
+        if (!level().isClientSide && tickCount > 100) {
             discard();
         }
     }
@@ -145,23 +132,16 @@ public final class CultivationBeastProjectileEntity extends ThrowableItemProject
     private void impact(ServerLevel server, Vec3 point) {
         switch (projectileKind()) {
             case WIND_FEATHER -> {
-                server.sendParticles(ModParticles.METHOD_QI_WIND.get(), point.x, point.y, point.z,
-                        10, 0.25D, 0.25D, 0.25D, 0.08D);
                 server.playSound(null, blockPosition(), SoundEvents.BREEZE_SHOOT,
                         SoundSource.HOSTILE, 0.7F, 1.35F);
             }
             case STONE_PELLET -> {
-                server.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK,
-                                Blocks.DEEPSLATE.defaultBlockState()), point.x, point.y, point.z,
-                        12, 0.24D, 0.24D, 0.24D, 0.08D);
                 server.playSound(null, blockPosition(), SoundEvents.DEEPSLATE_BREAK,
                         SoundSource.HOSTILE, 0.8F, 0.9F);
             }
             case FIRE_FEATHER -> {
                 if (getOwner() instanceof CultivationBestiaryBeastEntity owl)
                     BeastMoveBlockBreaker.breakSphere(server, owl, point, 1.3, 1.1, 16, 8);
-                server.sendParticles(ParticleTypes.FLAME, point.x, point.y, point.z,
-                        16, 0.35D, 0.18D, 0.35D, 0.06D);
                 CultivationBeastFirePatchEntity patch = ModEntities.CULTIVATION_BEAST_FIRE_PATCH.get().create(server);
                 if (patch != null) {
                     patch.setPos(point.x, point.y + 0.05D, point.z);

@@ -2,6 +2,7 @@ package com.example.immortal_cultivation_mod.entity;
 
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.combat.CombatStateManager;
+import com.example.immortal_cultivation_mod.combat.QiDomainSystem;
 import com.example.immortal_cultivation_mod.effect.ModEffects;
 import com.example.immortal_cultivation_mod.item.FuchenItem;
 import com.example.immortal_cultivation_mod.item.HeavyIronBracerItem;
@@ -111,6 +112,24 @@ public final class NpcCombatBrain {
             return;
         }
         long now = mob.level().getGameTime();
+        // Game mode can change during a committed attack or cast. Drop the target
+        // before action locks, so neither pursuit nor an existing windup survives it.
+        LivingEntity previousTarget = mob.getTarget();
+        if (NpcProfile.isNonCombatPlayer(previousTarget)) {
+            cancelPendingCast(now);
+            mob.setTarget(null);
+            mob.getNavigation().stop();
+            clearFlightIntent();
+            clearCoverPlan();
+            battle.reset();
+            rhythm.reset();
+            mob.removeEffect(ModEffects.NPC_WEAPON_GUARD);
+            actionLockUntil = now;
+            nextDecisionTick = now;
+        }
+        if (NpcProfile.isNonCombatPlayer(mob.getLastHurtByMob())) {
+            mob.setLastHurtByMob(null);
+        }
         NpcCombatResources.tick(mob);
         HeavyIronBracerItem.syncNpcOffhandCompanion(mob);
         if (mob.isNoAi() || NpcProfile.isInteracting(mob)) {
@@ -173,7 +192,8 @@ public final class NpcCombatBrain {
         recentDamageByAttacker.entrySet().removeIf(entry -> entry.getValue().expiresAt() <= now);
         // Do not periodically replace the live equipped stack with the profile copy: doing so
         // would reset durability and weapon-stored qi during combat.
-        if (mob.tickCount == 1 || mob.getMainHandItem().isEmpty()) {
+        if ((mob.tickCount == 1 || mob.getMainHandItem().isEmpty())
+                && !(QiDomainSystem.blasting(mob)&&mob.getMainHandItem().isEmpty())) {
             NpcProfile.equipCombatWeapon(mob);
         }
 
@@ -238,6 +258,7 @@ public final class NpcCombatBrain {
                 useResource(c,NpcCombatResources.Purpose.CLEANSE)||tryCast(null,ModSpells.CLEANSE,ActionKind.DEFENSE)));
         choices.add(new Intent("heal",c.selfHealthRatio()<.65F?610:-1,()->
                 healingOpening()&&tryBestHealing(ActionKind.DEFENSE)));
+        choices.add(new Intent("blast_fist_pressure",!survival&&blastFists(c)?575:-1,()->blastFistAttack(c)));
         choices.add(new Intent("protect_ally",battle.loyal()&&threatensWoundedAlly(c.target())?560:-1,()->
                 interrupt(c)||bestAttack(c)));
         choices.add(new Intent("formation",NpcBattlefield.needsFormationResponse(mob,c.target())?520:-1,()->formationResponse(c)));
@@ -471,7 +492,7 @@ public final class NpcCombatBrain {
         if (mob.hasEffect(ModEffects.QI_GATHERING)) {
             cancelQiRecovery(now);
         }
-        if (sourceActor == null) {
+        if (sourceActor == null || NpcProfile.isNonCombatPlayer(sourceActor)) {
             return;
         }
         recentDamageByAttacker.compute(sourceActor.getUUID(), (ignored, previous) ->
@@ -479,6 +500,9 @@ public final class NpcCombatBrain {
     }
 
     private LivingEntity selectTarget() {
+        // Finish the current fight before considering newly arrived threats.
+        // Invalidation still releases dead, allied, distant or protected targets.
+        if (hasValidCombatTarget(mob)) return mob.getTarget();
         Set<LivingEntity> candidates = new LinkedHashSet<>();
         addCandidate(candidates, mob.getTarget());
         addCandidate(candidates, mob.getLastHurtByMob());
@@ -490,7 +514,10 @@ public final class NpcCombatBrain {
         }
         return candidates.stream()
                 .filter(this::validTarget)
-                .max(Comparator.comparingDouble(this::targetScore))
+                // With no valid opponent, prefer beast threats, then tactical utility.
+                .max(Comparator.<LivingEntity>comparingInt(target ->
+                        isBeastThreat(target) ? 1 : 0)
+                        .thenComparingDouble(this::targetScore))
                 .orElse(null);
     }
 
@@ -501,7 +528,8 @@ public final class NpcCombatBrain {
     }
 
     private boolean isHostileCandidate(LivingEntity candidate) {
-        if (candidate == mob || !candidate.isAlive() || NpcProfile.areCombatAllies(mob, candidate)) {
+        if (candidate == mob || !candidate.isAlive() || NpcProfile.isNonCombatPlayer(candidate)
+                || NpcProfile.areCombatAllies(mob, candidate)) {
             return false;
         }
         if (!mob.hasLineOfSight(candidate)) return candidate==mob.getTarget()
@@ -537,15 +565,48 @@ public final class NpcCombatBrain {
         return candidate instanceof ServerPlayer player && NpcProfile.shouldAttackPlayer(mob, player);
     }
 
+    private static boolean isBeastThreat(LivingEntity target) {
+        return target instanceof RealmBeast || target instanceof XuanjinZhengEntity || target instanceof Enemy;
+    }
+
+    static boolean hasValidCombatTarget(PathfinderMob npc) {
+        LivingEntity target = npc.getTarget();
+        return target != null && validTarget(npc, target);
+    }
+
+    /** Automatic retaliation and social targeting share the brain's beast-first acquisition rule. */
+    static void acquireCombatTarget(PathfinderMob npc, LivingEntity fallback) {
+        if (!hasValidCombatTarget(npc) && !acquirePriorityBeastTarget(npc)) npc.setTarget(fallback);
+    }
+
+    static boolean acquirePriorityBeastTarget(PathfinderMob npc) {
+        if (hasValidCombatTarget(npc) || NpcProfile.isSparring(npc)) return false;
+        LivingEntity beast = npc.level().getEntitiesOfClass(LivingEntity.class,
+                        npc.getBoundingBox().inflate(TARGET_SEARCH_RANGE), candidate ->
+                                isBeastThreat(candidate) && validTarget(npc, candidate)
+                                && npc.hasLineOfSight(candidate)
+                                && (isHostileBeast(candidate)
+                                || candidate instanceof Enemy && npc.distanceToSqr(candidate) <= HOSTILE_MOB_AGGRO_RADIUS_SQUARED
+                                || candidate == npc.getLastHurtByMob()
+                                || candidate instanceof Mob other && (other.getTarget() == npc || other.getLastHurtByMob() == npc)))
+                .stream().min(Comparator.comparingDouble(npc::distanceToSqr)).orElse(null);
+        if (beast == null) return false;
+        npc.setTarget(beast);
+        return true;
+    }
+
     private static boolean isHostileBeast(LivingEntity candidate) {
-        return candidate instanceof CrimsonScaleFlameLizardEntity
-                || candidate instanceof CrimsonSkyFlameFloodDragonEntity
-                || candidate instanceof BloodApeDemonGeneralEntity
+        return candidate instanceof RealmBeastMonster
                 || candidate instanceof XuanjinZhengEntity beast && beast.isFree();
     }
 
     private boolean validTarget(LivingEntity target) {
+        return validTarget(mob, target);
+    }
+
+    private static boolean validTarget(PathfinderMob mob, LivingEntity target) {
         return target != mob && target.isAlive() && target.level() == mob.level()
+                && !NpcProfile.isNonCombatPlayer(target)
                 && !NpcProfile.areCombatAllies(mob, target)
                 && mob.distanceToSqr(target) <= TARGET_SEARCH_RANGE * TARGET_SEARCH_RANGE
                 && (!(target instanceof ServerPlayer player)
@@ -914,6 +975,7 @@ public final class NpcCombatBrain {
     }
 
     private boolean bestAttack(Context context) {
+        if(blastFists(context)&&battle.mode()!=NpcBattlePlan.Mode.SURVIVAL&&blastFistAttack(context))return true;
         boolean reveal=!battle.probing()||battle.mode()!=NpcBattlePlan.Mode.NORMAL||context.targetDangerousAction();
         if (reveal&&NpcProfile.tryUseIdentityCombatAbility(mob)) {
             finishCastAction(ActionKind.SPELL_ATTACK, "identity_ability");
@@ -928,11 +990,6 @@ public final class NpcCombatBrain {
         String spell = selectSpell(context, id -> {
             var profile = NpcSpellcasting.profile(id);
             if (profile == null || profile.role() != NpcSpellcasting.Role.ATTACK) {
-                return false;
-            }
-            if (profile.area() && areaTargetCount(context, id) < 2
-                    && (context.targetHealthRatio() < 0.45F
-                    || context.targetRealm() < context.selfRealm())) {
                 return false;
             }
             if (profile.area() && areaAlliesAtRisk(context, id) > 0) {
@@ -1039,7 +1096,7 @@ public final class NpcCombatBrain {
         if (profile.fast() && preferFast) score += 35.0D;
         if (profile.area()) {
             score += areaAlliesAtRisk(context, spellId) > 0
-                    ? -200.0D : areaTargetCount(context, spellId) >= 2 ? 35.0D : -45.0D;
+                    ? -200.0D : areaTargetCount(context, spellId) >= 2 ? 35.0D : 10.0D;
         }
         if (profile.role() == NpcSpellcasting.Role.CONTROL && context.targetBlocking()) score += 30.0D;
         if (profile.role() == NpcSpellcasting.Role.CONTROL && context.targetCasting()) score += 45.0D;
@@ -1047,6 +1104,11 @@ public final class NpcCombatBrain {
         score-=recentSpells.stream().filter(spellId::equals).count()*14*battle.experience();
         int maxQi = Math.max(1, NpcProfile.maxQi(mob, archetype()));
         double costRatio = NpcSpellcasting.qiCost(mob, spellId) / (double) maxQi;
+        // After assessing the opponent, commit to powerful learned attacks instead of
+        // allowing cost/reveal penalties to keep every large spell below cheap filler.
+        if(!battle.probing()&&context.selfQiRatio()>=.5F
+                &&(profile.role()==NpcSpellcasting.Role.ATTACK||profile.role()==NpcSpellcasting.Role.CONTROL))
+            score+=Math.min(45,costRatio*100)+Math.min(48,Math.max(0,CultivationLevels.getStageIndex(spell.requiredLevel()))*6);
         score += battle.frenzy()?costRatio*180:-costRatio*(context.targetRealm()>context.selfRealm()?95:55);
         score -= battle.revealPenalty(costRatio,NpcCombatKnowledge.wasRevealed(mob,spellId),context.targetDangerousAction());
         score -= NpcCombatKnowledge.failurePenalty(mob,context.target(),spellId,spell.element())*(.4+battle.experience());
@@ -1142,6 +1204,15 @@ public final class NpcCombatBrain {
         return false;
     }
 
+    private boolean blastFists(Context context) {
+        return QiDomainSystem.blasting(mob)&&(context.weaponStyle()==WeaponStyle.UNARMED||context.weaponStyle()==WeaponStyle.FIST);
+    }
+    private boolean blastFistAttack(Context context) {
+        if(!blastFists(context))return false;
+        if(context.distance()<=weaponRange(context.weaponStyle()))return weaponAttack(context,context.targetBlocking());
+        if(context.distance()>weaponRange(context.weaponStyle())+3&&tryMovementSpell(context,false,ActionKind.MOVEMENT))return true;
+        return approachPredicted(context);
+    }
     private boolean weaponAttack(Context context, boolean forceHeavy) {
         long now=mob.level().getGameTime();
         if (!context.lineOfSight() || context.distance() > weaponRange(context.weaponStyle())
@@ -2049,11 +2120,7 @@ public final class NpcCombatBrain {
             return true;
         }
         Context current = observe(target);
-        return areaAlliesAtRisk(current, cast.spellId()) == 0
-                && (cast.action() == ActionKind.INTERRUPT
-                || areaTargetCount(current, cast.spellId()) >= 2
-                || current.targetHealthRatio() >= 0.45F
-                && current.targetRealm() >= current.selfRealm());
+        return areaAlliesAtRisk(current, cast.spellId()) == 0;
     }
 
     private int areaTargetCount(Context context, String spellId) {

@@ -1,0 +1,18 @@
+{
+  "name": "固元丹",
+  "icon": "immortal_cultivation_mod:guyuan_pill",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "固元丹善固气血，稳守元气。服之之后，体内气机沉稳，外力侵身时可略减伤势，亦不易被强劲冲击震退。适合近身斗法之时服用。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹效",
+      "text": "九十息内，所受伤害减少百分之五，击退效果减少百分之二十。"
+    }
+  ]
+}

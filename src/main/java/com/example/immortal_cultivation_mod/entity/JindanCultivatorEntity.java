@@ -97,7 +97,6 @@ public class JindanCultivatorEntity extends PathfinderMob implements Cultivation
     @Override
     public void tick() {
         super.tick();
-        NpcProfile.ensure(this, npcArchetype());
         NpcProfile.tickCultivation(this, npcArchetype());
         if (getCastingTicks() > 0) {
             entityData.set(CAST_TICKS, getCastingTicks() - 1);

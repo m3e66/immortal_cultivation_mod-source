@@ -62,7 +62,7 @@ public final class GushiShield {
             return damage;
         }
 
-        float multiplier = DefensePiercingProjectile.shieldMultiplier(source);
+        float multiplier = DefensePiercingProjectile.shieldMultiplier(source) * com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.shieldMultiplier(source);
         float absorbed = Math.min(damage * multiplier, shield);
         float remainingShield = shield - absorbed;
         float remainingDamage = Math.max(0.0F, damage - absorbed / multiplier);

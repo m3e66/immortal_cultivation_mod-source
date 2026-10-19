@@ -1,0 +1,28 @@
+{
+  "name": "野生糯米",
+  "icon": "immortal_cultivation_mod:nuomi_seed",
+  "category": "immortal_cultivation_mod:volume_6",
+  "sortnum": 16,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "野生糯米",
+      "text": "$(bold)生成尝试频率：$()1/3"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《百草录》记载",
+      "text": "野生糯米虽属凡谷，却得水土滋养，谷粒饱满，生于河泽林野之间。其性平和，不似灵草奇花般蕴有强烈灵气，却是凡人与低阶修士皆可寻得的天然谷物。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《百草录》记载",
+      "text": "修仙之道始于凡尘，纵有吞霞饮露之志，亦莫忘五谷养身之本。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻谷",
+      "text": "河流、沼泽、森林、繁花森林、暗林、丛林、稀疏丛林及竹林。"
+    }
+  ]
+}

@@ -1,105 +1,66 @@
 package com.example.immortal_cultivation_mod.screen;
 
-import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.BodyTypes;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 
-import java.util.List;
-
+/** Dantian ignition and twelve traveling meridians reveal the actual rolled physique. */
 public class BodyTypeSelectionScreen extends EnlightenmentSelectionScreen {
-    private static final int WINDOW_W = 260;
-    private static final int WINDOW_H = 170;
     private static final int MAX_REFRESHES = 3;
-
     private final RandomSource random = RandomSource.create();
     private final List<String> roots;
     private final String grade;
     private String selectedBodyType;
     private int refreshesLeft = MAX_REFRESHES;
+    private Button refresh, proceed;
 
     public BodyTypeSelectionScreen(List<String> roots, String grade) {
-        super(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".body_type_selection"));
+        super(Component.translatable("screen.immortal_cultivation_mod.body_type_selection"));
         this.roots = SpiritRoots.sanitizeRootList(roots);
         this.grade = SpiritRoots.sanitizeGrade(grade);
-        rollBodyType();
-    }
-
-    @Override
-    protected void init() {
-        clearWidgets();
-        int x = (width - WINDOW_W) / 2;
-        int y = (height - WINDOW_H) / 2;
-
-        addRenderableWidget(new SpiritRootSelectionScreen.StyledButton(
-                x + 20,
-                y + WINDOW_H - 32,
-                100,
-                20,
-                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".refresh_count", refreshesLeft),
-                b -> refreshBodyType()
-        )).active = refreshesLeft > 0;
-
-        addRenderableWidget(new SpiritRootSelectionScreen.StyledButton(
-                x + WINDOW_W - 120,
-                y + WINDOW_H - 32,
-                100,
-                20,
-                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".continue_button"),
-                b -> confirm()
-        ));
-    }
-
-    private void refreshBodyType() {
-        if (refreshesLeft <= 0) {
-            return;
-        }
-        refreshesLeft--;
-        rollBodyType();
-        init();
-    }
-
-    private void rollBodyType() {
         selectedBodyType = BodyTypes.random(random);
     }
 
-    private void confirm() {
-        Minecraft.getInstance().setScreen(new GenderSelectionScreen(roots, grade, selectedBodyType));
+    @Override protected float revealSeconds() { return AwakeningVisuals.BODY_REVEAL; }
+
+    @Override protected void init() {
+        clearWidgets();
+        int size = Math.max(12, Math.round(48 * AwakeningVisuals.scale(width, height)));
+        int y = AwakeningVisuals.screenY(width, height, 665) - size / 2;
+        refresh = addRenderableWidget(new AwakeningVisuals.IconButton(
+                AwakeningVisuals.screenX(width, height, 582) - size / 2, y, size,
+                Component.translatable("screen.immortal_cultivation_mod.refresh_count", refreshesLeft),
+                button -> refreshBodyType(), true, () -> refreshesLeft));
+        proceed = addRenderableWidget(new AwakeningVisuals.IconButton(
+                AwakeningVisuals.screenX(width, height, 698) - size / 2, y, size,
+                Component.translatable("screen.immortal_cultivation_mod.continue_button"),
+                button -> Minecraft.getInstance().setScreen(new GenderSelectionScreen(roots, grade, selectedBodyType)),
+                false, () -> 0));
+        tick();
     }
 
-    @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        int x = (width - WINDOW_W) / 2;
-        int y = (height - WINDOW_H) / 2;
-        Minecraft mc = Minecraft.getInstance();
+    @Override public void tick() {
+        if (refresh != null) refresh.active = animationReady() && refreshesLeft > 0;
+        if (proceed != null) proceed.active = animationReady();
+    }
 
-        SpiritRootSelectionScreen.drawPanel(g, x, y, WINDOW_W, WINDOW_H);
-        g.drawString(mc.font, title, x + 14, y + 12, 0x55DDFF, true);
+    private void refreshBodyType() {
+        if (!animationReady() || refreshesLeft <= 0) return;
+        refreshesLeft--;
+        selectedBodyType = BodyTypes.random(random);
+        restartAnimation(); init();
+    }
 
-        g.drawString(mc.font,
-                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".spirit_roots").append(": ")
-                        .append(SpiritRoots.format(roots, grade)),
-                x + 18, y + 46, 0x88FFCC, true);
-        g.drawString(mc.font,
-                Component.translatable("screen." + ImmortalCultivationMod.MODID + ".body_type").append(": "),
-                x + 18, y + 70, 0xCCCCCC, true);
-        g.drawString(mc.font, Component.literal(selectedBodyType), x + 18, y + 88, 0xFFDDAA, true);
-
-        Component tries = Component.translatable("screen." + ImmortalCultivationMod.MODID + ".refreshes_left", refreshesLeft);
-        g.drawString(mc.font, tries, x + 18, y + 112, 0xAAAAAA, true);
-
+    @Override public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        float time = animationSeconds();
+        AwakeningVisuals.body(g, width, height, time, roots, selectedBodyType);
         super.render(g, mouseX, mouseY, partialTick);
     }
-
-    @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-    }
-
-    @Override
-    public boolean isPauseScreen() {
-        return false;
-    }
+    @Override public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {}
+    @Override public boolean isPauseScreen() { return false; }
 }

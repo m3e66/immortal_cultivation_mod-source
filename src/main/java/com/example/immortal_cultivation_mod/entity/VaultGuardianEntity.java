@@ -39,7 +39,6 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -57,7 +56,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
  * wakes for intruders or protected treasure interactions, and cycles through
  * furnace pressure, overload, and a vulnerable venting window.
  */
-public final class VaultGuardianEntity extends Monster implements GeoEntity {
+public final class VaultGuardianEntity extends RealmBeastMonster implements GeoEntity {
     private static final EntityDataAccessor<Byte> ACTION_STATE =
             SynchedEntityData.defineId(VaultGuardianEntity.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Integer> ACTION_TICKS =
@@ -69,8 +68,6 @@ public final class VaultGuardianEntity extends Monster implements GeoEntity {
     private static final EntityDataAccessor<Boolean> ACTIVE =
             SynchedEntityData.defineId(VaultGuardianEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> CORE_EXPOSED =
-            SynchedEntityData.defineId(VaultGuardianEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Boolean> JINDAN_VARIANT =
             SynchedEntityData.defineId(VaultGuardianEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> HEATED_ARMOR =
             SynchedEntityData.defineId(VaultGuardianEntity.class, EntityDataSerializers.BOOLEAN);
@@ -161,31 +158,16 @@ public final class VaultGuardianEntity extends Monster implements GeoEntity {
     private String smallSectInstanceKey = "";
 
     public VaultGuardianEntity(
-            EntityType<? extends VaultGuardianEntity> type, Level level,
-            boolean jindanVariant) {
+            EntityType<? extends VaultGuardianEntity> type, Level level) {
         super(type, level);
-        entityData.set(JINDAN_VARIANT, jindanVariant);
-        xpReward = jindanVariant ? 1_200 : 450;
+        xpReward = 1_200;
         setPersistenceRequired();
         noCulling = true;
     }
 
-    public static AttributeSupplier.Builder createZhujiAttributes() {
+    public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 2_800.0D)
-                .add(Attributes.ARMOR, 26.0D)
-                .add(Attributes.ARMOR_TOUGHNESS, 8.0D)
-                .add(Attributes.ATTACK_DAMAGE, 110.0D)
-                .add(Attributes.ATTACK_SPEED, 3.2D)
-                .add(Attributes.MOVEMENT_SPEED, 0.23D)
-                .add(Attributes.FOLLOW_RANGE, 32.0D)
-                .add(Attributes.KNOCKBACK_RESISTANCE, 0.82D)
-                .add(Attributes.STEP_HEIGHT, 1.1D);
-    }
-
-    public static AttributeSupplier.Builder createJindanAttributes() {
-        return Mob.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 6_800.0D)
+                .add(Attributes.MAX_HEALTH, CultivationLevels.getLevelDef(BeastRealms.level(3)).maxHp())
                 .add(Attributes.ARMOR, 42.0D)
                 .add(Attributes.ARMOR_TOUGHNESS, 14.0D)
                 .add(Attributes.ATTACK_DAMAGE, 240.0D)
@@ -194,6 +176,16 @@ public final class VaultGuardianEntity extends Monster implements GeoEntity {
                 .add(Attributes.FOLLOW_RANGE, 38.0D)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.96D)
                 .add(Attributes.STEP_HEIGHT, 1.2D);
+    }
+
+    @Override
+    public void setBeastRealm(int realm) {
+        super.setBeastRealm(realm);
+        xpReward = isJindanVariant() ? 1_200 : 450;
+    }
+
+    public float techniqueDamage(float jindanDamage) {
+        return (float)(jindanDamage * BeastRealms.powerScale(this));
     }
 
     @Override
@@ -215,7 +207,6 @@ public final class VaultGuardianEntity extends Monster implements GeoEntity {
         builder.define(FURNACE_PHASE, PHASE_NORMAL);
         builder.define(ACTIVE, false);
         builder.define(CORE_EXPOSED, false);
-        builder.define(JINDAN_VARIANT, false);
         builder.define(HEATED_ARMOR, false);
     }
 
@@ -325,7 +316,7 @@ public final class VaultGuardianEntity extends Monster implements GeoEntity {
     }
 
     public void activateAgainst(@Nullable LivingEntity intruder) {
-        if (level().isClientSide || !isAlive()) {
+        if (level().isClientSide || !isAlive() || com.example.immortal_cultivation_mod.combat.ColdTideFreeze.isFrozen(this)) {
             return;
         }
         initializeHome();
@@ -528,7 +519,7 @@ public final class VaultGuardianEntity extends Monster implements GeoEntity {
         actionImpactDone = true;
         swing(InteractionHand.MAIN_HAND, true);
         addPressure(9);
-        float damage = isJindanVariant() ? 380.0F : 180.0F;
+        float damage = 380.0F;
         Vec3 forward = horizontalLook();
         AABB area = getBoundingBox().inflate(3.7D, 1.6D, 3.7D);
         for (LivingEntity victim : level.getEntitiesOfClass(
@@ -571,7 +562,7 @@ public final class VaultGuardianEntity extends Monster implements GeoEntity {
     }
 
     private void damageFurnaceCone(ServerLevel level) {
-        float damage = isJindanVariant() ? 140.0F : 75.0F;
+        float damage = 140.0F;
         Vec3 origin = chestPoint();
         Vec3 forward = horizontalLook();
         AABB area = getBoundingBox().inflate(7.2D, 2.8D, 7.2D);
@@ -633,7 +624,7 @@ public final class VaultGuardianEntity extends Monster implements GeoEntity {
                     LivingEntity.class, impactArea, this::canDamageIntruder)) {
                 if (victim.position().distanceToSqr(forgingDomainCenter) <= 25.0D) {
                     hurtAbilityTarget(victim,
-                            isJindanVariant() ? 250.0F : 120.0F, false);
+                            250.0F, false);
                     Vec3 away = victim.position().subtract(forgingDomainCenter);
                     if (away.horizontalDistanceSqr() > 0.001D) {
                         victim.knockback(0.55D, -away.x, -away.z);
@@ -668,7 +659,7 @@ public final class VaultGuardianEntity extends Monster implements GeoEntity {
                 victim.setDeltaMovement(motion.x * 0.82D, 0.08D, motion.z * 0.82D);
             }
             if (forgingDomainTicks % 20 == 0) {
-                hurtAbilityTarget(victim, isJindanVariant() ? 50.0F : 25.0F, false);
+                hurtAbilityTarget(victim, 50.0F, false);
                 level.sendParticles(ParticleTypes.ASH,
                         victim.getX(), victim.getY() + 0.15D, victim.getZ(),
                         6, 0.35D, 0.12D, 0.35D, 0.035D);
@@ -697,7 +688,7 @@ public final class VaultGuardianEntity extends Monster implements GeoEntity {
         Vec3 targetPoint = target.getBoundingBox().getCenter();
         Vec3 base = targetPoint.subtract(origin).normalize();
         Vec3 horizontalRight = new Vec3(-base.z, 0.0D, base.x).normalize();
-        float damage = isJindanVariant() ? 80.0F : 45.0F;
+        float damage = techniqueDamage(80.0F);
         for (int index = 0; index < 8; index++) {
             double spread = (index - 3.5D) * 0.055D;
             Vec3 direction = base.add(horizontalRight.scale(spread))
@@ -774,7 +765,7 @@ public final class VaultGuardianEntity extends Monster implements GeoEntity {
     }
 
     private void slamGrabbedTarget(ServerLevel level, LivingEntity target) {
-        float damage = isJindanVariant() ? 320.0F : 150.0F;
+        float damage = 320.0F;
         hurtAbilityTarget(target, damage, true);
         target.teleportTo(target.getX(), Math.max(level.getMinBuildHeight(), getY() + 0.05D), target.getZ());
         target.setDeltaMovement(horizontalLook().scale(0.45D).add(0.0D, 0.18D, 0.0D));
@@ -827,6 +818,7 @@ public final class VaultGuardianEntity extends Monster implements GeoEntity {
     }
 
     private void startAction(byte action, int ticks, @Nullable LivingEntity target) {
+        if (com.example.immortal_cultivation_mod.combat.ColdTideFreeze.isFrozen(this)) return;
         entityData.set(ACTION_STATE, action);
         entityData.set(ACTION_TICKS, Math.max(1, ticks));
         actionTargetUuid = target == null ? null : target.getUUID();
@@ -997,6 +989,7 @@ public final class VaultGuardianEntity extends Monster implements GeoEntity {
     }
 
     private boolean hurtAbilityTarget(LivingEntity target, float damage, boolean heavy) {
+        damage = techniqueDamage(damage);
         if (!canDamageIntruder(target)
                 || ForcefieldCenterBehavior.interceptAttackPath(
                         this, getBoundingBox().getCenter(),
@@ -1051,7 +1044,7 @@ public final class VaultGuardianEntity extends Monster implements GeoEntity {
             modified *= 1.50F;
         }
         boolean hurt = super.hurt(source, modified);
-        if (!hurt || level().isClientSide || !isAlive()) {
+        if (!hurt || level().isClientSide || !isAlive() || com.example.immortal_cultivation_mod.combat.ColdTideFreeze.isFrozen(this)) {
             return hurt;
         }
 
@@ -1067,7 +1060,7 @@ public final class VaultGuardianEntity extends Monster implements GeoEntity {
                 && attacker != this && direct == attackerEntity
                 && distanceToSqr(attacker) <= 4.5D * 4.5D) {
             attacker.hurt(damageSources().mobAttack(this),
-                    isJindanVariant() ? 70.0F : 35.0F);
+                    techniqueDamage(70.0F));
             if (level() instanceof ServerLevel level) {
                 level.sendParticles(ParticleTypes.ELECTRIC_SPARK,
                         attacker.getX(), attacker.getY() + attacker.getBbHeight() * 0.55D,
@@ -1075,7 +1068,7 @@ public final class VaultGuardianEntity extends Monster implements GeoEntity {
             }
         }
 
-        float staggerThreshold = isJindanVariant() ? 500.0F : 250.0F;
+        float staggerThreshold = techniqueDamage(500.0F);
         if (isCoreExposed() && modified >= staggerThreshold
                 && getActionState() != ACTION_STAGGER
                 && getFurnacePhase() != PHASE_VENTING) {
@@ -1139,13 +1132,11 @@ public final class VaultGuardianEntity extends Monster implements GeoEntity {
     }
 
     public boolean isJindanVariant() {
-        return entityData.get(JINDAN_VARIANT);
+        return beastRealm() >= 3;
     }
 
     public String cultivationRealm() {
-        return isJindanVariant()
-                ? CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_MID
-                : CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE;
+        return beastCultivationLevel();
     }
 
     public boolean isActive() {
@@ -1170,7 +1161,7 @@ public final class VaultGuardianEntity extends Monster implements GeoEntity {
 
     /** Returns this same persistent guardian to its assigned vault position. */
     public void returnToVaultHome() {
-        if (level().isClientSide || !homeInitialized || !isAlive()) {
+        if (level().isClientSide || !homeInitialized || !isAlive() || com.example.immortal_cultivation_mod.combat.ColdTideFreeze.isFrozen(this)) {
             return;
         }
         getNavigation().stop();

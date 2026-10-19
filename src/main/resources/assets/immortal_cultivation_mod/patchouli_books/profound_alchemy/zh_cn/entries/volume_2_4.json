@@ -1,0 +1,18 @@
+{
+  "name": "铁骨丹",
+  "icon": "immortal_cultivation_mod:tiegu_pill",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "铁骨丹药性沉重，服之如铁气入骨，令肉身短暂坚韧如甲。然刚强必有所失，服丹之后筋骨沉凝，行动亦随之迟缓。适用于固守强敌攻势，不宜轻敌追逐。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹效",
+      "text": "四十五息内获得抗性提升 III，同时受到缓慢 II 影响。"
+    }
+  ]
+}

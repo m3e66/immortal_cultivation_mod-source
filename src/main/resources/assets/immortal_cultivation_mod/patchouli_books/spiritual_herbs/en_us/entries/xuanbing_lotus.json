@@ -1,0 +1,23 @@
+{
+  "name": "Profound Ice Lotus",
+  "icon": "immortal_cultivation_mod:xuanbing_lotus",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Profound Ice Lotus",
+      "text": "$(bold)Spawn attempt frequency: $()1/5"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "The Profound Ice Lotus is born within lands of enduring frost. Its translucent petals resemble carved ice, preserving cold spiritual energy within their delicate structure. Even beneath relentless snowfall, the lotus remains undisturbed."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Snowy plains and slopes, ice spikes, frozen rivers and oceans, and frozen peaks."
+    }
+  ]
+}

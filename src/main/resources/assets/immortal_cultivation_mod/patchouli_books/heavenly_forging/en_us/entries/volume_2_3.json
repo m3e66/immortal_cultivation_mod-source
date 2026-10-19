@@ -1,0 +1,28 @@
+{
+  "name": "Earthlung Flame",
+  "icon": "immortal_cultivation_mod:earth_flame_seed",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Earthlung Flame",
+      "text": "Maximum temperature: 6,000°C"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Earthlung Flame",
+      "text": "Qi per pulse: 18"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Earthlung Flame",
+      "text": "Quality bonus: +5"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Earthlung Flame is born from the deep heat of the earth. Its heavy, steady nature makes it useful for controlled refinement. Artifacts forged with this flame gain an additional 5 quality points."
+    }
+  ]
+}

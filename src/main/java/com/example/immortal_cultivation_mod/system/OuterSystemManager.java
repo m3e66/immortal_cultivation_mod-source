@@ -50,6 +50,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -74,6 +75,56 @@ public final class OuterSystemManager {
     private static final Map<UUID, Boolean> LAST_EQUIPPED = new HashMap<>();
 
     private OuterSystemManager() {
+    }
+
+    @SubscribeEvent
+    public static void onSystemPickup(ItemEntityPickupEvent.Post event) {
+        if (!(event.getPlayer() instanceof ServerPlayer player)
+                || OuterSystemData.equipped(player).isPresent()) {
+            return;
+        }
+        ItemStack pickedUp = event.getOriginalStack();
+        if (!pickedUp.is(ModItems.SYSTEM.get())
+                || pickedUp.getCount() <= event.getCurrentStack().getCount()) {
+            return;
+        }
+        // Post runs only after a valid pickup, including delay, ownership and inventory checks.
+        for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
+            ItemStack stack = player.getInventory().getItem(slot);
+            if (!ItemStack.isSameItemSameComponents(stack, pickedUp)) {
+                continue;
+            }
+            bindFromItem(player, stack);
+            return;
+        }
+    }
+
+    /** Rolls, binds and consumes one system item, shared by pickup and right-click use. */
+    public static boolean bindFromItem(ServerPlayer player, ItemStack stack) {
+        if (stack.isEmpty() || !stack.is(ModItems.SYSTEM.get())
+                || OuterSystemData.equipped(player).isPresent()) {
+            return false;
+        }
+        OuterSystemData.ensureSlot(player);
+        OuterSystemType type = OuterSystemType.random(player.getRandom());
+        ItemStack bound = stack.copyWithCount(1);
+        OuterSystemItem.setType(bound, type);
+        if (!OuterSystemData.equip(player, bound)) {
+            return false;
+        }
+        stack.shrink(1);
+        player.getInventory().setChanged();
+        CompoundTag state = OuterSystemData.read(player);
+        state.putBoolean(OuterSystemData.PICKUP_BOUND, true);
+        state.putBoolean(OuterSystemData.EVER_BOUND, true);
+        state.putBoolean(OuterSystemData.DESTROYED, false);
+        state.putBoolean(OuterSystemData.BOOT_SHOWN, true);
+        state.putString(OuterSystemData.TYPE, type.id());
+        OuterSystemData.save(player, state);
+        PacketDistributor.sendToPlayer(player,
+                new OuterSystemPayloads.ClientboundBoot(type.id()));
+        sync(player);
+        return true;
     }
 
     @SubscribeEvent
@@ -199,6 +250,7 @@ public final class OuterSystemManager {
 
     public static void closeScreen(ServerPlayer player) {
         OPEN_SCREENS.remove(player.getUUID());
+        SystemShopSync.clear(player.getUUID());
         UUID entityId = MANIFESTS.remove(player.getUUID());
         if (entityId != null && player.level() instanceof ServerLevel level) {
             Entity entity = level.getEntity(entityId);
@@ -206,6 +258,30 @@ public final class OuterSystemManager {
                 entity.discard();
             }
         }
+    }
+
+    /** Lifespan exhaustion ends this life's system, including item-bound state and progress. */
+    public static void loseOnAgeExhaustion(ServerPlayer player) {
+        CompoundTag cleared = new CompoundTag();
+        // An undying body can retain its body type after lifespan runs out. Do not auto-rebind it.
+        if (BodyTypes.OUTER_DEMON_BODY.equals(ModAttachments.getData(player).bodyType())) {
+            cleared.putBoolean(OuterSystemData.DESTROYED, true);
+        }
+        boolean changed = !OuterSystemData.read(player).equals(cleared)
+                || OuterSystemData.equipped(player).isPresent() || OPEN_SCREENS.contains(player.getUUID());
+        UUID manifestId = MANIFESTS.get(player.getUUID());
+        closeScreen(player);
+        if (manifestId != null) {
+            for (ServerLevel level : player.server.getAllLevels()) {
+                Entity manifest = level.getEntity(manifestId);
+                if (manifest != null) manifest.discard();
+            }
+        }
+        OuterSystemData.removeEquipped(player);
+        OuterSystemData.removeSlot(player);
+        if (cleared.isEmpty()) player.getPersistentData().remove(OuterSystemData.ROOT_TAG);
+        else OuterSystemData.save(player, cleared);
+        if (changed) sync(player);
     }
 
     public static void destroySystem(SystemManifestEntity manifest) {
@@ -243,10 +319,14 @@ public final class OuterSystemManager {
             return;
         }
         List<ItemStack> rewards = rewards(
-                player, quest.getInt(TIER), quest.getLong(SEED));
+                quest.getString("RewardRealm").isEmpty()
+                        ? ModAttachments.getData(player).cultivationLevel() : quest.getString("RewardRealm"),
+                quest.getInt(TIER), quest.getLong(SEED));
         for (ItemStack reward : rewards) {
-            if (!player.getInventory().add(reward.copy())) {
-                player.drop(reward.copy(), false);
+            ItemStack remaining = reward.copy();
+            player.getInventory().add(remaining);
+            if (!remaining.isEmpty()) {
+                player.drop(remaining, false);
             }
         }
         quest = new CompoundTag();
@@ -292,7 +372,18 @@ public final class OuterSystemManager {
 
     public static void handleLifeAction(
             ServerPlayer player, String action) {
+        if (!OPEN_SCREENS.contains(player.getUUID())
+                || OuterSystemData.equipped(player).isEmpty()
+                || OuterSystemData.type(player) != OuterSystemType.LIFE_SIMULATION) {
+            return;
+        }
         LifeSimulationSystem.handleAction(player, action);
+        // A rejected action also acknowledges its request. Periodic refreshes keep this
+        // revision unchanged, so clients cannot confuse an old snapshot with the response.
+        CompoundTag state = OuterSystemData.read(player);
+        long revision = state.getLong("LifeActionRevision");
+        state.putLong("LifeActionRevision", revision == Long.MAX_VALUE ? 1L : revision + 1L);
+        OuterSystemData.save(player, state);
         refreshOpenScreen(player);
     }
 
@@ -317,8 +408,7 @@ public final class OuterSystemManager {
     }
 
     /**
-     * Debug-editor system selection. It is stored even before the player has
-     * the Outer Demon Body, then applied when that body grants its system.
+     * Changes an existing bound system, or stores a preset for a future body-granted system.
      */
     public static void setDebugSystem(ServerPlayer player, OuterSystemType type) {
         if (type == null) {
@@ -326,7 +416,8 @@ public final class OuterSystemManager {
         }
 
         CompoundTag state = OuterSystemData.read(player);
-        String previousType = OuterSystemData.equipped(player)
+        var equipped = OuterSystemData.equipped(player);
+        String previousType = equipped
                 .map(OuterSystemItem::getType)
                 .map(OuterSystemType::id)
                 .orElse(state.getString(OuterSystemData.TYPE));
@@ -339,13 +430,17 @@ public final class OuterSystemManager {
 
         boolean outerBody = BodyTypes.OUTER_DEMON_BODY.equals(
                 ModAttachments.getData(player).bodyType());
-        if (outerBody) {
+        if (outerBody || equipped.isPresent() || state.getBoolean(OuterSystemData.PICKUP_BOUND)) {
             closeScreen(player);
             OuterSystemData.ensureSlot(player);
+            ItemStack replacement = equipped.map(ItemStack::copy)
+                    .orElseGet(() -> OuterSystemItem.create(type));
+            OuterSystemItem.setType(replacement, type);
             OuterSystemData.removeEquipped(player);
-            if (OuterSystemData.equip(player, OuterSystemItem.create(type))) {
+            if (OuterSystemData.equip(player, replacement)) {
                 state.putBoolean(OuterSystemData.EVER_BOUND, true);
                 state.putBoolean(OuterSystemData.BOOT_SHOWN, true);
+                if (!outerBody) state.putBoolean(OuterSystemData.PICKUP_BOUND, true);
             }
         }
         OuterSystemData.save(player, state);
@@ -354,6 +449,20 @@ public final class OuterSystemManager {
 
     private static void ensureBinding(ServerPlayer player) {
         CompoundTag state = OuterSystemData.read(player);
+        if (state.getBoolean(OuterSystemData.PICKUP_BOUND)) {
+            if (state.getBoolean(OuterSystemData.DESTROYED)) {
+                OuterSystemData.removeEquipped(player);
+                OuterSystemData.removeSlot(player);
+                return;
+            }
+            OuterSystemData.ensureSlot(player);
+            if (!player.getAbilities().instabuild
+                    && OuterSystemData.equipped(player).isEmpty()) {
+                OuterSystemData.equip(player, OuterSystemItem.create(
+                        OuterSystemType.byId(state.getString(OuterSystemData.TYPE))));
+            }
+            return;
+        }
         boolean outerBody = BodyTypes.OUTER_DEMON_BODY.equals(
                 ModAttachments.getData(player).bodyType());
         if (!outerBody) {
@@ -479,10 +588,20 @@ public final class OuterSystemManager {
 
     private static void sendScreenState(
             ServerPlayer player, boolean includeShopCatalog) {
+        CompoundTag state = createClientState(player, includeShopCatalog);
+        SystemShopSync.Update shopUpdate = null;
+        if (OuterSystemData.type(player) == OuterSystemType.SYSTEM_SHOP) {
+            shopUpdate = SystemShopSync.prepare(player, includeShopCatalog, state);
+        } else {
+            SystemShopSync.clear(player.getUUID());
+        }
+        // Only an explicit Open request may open a new client screen. An update
+        // queued before Close must not bring the interface back after dismissal.
+        state.putBoolean("OpenRequested", includeShopCatalog);
         PacketDistributor.sendToPlayer(
                 player,
-                new OuterSystemPayloads.ClientboundOpen(
-                        createClientState(player, includeShopCatalog)));
+                new OuterSystemPayloads.ClientboundOpen(state));
+        if (shopUpdate != null) shopUpdate.send(player);
     }
 
     private static CompoundTag createClientState(
@@ -523,7 +642,8 @@ public final class OuterSystemManager {
                 result.putString(
                         "QuestRewardSummary",
                         rewardSummary(
-                                player,
+                                quest.getString("RewardRealm").isEmpty()
+                                        ? ModAttachments.getData(player).cultivationLevel() : quest.getString("RewardRealm"),
                                 quest.getInt(TIER),
                                 quest.getLong(SEED)));
             }
@@ -534,6 +654,7 @@ public final class OuterSystemManager {
             DivineGachaSystem.writeClientState(player, result);
         } else if (type == OuterSystemType.LIFE_SIMULATION) {
             LifeSimulationSystem.writeClientState(player, result);
+            result.putLong("LifeActionRevision", OuterSystemData.read(player).getLong("LifeActionRevision"));
         }
         return result;
     }
@@ -599,7 +720,7 @@ public final class OuterSystemManager {
         if (fraction <= 0.0D) {
             return;
         }
-        long gain = Math.max(1L, Math.round(required * fraction));
+        long gain = com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.cultivationGain(killer, Math.max(1L, Math.round(required * fraction)));
         long progress = Math.min(
                 required, data.cultivationProgress() + gain);
         ModAttachments.setData(
@@ -660,10 +781,16 @@ public final class OuterSystemManager {
     private static void ensureQuest(ServerPlayer player) {
         CompoundTag state = OuterSystemData.read(player);
         CompoundTag quest = state.getCompound(OuterSystemData.QUEST).copy();
-        if (quest.getBoolean(ACTIVE)
-                || System.currentTimeMillis() < quest.getLong(NEXT_AT)) {
+        if (quest.getBoolean(ACTIVE)) {
+            // Upgrade pending quests too; snapshot eligibility so preview and claim agree.
+            if (!quest.contains("RewardRealm")) {
+                quest.putString("RewardRealm", ModAttachments.getData(player).cultivationLevel());
+                state.put(OuterSystemData.QUEST, quest);
+                OuterSystemData.save(player, state);
+            }
             return;
         }
+        if (System.currentTimeMillis() < quest.getLong(NEXT_AT)) return;
         quest = generateQuest(player);
         state.put(OuterSystemData.QUEST, quest);
         OuterSystemData.save(player, state);
@@ -744,6 +871,8 @@ public final class OuterSystemManager {
         quest.putString(TARGET_NAME, targetName);
         quest.putString(KIND, kind);
         quest.putInt(TIER, tier);
+        quest.putInt("InitialDistance", distance);
+        quest.putString("RewardRealm", ModAttachments.getData(player).cultivationLevel());
         quest.putLong(SEED, random.nextLong());
         quest.putString(DIMENSION, level.dimension().location().toString());
         return quest;
@@ -786,64 +915,41 @@ public final class OuterSystemManager {
         return 1;
     }
 
-    private static List<ItemStack> rewards(
-            ServerPlayer player, int tier, long seed) {
+    static List<ItemStack> rewards(
+            String realm, int tier, long seed) {
         RandomSource random = RandomSource.create(seed);
         List<ItemStack> rewards = new ArrayList<>();
+        var stones = com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_STONE.get();
+        var medium = com.example.immortal_cultivation_mod.magicritual.item.ModItems.MEDIUM_SPIRIT_STONE.get();
+        var high = com.example.immortal_cultivation_mod.magicritual.item.ModItems.HIGH_SPIRIT_STONE.get();
         switch (Mth.clamp(tier, 1, 5)) {
             case 1 -> {
-                rewards.add(new ItemStack(
-                        ModItems.COPPER_COIN.get(), 12 + random.nextInt(13)));
-                rewards.add(random.nextBoolean()
-                        ? new ItemStack(Items.BREAD, 4 + random.nextInt(5))
-                        : new ItemStack(
-                                ModItems.LOW_QI_RECOVERY_PILL.get(),
-                                1 + random.nextInt(2)));
+                rewards.add(new ItemStack(stones, 16 + random.nextInt(17)));
+                rewards.add(new ItemStack(ModItems.LOW_QI_RECOVERY_PILL.get(), 4 + random.nextInt(5)));
+                rewards.add(new ItemStack(ModItems.COPPER_COIN.get(), 64));
             }
             case 2 -> {
-                rewards.add(new ItemStack(
-                        com.example.immortal_cultivation_mod.magicritual.item
-                                .ModItems.SPIRIT_STONE.get(),
-                        8 + random.nextInt(9)));
-                rewards.add(random.nextBoolean()
-                        ? eligibleScroll(player, random)
-                        : new ItemStack(
-                                ModItems.LOW_SWORD_GRINDSTONE.get(),
-                                1 + random.nextInt(2)));
+                rewards.add(new ItemStack(stones, 48 + random.nextInt(17)));
+                rewards.add(new ItemStack(ModItems.LOW_QI_RECOVERY_PILL.get(), 8));
+                rewards.add(eligibleScroll(realm, random));
             }
             case 3 -> {
-                rewards.add(new ItemStack(
-                        ModItems.MIDDLE_QI_RECOVERY_PILL.get(),
-                        2 + random.nextInt(3)));
-                rewards.add(random.nextBoolean()
-                        ? new ItemStack(ModItems.RESTRICTION_INSIGHT.get())
-                        : new ItemStack(
-                                ModBlocks.MOXUAN_IRON.get().asItem(),
-                                2 + random.nextInt(3)));
+                rewards.add(new ItemStack(medium, 8 + random.nextInt(5)));
+                rewards.add(new ItemStack(ModItems.MIDDLE_QI_RECOVERY_PILL.get(), 6 + random.nextInt(5)));
+                rewards.add(new ItemStack(ModItems.RESTRICTION_INSIGHT.get(), 2));
             }
             case 4 -> {
-                rewards.add(eligibleScroll(player, random));
-                rewards.add(new ItemStack(
-                        com.example.immortal_cultivation_mod.magicritual.item
-                                .ModItems.MEDIUM_SPIRIT_STONE.get(),
-                        12 + random.nextInt(13)));
-                rewards.add(new ItemStack(
-                        ModItems.LINGJIAO_SCALE.get(),
-                        1 + random.nextInt(2)));
+                rewards.add(new ItemStack(medium, 24 + random.nextInt(9)));
+                rewards.add(eligibleScroll(realm, random));
+                rewards.add(new ItemStack(ModItems.LINGJIAO_SCALE.get(), 4 + random.nextInt(3)));
             }
             default -> {
-                rewards.add(eligibleScroll(player, random));
-                rewards.add(new ItemStack(
-                        com.example.immortal_cultivation_mod.magicritual.item
-                                .ModItems.HIGH_SPIRIT_STONE.get(),
-                        3 + random.nextInt(4)));
-                rewards.add(random.nextInt(100) == 0
-                        ? new ItemStack(
-                                ModItems.PROTECTIVE_JADE_PENDANT.get())
-                        : new ItemStack(
-                                random.nextBoolean()
-                                        ? ModItems.FEIJIAN_YUJIAN.get()
-                                        : ModItems.JINGTIE_SPEAR_YUJIAN.get()));
+                rewards.add(new ItemStack(high, 8 + random.nextInt(5)));
+                rewards.add(eligibleScroll(realm, random));
+                rewards.add(new ItemStack(ModItems.RESTRICTION_INSIGHT.get(), 4));
+                rewards.add(new ItemStack(random.nextBoolean()
+                        ? ModItems.FEIJIAN_YUJIAN.get() : ModItems.JINGTIE_SPEAR_YUJIAN.get()));
+                if (random.nextInt(100) == 0) rewards.add(new ItemStack(ModItems.PROTECTIVE_JADE_PENDANT.get()));
             }
         }
         rewards.removeIf(ItemStack::isEmpty);
@@ -851,8 +957,7 @@ public final class OuterSystemManager {
     }
 
     private static ItemStack eligibleScroll(
-            ServerPlayer player, RandomSource random) {
-        String level = ModAttachments.getData(player).cultivationLevel();
+            String level, RandomSource random) {
         List<Item> eligible = BuiltInRegistries.ITEM.stream()
                 .filter(item -> item instanceof ModItems.SpellScrollItem scroll
                         && ModSpells.get(scroll.spellId()) != null
@@ -868,8 +973,8 @@ public final class OuterSystemManager {
     }
 
     private static String rewardSummary(
-            ServerPlayer player, int tier, long seed) {
-        return rewards(player, tier, seed).stream()
+            String realm, int tier, long seed) {
+        return rewards(realm, tier, seed).stream()
                 .map(stack -> stack.getHoverName().getString()
                         + " x" + stack.getCount())
                 .reduce((left, right) -> left + ", " + right)

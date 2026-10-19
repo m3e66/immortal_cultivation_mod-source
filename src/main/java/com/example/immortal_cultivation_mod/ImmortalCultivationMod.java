@@ -75,8 +75,8 @@ public class ImmortalCultivationMod {
                 com.example.immortal_cultivation_mod.externalpower.ExternalPowerConfig.SPEC,
                 "immortal_cultivation_mod-external-power.toml");
         modContainer.registerConfig(ModConfig.Type.SERVER,
-                com.example.immortal_cultivation_mod.pagoda.PagodaConfig.SPEC,
-                "immortal_cultivation_mod-pagoda.toml");
+                com.example.immortal_cultivation_mod.alchemy.PillToxicityConfig.SPEC,
+                "immortal_cultivation_mod-pill-toxicity.toml");
 
         modEventBus.addListener(
                 this::commonSetup

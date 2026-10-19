@@ -1,5 +1,6 @@
 package com.example.immortal_cultivation_mod.client.flame;
 
+import com.example.immortal_cultivation_mod.client.VfxVertexWriter;
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.flame.FlameKind;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -252,26 +253,54 @@ public final class FlameVfxRenderer {
 
     static void sphere(VertexConsumer out, Matrix4f matrix, Vec3 center, float radius,
             int color, float alpha, int sides, int bands) {
+        SphereAngles angles = sphereAngles(sides, bands);
         for (int band = 0; band < bands; band++) {
-            float latitude0 = -Mth.HALF_PI + band * Mth.PI / bands;
-            float latitude1 = -Mth.HALF_PI + (band + 1) * Mth.PI / bands;
+            float horizontal0 = radius * angles.latitudeCos[band];
+            float horizontal1 = radius * angles.latitudeCos[band + 1];
+            float y0 = radius * angles.latitudeSin[band], y1 = radius * angles.latitudeSin[band + 1];
             for (int side = 0; side < sides; side++) {
-                float a0 = side * TAU / sides;
-                float a1 = (side + 1) * TAU / sides;
-                float shade = .70F + .30F * Math.max(0, Mth.cos(a0 - .7F) * Mth.cos(latitude0));
-                int shaded = shade(color, shade);
-                vertex(out, matrix, center.add(spherical(radius, latitude0, a0)), shaded, alpha);
-                vertex(out, matrix, center.add(spherical(radius, latitude0, a1)), shaded, alpha);
-                vertex(out, matrix, center.add(spherical(radius, latitude1, a1)), shaded, alpha);
-                vertex(out, matrix, center.add(spherical(radius, latitude1, a0)), shaded, alpha);
+                int shaded = shade(color, angles.shades[band * sides + side]);
+                sphereVertex(out, matrix, center, horizontal0, y0, angles, side, shaded, alpha);
+                sphereVertex(out, matrix, center, horizontal0, y0, angles, side + 1, shaded, alpha);
+                sphereVertex(out, matrix, center, horizontal1, y1, angles, side + 1, shaded, alpha);
+                sphereVertex(out, matrix, center, horizontal1, y1, angles, side, shaded, alpha);
             }
         }
     }
 
-    private static Vec3 spherical(float radius, float latitude, float longitude) {
-        float horizontal = radius * Mth.cos(latitude);
-        return new Vec3(horizontal * Mth.cos(longitude), radius * Mth.sin(latitude),
-                horizontal * Mth.sin(longitude));
+    // Cache only the three fixed tessellations used by seeds, dragon heads and fireballs.
+    // Radius multiplication keeps the original float order; colors still vary per frame.
+    private static final SphereAngles NEAR_SPHERE = new SphereAngles(12, 6);
+    private static final SphereAngles FAR_SPHERE = new SphereAngles(8, 4);
+    private static final SphereAngles FIREBALL_SPHERE = new SphereAngles(12, 8);
+    private static SphereAngles sphereAngles(int sides, int bands) {
+        if (sides == 12 && bands == 6) return NEAR_SPHERE;
+        if (sides == 8 && bands == 4) return FAR_SPHERE;
+        if (sides == 12 && bands == 8) return FIREBALL_SPHERE;
+        return new SphereAngles(sides, bands);
+    }
+    private static final class SphereAngles {
+        final float[] latitudeCos, latitudeSin, longitudeCos, longitudeSin, shades;
+        SphereAngles(int sides, int bands) {
+            latitudeCos = new float[bands + 1]; latitudeSin = new float[bands + 1];
+            longitudeCos = new float[sides + 1]; longitudeSin = new float[sides + 1];
+            shades = new float[bands * sides];
+            for (int band = 0; band <= bands; band++) {
+                float latitude = -Mth.HALF_PI + band * Mth.PI / bands;
+                latitudeCos[band] = Mth.cos(latitude); latitudeSin[band] = Mth.sin(latitude);
+            }
+            for (int side = 0; side <= sides; side++) {
+                float angle = side * TAU / sides;
+                longitudeCos[side] = Mth.cos(angle); longitudeSin[side] = Mth.sin(angle);
+                if (side < sides) for (int band = 0; band < bands; band++)
+                    shades[band * sides + side] = .70F + .30F * Math.max(0, Mth.cos(angle - .7F) * latitudeCos[band]);
+            }
+        }
+    }
+    private static void sphereVertex(VertexConsumer out, Matrix4f matrix, Vec3 center,
+            float horizontal, float y, SphereAngles angles, int side, int color, float alpha) {
+        vertex(out, matrix, center.x + horizontal * angles.longitudeCos[side], center.y + y,
+                center.z + horizontal * angles.longitudeSin[side], color, alpha);
     }
 
     private static void ring(VertexConsumer out, Matrix4f matrix, float radius, float width,
@@ -365,16 +394,16 @@ public final class FlameVfxRenderer {
 
     private static void softRibbon(VertexConsumer out, Matrix4f matrix, Vec3 a, Vec3 b, Vec3 side,
             float widthA, float widthB, int color, float alphaA, float alphaB) {
-        Vec3 sideA = side.scale(widthA);
-        Vec3 sideB = side.scale(widthB);
-        vertex(out, matrix, a.subtract(sideA), color, 0);
-        vertex(out, matrix, a, color, alphaA);
-        vertex(out, matrix, b, color, alphaB);
-        vertex(out, matrix, b.subtract(sideB), color, 0);
-        vertex(out, matrix, a, color, alphaA);
-        vertex(out, matrix, a.add(sideA), color, 0);
-        vertex(out, matrix, b.add(sideB), color, 0);
-        vertex(out, matrix, b, color, alphaB);
+        double sax = side.x * widthA, say = side.y * widthA, saz = side.z * widthA;
+        double sbx = side.x * widthB, sby = side.y * widthB, sbz = side.z * widthB;
+        vertex(out, matrix, a.x - sax, a.y - say, a.z - saz, color, 0);
+        vertex(out, matrix, a.x, a.y, a.z, color, alphaA);
+        vertex(out, matrix, b.x, b.y, b.z, color, alphaB);
+        vertex(out, matrix, b.x - sbx, b.y - sby, b.z - sbz, color, 0);
+        vertex(out, matrix, a.x, a.y, a.z, color, alphaA);
+        vertex(out, matrix, a.x + sax, a.y + say, a.z + saz, color, 0);
+        vertex(out, matrix, b.x + sbx, b.y + sby, b.z + sbz, color, 0);
+        vertex(out, matrix, b.x, b.y, b.z, color, alphaB);
     }
 
     private static int shade(int color, float value) {
@@ -389,7 +418,12 @@ public final class FlameVfxRenderer {
     }
 
     static void vertex(VertexConsumer out, Matrix4f matrix, Vec3 point, int color, float alpha) {
-        out.addVertex(matrix, (float) point.x, (float) point.y, (float) point.z)
+        vertex(out, matrix, point.x, point.y, point.z, color, alpha);
+    }
+
+    private static void vertex(VertexConsumer out, Matrix4f matrix, double x, double y, double z,
+            int color, float alpha) {
+        VfxVertexWriter.vertex(out, matrix, (float) x, (float) y, (float) z)
                 .setColor((color >> 16 & 255) / 255F, (color >> 8 & 255) / 255F,
                         (color & 255) / 255F, Mth.clamp(alpha, 0, 1));
     }

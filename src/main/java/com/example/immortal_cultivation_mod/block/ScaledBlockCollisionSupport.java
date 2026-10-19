@@ -54,19 +54,17 @@ public final class ScaledBlockCollisionSupport {
         int maxChunkZ = SectionPos.blockToSectionCoord(
                 Mth.floor(queryBox.maxZ) + MAX_HORIZONTAL_ANCHOR_DISTANCE);
 
-        VoxelShape queryShape = Shapes.create(queryBox);
-        List<Collision> collisions = new ArrayList<>();
+        List<Collision> collisions = List.of();
         for (int chunkX = minChunkX; chunkX <= maxChunkX; chunkX++) {
             for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; chunkZ++) {
                 ChunkAccess chunk = level.getChunk(chunkX, chunkZ, ChunkStatus.FULL, false);
                 if (!(chunk instanceof LevelChunk levelChunk)) {
                     continue;
                 }
-                collectChunkCollisions(
+                collisions = collectChunkCollisions(
                         level,
                         levelChunk,
                         queryBox,
-                        queryShape,
                         context,
                         onlySuffocatingBlocks,
                         collisions);
@@ -75,14 +73,14 @@ public final class ScaledBlockCollisionSupport {
         return collisions;
     }
 
-    private static void collectChunkCollisions(
+    private static List<Collision> collectChunkCollisions(
             Level level,
             LevelChunk chunk,
             AABB queryBox,
-            VoxelShape queryShape,
             CollisionContext context,
             boolean onlySuffocatingBlocks,
             List<Collision> collisions) {
+        VoxelShape queryShape = null;
         for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
             if (!(blockEntity instanceof GeoRockBlockEntity) || blockEntity.isRemoved()) {
                 continue;
@@ -101,11 +99,14 @@ public final class ScaledBlockCollisionSupport {
 
             VoxelShape worldShape = state.getCollisionShape(level, anchor, context).move(
                     anchor.getX(), anchor.getY(), anchor.getZ());
-            if (!worldShape.isEmpty()
-                    && Shapes.joinIsNotEmpty(worldShape, queryShape, BooleanOp.AND)) {
+            if (worldShape.isEmpty()) continue;
+            if (queryShape == null) queryShape = Shapes.create(queryBox);
+            if (Shapes.joinIsNotEmpty(worldShape, queryShape, BooleanOp.AND)) {
+                if (collisions.isEmpty()) collisions = new ArrayList<>();
                 collisions.add(new Collision(anchor.immutable(), worldShape));
             }
         }
+        return collisions;
     }
 
     /** Mirrors the bounds and face/edge rules used by vanilla's Cursor3D. */

@@ -14,8 +14,15 @@ public final class PhantomVeilFoxCloneRenderer
         extends GeoEntityRenderer<PhantomVeilFoxCloneEntity> {
     public PhantomVeilFoxCloneRenderer(EntityRendererProvider.Context context) {
         super(context, new PhantomVeilFoxCloneModel());
-        withScale(1.0F);
-        shadowRadius = 0.18F;
+        withScale(2.0F);
+        shadowRadius = 0.36F;
+    }
+
+    @Override
+    public software.bernie.geckolib.util.Color getRenderColor(PhantomVeilFoxCloneEntity entity, float partialTick, int packedLight) {
+        float fade = Math.min(1, (entity.tickCount + partialTick) / 8F);
+        float variation = .42F + .06F * (float)Math.sin((entity.tickCount + partialTick) * .08 + entity.getId());
+        return software.bernie.geckolib.util.Color.ofRGBA(.91F, .94F, .93F, variation * fade);
     }
 
     @Override
@@ -29,12 +36,10 @@ public final class PhantomVeilFoxCloneRenderer
     @Override
     public void render(PhantomVeilFoxCloneEntity entity, float entityYaw, float partialTick,
                        PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
-        RenderSystem.setShaderColor(0.86F, 0.68F, 1.0F, 0.58F);
         poseStack.pushPose();
         float scale = entity.renderScale();
         poseStack.scale(scale, scale, scale);
         super.render(entity, entityYaw, partialTick, poseStack, buffer, packedLight);
         poseStack.popPose();
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 }

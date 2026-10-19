@@ -43,7 +43,7 @@ public final class CombatImpactVfx {
     private static int renderedQuads;
     private static long admittedTick = Long.MIN_VALUE;
     private static int admittedCount;
-    private static final RenderType MATTER = RenderType.create("cultivation_impact_matter",
+    static final RenderType MATTER = RenderType.create("cultivation_impact_matter",
             DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 65536, false, true,
             RenderType.CompositeState.builder()
                     .setShaderState(new RenderStateShard.ShaderStateShard(GameRenderer::getPositionColorShader))
@@ -427,7 +427,7 @@ public final class CombatImpactVfx {
             renderedQuads++;
         }
         void vertex(Vec3 p, int color, float alpha) {
-            out.addVertex(matrix, (float) (p.x - camera.x), (float) (p.y - camera.y), (float) (p.z - camera.z))
+            VfxVertexWriter.vertex(out, matrix, (float) (p.x - camera.x), (float) (p.y - camera.y), (float) (p.z - camera.z))
                     .setColor(red(color), green(color), blue(color), Mth.clamp(alpha, 0, 1));
         }
         void rock(Vec3 center, double size, int color, float alpha, double rotation) {

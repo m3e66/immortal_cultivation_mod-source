@@ -6,11 +6,11 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Zhuji Cultivator is a neutral Foundation Establishment Middle cultivator. It can use Qi Gathering, Regeneration at low health, Fireball, Wind Step, Lingbeng, and Clear Heart Method behavior."
+      "text": "Foundation cultivators initially appear at Middle Foundation and Golden Core cultivators at Early Golden Core. Their combat follows their actual methods, spells, weapons, and Qi. They can cultivate and advance when safe.$(br2)Speak, trade, and offer gifts to learn about them; see Cultivators in the World."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Jindan Cultivator is a neutral Golden Core Early cultivator. It uses Qi Gathering, stronger Regeneration at 25% health, Zhenshan Palm at range, Lightning Invocation nearby, and Wind Riding to chase or flee."
+      "text": "Cultivators keep their valid opponent when beasts arrive. Afterward, nearby hostile beasts take priority over another player or NPC. Golden Core and stronger cultivators have Great mastery of their own art and use its domain effects with sufficient Qi. Release lasts up to ten seconds, then recovers for ten seconds. Cultivators may grow stronger between meetings."
     },
     {
       "type": "patchouli:text",

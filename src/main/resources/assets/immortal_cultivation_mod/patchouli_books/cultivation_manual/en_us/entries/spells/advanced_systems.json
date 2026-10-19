@@ -18,7 +18,38 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Target lock uses G. It locks onto the non-item entity you are looking at and smoothly turns the camera toward the target while active."
+      "title": "Golden Core Flight",
+      "text": "Golden Core and higher can use creative-style flight. Enable Golden Core flight in settings, then double-tap Jump to take off or stop flying. Jump rises; Sneak descends. WASD moves horizontally. Looking up or down does not steer vertical movement."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Realm Speed Caps",
+      "text": "Speeds are relative to vanilla creative flight. Golden Core: up to x5. Nascent Soul: up to x10. Soul Transformation and higher: up to x20.$(br2)Enable flight mouse-wheel speed control in settings to adjust the selected speed. Faster flight costs more qi."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Sword Flight",
+      "text": "Golden Core required. All swords can be released and controlled: vanilla swords, Peachwood, Copper Coin, Flying Sword, Black Iron Jian, Black Iron Greatsword, Thunderwood, Seven-Star and manifested swords.$(br2)Sabers, spears, fans and other weapons cannot use this system."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Using Any Sword",
+      "text": "Release a sword with Release / Recall Sword, then control it with Yuqi Shu. Near a visible controlled sword, press Toggle Sword Flight (default N; remappable).$(br2)The sword lies flat beneath your feet. Double-tap Jump to take off; Jump rises, Sneak descends. You use normal player movement, not a vehicle."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Sword Speed Bonus",
+      "text": "Sword flight uses the same Jump, Sneak, WASD and speed controls as ordinary flight. Sneak descends; it does not dismount.$(br2)Your selected speed is multiplied by 1.5 after the realm cap: x5 becomes x7.5; x10 becomes x15; x20 becomes x30. Toggle Sword Flight again to remove the bonus and resume ordinary flight."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Controlling the Blade",
+      "text": "The blade beneath your feet cannot be launched or picked up while sword flight is enabled; other controlled swords can still attack. Toggle sword flight off to recall its blade.$(br2)Flight and sword control consume qi. If flight becomes unavailable, the sword bonus ends. Normal player collision prevents flying through terrain."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Qi Release",
+      "text": "Golden Core and higher: enter combat mode, then press G to release qi. Shift + scroll adjusts 100–200%. At 200%, a moving domain extends 20 blocks from you. Press G again to stop. See the Qi Domains entry for costs, clashes and method powers."
     }
   ]
 }

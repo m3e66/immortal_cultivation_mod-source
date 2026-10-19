@@ -1,0 +1,23 @@
+{
+  "name": "Three-Yang Cauldron",
+  "icon": "immortal_cultivation_mod:chi_jin_sanyang_ding",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Three-Yang Cauldron",
+      "text": "Material capacity: 20 slots"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "The Three-Yang Cauldron is an advanced forging vessel capable of holding up to 20 materials. Its expanded capacity makes it suited for recipes requiring numerous ingredients."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Like the Bronze Cauldron, its lid can be opened or closed by Shift-right-clicking, and its interface can only be accessed while open."
+    }
+  ]
+}

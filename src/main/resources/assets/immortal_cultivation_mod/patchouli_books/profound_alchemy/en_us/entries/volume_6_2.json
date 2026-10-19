@@ -1,0 +1,18 @@
+{
+  "name": "Realm-Breakthrough Pill",
+  "icon": "immortal_cultivation_mod:breakthrough_pill",
+  "category": "immortal_cultivation_mod:volume_6",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Scripture Account",
+      "text": "The Realm-Breakthrough Pill is a special medicine required when advancing from Qi Refining to Foundation Establishment. It serves as a catalyst for one of the earliest major transformations on the cultivation path."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Effect",
+      "text": "Consumes one pill when advancing from Qi Refining to Foundation Establishment."
+    }
+  ]
+}

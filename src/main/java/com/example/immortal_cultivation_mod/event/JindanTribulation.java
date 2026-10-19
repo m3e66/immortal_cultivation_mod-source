@@ -504,7 +504,7 @@ public final class JindanTribulation {
                 impact.x, impact.y + 8.0D, impact.z,
                 460, 2.8D, 9.0D, 2.8D, 0.11D);
         playThunder(level, player, 12);
-        damagePlayer(level, player, 1000.0F);
+        damagePlayer(level, player, 600.0F);
     }
 
     private static void spawnFinalSecondaryBolts(ServerLevel level, ServerPlayer player,

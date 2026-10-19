@@ -1,0 +1,23 @@
+{
+  "name": "Frostspine Cave Bear",
+  "icon": "immortal_cultivation_mod:frostspine_cave_bear_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 7,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Frostspine Cave Bear",
+      "text": "$(bold)Realm: $()Qi Refining – Golden Core"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "The Frostspine Cave Bear is a massive beast whose back bears ridges of frozen bone. Adapted to the harshest cold, it inhabits snowy mountains and sheltered dens. Disturbing one in its territory is a dangerous mistake, even for experienced cultivators."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Found on snowy slopes, frozen and jagged peaks, groves, snowy taigas, ice spikes, and frozen rivers. Requires Y ≥ 72 or a covered sky."
+    }
+  ]
+}

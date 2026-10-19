@@ -96,6 +96,12 @@ public class GeoRockBlockItemRenderer extends GeoItemRenderer<GeoRockBlockItem> 
         return bounds;
     }
 
+    public static net.minecraft.world.phys.AABB modelBounds(BakedGeoModel model) {
+        GuiBounds bounds = calculateBounds(model);
+        return bounds.valid() ? new net.minecraft.world.phys.AABB(bounds.minX, bounds.minY, bounds.minZ,
+                bounds.maxX, bounds.maxY, bounds.maxZ) : new net.minecraft.world.phys.AABB(-.5, 0, -.5, .5, 1, .5);
+    }
+
     private static void includeBone(
             GuiBounds bounds, PoseStack poseStack, GeoBone bone) {
         poseStack.pushPose();

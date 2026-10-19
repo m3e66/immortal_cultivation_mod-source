@@ -2,6 +2,8 @@ package com.example.immortal_cultivation_mod.physics;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
+import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
+import com.example.immortal_cultivation_mod.spell.JindanCreativeFlight;
 import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import com.example.immortal_cultivation_mod.effect.ModEffects;
@@ -182,26 +184,42 @@ public final class CultivationFlightTrailGameTests {
     }
 
     @GameTest(template="fate_test")
-    public static void swordFlightUsesTheMountGroundStateAndEndsOnDismount(GameTestHelper h) {
-        // FakePlayer deliberately disables startRiding; use a real player with its inert test connection.
+    public static void swordFlightUsesPlayerGroundStateAndRetainsOrdinaryFlight(GameTestHelper h) {
         var p=new net.minecraft.server.level.ServerPlayer(h.getLevel().getServer(),h.getLevel(),
                 new GameProfile(UUID.randomUUID(),"sword-flight-test"),net.minecraft.server.level.ClientInformation.createDefault());
         p.connection=airbornePlayer(h).connection;
-        var sword=new FlyingSwordEntity(h.getLevel(),p,p.position());
-        h.assertTrue(p.startRiding(sword,true),"Fixture rides an actual flying sword");
-        p.setOnGround(true);sword.setOnGround(false);
-        h.assertTrue(CultivationFlightVisuals.eligible(p),"A stale rider ground flag cannot hide airborne sword trails");
-        sword.setOnGround(true);
-        h.assertTrue(!CultivationFlightVisuals.eligible(p),"A grounded sword does not emit a flying wake");
-        sword.setOnGround(false);p.stopRiding();
-        h.assertTrue(!CultivationFlightVisuals.eligible(p),"Dismounting ends sword trails");h.succeed();
+        var pos=h.absolutePos(new net.minecraft.core.BlockPos(4,20,4));
+        p.setPos(pos.getX()+.5,pos.getY(),pos.getZ()+.5);
+        ModAttachments.setData(p,ModAttachments.getData(p).withCultivationLevel(
+                CultivationLevels.REALM_JINDAN+CultivationLevels.STAGE_EARLY).withQi(10000));
+        h.assertTrue(FlyingSwordEntity.releaseControlledFromCase(p,java.util.List.of(
+                new net.minecraft.world.item.ItemStack(com.example.immortal_cultivation_mod.item.ModItems.FLYING_SWORD.get())))==1,
+                "Real owned blade released");
+        h.assertTrue(FlyingSwordEntity.toggleRiding(p),"Sword assists ordinary creative-style flight");
+        var sword=FlyingSwordEntity.flightSword(p);
+        p.getAbilities().flying=true;p.setOnGround(false);
+        p.getAbilities().setFlyingSpeed(1F);
+        p.addEffect(new MobEffectInstance(ModEffects.YUFENG_JUE,100));
+        p.addEffect(new MobEffectInstance(ModEffects.FROST_FLIGHT,100));
+        h.assertTrue(!CultivationFlightVisuals.eligible(p)&&!CultivationFlightVisuals.shouldEmit(p,3)&&!p.isPassenger(),"Sword flight suppresses trails even at maximum speed with other flight effects");
+        p.setOnGround(true);
+        h.assertTrue(!CultivationFlightVisuals.eligible(p),"Grounded player does not emit flight wake");
+        p.setOnGround(false);FlyingSwordEntity.toggleRiding(p);
+        h.assertTrue(CultivationFlightVisuals.eligible(p),"Removing sword keeps ordinary Golden Core flight wake");
+        p.removeEffect(ModEffects.YUFENG_JUE);p.removeEffect(ModEffects.FROST_FLIGHT);
+        JindanCreativeFlight.setEnabled(p,false);
+        h.assertTrue(!CultivationFlightVisuals.eligible(p),"Disabling flight ends wake");
+        sword.discard();h.succeed();
     }
 
     @GameTest(template="fate_test")
-    public static void npcAndFlyingUndeadSkillsShareTheFlightVisuals(GameTestHelper h) {
+    public static void npcFlightHasNoTrailWhileFlyingUndeadKeepsItsVisuals(GameTestHelper h) {
         var npc=ModEntities.LIANQI_CULTIVATOR.get().create(h.getLevel());
         npc.setOnGround(false);npc.addEffect(new MobEffectInstance(ModEffects.YUFENG_JUE,100));
-        h.assertTrue(CultivationFlightVisuals.eligible(npc),"NPC wind flight is no longer excluded by player-only dispatch");
+        h.assertTrue(!CultivationFlightVisuals.eligible(npc)&&!CultivationFlightVisuals.shouldEmit(npc,3),"NPC wind flight never emits a trail");
+        npc.addEffect(new MobEffectInstance(ModEffects.FROST_FLIGHT,100));
+        h.assertTrue(!CultivationFlightVisuals.eligible(npc),"NPC frost flight cannot bypass trail suppression");
+        npc.removeEffect(ModEffects.FROST_FLIGHT);
         npc.removeEffect(ModEffects.YUFENG_JUE);
         h.assertTrue(!CultivationFlightVisuals.eligible(npc),"An airborne NPC without its flight spell is only falling");
         var zombie=net.minecraft.world.entity.EntityType.ZOMBIE.create(h.getLevel());
@@ -216,33 +234,33 @@ public final class CultivationFlightTrailGameTests {
     @GameTest(template="fate_test")
     public static void trailsRequireFiveTimesFlightSpeedAndStopBelowIt(GameTestHelper h) {
         var p=airbornePlayer(h);p.getAbilities().mayfly=true;p.getAbilities().flying=true;
-        for(float speed:new float[]{.05F,.10F,.225F,.249F}) {
+        for(float speed:new float[]{.05F,.10F,.25F,.4F,.499F}) {
             p.getAbilities().setFlyingSpeed(speed);
-            h.assertTrue(!CultivationFlightVisuals.shouldEmit(p,3),"Fast displacement cannot bypass a selected speed below x5");
+            h.assertTrue(!CultivationFlightVisuals.shouldEmit(p,3),"Fast displacement cannot bypass a selected speed below x10");
         }
-        for(float speed:new float[]{.25F,.4F,.5F,1F}) {
+        for(float speed:new float[]{.5F,.75F,1F}) {
             p.getAbilities().setFlyingSpeed(speed);
-            h.assertTrue(CultivationFlightVisuals.shouldEmit(p,.6),"Trails start at exactly x5 and continue above it");
+            h.assertTrue(CultivationFlightVisuals.shouldEmit(p,.6),"Trails start at exactly x10 and continue above it");
         }
         h.assertTrue(!CultivationFlightVisuals.shouldEmit(p,0)&&!CultivationFlightVisuals.shouldEmit(p,100)
                 &&!CultivationFlightVisuals.shouldEmit(p,Double.NaN),"Hovering, teleports and invalid movement never emit");
         p.getAbilities().setFlyingSpeed(.225F);
-        h.assertTrue(!CultivationFlightVisuals.shouldEmit(p,.6),"Reducing flight speed below x5 stops emission immediately");h.succeed();
+        h.assertTrue(!CultivationFlightVisuals.shouldEmit(p,.6),"Reducing flight speed below x10 stops emission immediately");h.succeed();
     }
 
     @GameTest(template="fate_test")
-    public static void frostKeepsSpeedThresholdWhileNpcFlightAlwaysEmits(GameTestHelper h) {
+    public static void frostKeepsSpeedThresholdWhileNpcFlightStaysHidden(GameTestHelper h) {
         var p=airbornePlayer(h);p.addEffect(new MobEffectInstance(ModEffects.FROST_FLIGHT,100));
         p.getAbilities().setFlyingSpeed(1F);
         var npc=ModEntities.LIANQI_CULTIVATOR.get().create(h.getLevel());
         npc.setOnGround(false);npc.addEffect(new MobEffectInstance(ModEffects.YUFENG_JUE,100));
         double threshold=CultivationFlightVisuals.MIN_TRAIL_TRAVEL_SPEED;
-        h.assertTrue(!CultivationFlightVisuals.shouldEmit(p,threshold-.01),"Player glide below equivalent x5 stays quiet");
+        h.assertTrue(!CultivationFlightVisuals.shouldEmit(p,threshold-.01),"Player glide below equivalent x10 stays quiet");
         for (double speed : new double[]{0, .001, .04, .12, threshold}) {
-            h.assertTrue(CultivationFlightVisuals.shouldEmit(npc,speed),"NPC wind flight emits at any speed, including hover and landing");
+            h.assertTrue(!CultivationFlightVisuals.shouldEmit(npc,speed),"NPC flight never emits at any speed");
         }
+        h.assertTrue(CultivationFlightVisuals.shouldEmit(p,threshold),"Actual fast player glide emits");
         for(var flyer:List.of(p,npc)) {
-            h.assertTrue(CultivationFlightVisuals.shouldEmit(flyer,threshold),"Actual fast flight emits");
             flyer.setOnGround(true);
             h.assertTrue(!CultivationFlightVisuals.shouldEmit(flyer,threshold),"Speed alone never emits a grounded trail");
         }

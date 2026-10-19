@@ -34,7 +34,8 @@ public final class NpcSkinCatalog {
             new Skin("frost_robed_cultivator", MALE));
 
     public static final List<Skin> NAMED_SKINS = List.of(
-            new Skin("hotelkeeper", MALE));
+            new Skin("hotelkeeper", MALE),
+            new Skin("recipe_merchant", MALE));
 
     public static final List<Skin> ALL_SKINS;
     private static final Map<String, Skin> BY_ID;

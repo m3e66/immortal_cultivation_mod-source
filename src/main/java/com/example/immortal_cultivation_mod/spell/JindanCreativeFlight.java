@@ -95,6 +95,25 @@ public final class JindanCreativeFlight {
         return MAX_FLYING_SPEED;
     }
 
+    /** Realm caps apply to the selected base speed; sword flight multiplies afterward. */
+    public static float maxFlyingSpeedForRealm(int realm) {
+        return VANILLA_FLYING_SPEED * (realm >= 5 ? 20.0F : realm == 4 ? 10.0F : 5.0F);
+    }
+
+    public static boolean canUseSwordFlight(ServerPlayer player) {
+        return player.isAlive() && !player.isCreative() && !player.isSpectator()
+                && !player.isPassenger() && !hasExternalFlight(player)
+                && player.getPersistentData().getBoolean(ENABLED_TAG)
+                && player.getPersistentData().getBoolean(GRANTED_TAG)
+                && CultivationLevels.getRealmIndex(ModAttachments.getData(player).cultivationLevel()) >= 3;
+    }
+
+    public static float effectiveFlyingSpeed(ServerPlayer player) {
+        float base = selectedSpeed(player);
+        return base * (FlyingSwordEntity.flightSword(player) != null
+                ? FlyingSwordEntity.FLIGHT_SPEED_MULTIPLIER : 1.0F);
+    }
+
     public static float flyingSpeedStep() {
         return FLYING_SPEED_STEP;
     }
@@ -102,6 +121,7 @@ public final class JindanCreativeFlight {
     public static void setEnabled(ServerPlayer player, boolean enabled) {
         player.getPersistentData().putBoolean(ENABLED_TAG, enabled);
         syncControlActive(player, false);
+        if (!enabled) FlyingSwordEntity.stopSwordFlight(player);
         if (!enabled && !hasExternalFlight(player)) {
             revokeIfOwned(player);
         }
@@ -109,6 +129,15 @@ public final class JindanCreativeFlight {
 
 
     public static void tick(ServerPlayer player) {
+        update(player, true);
+    }
+
+    /** Recompute a toggled blade bonus without advancing effects or charging a second upkeep tick. */
+    public static void refreshFlightAbilities(ServerPlayer player) {
+        update(player, false);
+    }
+
+    private static void update(ServerPlayer player, boolean advanceFlight) {
         // Another flight system may have snapshotted Jindan's grant and speed. Leave that
         // ownership intact until it finishes so its eventual restore cannot leak mayfly.
         if (hasExternalFlight(player)) {
@@ -127,7 +156,7 @@ public final class JindanCreativeFlight {
             resetPeriodicFlightBoom(player);
             boolean abilitiesChanged = false;
             syncControlActive(player, true);
-            float selectedSpeed = selectedSpeed(player);
+            float selectedSpeed = effectiveFlyingSpeed(player);
             if (Math.abs(player.getAbilities().getFlyingSpeed() - selectedSpeed) > 0.0001F) {
                 player.getAbilities().setFlyingSpeed(selectedSpeed);
                 abilitiesChanged = true;
@@ -151,7 +180,7 @@ public final class JindanCreativeFlight {
         }
 
         var data = ModAttachments.getData(player);
-        float selectedSpeed = selectedSpeed(player);
+        float selectedSpeed = effectiveFlyingSpeed(player);
         int layeredQiCost = qiCostPerSecond(selectedSpeed);
         int flightCost = com.example.immortal_cultivation_mod.entity.TalismanWardEntity
                 .adjustFlightQiCost(player, layeredQiCost);
@@ -190,14 +219,17 @@ public final class JindanCreativeFlight {
 
         if (Math.abs(player.getAbilities().getFlyingSpeed() - selectedSpeed) > 0.0001F) {
             player.getAbilities().setFlyingSpeed(selectedSpeed);
+            ModPayloads.syncJindanFlightSpeed(player, selectedSpeed, 0);
             abilitiesChanged = true;
         }
 
-        boolean fastFlightMode = tickFastFlightMode(player, selectedSpeed);
-        tickPeriodicFlightBoom(player, selectedSpeed, fastFlightMode);
-        tickDive(player, selectedSpeed,
-                player.getAbilities().flying
-                        && isDownwardSmashSpeed(selectedSpeed));
+        if (advanceFlight) {
+            boolean fastFlightMode = tickFastFlightMode(player, selectedSpeed);
+            tickPeriodicFlightBoom(player, selectedSpeed, fastFlightMode);
+            tickDive(player, selectedSpeed,
+                    player.getAbilities().flying
+                            && isDownwardSmashSpeed(selectedSpeed));
+        }
 
         if (player.onGround()) {
             if (player.getPersistentData().getBoolean(WAS_AIRBORNE_TAG)
@@ -212,7 +244,7 @@ public final class JindanCreativeFlight {
 
         // The continuous wake is synchronized by CultivationFlightVisuals and rendered as client ribbons.
 
-        if (player.getAbilities().flying && player.tickCount % 20 == 0) {
+        if (advanceFlight && player.getAbilities().flying && player.tickCount % 20 == 0) {
             if (!ServerEvents.spendSustainedQiOrBlood(
                     player, data, flightCost)) {
                 suspendForNoQi(player);
@@ -255,28 +287,28 @@ public final class JindanCreativeFlight {
         int steps = Mth.clamp(
                 requestedSteps, -MAX_SCROLL_STEPS_PER_PACKET, MAX_SCROLL_STEPS_PER_PACKET);
         float currentSpeed = selectedSpeed(player);
-        float nextSpeed = clampSpeed(currentSpeed + steps * FLYING_SPEED_STEP);
+        float nextSpeed = clampSelectedSpeed(player, currentSpeed + steps * FLYING_SPEED_STEP);
         int changedLayers = 0;
         if (Math.abs(nextSpeed - currentSpeed) > 0.0001F) {
             changedLayers = Math.round((nextSpeed - currentSpeed) / FLYING_SPEED_STEP);
             player.getPersistentData().putFloat(SPEED_TAG, nextSpeed);
-            player.getAbilities().setFlyingSpeed(nextSpeed);
+            player.getAbilities().setFlyingSpeed(effectiveFlyingSpeed(player));
             player.onUpdateAbilities();
 
             if (jindanFlight && !undeadFlight) {
-                ModPayloads.syncJindanFlightSpeed(player, nextSpeed, changedLayers);
+                ModPayloads.syncJindanFlightSpeed(player, effectiveFlyingSpeed(player), changedLayers);
                 if (changedLayers > 0) {
-                    emitSpeedLayerBurst(player, changedLayers, nextSpeed);
+                    emitSpeedLayerBurst(player, changedLayers, effectiveFlyingSpeed(player));
                 }
             }
         }
 
         String multiplier = String.format(
-                Locale.ROOT, "%.1f", nextSpeed / VANILLA_FLYING_SPEED);
+                Locale.ROOT, "%.1f", effectiveFlyingSpeed(player) / VANILLA_FLYING_SPEED);
         player.displayClientMessage(Component.translatable(
                 "message.immortal_cultivation_mod.jindan_flight_speed",
                 multiplier,
-                qiCostPerSecond(nextSpeed)), true);
+                qiCostPerSecond(effectiveFlyingSpeed(player))), true);
     }
 
     private static int qiCostPerSecond(float selectedSpeed) {
@@ -687,8 +719,7 @@ public final class JindanCreativeFlight {
         if (player == null || player.isCreative() || player.isSpectator()) {
             return false;
         }
-        return player.getVehicle() instanceof FlyingSwordEntity
-                || player.hasEffect(ModEffects.YUFENG_JUE)
+        return player.hasEffect(ModEffects.YUFENG_JUE)
                 || player.hasEffect(ModEffects.FROST_FLIGHT)
                 || (isUndeadFlightAvailable(player) && player.getAbilities().flying)
                 || (player.getPersistentData().getBoolean(ENABLED_TAG)
@@ -715,6 +746,7 @@ public final class JindanCreativeFlight {
     }
 
     private static void revokeIfOwned(ServerPlayer player) {
+        FlyingSwordEntity.stopSwordFlight(player);
         resetDiveState(player);
         resetFastFlightState(player);
         resetPeriodicFlightBoom(player);
@@ -742,7 +774,13 @@ public final class JindanCreativeFlight {
         if (!player.getPersistentData().contains(SPEED_TAG)) {
             return DEFAULT_FLYING_SPEED;
         }
-        return clampSpeed(player.getPersistentData().getFloat(SPEED_TAG));
+        return clampSelectedSpeed(player, player.getPersistentData().getFloat(SPEED_TAG));
+    }
+
+    private static float clampSelectedSpeed(ServerPlayer player, float speed) {
+        float cap = isUndeadFlightAvailable(player) ? MAX_FLYING_SPEED
+                : maxFlyingSpeedForRealm(CultivationLevels.getRealmIndex(ModAttachments.getData(player).cultivationLevel()));
+        return Math.min(cap, clampSpeed(speed));
     }
 
     private static float clampSpeed(float speed) {
@@ -761,7 +799,6 @@ public final class JindanCreativeFlight {
 
     private static void suspendSelectedSpeedForExternalFlight(ServerPlayer player) {
         if (!player.getPersistentData().getBoolean(GRANTED_TAG)
-                || player.getVehicle() instanceof FlyingSwordEntity
                 || !player.hasEffect(ModEffects.YUFENG_JUE)
                 || player.getPersistentData().getBoolean(EXTERNAL_SPEED_SUSPENDED_TAG)) {
             return;
@@ -794,8 +831,7 @@ public final class JindanCreativeFlight {
     }
 
     private static boolean hasExternalFlight(ServerPlayer player) {
-        return player.hasEffect(ModEffects.YUFENG_JUE)
-                || player.getVehicle() instanceof FlyingSwordEntity;
+        return player.hasEffect(ModEffects.YUFENG_JUE);
     }
 
     private static boolean isUndeadFlightAvailable(ServerPlayer player) {

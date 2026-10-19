@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "immortal_cultivation_mod:harmonizing_herb"
+    },
+    {
+      "item": "immortal_cultivation_mod:harmonizing_herb"
+    },
+    {
+      "item": "immortal_cultivation_mod:harmonizing_herb"
+    },
+    {
+      "item": "immortal_cultivation_mod:lingquan_leaf"
+    },
+    {
+      "item": "immortal_cultivation_mod:lingquan_leaf"
+    },
+    {
+      "item": "immortal_cultivation_mod:xuanbing_lotus"
+    }
+  ],
+  "result": {
+    "id": "immortal_cultivation_mod:qingdu_formula",
+    "count": 1
+  }
+}

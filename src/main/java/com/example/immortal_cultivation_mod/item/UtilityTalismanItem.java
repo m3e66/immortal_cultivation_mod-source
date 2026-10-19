@@ -50,9 +50,10 @@ public final class UtilityTalismanItem extends TalismanItem {
     private static final String SHIELD_ENTRIES =
             ImmortalCultivationMod.MODID + ":talisman_shields";
     private static final String SHIELD_BAR_SOURCE = "talisman_shields";
+    private static final String THIN_GOLD_SOURCE="thin_gold_talisman",GOLDEN_BODY_SOURCE="golden_body_talisman";
     private static final String LUCK_WARD_ENTRIES =
             ImmortalCultivationMod.MODID + ":five_mountains_luck";
-    private static final int LIGHT_ANCHOR_HOLD_TICKS = 8;
+    public static final int LIGHT_ANCHOR_HOLD_TICKS = 8;
     private static final int LIGHT_USE_DURATION = 72_000;
     private static final int EVIL_WARD_TICKS = 5 * 60 * 20;
     private static final int THOUGHT_REGEN_TICKS = 3 * 60 * 20;
@@ -231,7 +232,7 @@ public final class UtilityTalismanItem extends TalismanItem {
                 ring(level, player, ParticleTypes.SMOKE, 2.5D, 18);
             }
             case THIN_GOLD_SHIELD -> addShield(
-                    player, 200.0F + player.getMaxHealth() * 0.01F, 15 * 20);
+                    player, 200.0F + player.getMaxHealth() * 0.01F, 15 * 20,THIN_GOLD_SOURCE);
             case CALM_SOUL -> {
                 player.getPersistentData().putLong(
                         EVIL_WARD_UNTIL, now + EVIL_WARD_TICKS);
@@ -252,7 +253,7 @@ public final class UtilityTalismanItem extends TalismanItem {
             case STABILIZE_DISTURBANCE ->
                     TalismanWardEntity.spawnSuppression(level, player);
             case GOLDEN_BODY_SHIELD -> addShield(
-                    player, 600.0F + player.getMaxHealth() * 0.01F, 25 * 20);
+                    player, 600.0F + player.getMaxHealth() * 0.01F, 25 * 20,GOLDEN_BODY_SOURCE);
             case FIVE_MOUNTAINS_WARD -> {
                 if (addFiveMountainsLuck(player, now)) {
                     TalismanWardEntity.spawnMountains(
@@ -336,18 +337,18 @@ public final class UtilityTalismanItem extends TalismanItem {
     }
 
     private static void addShield(
-            ServerPlayer player, float amount, int durationTicks) {
+            ServerPlayer player, float amount, int durationTicks,String displaySource) {
         long now = player.serverLevel().getGameTime();
         ListTag shields = liveShieldEntries(player, now);
         CompoundTag entry = new CompoundTag();
         entry.putFloat("Amount", Math.max(0.0F, amount));
         entry.putFloat("Max", Math.max(0.0F, amount));
         entry.putLong("Expires", now + durationTicks);
+        entry.putString("DisplaySource",displaySource);
         shields.add(entry);
         player.getPersistentData().put(SHIELD_ENTRIES, shields);
         syncShieldBar(player, shields);
-        player.displayClientMessage(net.minecraft.network.chat.Component.literal(
-                "护盾 +" + Math.round(amount)), true);
+        player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.immortal_cultivation_mod.talisman.shield", Math.round(amount)), true);
         ring(player.serverLevel(), player,
                 ParticleTypes.ENCHANTED_HIT, 1.15D, 22);
     }
@@ -355,11 +356,17 @@ public final class UtilityTalismanItem extends TalismanItem {
     /** Consumes oldest stackable talisman shields and returns remaining damage. */
     public static float absorbTalismanShields(
             ServerPlayer player, float incomingDamage) {
+        return absorbTalismanShields(player, null, incomingDamage);
+    }
+
+    public static float absorbTalismanShields(
+            ServerPlayer player, net.minecraft.world.damagesource.DamageSource source, float incomingDamage) {
         if (incomingDamage <= 0.0F) return incomingDamage;
         ListTag current = liveShieldEntries(
                 player, player.serverLevel().getGameTime());
         if (current.isEmpty()) return incomingDamage;
-        float remaining = incomingDamage;
+        float multiplier = com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.shieldMultiplier(source);
+        float remaining = incomingDamage * multiplier;
         ListTag kept = new ListTag();
         for (int index = 0; index < current.size(); index++) {
             CompoundTag entry = current.getCompound(index);
@@ -376,7 +383,7 @@ public final class UtilityTalismanItem extends TalismanItem {
         }
         putOrRemove(player.getPersistentData(), SHIELD_ENTRIES, kept);
         syncShieldBar(player, kept);
-        if (remaining < incomingDamage) {
+        if (remaining < incomingDamage * multiplier) {
             player.serverLevel().sendParticles(ParticleTypes.ENCHANTED_HIT,
                     player.getX(), player.getY() + player.getBbHeight() * 0.55D,
                     player.getZ(), 8, 0.45D, 0.55D, 0.45D, 0.02D);
@@ -384,7 +391,7 @@ public final class UtilityTalismanItem extends TalismanItem {
                     SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS,
                     0.45F, 1.45F);
         }
-        return Math.max(0.0F, remaining);
+        return Math.max(0.0F, remaining / multiplier);
     }
 
     private static ListTag liveShieldEntries(ServerPlayer player, long now) {
@@ -415,19 +422,18 @@ public final class UtilityTalismanItem extends TalismanItem {
 
     private static void syncShieldBar(
             ServerPlayer player, ListTag shields) {
-        float amount = 0.0F;
-        float max = 0.0F;
+        float[] amounts=new float[3],maxima=new float[3];
         for (int index = 0; index < shields.size(); index++) {
             CompoundTag entry = shields.getCompound(index);
             float current = Math.max(0.0F, entry.getFloat("Amount"));
-            amount += current;
-            max += Math.max(current, entry.getFloat("Max"));
+            int kind=switch(entry.getString("DisplaySource")){case THIN_GOLD_SOURCE->1;case GOLDEN_BODY_SOURCE->2;default->0;};
+            amounts[kind]+=current;
+            maxima[kind]+=Math.max(current, entry.getFloat("Max"));
         }
-        if (amount <= 0.0F || max <= 0.0F) {
-            PlayerShieldManager.clear(player, SHIELD_BAR_SOURCE);
-        } else {
-            PlayerShieldManager.set(
-                    player, SHIELD_BAR_SOURCE, amount, max);
+        String[] sources={SHIELD_BAR_SOURCE,THIN_GOLD_SOURCE,GOLDEN_BODY_SOURCE};
+        for(int i=0;i<sources.length;i++) {
+            if(amounts[i]<=0||maxima[i]<=0)PlayerShieldManager.clear(player,sources[i]);
+            else PlayerShieldManager.set(player,sources[i],amounts[i],maxima[i]);
         }
     }
 
@@ -436,8 +442,7 @@ public final class UtilityTalismanItem extends TalismanItem {
         ListTag wards = liveLuckEntries(player, now, true);
         if (wards.size() >= MAX_FIVE_MOUNTAINS_STACKS) {
             player.displayClientMessage(
-                    net.minecraft.network.chat.Component.literal(
-                            "五岳辟厄符已达到 3 层上限"), true);
+                    net.minecraft.network.chat.Component.translatable("message.immortal_cultivation_mod.talisman.five_mountains_limit"), true);
             return false;
         }
         int bonus = wards.isEmpty() ? 10 : wards.size() == 1 ? 7 : 3;
@@ -450,8 +455,7 @@ public final class UtilityTalismanItem extends TalismanItem {
         entry.putLong("Expires", now + FIVE_MOUNTAINS_TICKS);
         wards.add(entry);
         player.getPersistentData().put(LUCK_WARD_ENTRIES, wards);
-        player.displayClientMessage(net.minecraft.network.chat.Component.literal(
-                "五岳护运：幸运 +" + bonus), true);
+        player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.immortal_cultivation_mod.talisman.five_mountains_gain", bonus), true);
         return true;
     }
 
@@ -474,8 +478,7 @@ public final class UtilityTalismanItem extends TalismanItem {
             return true;
         }
         player.displayClientMessage(
-                net.minecraft.network.chat.Component.literal(
-                        "五岳辟厄符已达到 3 层上限"), true);
+                net.minecraft.network.chat.Component.translatable("message.immortal_cultivation_mod.talisman.five_mountains_limit"), true);
         return false;
     }
 
@@ -501,8 +504,7 @@ public final class UtilityTalismanItem extends TalismanItem {
             var data = ModAttachments.getData(player);
             ModAttachments.setData(player, data.withLuck(
                     data.luck() - removedBonus - permanentLoss));
-            player.displayClientMessage(net.minecraft.network.chat.Component.literal(
-                    "五岳借运已尽：永久幸运 -" + permanentLoss), true);
+            player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.immortal_cultivation_mod.talisman.five_mountains_expired", permanentLoss), true);
         }
         return kept;
     }
@@ -529,7 +531,7 @@ public final class UtilityTalismanItem extends TalismanItem {
         long now = player.serverLevel().getGameTime();
         ListTag shields = liveShieldEntries(player, now);
         // Re-register persistent talisman shields after login/server reload and
-        // keep the aggregate HUD source authoritative without sending a packet
+        // keep each colored HUD source authoritative without sending a packet
         // every tick.
         if (player.tickCount % 20 == 0) {
             syncShieldBar(player, shields);

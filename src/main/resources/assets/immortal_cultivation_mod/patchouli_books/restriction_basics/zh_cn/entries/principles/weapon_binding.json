@@ -1,0 +1,23 @@
+{
+  "name": "法宝认主",
+  "icon": "immortal_cultivation_mod:flying_sword",
+  "category": "immortal_cultivation_mod:principles",
+  "sortnum": 31,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "初次伤敌",
+      "text": "法宝及更高品阶的兵器，在首次由玩家造成有效伤害时认主。仅拾起、装备、蓄力或挥空，不会令兵器认主；被完全抵挡、未造成伤害的攻击也不算。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "各有其主",
+      "text": "认主后，仅原主人可使用这件兵器。物品说明会记载主人的名字，拾得他人法宝时应先查看。交给他人或重新登录，不会抹去认主。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "低阶兵器",
+      "text": "凡器、法器与灵器不会因这一认主规则绑定。兵器仍须满足原有境界、灵气与操作条件；有主法宝不会因换一只手持握便认他人为主。"
+    }
+  ]
+}

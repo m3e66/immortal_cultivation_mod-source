@@ -31,6 +31,7 @@ public final class SwordTechniqueProjectileRenderer extends EntityRenderer<Sword
       }
 
       poseStack.pushPose();
+      com.example.immortal_cultivation_mod.client.SpellProjectileVisuals.enlarge(poseStack);
       orientToDirection(poseStack, direction);
       poseStack.mulPose(Axis.ZP.rotationDegrees(entity.roll()));
       if (entity.kind() == SwordTechniqueProjectileEntity.Kind.POKONG_JIANHEN) {

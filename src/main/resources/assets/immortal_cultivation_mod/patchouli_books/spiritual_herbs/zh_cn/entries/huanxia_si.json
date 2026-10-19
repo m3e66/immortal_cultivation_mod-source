@@ -1,0 +1,23 @@
+{
+  "name": "幻霞丝",
+  "icon": "immortal_cultivation_mod:huanxia_si",
+  "category": "immortal_cultivation_mod:volume_4",
+  "sortnum": 10,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "幻霞丝",
+      "text": "$(bold)生成尝试频率：$()1/9"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《百草录》记载",
+      "text": "幻霞丝生于高山清灵之地，其形纤细如丝，色若晨霞。山风吹拂之时，丝缕飘动，似真似幻。此物喜天地空明之处，常见于云雾缭绕的高岭与草甸。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻药",
+      "text": "草甸、樱花林、狂风山丘、尖峭山峰、冰封山峰及石峰。"
+    }
+  ]
+}

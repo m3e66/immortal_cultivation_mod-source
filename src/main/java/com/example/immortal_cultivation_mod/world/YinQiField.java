@@ -102,6 +102,10 @@ public final class YinQiField {
         return value;
     }
 
+    public static int sampleQi(ServerLevel level,BlockPos pos) {
+        return sampleQi(level.getSeed(),pos.getX(),pos.getZ());
+    }
+
     private static int sampleQi(long seed, int blockX, int blockZ) {
         double gate = valueNoise01(seed, blockX / GATE_SCALE, blockZ / GATE_SCALE, 0x71A9FF);
         if (gate < ZERO_THRESHOLD) {

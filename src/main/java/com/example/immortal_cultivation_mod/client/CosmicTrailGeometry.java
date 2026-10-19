@@ -83,13 +83,13 @@ final class CosmicTrailGeometry {
             float startU = startProgress * 0.5F;
             float endU = endProgress * 0.5F;
 
-            buffer.addVertex(matrix, startLeft.x, startLeft.y, startLeft.z)
+            VfxVertexWriter.vertex(buffer, matrix, startLeft.x, startLeft.y, startLeft.z)
                     .setUv(startU, 1.0F).setColor(red, green, blue, alpha * startFade);
-            buffer.addVertex(matrix, startRight.x, startRight.y, startRight.z)
+            VfxVertexWriter.vertex(buffer, matrix, startRight.x, startRight.y, startRight.z)
                     .setUv(startU, 0.0F).setColor(red, green, blue, alpha * startFade);
-            buffer.addVertex(matrix, endRight.x, endRight.y, endRight.z)
+            VfxVertexWriter.vertex(buffer, matrix, endRight.x, endRight.y, endRight.z)
                     .setUv(endU, 0.0F).setColor(red, green, blue, alpha * endFade);
-            buffer.addVertex(matrix, endLeft.x, endLeft.y, endLeft.z)
+            VfxVertexWriter.vertex(buffer, matrix, endLeft.x, endLeft.y, endLeft.z)
                     .setUv(endU, 1.0F).setColor(red, green, blue, alpha * endFade);
         }
     }

@@ -1,0 +1,18 @@
+{
+  "name": "凝形淬器",
+  "icon": "immortal_cultivation_mod:dao",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "灵材既熔，器形初成。凡需模具定形之兵器，尚须以水淬炼，使其形体稳固、锋芒内敛。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "若为无需模具之炼器法，则待熔炼完成，即可直接得其成品。"
+    }
+  ]
+}

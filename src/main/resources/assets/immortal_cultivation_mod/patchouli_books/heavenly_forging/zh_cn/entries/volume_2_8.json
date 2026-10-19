@@ -1,0 +1,18 @@
+{
+  "name": "蛟龙炎",
+  "icon": "immortal_cultivation_mod:dragon_flame_seed",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 7,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "蛟龙炎",
+      "text": "火候上限 ：10,000°C | 灵气消耗 ：45"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "蛟龙炎蕴蛟族炽烈血脉之息，炎威浩荡，火势如龙腾九霄。其焰足以熔炼诸多高阶灵金，寻常灵火难与之相比。"
+    }
+  ]
+}

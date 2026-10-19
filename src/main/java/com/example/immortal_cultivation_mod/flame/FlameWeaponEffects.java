@@ -27,7 +27,7 @@ public final class FlameWeaponEffects {
         Hit previous = PROJECTILE_HIT.get();
         PROJECTILE_HIT.set(new Hit(weapon, target));
         try {
-            return target.hurt(source, damage);
+            return com.example.immortal_cultivation_mod.item.WeaponBinding.withWeapon(weapon, source, () -> target.hurt(source, damage));
         } finally {
             if (previous == null) PROJECTILE_HIT.remove();
             else PROJECTILE_HIT.set(previous);

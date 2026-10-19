@@ -135,6 +135,7 @@ public final class SpellRibbonRenderer {
                     if(age>=warning)intensity=(float)Mth.clamp(1-(age-warning-4)/4,0,1);
                     age=age<warning?age*20/warning:20+age-warning;
                 }
+                if(moving&&!(e instanceof TianyunFenchengMeteorEntity meteor&&meteor.impacted()))scale*=SpellProjectileVisuals.SCALE;
                 Vec3 origin=pos;
                 if(e instanceof XinliaoFireballEntity){
                     Vec3 forward=dir.lengthSqr()<.00001?new Vec3(0,0,1):dir.normalize();
@@ -221,7 +222,7 @@ public final class SpellRibbonRenderer {
             Vec3 drift=new Vec3(Math.sin(phase+i*.4),Math.cos(phase+i*.3),0).scale(.11*(1-u));
             double width=id.equals("light_beam_attack")?.018:id.equals("ignite_flare")?.028:.055;
             float brightness=id.equals("ignite_flare")?.3F:.7F;
-            light(out,matrix,camera,points.get(i-1).add(drift),points.get(i).add(drift),width*u,r,g,b,(float)(u*brightness));
+            light(out,matrix,camera,points.get(i-1).add(drift),points.get(i).add(drift),width*u*SpellProjectileVisuals.SCALE,r,g,b,(float)(u*brightness));
         }
     }
     private static void light(VertexConsumer out,Matrix4f matrix,Vec3 camera,Vec3 a,Vec3 b,double width,float r,float g,float blue,float alpha){

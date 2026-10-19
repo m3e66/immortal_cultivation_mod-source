@@ -30,6 +30,188 @@ import software.bernie.geckolib.animation.PlayState;
 @PrefixGameTestTemplate(false)
 public final class DingModelGameTests {
     @GameTest(template = "fate_test")
+    public static void debugEyeScalingTakesPriorityOverLidsWithAnyHeldItem(GameTestHelper h) {
+        var pos = new BlockPos(3, 2, 3);
+        var absolute = h.absolutePos(pos);
+        var player = new FakePlayer(h.getLevel(), new GameProfile(UUID.randomUUID(), "ding-scale-priority")) {
+            @Override public boolean hasPermissions(int level) { return level <= 2; }
+        };
+        player.setShiftKeyDown(true);
+        player.getPersistentData().putBoolean("ImmortalCultivationDebugEyeEnabled", true);
+        var hit = new net.minecraft.world.phys.BlockHitResult(
+                net.minecraft.world.phys.Vec3.atCenterOf(absolute), Direction.UP, absolute, false);
+        for (var block : new Block[]{ModBlocks.QINGTONG_YINHUO_DING.get(), ModBlocks.CHI_JIN_SANYANG_DING.get()}) {
+            var dingBlock = (DingBlock) block;
+            for (boolean lidOpen : new boolean[]{false, true}) {
+                h.setBlock(pos, block.defaultBlockState().setValue(DingBlock.SCALE, 1));
+                var ding = (DingBlockEntity) h.getLevel().getBlockEntity(absolute);
+                ding.setLidOpen(lidOpen);
+                player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+                dingBlock.useWithoutItem(h.getLevel().getBlockState(absolute), h.getLevel(), absolute, player, hit);
+                h.assertTrue(h.getLevel().getBlockState(absolute).getValue(DingBlock.SCALE) == 2
+                                && ding.isLidOpen() == lidOpen,
+                        "Empty-handed Debug Eye scale change takes priority over either lid state");
+                player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.IRON_INGOT));
+                for (int expected : new int[]{3, 4, 5, 1}) {
+                    dingBlock.useItemOn(player.getMainHandItem(), h.getLevel().getBlockState(absolute),
+                            h.getLevel(), absolute, player, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+                    h.assertTrue(h.getLevel().getBlockState(absolute).getValue(DingBlock.SCALE) == expected
+                                    && ding.isLidOpen() == lidOpen,
+                            "Holding ordinary materials still scales through the full cycle without toggling the lid");
+                }
+                player.getPersistentData().putBoolean("ImmortalCultivationDebugEyeEnabled", false);
+                dingBlock.useItemOn(player.getMainHandItem(), h.getLevel().getBlockState(absolute),
+                        h.getLevel(), absolute, player, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+                h.assertTrue(h.getLevel().getBlockState(absolute).getValue(DingBlock.SCALE) == 1
+                                && ding.isLidOpen() != lidOpen,
+                        "With Debug Eye disabled, sneak-right-click toggles only the lid");
+                player.getPersistentData().putBoolean("ImmortalCultivationDebugEyeEnabled", true);
+            }
+        }
+        h.succeed();
+    }
+
+    @GameTest(template = "fate_test")
+    public static void sealedFloorsSupportTheModelAtEveryFacingAndScale(GameTestHelper h) throws Exception {
+        var position = new BlockPos(3, 2, 3);
+        for (var block : new Block[]{ModBlocks.CU_TIE_XIAODING.get(), ModBlocks.QINGTONG_YINHUO_DING.get(),
+                ModBlocks.CHI_JIN_SANYANG_DING.get()}) {
+            h.setBlock(position, block);
+            var ding = (DingBlockEntity) h.getLevel().getBlockEntity(h.absolutePos(position));
+            try (var reader = new InputStreamReader(DingModelGameTests.class.getResourceAsStream(
+                    "/assets/immortal_cultivation_mod/geo/block/" + ding.modelName() + ".geo.json"),
+                    StandardCharsets.UTF_8)) {
+                var geometry = JsonParser.parseReader(reader).getAsJsonObject()
+                        .getAsJsonArray("minecraft:geometry").get(0).getAsJsonObject();
+                var bones = geometry.getAsJsonArray("bones");
+                for (var boneValue : bones) {
+                    var bone = boneValue.getAsJsonObject();
+                    if (!bone.get("name").getAsString().equals("body")) continue;
+                    var cubes = bone.getAsJsonArray("cubes");
+                    for (var facing : Direction.Plane.HORIZONTAL) for (int scale = 1; scale <= 5; scale++) {
+                        var state = block.defaultBlockState().setValue(DingBlock.FACING, facing)
+                                .setValue(DingBlock.SCALE, scale);
+                        var boxes = state.getCollisionShape(h.getLevel(), h.absolutePos(position)).toAabbs();
+                        for (var cubeValue : cubes) {
+                            var cube = cubeValue.getAsJsonObject();
+                            var origin = cube.getAsJsonArray("origin");
+                            var size = cube.getAsJsonArray("size");
+                            for (double fraction : new double[]{.01, .5, .99}) {
+                                double x = (origin.get(0).getAsDouble() + size.get(0).getAsDouble() * fraction) / 16;
+                                double z = (origin.get(2).getAsDouble() + size.get(2).getAsDouble() / 2) / 16;
+                                double rotatedX = switch (facing) { case EAST -> -z; case SOUTH -> -x; case WEST -> z; default -> x; };
+                                double rotatedZ = switch (facing) { case EAST -> x; case SOUTH -> -z; case WEST -> -x; default -> z; };
+                                var point = new net.minecraft.world.phys.Vec3(.5 + rotatedX * scale,
+                                        (origin.get(1).getAsDouble() + size.get(1).getAsDouble() - .01) / 16 * scale,
+                                        .5 + rotatedZ * scale);
+                                h.assertTrue(boxes.stream().anyMatch(box -> box.contains(point)),
+                                        "Sealed floor has physical support at " + ding.modelName() + " / " + facing + " / " + scale);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        h.succeed();
+    }
+
+    @GameTest(template = "fate_test")
+    public static void materialsSpreadInFourDirectionsWithoutGrowingPastTheBasin(GameTestHelper h) {
+        var model = new net.minecraft.world.phys.AABB(-.25, -.125, -.25, .25, .125, .25);
+        for (String name : new String[]{"cu_tie_xiaoding", "qingtong_yinhuo_ding", "chi_jin_sanyang_ding"})
+        for (int scale = 1; scale <= 5; scale++) {
+            var layout = DingPileLayout.forModel(name, scale);
+            var repeated = DingPileLayout.forModel(name, scale);
+            var placed = new java.util.ArrayList<net.minecraft.world.phys.AABB>();
+            for (int index = 0; index < 100; index++) {
+                var offset = layout.place(model, index * 7919L);
+                h.assertTrue(offset.equals(repeated.place(model, index * 7919L)),
+                        "Pile positions do not jitter when rebuilt with unchanged contents");
+                var bounds = model.move(offset);
+                h.assertTrue(Math.abs(bounds.getXsize() - .5) < .000001
+                                && Math.abs(bounds.getYsize() - .25) < .000001,
+                        "Material retains native size even in an enlarged ding");
+                h.assertTrue(layout.volume().contains(bounds), "Normal material remains completely inside the basin");
+                placed.add(bounds);
+            }
+            h.assertTrue(placed.get(0).getCenter().x > 0 && placed.get(1).getCenter().z > 0
+                            && placed.get(2).getCenter().x < 0 && placed.get(3).getCenter().z < 0,
+                    "Materials spread toward all four sides instead of only upward");
+            double floor = layout.volume().bounds().minY;
+            double height = layout.volume().bounds().getYsize();
+            h.assertTrue(layout.bounds().maxY <= floor + height * .22 + model.getYsize() + 1e-6,
+                    "Large inventories cannot build a tall tower");
+        }
+        var wide = new net.minecraft.world.phys.AABB(-1, 0, -1, 1, .5, 1);
+        var narrowDing = new DingPileLayout(.42, .63, .65, 1.36);
+        var first = model.move(narrowDing.place(model, 0));
+        var second = model.move(narrowDing.place(model, 1));
+        h.assertTrue(first.intersects(second), "A crowded basin allows model overlap instead of tall stacks");
+        var widePlaced = wide.move(narrowDing.place(wide, 42));
+        h.assertTrue(widePlaced.getXsize() == 2 && widePlaced.minY == .65,
+                "Oversized material keeps native dimensions and rests on the floor before visual cropping");
+        h.assertTrue(narrowDing.bounds().maxY <= 1.36 && narrowDing.bounds().getXsize() <= 1.26,
+                "Visible bounds exclude oversized protrusions");
+        h.assertTrue(DingPileLayout.visibleCopies(0) == 0 && DingPileLayout.visibleCopies(3) == 3
+                        && DingPileLayout.visibleCopies(64) == 5,
+                "Stack quantity adds visible pieces with a bounded draw cost");
+        h.succeed();
+    }
+
+    @GameTest(template = "fate_test")
+    public static void oversizedMaterialFacesAreCroppedInsideEveryDing(GameTestHelper h) {
+        for (String name : new String[]{"cu_tie_xiaoding", "qingtong_yinhuo_ding", "chi_jin_sanyang_ding"})
+        for (int scale = 1; scale <= 5; scale++) {
+            var volume = DingPileLayout.forModel(name, scale).volume();
+            double middle = volume.bounds().getCenter().y;
+            var face = java.util.List.of(new net.minecraft.world.phys.Vec3(-10, middle, -10),
+                    new net.minecraft.world.phys.Vec3(10, middle, -10),
+                    new net.minecraft.world.phys.Vec3(10, middle, 10),
+                    new net.minecraft.world.phys.Vec3(-10, middle, 10));
+            var clipped = volume.clip(face, point -> point, net.minecraft.world.phys.Vec3::lerp);
+            h.assertTrue(clipped.size() >= 3, "Oversized item faces retain their visible interior");
+            for (var vertex : clipped) h.assertTrue(volume.contains(vertex), "No item vertex sticks through a wall");
+            var vertical = java.util.List.of(new net.minecraft.world.phys.Vec3(-.1, -10, 0),
+                    new net.minecraft.world.phys.Vec3(.1, -10, 0),
+                    new net.minecraft.world.phys.Vec3(.1, 20, 0),
+                    new net.minecraft.world.phys.Vec3(-.1, 20, 0));
+            var cropped = volume.clip(vertical, point -> point, net.minecraft.world.phys.Vec3::lerp);
+            h.assertTrue(cropped.size() >= 3, "Tall models retain the part inside the bowl");
+            for (var vertex : cropped) h.assertTrue(volume.contains(vertex), "Nothing appears above the ceiling or below the floor");
+            var above = face.stream().map(point -> point.add(0, 20, 0)).toList();
+            h.assertTrue(volume.clip(above, point -> point, net.minecraft.world.phys.Vec3::lerp).isEmpty(),
+                    "Fully outside faces are discarded");
+        }
+        h.succeed();
+    }
+
+    @GameTest(template = "fate_test")
+    public static void basinCroppingPreservesTextureCoordinatesAndNarrowingWalls(GameTestHelper h) {
+        record TexturedPoint(net.minecraft.world.phys.Vec3 position, double u) {
+            TexturedPoint lerp(TexturedPoint other, double t) {
+                return new TexturedPoint(position.lerp(other.position, t), u + (other.u - u) * t);
+            }
+        }
+        var volume = new DingBasinVolume(1, .5, 0, 1);
+        var face = java.util.List.of(new TexturedPoint(new net.minecraft.world.phys.Vec3(-2, .5, 0), 0),
+                new TexturedPoint(new net.minecraft.world.phys.Vec3(2, .5, 0), 1),
+                new TexturedPoint(new net.minecraft.world.phys.Vec3(2, .7, 0), 1),
+                new TexturedPoint(new net.minecraft.world.phys.Vec3(-2, .7, 0), 0));
+        var cropped = volume.clip(face, TexturedPoint::position, TexturedPoint::lerp);
+        h.assertTrue(cropped.size() >= 3, "A narrowing basin still keeps interior faces");
+        for (var vertex : cropped) {
+            h.assertTrue(volume.contains(vertex.position()), "Narrowing wall clips correctly");
+            h.assertTrue(Math.abs(vertex.u() - (vertex.position().x + 2) / 4) < 1e-6,
+                    "Clipped edges interpolate original UVs rather than stretching the item texture");
+        }
+        var inside = java.util.List.of(new net.minecraft.world.phys.Vec3(0, .1, 0),
+                new net.minecraft.world.phys.Vec3(.1, .1, 0), new net.minecraft.world.phys.Vec3(0, .2, 0));
+        h.assertTrue(volume.clip(inside, point -> point, net.minecraft.world.phys.Vec3::lerp) == inside,
+                "Models already inside remain unchanged");
+        h.succeed();
+    }
+
+    @GameTest(template = "fate_test")
     public static void heatedDingsResumeBurningAfterRepeatedLidCycles(GameTestHelper h) throws Exception {
         var pos = new BlockPos(3, 2, 3);
         var viewer = new FakePlayer(h.getLevel(), new GameProfile(UUID.randomUUID(), "ding-heat-loop"));
@@ -217,7 +399,7 @@ public final class DingModelGameTests {
         var client = new DingBlockEntity(ding.getBlockPos(), ding.getBlockState());
         client.handleUpdateTag(tag, h.getLevel().registryAccess());
         h.assertTrue(client.getDisplayItem(DingBlockEntity.MATERIAL_START).is(Items.IRON_INGOT)
-                        && client.getDisplayItem(DingBlockEntity.MATERIAL_START).getCount() == 1
+                        && client.getDisplayItem(DingBlockEntity.MATERIAL_START).getCount() == 3
                         && client.isEmpty(), "Display copies show the ingredient without creating client inventory");
         ding.stopOpen(second);
         h.assertTrue(ding.isLidOpen(), "Exiting the last menu leaves the physical lid open");
@@ -225,10 +407,14 @@ public final class DingModelGameTests {
         loaded.loadWithComponents(ding.saveWithFullMetadata(h.getLevel().registryAccess()), h.getLevel().registryAccess());
         h.assertTrue(loaded.isLidOpen() && loaded.getDisplayItem(DingBlockEntity.MATERIAL_START).is(Items.IRON_INGOT),
                 "The manual lid and visible contents survive chunk reload");
+        ding.removeItem(DingBlockEntity.MATERIAL_START, 1);
+        client.handleUpdateTag(ding.getUpdateTag(h.getLevel().registryAccess()), h.getLevel().registryAccess());
+        h.assertTrue(client.getDisplayItem(DingBlockEntity.MATERIAL_START).getCount() == 2,
+                "Stack quantity changes synchronize the visible pile without adding client inventory");
         ding.setLidOpen(false);
         h.assertTrue(!ding.isLidOpen() && !ding.getUpdateTag(h.getLevel().registryAccess()).getBoolean("MeshLidOpen"),
                 "Only explicitly closing the lid changes its synchronized state");
-        h.assertTrue(ding.getItem(DingBlockEntity.MATERIAL_START).getCount() == 3,
+        h.assertTrue(ding.getItem(DingBlockEntity.MATERIAL_START).getCount() == 2,
                 "Opening and closing preserve forge ingredients");
         ding.removeItem(DingBlockEntity.MATERIAL_START, 3);
         client.handleUpdateTag(ding.getUpdateTag(h.getLevel().registryAccess()), h.getLevel().registryAccess());

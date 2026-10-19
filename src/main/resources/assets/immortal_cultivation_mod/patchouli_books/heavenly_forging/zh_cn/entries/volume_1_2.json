@@ -1,0 +1,33 @@
+{
+  "name": "铜鼎",
+  "icon": "immortal_cultivation_mod:cu_tie_xiaoding",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "铜鼎",
+      "text": "容纳材料 ：15 格"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "铜鼎较粗铁小鼎更为精良，鼎身稳固，内部空间亦有所扩展。其上设有可启闭之鼎盖，使炼器者得以开鼎投料、闭鼎守火。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "欲投灵材，须先启其盖；炼器之时，则当善用鼎火，调和诸材。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "开鼎之法",
+      "text": "潜行右击：开启或关闭鼎盖。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "开鼎之法",
+      "text": "开盖右击：查看鼎中材料。"
+    }
+  ]
+}

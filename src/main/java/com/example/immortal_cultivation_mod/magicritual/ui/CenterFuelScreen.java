@@ -1,5 +1,7 @@
 package com.example.immortal_cultivation_mod.magicritual.ui;
 
+import com.example.immortal_cultivation_mod.client.FormationLayers;
+
 import com.example.immortal_cultivation_mod.client.DaoGuidanceClient;
 import com.example.immortal_cultivation_mod.magicritual.block.custom.MagicCenterBlockEntity;
 import com.example.immortal_cultivation_mod.magicritual.center.CenterFuelController;
@@ -44,29 +46,7 @@ public class CenterFuelScreen extends AbstractContainerScreen<CenterFuelMenu> {
    private static final ResourceLocation TEX_EB = tex("border_edge_bottom");
    private static final ResourceLocation TEX_EL = tex("border_edge_left");
    private static final ResourceLocation TEX_ER = tex("border_edge_right");
-   private static final ResourceLocation CENTER_GLYPH = glyph("magic_center_glyph");
-   private static final ResourceLocation FOG_GLYPH_1 = glyph("magic_center_fog_1");
-   private static final ResourceLocation FOG_GLYPH_2 = glyph("magic_center_fog_2");
-   private static final ResourceLocation INVERTED_GLYPH_1 = glyph("magic_center_inverted_1");
-   private static final ResourceLocation INVERTED_GLYPH_2 = glyph("magic_center_inverted_2");
-   private static final ResourceLocation FORCEFIELD_GLYPH_1 = glyph("magic_center_forcefield_1");
-   private static final ResourceLocation FORCEFIELD_GLYPH_2 = glyph("magic_center_forcefield_2");
-   private static final ResourceLocation SCORCHING_GLYPH_1 = glyph("magic_center_scorching_1");
-   private static final ResourceLocation SCORCHING_GLYPH_2 = glyph("magic_center_scorching_2");
-   private static final ResourceLocation SANCTUARY_GLYPH_1 = glyph("magic_center_sanctuary_1");
-   private static final ResourceLocation SANCTUARY_GLYPH_2 = glyph("magic_center_sanctuary_2");
-   private static final ResourceLocation FROST_GLYPH_1 = glyph("magic_center_frost_1");
-   private static final ResourceLocation FROST_GLYPH_2 = glyph("magic_center_frost_2");
-   private static final ResourceLocation DECAY_GLYPH_1 = glyph("magic_center_decay_1");
-   private static final ResourceLocation DECAY_GLYPH_2 = glyph("magic_center_decay_2");
-   private static final ResourceLocation THUNDER_GLYPH_1 = glyph("magic_center_thunder_1");
-   private static final ResourceLocation THUNDER_GLYPH_2 = glyph("magic_center_thunder_2");
-   private static final ResourceLocation DETECTION_GLYPH_1 = glyph("magic_center_detection_1");
-   private static final ResourceLocation DETECTION_GLYPH_2 = glyph("magic_center_detection_2");
-   private static final ResourceLocation REFORGE_BLADE_GLYPH_1 = glyph("magic_center_reforge_blade_1");
-   private static final ResourceLocation REFORGE_BLADE_GLYPH_2 = glyph("magic_center_reforge_blade_2");
-   private static final ResourceLocation TELEPORT_GLYPH_1 = glyph("magic_center_teleport_1");
-   private static final ResourceLocation TELEPORT_GLYPH_2 = glyph("magic_center_teleport_2");
+
    private static final int BORDER = 5;
    private static final int FUEL_ROW_H = 18;
    private static final int TOGGLE_H = 18;
@@ -117,9 +97,6 @@ public class CenterFuelScreen extends AbstractContainerScreen<CenterFuelMenu> {
       return ResourceLocation.fromNamespaceAndPath("minecraft", "textures/gui/" + name + ".png");
    }
 
-   private static ResourceLocation glyph(String name) {
-      return ResourceLocation.fromNamespaceAndPath("immortal_cultivation_mod", "textures/particle/" + name + ".png");
-   }
 
    private String labelParticles() {
       return "Particles:" + (((CenterFuelMenu)this.menu).particlesEnabled ? "ON" : "OFF");
@@ -172,7 +149,7 @@ public class CenterFuelScreen extends AbstractContainerScreen<CenterFuelMenu> {
       this.radiusInput.setFilter((value) -> value.isEmpty() || value.chars().allMatch(Character::isDigit));
       this.radiusInput.setValue(Integer.toString(((CenterFuelMenu)this.menu).displayedRadius()));
       this.radiusInput.setHint(Component.literal("3-303"));
-      this.radiusApplyBtn = (Button)this.addRenderableWidget(new MagicRitualGuiStyle.RitualButton(x + 320, y + 169, 38, 18, Component.literal("OK"), (buttonx) -> this.applyTypedRadius()));
+      this.radiusApplyBtn = (Button)this.addRenderableWidget(new MagicRitualGuiStyle.RitualButton(x + 320, y + 169, 38, 18, Component.translatable("gui.ok"), (buttonx) -> this.applyTypedRadius()));
       this.radiusUpBtn = (Button)this.addRenderableWidget(new MagicRitualGuiStyle.RitualButton(x + 364, y + 169, 28, 18, Component.literal("+"), (buttonx) -> this.changeRadius(2)));
       MagicCenterType centerType = MagicCenterTypeRegistry.getOrBlank(((CenterFuelMenu)this.menu).centerTypeId);
       this.hostileBtn.visible = centerType.behavior().supportsHostileMobSetting();
@@ -791,43 +768,16 @@ public class CenterFuelScreen extends AbstractContainerScreen<CenterFuelMenu> {
       float green = (float)(color >> 8 & 255) / 255.0F;
       float blue = (float)(color & 255) / 255.0F;
       graphics.setColor(red, green, blue, 1.0F);
-      float time = Minecraft.getInstance().level == null ? (float)System.currentTimeMillis() / 50.0F : (float)Minecraft.getInstance().level.getGameTime() + partialTick;
-      ResourceLocation[] textures = this.centerGlyphTextures();
-      if (textures.length == 1) {
-         drawGlyphLayer(graphics, textures[0], centerX, centerY, size, time * 0.45F);
-      } else {
-         drawGlyphLayer(graphics, textures[0], centerX, centerY, size, time * 0.65F);
-         drawGlyphLayer(graphics, textures[1], centerX, centerY, size, -time * 0.52F);
+      double time = Minecraft.getInstance().level == null ? System.nanoTime() / 50_000_000.0
+              : (double)Minecraft.getInstance().level.getGameTime() + partialTick;
+      var textures = FormationLayers.center(((CenterFuelMenu)this.menu).centerTypeId);
+      for (int layer = 0; layer < FormationLayers.COUNT; layer++) {
+         drawGlyphLayer(graphics, textures.get(layer), centerX, centerY, size, FormationLayers.angle(time, layer));
       }
 
       graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
    }
 
-   private ResourceLocation[] centerGlyphTextures() {
-      if (MagicCenterTypeRegistry.FOG.equals(((CenterFuelMenu)this.menu).centerTypeId)) {
-         return new ResourceLocation[]{FOG_GLYPH_1, FOG_GLYPH_2};
-      } else if (MagicCenterTypeRegistry.INVERTED.equals(((CenterFuelMenu)this.menu).centerTypeId)) {
-         return new ResourceLocation[]{INVERTED_GLYPH_1, INVERTED_GLYPH_2};
-      } else if (MagicCenterTypeRegistry.FORCEFIELD.equals(((CenterFuelMenu)this.menu).centerTypeId)) {
-         return new ResourceLocation[]{FORCEFIELD_GLYPH_1, FORCEFIELD_GLYPH_2};
-      } else if (MagicCenterTypeRegistry.SCORCHING.equals(((CenterFuelMenu)this.menu).centerTypeId)) {
-         return new ResourceLocation[]{SCORCHING_GLYPH_1, SCORCHING_GLYPH_2};
-      } else if (MagicCenterTypeRegistry.SANCTUARY.equals(((CenterFuelMenu)this.menu).centerTypeId)) {
-         return new ResourceLocation[]{SANCTUARY_GLYPH_1, SANCTUARY_GLYPH_2};
-      } else if (MagicCenterTypeRegistry.FROST.equals(((CenterFuelMenu)this.menu).centerTypeId)) {
-         return new ResourceLocation[]{FROST_GLYPH_1, FROST_GLYPH_2};
-      } else if (MagicCenterTypeRegistry.DECAY.equals(((CenterFuelMenu)this.menu).centerTypeId)) {
-         return new ResourceLocation[]{DECAY_GLYPH_1, DECAY_GLYPH_2};
-      } else if (MagicCenterTypeRegistry.THUNDER.equals(((CenterFuelMenu)this.menu).centerTypeId)) {
-         return new ResourceLocation[]{THUNDER_GLYPH_1, THUNDER_GLYPH_2};
-      } else if (MagicCenterTypeRegistry.DETECTION.equals(((CenterFuelMenu)this.menu).centerTypeId)) {
-         return new ResourceLocation[]{DETECTION_GLYPH_1, DETECTION_GLYPH_2};
-      } else if (MagicCenterTypeRegistry.REFORGE_BLADE.equals(((CenterFuelMenu)this.menu).centerTypeId)) {
-         return new ResourceLocation[]{REFORGE_BLADE_GLYPH_1, REFORGE_BLADE_GLYPH_2};
-      } else {
-         return MagicCenterTypeRegistry.TELEPORT.equals(((CenterFuelMenu)this.menu).centerTypeId) ? new ResourceLocation[]{TELEPORT_GLYPH_1, TELEPORT_GLYPH_2} : new ResourceLocation[]{CENTER_GLYPH};
-      }
-   }
 
    private static void drawGlyphLayer(GuiGraphics graphics, ResourceLocation texture, int centerX, int centerY, int size, float angle) {
       graphics.pose().pushPose();

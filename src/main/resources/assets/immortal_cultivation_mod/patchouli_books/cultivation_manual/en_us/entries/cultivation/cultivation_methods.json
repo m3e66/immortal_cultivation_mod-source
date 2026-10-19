@@ -6,7 +6,22 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Meditation now needs an active cultivation method. Without a method, you can still meditate, but cultivation progress will not increase.$(br2)Right-click a method book to activate it."
+      "text": "Cultivation progress from meditation requires an active method. Right-click a method book and complete its Lingqi Trajectory learning puzzle to activate it. Without a method, meditation does not increase cultivation progress.$(br2)Basic Breathing and Clear Heart are starter methods. Their puzzles always use a simple 5×5 Qi Refining board with extra spare moves; realm gaps and low talent do not add advanced mechanisms."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Realm and Comprehension",
+      "text": "To comprehend a spell or study a method, weigh its realm against your own. For spells, use the required realm; for methods, use the realm of its cultivation limit.$(br2)Equal realms yield a Foundation puzzle. Each major realm above the learner raises the puzzle by one tier. Early, middle, and late stages do not count as major realm gaps."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Study Across Realms",
+      "text": "When the teaching stands above your realm, puzzle tiers follow this order:$(br2)One realm: Golden Core.$(br)Two: Nascent Soul.$(br)Three: Spirit Transformation.$(br)Four: Void Refining.$(br)Five: Body Integration.$(br)Six: Great Ascension.$(br)Seven or more: Tribulation Crossing.$(br2)Teachings below your realm use Qi Refining difficulty. These are the lowest and highest puzzle tiers."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "A Golden Core Example",
+      "text": "A Golden Core cultivator studying Golden Core teachings faces a Foundation puzzle. Nascent Soul teachings yield a Golden Core puzzle; Spirit Transformation teachings yield a Nascent Soul puzzle. All realms follow this pattern.$(br2)Puzzle tier governs the board and its mechanisms. Talent and assistance still affect the challenge; the spell keeps its elements. Comprehension difficulty does not replace learning or casting requirements."
     },
     {
       "type": "patchouli:text",
@@ -18,11 +33,11 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Reincarnation True Art: dark, heaven tier, limit Soul Transformation Late.$(br)This method automatically grants Absorb, a projectile spell that steals cultivation progress from lower-level players."
+      "text": "$(br)Reincarnation True Art: Yin, heaven tier, limit Soul Transformation Late.$(br)This method automatically grants Absorb, a projectile spell that steals cultivation progress from lower-level players."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Heaven Devouring Demon Art: dark, heaven tier, limit Soul Transformation Late.$(br)This method automatically grants Devour Heaven, which consumes blocks and slain life into fast cultivation progress."
+      "text": "$(br)Heaven Devouring Demon Art: Yin, heaven tier, limit Soul Transformation Late.$(br)This method automatically grants Devour Heaven, which consumes blocks and slain life into fast cultivation progress."
     },
     {
       "type": "patchouli:text",

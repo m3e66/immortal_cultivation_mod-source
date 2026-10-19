@@ -57,8 +57,11 @@ import software.bernie.geckolib.util.GeckoLibUtil;
  * 霜脊穴熊: a Foundation Establishment middle-stage ice/earth territorial beast.
  * Four visible frost ridges independently absorb 70 upper-back damage.
  */
-public final class FrostspineCaveBearEntity extends Monster implements GeoEntity {
-    public static final float MODEL_SCALE = 1.0F;
+public final class FrostspineCaveBearEntity extends RealmBeastMonster implements GeoEntity {
+    // Visuals use synchronized BeastAttackVfx; server combat and sounds remain unchanged.
+    public static final float MODEL_SCALE = 2.0F;
+    public static final float BODY_WIDTH = 2.8F * MODEL_SCALE;
+    public static final float BODY_HEIGHT = 2.2F * MODEL_SCALE;
 
     private static final EntityDataAccessor<Byte> ACTION_STATE =
             SynchedEntityData.defineId(FrostspineCaveBearEntity.class,
@@ -176,7 +179,7 @@ public final class FrostspineCaveBearEntity extends Monster implements GeoEntity
             EntityType<FrostspineCaveBearEntity> type,
             ServerLevelAccessor level, MobSpawnType spawnType,
             BlockPos pos, RandomSource random) {
-        if (!Monster.checkMonsterSpawnRules(type, level, spawnType, pos, random)) {
+        if (!Monster.checkAnyLightMonsterSpawnRules(type, level, spawnType, pos, random)) {
             return false;
         }
         BlockPos floor = pos.below();
@@ -219,24 +222,11 @@ public final class FrostspineCaveBearEntity extends Monster implements GeoEntity
         // Constant heavy white breath and faint cold leakage from the ridges.
         if (tickCount % 5 == 0) {
             Vec3 forward = horizontalLook();
-            Vec3 muzzle = position().add(forward.scale(1.45D)).add(0.0D, 1.15D, 0.0D);
-            level().addParticle(ParticleTypes.CLOUD, muzzle.x, muzzle.y, muzzle.z,
-                    forward.x * 0.035D, -0.008D, forward.z * 0.035D);
-            if (hasAnyRidge() && tickCount % 10 == 0) {
-                level().addParticle(ParticleTypes.SNOWFLAKE,
-                        getX() + (random.nextDouble() - 0.5D) * 1.7D,
-                        getY() + 1.55D + random.nextDouble() * 0.45D,
-                        getZ() + (random.nextDouble() - 0.5D) * 2.2D,
-                        0.0D, 0.008D, 0.0D);
-            }
+            Vec3 muzzle = position().add(forward.scale(1.45D * MODEL_SCALE))
+                    .add(0.0D, 1.15D * MODEL_SCALE, 0.0D);
+
         }
-        if (isFrenzied() && (tickCount & 1) == 0) {
-            level().addParticle(ModParticles.METHOD_QI_ICE.get(),
-                    getX() + (random.nextDouble() - 0.5D) * 2.1D,
-                    getY() + random.nextDouble() * 1.5D,
-                    getZ() + (random.nextDouble() - 0.5D) * 2.4D,
-                    0.0D, 0.018D, 0.0D);
-        }
+
     }
 
     @Override
@@ -352,12 +342,6 @@ public final class FrostspineCaveBearEntity extends Monster implements GeoEntity
         updateCombatAttributes();
         beginAction(ACTION_FRENZY, FRENZY_ACTION_TICKS, getTarget());
         if (level() instanceof ServerLevel level) {
-            level.sendParticles(ModParticles.METHOD_QI_ICE.get(),
-                    getX(), getY() + 1.0D, getZ(),
-                    48, 1.15D, 0.9D, 1.15D, 0.12D);
-            level.sendParticles(ParticleTypes.SNOWFLAKE,
-                    getX(), getY() + 1.0D, getZ(),
-                    38, 1.1D, 0.8D, 1.1D, 0.11D);
             level.playSound(null, blockPosition(), SoundEvents.POLAR_BEAR_WARNING,
                     SoundSource.HOSTILE, 1.5F, 0.68F);
         }
@@ -437,8 +421,6 @@ public final class FrostspineCaveBearEntity extends Monster implements GeoEntity
     private void tickFrostRoar(ServerLevel level, int ticks) {
         if (ticks > 18 && ticks % 3 == 0) {
             Vec3 mouth = position().add(horizontalLook().scale(1.35D)).add(0, 1.2D, 0);
-            level.sendParticles(ParticleTypes.CLOUD, mouth.x, mouth.y, mouth.z,
-                    5, .32D, .22D, .32D, .025D);
         }
         if (ticks != 18) return;
         for (LivingEntity target : targetsIn(position(), 6.0D, 3.0D)) {
@@ -530,11 +512,7 @@ public final class FrostspineCaveBearEntity extends Monster implements GeoEntity
     }
 
     private void tickRidgeBurst(ServerLevel level, int ticks) {
-        if (ticks > 14 && ticks % 3 == 0) {
-            level.sendParticles(ParticleTypes.SNOWFLAKE,
-                    getX(), getY() + 1.45D, getZ(),
-                    6 * Math.max(1, ridgeCount()), .7D, .35D, .7D, .03D);
-        }
+
         if (ticks != 14) return;
         for (LivingEntity target : targetsIn(position(), 5.0D, 2.7D)) {
             if (damageTarget(target, scaledDamage(65.0F, true))) {
@@ -555,11 +533,7 @@ public final class FrostspineCaveBearEntity extends Monster implements GeoEntity
     }
 
     private void tickFrenzyAction(ServerLevel level, int ticks) {
-        if (ticks % 3 == 0) {
-            level.sendParticles(ModParticles.METHOD_QI_ICE.get(),
-                    getX(), getY() + .9D, getZ(), 8,
-                    .95D, .7D, .95D, .08D);
-        }
+
     }
 
     private void tickFrozenGround() {
@@ -578,9 +552,6 @@ public final class FrostspineCaveBearEntity extends Monster implements GeoEntity
                 double radius = Math.sqrt(random.nextDouble()) * 4.0D;
                 double x = frozenGroundCenter.x + Math.cos(angle) * radius;
                 double z = frozenGroundCenter.z + Math.sin(angle) * radius;
-                level.sendParticles(ParticleTypes.SNOWFLAKE,
-                        x, frozenGroundCenter.y + .06D, z,
-                        1, .03D, .02D, .03D, 0);
             }
         }
         if (frozenGroundTicks == 0) frozenGroundCenter = Vec3.ZERO;
@@ -615,11 +586,7 @@ public final class FrostspineCaveBearEntity extends Monster implements GeoEntity
         // Dense fog does not make the bear invisible; it makes ranged aim unreliable.
         if (isInFog() && source.is(DamageTypeTags.IS_PROJECTILE)
                 && random.nextFloat() < .35F) {
-            if (level() instanceof ServerLevel level) {
-                level.sendParticles(ParticleTypes.CLOUD,
-                        getX(), getY() + 1.0D, getZ(), 12,
-                        .7D, .6D, .7D, .035D);
-            }
+
             return false;
         }
         float adjusted = applyElementResistance(source, amount);
@@ -683,10 +650,10 @@ public final class FrostspineCaveBearEntity extends Monster implements GeoEntity
         double longitudinal = offset.dot(forward);
         double lateral = Math.abs(offset.dot(right));
         // Low frontal attacks strike the face/chest, not the dorsal ridges.
-        if (longitudinal > 1.1D && lateral < .85D) return -1;
-        if (longitudinal > .65D) return 0;
-        if (longitudinal > .05D) return 1;
-        if (longitudinal > -.65D) return 2;
+        if (longitudinal > 1.1D * MODEL_SCALE && lateral < .85D * MODEL_SCALE) return -1;
+        if (longitudinal > .46875D * MODEL_SCALE) return 0;
+        if (longitudinal > -.09375D * MODEL_SCALE) return 1;
+        if (longitudinal > -.65625D * MODEL_SCALE) return 2;
         return 3;
     }
 
@@ -694,12 +661,6 @@ public final class FrostspineCaveBearEntity extends Monster implements GeoEntity
         if (!(level() instanceof ServerLevel level)) return;
         Vec3 point = ridgeOffset(ridge);
         int count = Mth.clamp(Mth.ceil(absorbed / 4.5F), 4, 20);
-        level.sendParticles(ParticleTypes.SNOWFLAKE,
-                point.x, point.y, point.z, count, .5D, .38D, .5D, .1D);
-        level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK,
-                        Blocks.PACKED_ICE.defaultBlockState()),
-                point.x, point.y, point.z, count / 2,
-                .42D, .32D, .42D, .08D);
         level.playSound(null, blockPosition(), SoundEvents.GLASS_HIT,
                 SoundSource.HOSTILE, .75F, .65F + random.nextFloat() * .2F);
     }
@@ -709,11 +670,6 @@ public final class FrostspineCaveBearEntity extends Monster implements GeoEntity
         updateCombatAttributes();
         if (level() instanceof ServerLevel level) {
             Vec3 point = ridgeOffset(ridge);
-            level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK,
-                            Blocks.PACKED_ICE.defaultBlockState()),
-                    point.x, point.y, point.z, 48, .75D, .65D, .75D, .2D);
-            level.sendParticles(ModParticles.METHOD_QI_ICE.get(),
-                    point.x, point.y, point.z, 32, .7D, .55D, .7D, .14D);
             level.playSound(null, blockPosition(), SoundEvents.GLASS_BREAK,
                     SoundSource.HOSTILE, 1.3F, .58F);
         }
@@ -721,12 +677,13 @@ public final class FrostspineCaveBearEntity extends Monster implements GeoEntity
 
     private Vec3 ridgeOffset(int ridge) {
         double along = switch (ridge) {
-            case 0 -> .82D;
-            case 1 -> .28D;
-            case 2 -> -.30D;
-            default -> -.82D;
+            case 0 -> .75D;
+            case 1 -> .1875D;
+            case 2 -> -.375D;
+            default -> -.9375D;
         };
-        return position().add(horizontalLook().scale(along)).add(0, 1.65D, 0);
+        return position().add(horizontalLook().scale(along * MODEL_SCALE))
+                .add(0, 1.65D * MODEL_SCALE, 0);
     }
 
     private void updateCombatAttributes() {
@@ -801,44 +758,20 @@ public final class FrostspineCaveBearEntity extends Monster implements GeoEntity
     }
 
     private void emitPawFrost(ServerLevel level) {
-        Vec3 point = position().add(horizontalLook().scale(1.25D)).add(0, .75D, 0);
-        level.sendParticles(ParticleTypes.SNOWFLAKE,
-                point.x, point.y, point.z, 18, .45D, .35D, .45D, .08D);
-        level.sendParticles(ModParticles.METHOD_QI_ICE.get(),
-                point.x, point.y, point.z, 10, .32D, .25D, .32D, .05D);
+        Vec3 point = position().add(horizontalLook().scale(1.25D * MODEL_SCALE))
+                .add(0, .75D * MODEL_SCALE, 0);
     }
 
     private void emitFrostImpact(ServerLevel level, Vec3 center, double radius, int count) {
-        level.sendParticles(ParticleTypes.SNOWFLAKE,
-                center.x, center.y + .25D, center.z, count,
-                radius * .42D, .35D, radius * .42D, .18D);
-        level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK,
-                        Blocks.PACKED_ICE.defaultBlockState()),
-                center.x, center.y + .18D, center.z, count / 2,
-                radius * .36D, .25D, radius * .36D, .12D);
         emitColdMistRing(level, center.add(0, .12D, 0), radius, 28);
     }
 
     private void emitIceEruption(ServerLevel level, Vec3 center, int index) {
         int count = 18 + index * 7;
-        level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK,
-                        Blocks.BLUE_ICE.defaultBlockState()),
-                center.x, center.y + .18D, center.z, count,
-                .45D + index * .06D, .8D + index * .14D,
-                .45D + index * .06D, .12D);
-        level.sendParticles(ModParticles.METHOD_QI_ICE.get(),
-                center.x, center.y + .4D, center.z, count / 2,
-                .35D, .65D + index * .12D, .35D, .08D);
     }
 
     private void emitTakeoffDust(ServerLevel level) {
         BlockState floor = level.getBlockState(blockPosition().below());
-        level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, floor),
-                getX(), getY() + .15D, getZ(), 12,
-                .7D, .22D, .7D, .1D);
-        level.sendParticles(ParticleTypes.SNOWFLAKE,
-                getX(), getY() + .4D, getZ(), 8,
-                .65D, .3D, .65D, .08D);
     }
 
     private void emitFog(ServerLevel level) {
@@ -849,8 +782,6 @@ public final class FrostspineCaveBearEntity extends Monster implements GeoEntity
             double x = getX() + Math.cos(angle) * radius;
             double z = getZ() + Math.sin(angle) * radius;
             double y = getY() + .12D + random.nextDouble() * .75D;
-            level.sendParticles(i % 3 == 0 ? ParticleTypes.SNOWFLAKE : ParticleTypes.CLOUD,
-                    x, y, z, 1, .12D, .05D, .12D, .008D);
         }
     }
 
@@ -860,8 +791,6 @@ public final class FrostspineCaveBearEntity extends Monster implements GeoEntity
             double angle = Math.PI * 2.0D * i / points;
             double x = center.x + Math.cos(angle) * radius;
             double z = center.z + Math.sin(angle) * radius;
-            level.sendParticles(i % 3 == 0 ? ParticleTypes.SNOWFLAKE : ParticleTypes.CLOUD,
-                    x, center.y, z, 1, .04D, .03D, .04D, .01D);
         }
     }
 
@@ -902,7 +831,7 @@ public final class FrostspineCaveBearEntity extends Monster implements GeoEntity
     }
 
     public String cultivationRealm() {
-        return CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_MID;
+        return beastCultivationLevel();
     }
 
     @Override

@@ -1,0 +1,18 @@
+{
+  "name": "Spirit Vein Core",
+  "icon": "immortal_cultivation_mod:spirit_vein_center",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 9,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "The Spirit Vein Core is a concentrated node of spiritual energy hidden within a Spirit Stone vein. As energy accumulates over time, certain portions of the ore may crystallize into these rare cores. Not every vein contains one, but a sufficiently rich deposit may conceal several."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Generated within Spirit Stone veins. Each placed ore block has a 1-in-50 chance of becoming a Spirit Vein Core."
+    }
+  ]
+}

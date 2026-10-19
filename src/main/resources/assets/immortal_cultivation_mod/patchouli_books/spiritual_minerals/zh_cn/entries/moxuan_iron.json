@@ -1,0 +1,23 @@
+{
+  "name": "墨玄铁",
+  "icon": "immortal_cultivation_mod:moxuan_iron",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "墨玄铁",
+      "text": "$(bold)起始高度：$()Y −64 至 −8$(br2)$(bold)尝试频率：$()1/28 区块"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《灵矿录》记载",
+      "text": "墨玄铁久埋地底，不见日月，吸纳沉厚地气而成。通体漆黑，质地凝重，内蕴深沉金精。此矿鲜露于浅层，唯有深入幽暗地穴，方能寻得其踪。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻脉",
+      "text": "主世界各地深层皆可能出现，多藏于 Y −64 至 −8 的地下区域。"
+    }
+  ]
+}

@@ -662,7 +662,7 @@ public final class ElementalTechniques {
             }
             target.addEffect(new MobEffectInstance(MobEffects.BLINDNESS,
                     fullCharge ? 80 : 50, 0, false, true, true));
-            level.sendParticles(ModParticles.METHOD_QI_LIGHT.get(),
+            level.sendParticles(ModParticles.METHOD_QI_YANG.get(),
                     target.getX(), target.getEyeY() + 0.16D, target.getZ(),
                     7, 0.30D, 0.18D, 0.30D, 0.025D);
             if (target instanceof Mob mob && mob.getTarget() == caster) {
@@ -682,7 +682,7 @@ public final class ElementalTechniques {
                 }
             }
             if (isDark(target)) {
-                level.sendParticles(ModParticles.METHOD_QI_LIGHT.get(),
+                level.sendParticles(ModParticles.METHOD_QI_YANG.get(),
                         target.getX(), target.getY() + target.getBbHeight() * 0.5D, target.getZ(),
                         18, 0.32D, target.getBbHeight() * 0.35D, 0.32D, 0.075D);
                 level.sendParticles(ParticleTypes.SMOKE,
@@ -692,11 +692,11 @@ public final class ElementalTechniques {
         }
         level.sendParticles(ParticleTypes.FLASH,
                 caster.getX(), caster.getEyeY(), caster.getZ(), 3, 0.3D, 0.3D, 0.3D, 0.0D);
-        level.sendParticles(ModParticles.METHOD_QI_LIGHT.get(),
+        level.sendParticles(ModParticles.METHOD_QI_YANG.get(),
                 caster.getX(), caster.getEyeY(), caster.getZ(), 80, 3.0D, 2.0D, 3.0D, 0.22D);
         SpellImpactParticles.shockRing(level,
                 caster.position().add(0.0D, caster.getBbHeight() * 0.50D, 0.0D),
-                ModParticles.METHOD_QI_LIGHT.get(), 0.45D, 42, 0.31D);
+                ModParticles.METHOD_QI_YANG.get(), 0.45D, 42, 0.31D);
         level.playSound(null, caster.blockPosition(), SoundEvents.BEACON_POWER_SELECT,
                 caster instanceof net.minecraft.server.level.ServerPlayer
                         ? SoundSource.PLAYERS : SoundSource.HOSTILE,
@@ -720,7 +720,7 @@ public final class ElementalTechniques {
             return true;
         }
         Vec3 old = caster.position();
-        level.sendParticles(ModParticles.METHOD_QI_DARK.get(),
+        level.sendParticles(ModParticles.METHOD_QI_YIN.get(),
                 old.x, old.y + 0.08D, old.z,
                 24, 0.38D, 0.08D, 0.38D, 0.025D);
         level.sendParticles(ParticleTypes.LARGE_SMOKE,
@@ -742,7 +742,7 @@ public final class ElementalTechniques {
         Vec3 shadowStart = old.add(0.0D, 0.08D, 0.0D);
         Vec3 shadowEnd = destination.add(0.0D, 0.08D, 0.0D);
         emitLine(level, shadowStart, shadowEnd,
-                ModParticles.METHOD_QI_DARK.get(), 0.55D);
+                ModParticles.METHOD_QI_YIN.get(), 0.55D);
         level.sendParticles(ParticleTypes.LARGE_SMOKE,
                 destination.x, destination.y + 0.8D, destination.z,
                 20, 0.35D, 0.65D, 0.35D, 0.04D);
@@ -751,9 +751,9 @@ public final class ElementalTechniques {
                 .cross(new Vec3(0.0D, 1.0D, 0.0D)).normalize();
         Vec3 slashStart = strikeCenter.subtract(side.scale(0.75D)).add(0.0D, -0.35D, 0.0D);
         Vec3 slashEnd = strikeCenter.add(side.scale(0.75D)).add(0.0D, 0.35D, 0.0D);
-        emitLine(level, slashStart, slashEnd, ModParticles.METHOD_QI_DARK.get(), 0.10D);
+        emitLine(level, slashStart, slashEnd, ModParticles.METHOD_QI_YIN.get(), 0.10D);
         if (behind) {
-            level.sendParticles(ModParticles.METHOD_QI_DARK.get(),
+            level.sendParticles(ModParticles.METHOD_QI_YIN.get(),
                     strikeCenter.x, strikeCenter.y, strikeCenter.z,
                     24, 0.38D, 0.48D, 0.38D, 0.12D);
         }
@@ -871,11 +871,11 @@ public final class ElementalTechniques {
         if (target instanceof net.minecraft.world.entity.player.Player player) {
             return com.example.immortal_cultivation_mod.attachment.ModAttachments
                     .getData(player).spiritRoots()
-                    .contains(com.example.immortal_cultivation_mod.attachment.SpiritRoots.DARK);
+                    .contains(com.example.immortal_cultivation_mod.attachment.SpiritRoots.YIN);
         }
         return target instanceof net.minecraft.world.entity.PathfinderMob mob
                 && target instanceof com.example.immortal_cultivation_mod.entity.CultivationNpc npc
                 && NpcProfile.spiritRootIds(mob, npc.npcArchetype())
-                .contains(com.example.immortal_cultivation_mod.attachment.SpiritRoots.DARK);
+                .contains(com.example.immortal_cultivation_mod.attachment.SpiritRoots.YIN);
     }
 }

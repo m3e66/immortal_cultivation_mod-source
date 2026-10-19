@@ -40,6 +40,7 @@ public class ShihunfanSoulWaveEntity extends Entity implements ForcefieldInterce
 
     private final Set<UUID> hitEntities = new HashSet<>();
     private final Set<BlockPos> brokenBlocks = new HashSet<>();
+    private net.minecraft.world.item.ItemStack bindingWeapon = net.minecraft.world.item.ItemStack.EMPTY;
     private UUID ownerUuid;
     private Vec3 direction = new Vec3(0.0D, 0.0D, 1.0D);
     private double speed = SPEED;
@@ -96,6 +97,12 @@ public class ShihunfanSoulWaveEntity extends Entity implements ForcefieldInterce
                 + HALF_HEIGHT * HALF_HEIGHT);
     }
 
+    public void setBindingWeapon(net.minecraft.world.item.ItemStack stack) {
+        com.example.immortal_cultivation_mod.item.WeaponBinding.prepare(stack);
+        bindingWeapon = stack.copy();
+    }
+    @Override public net.minecraft.world.item.ItemStack getWeaponItem() { return bindingWeapon; }
+
     public static ShihunfanSoulWaveEntity create(
             ServerLevel level, ServerPlayer owner, Vec3 direction, float damage, float soulDensity) {
         ShihunfanSoulWaveEntity wave = ModEntities.SHIHUNFAN_SOUL_WAVE.get().create(level);
@@ -129,7 +136,7 @@ public class ShihunfanSoulWaveEntity extends Entity implements ForcefieldInterce
             return;
         }
         ServerPlayer owner = ownerUuid == null ? null : serverLevel.getServer().getPlayerList().getPlayer(ownerUuid);
-        if (owner == null || !owner.isAlive() || tickCount > LIFETIME_TICKS) {
+        if (owner == null || !owner.isAlive() || !com.example.immortal_cultivation_mod.item.WeaponBinding.canUse(bindingWeapon, owner) || tickCount > LIFETIME_TICKS) {
             discard();
             return;
         }
@@ -269,6 +276,7 @@ public class ShihunfanSoulWaveEntity extends Entity implements ForcefieldInterce
 
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
+        bindingWeapon = net.minecraft.world.item.ItemStack.parseOptional(registryAccess(), tag.getCompound("BindingWeapon"));
         if (tag.hasUUID("Owner")) {
             ownerUuid = tag.getUUID("Owner");
         }
@@ -292,6 +300,7 @@ public class ShihunfanSoulWaveEntity extends Entity implements ForcefieldInterce
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
+        if (!bindingWeapon.isEmpty()) tag.put("BindingWeapon", bindingWeapon.saveOptional(registryAccess()));
         if (ownerUuid != null) {
             tag.putUUID("Owner", ownerUuid);
         }

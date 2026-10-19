@@ -1,0 +1,23 @@
+{
+  "name": "云纹银晶",
+  "icon": "immortal_cultivation_mod:yunwen_silver_crystal",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "云纹银晶",
+      "text": "$(bold)起始高度：$()Y 80 至 256$(br2)$(bold)尝试频率：$()1/28 区块"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《灵矿录》记载",
+      "text": "云纹银晶生于高山云海之间，常年受罡风吹拂，吸纳清灵之气。晶体银白，天然云纹流转其中，远观似有薄雾缠绕。唯高峰峻岭之地，方有此等清灵矿晶。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻脉",
+      "text": "尖峭山峰、冰封山峰、石峰、狂风山丘及狂风森林。常见于 Y 80 至 256 的高山区域。"
+    }
+  ]
+}

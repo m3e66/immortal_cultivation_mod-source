@@ -1,0 +1,18 @@
+{
+  "name": "Evil-Warding Pill",
+  "icon": "immortal_cultivation_mod:bixie_pill",
+  "category": "immortal_cultivation_mod:volume_4",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Scripture Account",
+      "text": "The Evil-Warding Pill dispels withering corruption from the body. Its protective essence then prevents the same affliction from taking hold for a limited time."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Effect",
+      "text": "Removes Wither and prevents Wither for 60 seconds."
+    }
+  ]
+}

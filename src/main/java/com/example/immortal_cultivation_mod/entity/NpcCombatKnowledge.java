@@ -46,7 +46,18 @@ public final class NpcCombatKnowledge {
             CompoundTag memory=new CompoundTag();memory.putLong("FirstSeen",now);memory.putLong("LastSeen",now);
             memory.putFloat("Health",1);memory.putFloat("QiEstimate",-1);all.put(key,memory);
         }
-        return all.getCompound(key);
+        var memory = all.getCompound(key);
+        for (String prefix : java.util.List.of("Element.", "Resisted.")) {
+            migrateElementMemory(memory, prefix + "light", prefix + "yang");
+            migrateElementMemory(memory, prefix + "dark", prefix + "yin");
+        }
+        return memory;
+    }
+
+    private static void migrateElementMemory(CompoundTag memory, String oldKey, String newKey) {
+        if (!memory.contains(oldKey)) return;
+        memory.putInt(newKey, Math.min(100, memory.getInt(oldKey) + memory.getInt(newKey)));
+        memory.remove(oldKey);
     }
     public static View view(PathfinderMob npc,LivingEntity enemy) {
         var e=entry(npc,enemy,false);long now=npc.level().getGameTime();
@@ -152,9 +163,9 @@ public final class NpcCombatKnowledge {
         return e.getInt("Miss."+spell)*18+e.getInt("Resisted."+normalizeElement(element))*12;
     }
     private static String normalizeElement(String element) {
-        return switch(element) {
+        return switch(com.example.immortal_cultivation_mod.attachment.SpiritRoots.normalizeElement(element)) {
             case "金"->"metal";case "木"->"wood";case "水"->"water";case "火"->"fire";case "土"->"earth";
-            case "风"->"wind";case "雷"->"lightning";case "冰"->"ice";case "光"->"light";case "暗"->"dark";
+            case "风"->"wind";case "雷"->"lightning";case "冰"->"ice";case "阳"->"yang";case "阴"->"yin";
             case "毒"->"poison";case "魂"->"soul";default->element;
         };
     }

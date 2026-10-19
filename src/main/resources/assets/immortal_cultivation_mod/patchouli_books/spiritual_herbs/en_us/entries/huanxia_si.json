@@ -1,0 +1,23 @@
+{
+  "name": "Mirage Cloud Silk",
+  "icon": "immortal_cultivation_mod:huanxia_si",
+  "category": "immortal_cultivation_mod:volume_4",
+  "sortnum": 10,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Mirage Cloud Silk",
+      "text": "$(bold)Spawn attempt frequency: $()1/9"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Mirage Cloud Silk is a delicate spiritual plant resembling strands of colored mist. Its fine fibers sway with the mountain winds, creating an almost illusory appearance. It favors open highlands, where clear air and drifting clouds meet."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Meadows, cherry groves, windswept hills, and jagged, frozen, or stony peaks."
+    }
+  ]
+}

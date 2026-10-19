@@ -1,0 +1,18 @@
+{
+  "name": "Azure Spirit Pill",
+  "icon": "immortal_cultivation_mod:qingling_pill",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Scripture Account",
+      "text": "The Azure Spirit Pill combines spiritual recovery with a small increase in cultivation progress. Its gentle medicinal energy replenishes Qi while providing a slight boost toward the next stage of cultivation."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Effect",
+      "text": "Restores 3% of maximum Qi over 10 seconds and instantly adds 0.1% cultivation progress."
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "name": "灵植寻踪索引",
+  "icon": "minecraft:map",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "灵植寻踪索引",
+      "text": "清灵草 · 1/5$(br)林地、草甸、繁茂洞穴$(br2)赤焰花 · 1/5$(br)荒漠、恶地、下界"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "灵植寻踪索引",
+      "text": "凝露芝 · 1/5$(br)古林、密林、湿洞$(br2)紫云藤 · 1/5$(br)密林、竹林、洞穴"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "灵植寻踪索引",
+      "text": "玄冰莲 · 1/5$(br)冰原、雪岭、冰海$(br2)噬魂草 · 1/5$(br)沼泽、幽林、灵魂沙峡谷"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "灵植寻踪索引",
+      "text": "腐骨苔 · 1/5$(br)幽暗洞穴、沼泽$(br2)幻霞丝 · 1/9$(br)草甸、樱林、山峰"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "灵植寻踪索引",
+      "text": "九叶仙兰 · 1/12$(br)樱林、花林、繁茂洞穴$(br2)调和草 · 1/6$(br)平原、森林"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "灵植寻踪索引",
+      "text": "灵泉叶 · 1/8$(br)河流、湿地、森林$(br2)凝灵花 · 1/8$(br)花林、草甸、樱林"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "灵植寻踪索引",
+      "text": "催化花 · 1/12$(br)草甸、风岭、花林$(br2)金纹果 · 1/24$(br)向阳平原、草甸、热带草原"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "灵植寻踪索引",
+      "text": "千年灵木心 · 1/24$(br)古老森林、密林$(br2)灵木树 · 1/7$(br)森林、针叶林、丛林"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "灵植寻踪索引",
+      "text": "野生糯米 · 1/3$(br)河流、沼泽、林野"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "索引注记",
+      "text": "上表频率保留原始生成数据，代表生成尝试频率，不保证每次尝试均成功。灵植的药性与炼丹用途属于图鉴世界观描述，并非已确认的游戏效果。"
+    }
+  ]
+}

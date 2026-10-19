@@ -2,6 +2,7 @@ package com.example.immortal_cultivation_mod.screen;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.client.ClientData;
+import com.example.immortal_cultivation_mod.client.CompassNavigation;
 import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -9,135 +10,120 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
+/** Overview, readable numeric loupe and world-coordinate navigation share one transform. */
 public class YinYangCompassScreen extends Screen {
-    private static final int PANEL_COLOR = 0xD0101010;
-    private static final int HIDDEN_DOT_COLOR = 0xFF101010;
-    private static final float REVEAL_SPEED = 1.35F;
-    private static final float REVEAL_DELAY_PER_DOT = 1.65F;
-    private static final float FLIP_DURATION = 6.0F;
+    private static final String PREFIX="screen.immortal_cultivation_mod.compass.";
+    private static final int WIDTH=460,HEIGHT=350,ZOOM_SIZE=9,CELL=16;
+    private final int centerX,centerZ,step,size;
+    private final List<Integer> values,qiValues;
+    private Mode mode;
+    private int openTicks,focusX,focusZ;
+    private Button clearButton;
 
-    private final int centerX;
-    private final int centerZ;
-    private final int step;
-    private final int size;
-    private final List<Integer> values;
-    private final List<Integer> qiValues;
-    private Mode mode = Mode.YIN_YANG;
-    private Button modeButton;
-    private int openTicks;
-
-    public YinYangCompassScreen(int centerX, int centerZ, int step, int size, List<Integer> values, List<Integer> qiValues) {
-        super(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".yinyang_compass"));
-        this.centerX = centerX;
-        this.centerZ = centerZ;
-        this.step = step;
-        this.size = Math.max(1, size);
-        this.values = values == null ? List.of() : List.copyOf(values);
-        this.qiValues = qiValues == null ? List.of() : List.copyOf(qiValues);
-        this.mode = ClientData.yinYangCompassQiMode() ? Mode.QI : Mode.YIN_YANG;
+    public YinYangCompassScreen(int centerX,int centerZ,int step,int size,List<Integer> values,List<Integer> qiValues){
+        super(Component.translatable("screen."+ImmortalCultivationMod.MODID+".yinyang_compass"));
+        this.centerX=centerX;this.centerZ=centerZ;this.step=Mth.clamp(step,1,128);this.size=Mth.clamp(size,1,65);
+        this.values=values==null?List.of():List.copyOf(values);this.qiValues=qiValues==null?List.of():List.copyOf(qiValues);
+        mode=ClientData.yinYangCompassQiMode()?Mode.QI:Mode.YIN_YANG;focusX=focusZ=this.size/2;
     }
-
-    @Override
-    protected void init() {
-        int buttonWidth = 92;
-        openTicks = 0;
-        modeButton = addRenderableWidget(Button.builder(modeLabel(), button -> {
-                    mode = mode == Mode.YIN_YANG ? Mode.QI : Mode.YIN_YANG;
-                    ClientData.setYinYangCompassQiMode(mode == Mode.QI);
-                    openTicks = 0;
-                    button.setMessage(modeLabel());
-                })
-                .bounds(this.width / 2 - buttonWidth / 2, 18, buttonWidth, 18)
-                .build());
+    private MenuViewport viewport(){return MenuViewport.fit(width,height,WIDTH,HEIGHT,1);}
+    private int ox(){return (viewport().logicalWidth()-WIDTH)/2;}
+    private int oy(){return (viewport().logicalHeight()-HEIGHT)/2;}
+    private int spacing(){return Math.max(2,Math.min(6,198/size));}
+    private int zoomSize(){return Math.min(ZOOM_SIZE,size);}
+    private int zoomX(){return Mth.clamp(focusX-zoomSize()/2,0,size-zoomSize());}
+    private int zoomZ(){return Mth.clamp(focusZ-zoomSize()/2,0,size-zoomSize());}
+    @Override protected void init(){
+        addRenderableWidget(Button.builder(modeLabel(),button->{
+            mode=mode==Mode.QI?Mode.YIN_YANG:Mode.QI;ClientData.setYinYangCompassQiMode(mode==Mode.QI);button.setMessage(modeLabel());
+        }).bounds(ox()+WIDTH-122,oy()+12,106,18).build());
+        clearButton=addRenderableWidget(Button.builder(Component.translatable(PREFIX+"clear"),button->CompassNavigation.clear())
+                .bounds(ox()+WIDTH-98,oy()+322,82,18).build());
     }
-
-    @Override
-    public void tick() {
-        super.tick();
-        openTicks++;
+    @Override public void tick(){super.tick();openTicks++;}
+    @Override public boolean isPauseScreen(){return false;}
+    @Override public void renderBackground(GuiGraphics g,int mouseX,int mouseY,float partial){}
+    private void text(GuiGraphics g,Component text,int x,int y,int color){g.drawString(font,text,x,y,color,false);}
+    private void fitted(GuiGraphics g,Component text,int x,int y,int color,int maxWidth){
+        float scale=Math.min(1,maxWidth/(float)Math.max(1,font.width(text)));
+        g.pose().pushPose();g.pose().translate(x,y,0);g.pose().scale(scale,scale,1);text(g,text,0,0,color);g.pose().popPose();
     }
-
-    @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
-        int spacing = 5;
-        int dot = 3;
-        int gridPixels = (size - 1) * spacing + dot;
-        int left = (this.width - gridPixels) / 2;
-        int top = (this.height - gridPixels) / 2 + 8;
-        int panelPad = 14;
-
-        guiGraphics.fill(left - panelPad, top - panelPad - 24, left + gridPixels + panelPad, top + gridPixels + panelPad + 18, PANEL_COLOR);
-        guiGraphics.fill(left - panelPad, top - panelPad - 24, left + gridPixels + panelPad, top - panelPad - 23, mode == Mode.QI ? 0xFF1F6FE5 : 0xFF8A1B1B);
-        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, top - panelPad - 17, 0xFFECECEC);
-
-        float animationTime = openTicks + partialTick;
-        int centerDot = size / 2;
-        for (int z = 0; z < size; z++) {
-            for (int x = 0; x < size; x++) {
-                int value = valueAt(x, z);
-                int color = colorFor(value);
-                int px = left + x * spacing;
-                int py = top + z * spacing;
-                drawAnimatedDot(guiGraphics, px, py, dot, color, revealProgress(x, z, centerDot, animationTime));
-            }
+    private void centered(GuiGraphics g,Component text,int x,int y,int color){text(g,text,x-font.width(text)/2,y,color);}
+    private int[] overviewAt(double x,double y){
+        int gx=(int)Math.floor((x-ox()-26)/spacing()),gz=(int)Math.floor((y-oy()-76)/spacing());
+        return gx>=0&&gz>=0&&gx<size&&gz<size?new int[]{gx,gz}:null;
+    }
+    private int[] zoomAt(double x,double y){
+        int gx=(int)Math.floor((x-ox()-252)/CELL),gz=(int)Math.floor((y-oy()-86)/CELL);
+        return gx>=0&&gz>=0&&gx<zoomSize()&&gz<zoomSize()?new int[]{zoomX()+gx,zoomZ()+gz}:null;
+    }
+    @Override public boolean mouseClicked(double mouseX,double mouseY,int button){
+        var v=viewport();double x=v.toMenu(mouseX),y=v.toMenu(mouseY);
+        if(super.mouseClicked(x,y,button))return true;
+        var point=overviewAt(x,y);if(point==null)point=zoomAt(x,y);
+        if(point!=null){
+            if(button==0){focusX=point[0];focusZ=point[1];CompassNavigation.pin(worldX(point[0]),worldZ(point[1]),valueAt(point[0],point[1]),mode==Mode.QI);return true;}
+            if(button==1){CompassNavigation.clear();return true;}
         }
-
-        int cx = left + centerDot * spacing;
-        int cz = top + centerDot * spacing;
-        float centerProgress = revealProgress(centerDot, centerDot, centerDot, animationTime);
-        guiGraphics.fill(cx - 1, cz - 1, cx + dot + 1, cz + dot + 1, centerProgress >= 0.5F ? 0xFF44AAFF : HIDDEN_DOT_COLOR);
-        drawAnimatedDot(guiGraphics, cx, cz, dot, colorFor(valueAt(centerDot, centerDot)), centerProgress);
-
-        int current = valueAt(centerDot, centerDot);
-        String footer = Component.translatable("screen." + ImmortalCultivationMod.MODID + "." + (mode == Mode.QI ? "spirit_qi_here" : "yin_qi_here"), current).getString()
-                + "  "
-                + Component.translatable("screen." + ImmortalCultivationMod.MODID + ".yin_qi_range", centerX, centerZ, step).getString();
-        guiGraphics.drawCenteredString(this.font, footer, this.width / 2, top + gridPixels + panelPad + 5, 0xFFECECEC);
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-    }
-
-    @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-    }
-
-    @Override
-    public boolean isPauseScreen() {
         return false;
     }
-
-    private float revealProgress(int x, int z, int centerDot, float animationTime) {
-        float dx = x - centerDot;
-        float dz = z - centerDot;
-        float distance = Mth.sqrt(dx * dx + dz * dz);
-        return Mth.clamp((animationTime * REVEAL_SPEED - distance * REVEAL_DELAY_PER_DOT) / FLIP_DURATION, 0.0F, 1.0F);
+    @Override public boolean mouseReleased(double x,double y,int button){var v=viewport();return super.mouseReleased(v.toMenu(x),v.toMenu(y),button);}
+    @Override public void render(GuiGraphics g,int mouseX,int mouseY,float partial){
+        var view=viewport();int mx=(int)view.toMenu(mouseX),my=(int)view.toMenu(mouseY),x=ox(),y=oy(),s=spacing();
+        var hovered=overviewAt(mx,my);if(hovered!=null){focusX=hovered[0];focusZ=hovered[1];}
+        var zoomed=zoomAt(mx,my);var detail=zoomed!=null?zoomed:new int[]{focusX,focusZ};
+        g.pose().pushPose();g.pose().scale((float)view.scale(),(float)view.scale(),1);
+        g.fill(x,y,x+WIDTH,y+HEIGHT,0xED101820);g.fill(x,y,x+WIDTH,y+1,0xFF638B9D);
+        text(g,title,x+16,y+16,0xFFF3F1DF);
+        text(g,Component.translatable(PREFIX+"help"),x+16,y+41,0xFFBAC8CE);
+        centered(g,Component.translatable(PREFIX+"overview"),x+26+size*s/2,y+61,0xFFE2E9ED);
+        text(g,Component.translatable(PREFIX+"zoom",step),x+252,y+66,0xFFE2E9ED);
+        int left=x+26,top=y+76;
+        for(int gz=0;gz<size;gz++)for(int gx=0;gx<size;gx++){
+            double distance=Math.hypot(gx-size/2,gz-size/2);
+            float reveal=Mth.clamp(((openTicks+partial)*1.35F-(float)distance*1.65F)/6F,0,1);
+            g.fill(left+gx*s,top+gz*s,left+gx*s+s-1,top+gz*s+s-1,reveal<.5?0xFF202B31:colorFor(valueAt(gx,gz)));
+        }
+        int fx=left+focusX*s,fz=top+focusZ*s;
+        g.renderOutline(fx-1,fz-1,s+1,s+1,0xFFFFFFFF);
+        var target=CompassNavigation.target();
+        if(target!=null){
+            double tx=(target.x()-centerX)/(double)step+size/2,tz=(target.z()-centerZ)/(double)step+size/2;
+            if(tx>=0&&tz>=0&&tx<size&&tz<size)cross(g,left+(int)Math.round(tx*s)+s/2,top+(int)Math.round(tz*s)+s/2,0xFFFFD774);
+        }
+        if(minecraft!=null&&minecraft.player!=null){
+            double px=(minecraft.player.getX()-centerX)/(double)step+size/2,pz=(minecraft.player.getZ()-centerZ)/(double)step+size/2;
+            if(px>=0&&pz>=0&&px<size&&pz<size)cross(g,left+(int)Math.round(px*s)+s/2,top+(int)Math.round(pz*s)+s/2,0xFF3EF0FF);
+        }
+        int zx=zoomX(),zz=zoomZ();
+        for(int gz=0;gz<zoomSize();gz++)for(int gx=0;gx<zoomSize();gx++){
+            int px=x+252+gx*CELL,py=y+86+gz*CELL,value=valueAt(zx+gx,zz+gz),color=colorFor(value);
+            g.fill(px,py,px+CELL-1,py+CELL-1,color);
+            String number=Integer.toString(value);g.pose().pushPose();g.pose().translate(px+(CELL-1)/2F,py+4,0);g.pose().scale(.8F,.8F,1);
+            int luminance=((color>>16&255)*299+(color>>8&255)*587+(color&255)*114)/1000;
+            g.drawString(font,number,-font.width(number)/2,0,luminance>155?0xFF111820:0xFFFFFFFF,false);g.pose().popPose();
+            if(zx+gx==detail[0]&&zz+gz==detail[1])g.renderOutline(px-1,py-1,CELL+1,CELL+1,0xFFFFD774);
+        }
+        text(g,Component.translatable("screen.immortal_cultivation_mod."+(mode==Mode.QI?"spirit_qi_here":"yin_qi_here"),valueAt(detail[0],detail[1])),x+252,y+242,0xFFF6E8B6);
+        fitted(g,Component.translatable(PREFIX+"sample",worldX(detail[0]),worldZ(detail[1])),x+252,y+256,0xFFD2DFE5,192);
+        var reading=CompassNavigation.reading();
+        Component current=CompassNavigation.position();
+        if(reading!=null)current=current.copy().append("   ").append(Component.translatable(PREFIX+"reading",reading.qi(),reading.yin()));
+        fitted(g,current,x+16,y+285,0xFFE2EEF3,WIDTH-32);
+        fitted(g,CompassNavigation.targetLabel(),x+16,y+303,0xFFFFD774,WIDTH-32);
+        fitted(g,CompassNavigation.directions(),x+16,y+323,0xFFFFD774,WIDTH-130);
+        clearButton.active=target!=null;
+        super.render(g,mx,my,partial);g.pose().popPose();
     }
-
-    private void drawAnimatedDot(GuiGraphics guiGraphics, int x, int y, int size, int color, float progress) {
-        if (progress <= 0.0F) {
-            guiGraphics.fill(x, y, x + size, y + size, HIDDEN_DOT_COLOR);
-            return;
-        }
-        if (progress >= 1.0F) {
-            guiGraphics.fill(x, y, x + size, y + size, color);
-            return;
-        }
-        float flip = Math.abs(progress - 0.5F) * 2.0F;
-        int width = Math.max(1, Mth.ceil(size * flip));
-        int offset = (size - width) / 2;
-        int activeColor = progress < 0.5F ? HIDDEN_DOT_COLOR : color;
-        guiGraphics.fill(x, y, x + size, y + size, HIDDEN_DOT_COLOR);
-        guiGraphics.fill(x + offset, y, x + offset + width, y + size, activeColor);
+    private void cross(GuiGraphics g,int x,int y,int color){
+        g.fill(x-4,y-1,x+5,y+2,0xFF081016);g.fill(x-1,y-4,x+2,y+5,0xFF081016);
+        g.fill(x-3,y,x+4,y+1,color);g.fill(x,y-3,x+1,y+4,color);
     }
-
-    private int valueAt(int x, int z) {
-        int index = z * size + x;
-        List<Integer> activeValues = mode == Mode.QI ? qiValues : values;
-        if (index < 0 || index >= activeValues.size()) {
-            return 0;
-        }
-        int min = mode == Mode.QI ? 0 : -15;
-        return Mth.clamp(activeValues.get(index), min, 15);
+    private int worldX(int cell){return centerX+(cell-size/2)*step;}
+    private int worldZ(int cell){return centerZ+(cell-size/2)*step;}
+    private int valueAt(int x,int z){
+        int index=z*size+x;var active=mode==Mode.QI?qiValues:values;
+        return index<0||index>=active.size()?0:Mth.clamp(active.get(index),mode==Mode.QI?0:-15,15);
     }
 
     private int colorFor(int value) {

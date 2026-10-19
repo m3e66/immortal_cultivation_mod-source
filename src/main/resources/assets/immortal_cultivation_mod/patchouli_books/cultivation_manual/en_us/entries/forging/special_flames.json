@@ -22,7 +22,7 @@
     {
       "type": "patchouli:text",
       "title": "Nether and Thunder",
-      "text": "$(bold)Nether Yin Flame$(): may appear from high-level undead, especially flying undead, or in ancient tombs.$(br2)$(bold)Thunder Flame$(): forms where an actual weapon-tribulation strike meets lava or fire. Ordinary weather lightning does not substitute for a weapon trial."
+      "text": "$(bold)Nether Yin Flame$(): may appear from high-level undead, especially flying undead.$(br2)$(bold)Thunder Flame$(): forms where an actual weapon-tribulation strike meets lava or fire. Ordinary weather lightning does not substitute for a weapon trial."
     },
     {
       "type": "patchouli:text",

@@ -1,0 +1,23 @@
+{
+  "name": "Spirit Spring Leaf",
+  "icon": "immortal_cultivation_mod:lingquan_leaf",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Spirit Spring Leaf",
+      "text": "$(bold)Spawn attempt frequency: $()1/8"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Spirit Spring Leaf grows in regions nourished by abundant water energy. Its smooth, vibrant leaves contain delicate veins resembling flowing streams. It is commonly associated with rivers and wetlands, where moisture and spiritual essence gather naturally."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Rivers, swamps, forests, and birch forests."
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod.item;
 
 import com.example.immortal_cultivation_mod.network.ModPayloads;
+import com.example.immortal_cultivation_mod.network.CompassReadingsPayloads;
 import com.example.immortal_cultivation_mod.world.YinQiField;
 import java.util.List;
 import net.minecraft.core.BlockPos;
@@ -23,10 +24,18 @@ public class YinYangCompassItem extends Item {
     }
 
     @Override
+    public void inventoryTick(ItemStack stack,Level level,net.minecraft.world.entity.Entity entity,int slot,boolean selected){
+        if(entity instanceof ServerPlayer player&&player.tickCount%5==0
+                &&(player.getMainHandItem()==stack||!player.getMainHandItem().is(this)&&player.getOffhandItem()==stack))
+            CompassReadingsPayloads.send(player);
+    }
+
+    @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (level instanceof ServerLevel serverLevel && player instanceof ServerPlayer serverPlayer) {
             BlockPos center = player.blockPosition();
+            CompassReadingsPayloads.send(serverPlayer);
             List<Integer> values = YinQiField.sampleGrid(serverLevel, center, GRID_SIZE, GRID_STEP);
             List<Integer> qiValues = YinQiField.sampleQiGrid(serverLevel, center, GRID_SIZE, GRID_STEP);
             PacketDistributor.sendToPlayer(serverPlayer, new ModPayloads.ClientboundYinYangCompassPayload(

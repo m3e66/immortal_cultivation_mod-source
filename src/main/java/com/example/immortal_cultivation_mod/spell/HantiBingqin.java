@@ -33,15 +33,15 @@ public final class HantiBingqin {
         castClaw(player, 1.0F);
     }
 
-    public static void castClaw(ServerPlayer player, float chargeScale) {
+    public static boolean castClaw(ServerPlayer player, float chargeScale) {
         var data = ModAttachments.getData(player);
         if (!CultivationMethods.isHantiBingqin(data.activeCultivationMethod())) {
-            return;
+            return false;
         }
         float scale = Math.max(1.0F, Math.min(2.0F, chargeScale));
         if (!spendChargedPercentQi(player, data, 3, scale)) {
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
-            return;
+            return false;
         }
 
         Vec3 start = player.getEyePosition();
@@ -68,6 +68,7 @@ public final class HantiBingqin {
             }
         }
         ServerEvents.syncPlayerData(player);
+        return true;
     }
 
     public static void toggleFrostFlight(ServerPlayer player) {
@@ -228,17 +229,16 @@ public final class HantiBingqin {
     }
 
     private static boolean spendPercentQi(ServerPlayer player, ModAttachments.CultivationData data, int percent) {
-        int maxQi = Math.max(1, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
-        int cost = Math.max(1, maxQi * percent / 100);
+        int maxQi = Math.max(1, data.maxQi());
+        int cost = Math.max(1, (int)((long)maxQi * percent / 100));
         return ServerEvents.spendSpellQiOrBlood(player, data, cost);
     }
 
     private static boolean spendFlightPercentQi(
             ServerPlayer player, ModAttachments.CultivationData data, int percent) {
         int maxQi = Math.max(1,
-                CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi()
-                        + data.maxQiBonus());
-        int cost = Math.max(1, maxQi * percent / 100);
+                data.maxQi());
+        int cost = Math.max(1, (int)((long)maxQi * percent / 100));
         cost = com.example.immortal_cultivation_mod.entity.TalismanWardEntity
                 .adjustFlightQiCost(player, cost);
         return ServerEvents.spendSpellQiOrBlood(player, data, cost);
@@ -247,17 +247,16 @@ public final class HantiBingqin {
     private static boolean spendSustainedFlightPercentQi(
             ServerPlayer player, ModAttachments.CultivationData data, int percent) {
         int maxQi = Math.max(1,
-                CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi()
-                        + data.maxQiBonus());
-        int cost = Math.max(1, maxQi * percent / 100);
+                data.maxQi());
+        int cost = Math.max(1, (int)((long)maxQi * percent / 100));
         cost = com.example.immortal_cultivation_mod.entity.TalismanWardEntity
                 .adjustFlightQiCost(player, cost);
-        return ServerEvents.spendSustainedQiOrBlood(player, data, cost);
+        return ServerEvents.spendSustainedSpellQiOrBlood(player, data, cost, ModSpells.SHUANGTIAN_QI);
     }
 
     private static boolean spendChargedPercentQi(ServerPlayer player, ModAttachments.CultivationData data, int percent, float chargeScale) {
-        int maxQi = Math.max(1, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
-        int baseCost = Math.max(1, maxQi * percent / 100);
+        int maxQi = Math.max(1, data.maxQi());
+        int baseCost = Math.max(1, (int)((long)maxQi * percent / 100));
         int cost = SpellCharge.qiCost(baseCost, chargeScale);
         return ServerEvents.spendSpellQiOrBlood(player, data, cost);
     }

@@ -42,7 +42,7 @@ public final class SpellTriggerProjectileRenderer extends EntityRenderer<SpellTr
          } else {
             float age = (float)entity.tickCount + partialTick;
             float pulse = 0.96F + 0.06F * Mth.sin(age * 0.65F);
-            float scale = (fallingSun ? 0.74F : 0.62F) * (entity.chargeScale() >= 1.99F ? 1.22F : 1.0F) * pulse;
+            float scale = (fallingSun ? 0.74F : 0.62F) * (entity.chargeScale() >= 1.99F ? 1.22F : 1.0F) * pulse * com.example.immortal_cultivation_mod.client.SpellProjectileVisuals.SCALE;
             if (fallingSun && entity.activated()) {
                float collapse = 1.0F - Mth.clamp(((float)entity.solarImpactTicks() + partialTick) / 4.0F, 0.0F, 1.0F);
                scale *= 0.12F + collapse * 0.88F;
@@ -75,6 +75,7 @@ public final class SpellTriggerProjectileRenderer extends EntityRenderer<SpellTr
          float momentumGlow = Mth.clamp(entity.momentumSnapshot() / 100.0F, 0.0F, 1.0F);
          float pulse = 0.88F + 0.12F * Mth.sin(age * 2.4F);
          poseStack.pushPose();
+         com.example.immortal_cultivation_mod.client.SpellProjectileVisuals.enlarge(poseStack);
          poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - yaw));
          poseStack.mulPose(Axis.XP.rotationDegrees(pitch));
          renderCorridor(poseStack, buffer, 0.34F, -1.1F, 4.8F, 0.12F, 0.92F, 1.0F, (0.2F + momentumGlow * 0.12F) * pulse, 24);

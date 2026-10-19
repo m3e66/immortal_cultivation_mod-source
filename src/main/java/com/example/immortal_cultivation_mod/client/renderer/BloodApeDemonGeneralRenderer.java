@@ -6,9 +6,10 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 public final class BloodApeDemonGeneralRenderer
-        extends GeoEntityRenderer<BloodApeDemonGeneralEntity> {
+        extends BeastGeoRenderer<BloodApeDemonGeneralEntity> {
     public BloodApeDemonGeneralRenderer(EntityRendererProvider.Context context) {
         super(context, new BloodApeDemonGeneralModel());
-        shadowRadius = 0.95F;
+        withScale(BloodApeDemonGeneralEntity.MODEL_SCALE);
+        shadowRadius = 0.95F * BloodApeDemonGeneralEntity.MODEL_SCALE;
     }
 }

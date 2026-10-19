@@ -1,0 +1,18 @@
+{
+  "name": "Temperature Determines Quality",
+  "icon": "immortal_cultivation_mod:liujin_sand",
+  "category": "immortal_cultivation_mod:volume_5",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Material purity determines the chance of success, while temperature independently affects the quality of the finished artifact."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "An average temperature within 250°C above or below the target yields high quality. Both underheating and overheating reduce quality, but overheating carries the harsher penalty."
+    }
+  ]
+}

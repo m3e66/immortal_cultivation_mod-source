@@ -99,7 +99,7 @@ public final class ShixuChiliu {
         if (timedUntil != null || player.tickCount % 20 != 0) {
             return;
         }
-        if (!ServerEvents.spendSustainedQiOrBlood(player, data, QI_PER_SECOND)) {
+        if (!ServerEvents.spendSustainedSpellQiOrBlood(player, data, QI_PER_SECOND, ModSpells.SHIXU_CHILIU)) {
             stop(player);
             player.sendSystemMessage(Component.translatable(
                     "message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));

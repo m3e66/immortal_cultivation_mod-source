@@ -154,7 +154,7 @@ public final class BlackTortoiseHeartguardMirrorItem extends Item implements ICu
     private static ShieldState activate(ServerPlayer player, long now) {
         var data = ModAttachments.getData(player);
         CultivationLevels.LevelDef level = CultivationLevels.getLevelDef(data.cultivationLevel());
-        int maxQi = Math.max(0, level.maxQi() + data.maxQiBonus());
+        int maxQi = Math.max(0, data.maxQi());
         int fullQiCost = Math.max(25, Mth.ceil(maxQi * 0.08F));
         int availableQi = Math.max(0, data.qi());
         int spentQi = player.getAbilities().instabuild

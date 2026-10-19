@@ -1,0 +1,18 @@
+{
+  "name": "Essence-Stabilizing Pill",
+  "icon": "immortal_cultivation_mod:guyuan_pill",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Scripture Account",
+      "text": "The Essence-Stabilizing Pill reinforces the body's defensive stability. Its effects reduce incoming damage and lessen the force of knockback, making it useful for cultivators facing powerful close-range opponents."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Effect",
+      "text": "5% damage reduction and 20% knockback reduction for 90 seconds."
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod.client.renderer;
 
 import com.example.immortal_cultivation_mod.client.SpiritualSenseClient;
+import com.example.immortal_cultivation_mod.client.ShaderPackCompatibility;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
@@ -36,7 +37,8 @@ public final class SpiritualReconstructionRenderer {
    }
 
    public static boolean isReady() {
-      return shader != null;
+      return shader != null && ShaderPackCompatibility.useCustomCoreShaders()
+              && !ShaderPackCompatibility.isRenderingShadowPass();
    }
 
    public static RenderType renderType(ResourceLocation texture) {

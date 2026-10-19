@@ -146,7 +146,7 @@ public final class Fengya {
     }
 
     private static int qiCost(ModAttachments.CultivationData data, boolean strong) {
-        int maxQi = Math.max(1, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
+        int maxQi = Math.max(1, data.maxQi());
         return Math.max(1, (int) Math.ceil(maxQi * (strong ? 0.3D : 0.1D)));
     }
 

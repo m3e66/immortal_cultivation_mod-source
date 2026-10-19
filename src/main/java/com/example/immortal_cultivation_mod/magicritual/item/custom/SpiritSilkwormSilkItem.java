@@ -19,11 +19,11 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 
-public final class SpiritSilkwormSilkItem extends Item {
+public final class SpiritSilkwormSilkItem extends com.example.immortal_cultivation_mod.item.BeastMaterialItem {
    private static final int REFINE_QI_COST = 20;
 
    public SpiritSilkwormSilkItem(Item.Properties properties) {
-      super(properties);
+      super(properties, 1);
    }
 
    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {

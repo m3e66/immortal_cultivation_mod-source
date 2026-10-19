@@ -76,7 +76,8 @@ import software.bernie.geckolib.util.GeckoLibUtil;
  * Each registered entity type supplies an immutable kind, while combat state is
  * synchronized so the matching GeckoLib model can animate the real action.
  */
-public final class CultivationBestiaryBeastEntity extends Monster implements GeoEntity {
+public final class CultivationBestiaryBeastEntity extends RealmBeastMonster implements GeoEntity {
+    // Visuals use synchronized BeastAttackVfx; server combat and sounds remain unchanged.
     public static final String QI_REGEN_SUPPRESSION_UNTIL = "SpiritDevouringRegenSuppressionUntil";
 
     public static int adjustQiRegeneration(LivingEntity entity, int amount) {
@@ -177,6 +178,8 @@ public final class CultivationBestiaryBeastEntity extends Monster implements Geo
         return entityData.get(ACTION);
     }
 
+    public int visualActionTicks() { return entityData.get(ACTION_TICKS); }
+
     public int resource() {
         return entityData.get(RESOURCE);
     }
@@ -260,20 +263,16 @@ public final class CultivationBestiaryBeastEntity extends Monster implements Geo
         }
 
         if (type == ModEntities.GREEN_PATTERNED_SPIRIT_DEVOURING_RAT.get()) {
-            return checkRatSpawn(level, pos)
-                    && belowNearbyCap(type, level, pos, 64.0D, 8);
+            return checkRatSpawn(level, pos);
         }
         if (type == ModEntities.RED_BACKED_IRON_SCALE_SCORPION.get()) {
-            return checkScorpionSpawn(level, pos)
-                    && belowNearbyCap(type, level, pos, 64.0D, 5);
+            return checkScorpionSpawn(level, pos);
         }
         if (type == ModEntities.WIND_FEATHER_CLIFF_DEER.get()) {
-            return checkDeerSpawn(level, pos)
-                    && belowNearbyCap(type, level, pos, 96.0D, 6);
+            return checkDeerSpawn(level, pos);
         }
         if (type == ModEntities.INK_ARMORED_STONE_DEVOURING_TORTOISE.get()) {
-            return checkTortoiseSpawn(level, pos)
-                    && belowNearbyCap(type, level, pos, 128.0D, 2);
+            return checkTortoiseSpawn(level, pos);
         }
         if (owl) {
             return checkOwlSpawn(level, pos);
@@ -353,8 +352,11 @@ public final class CultivationBestiaryBeastEntity extends Monster implements Geo
         if (!nether && (pos.getY() <= 140 || !level.getLevel().isNight())) {
             return false;
         }
-        return isTenToTwentyFourBlocksAboveTerrain(level, pos)
-                && hasCenteredClearVolume(level, pos, 3, 2);
+        // NaturalSpawner samples at/below the heightmap: requiring air ten blocks above
+        // it made surface owls impossible. A clear perch is also a valid starting point.
+        boolean perch = hasGroundSupport(level, pos) && hasClearSpawnVolume(level, pos, 1, 3);
+        return perch || (isTenToTwentyFourBlocksAboveTerrain(level, pos)
+                && hasCenteredClearVolume(level, pos, 3, 2));
     }
 
     private static boolean isDayOrDawn(ServerLevelAccessor level) {
@@ -416,23 +418,6 @@ public final class CultivationBestiaryBeastEntity extends Monster implements Geo
             }
         }
         return false;
-    }
-
-    private static boolean belowNearbyCap(EntityType<CultivationBestiaryBeastEntity> type,
-            ServerLevelAccessor level, BlockPos pos, double radius, int maximum) {
-        double centerX = pos.getX() + 0.5D;
-        double centerY = pos.getY() + 0.5D;
-        double centerZ = pos.getZ() + 0.5D;
-        double radiusSquared = radius * radius;
-        AABB area = new AABB(pos).inflate(radius);
-        int nearby = level.getEntitiesOfClass(
-                CultivationBestiaryBeastEntity.class,
-                area,
-                beast -> beast.isAlive()
-                        && beast.getType() == type
-                        && beast.distanceToSqr(centerX, centerY, centerZ) <= radiusSquared
-        ).size();
-        return nearby < maximum;
     }
 
     @Override
@@ -929,10 +914,7 @@ public final class CultivationBestiaryBeastEntity extends Monster implements Geo
                         60, 0, false, true, true), this);
             }
         }
-        if (level() instanceof ServerLevel server) {
-            server.sendParticles(ParticleTypes.FLAME, getX(), getY() + 0.5D, getZ(),
-                    48, 2.2D, 0.8D, 2.2D, 0.12D);
-        }
+
         addResource(-30, 100);
     }
 
@@ -971,9 +953,6 @@ public final class CultivationBestiaryBeastEntity extends Monster implements Geo
             navigation.stop();
             if ((burrowTicks & 1) == 0) {
                 BlockState surface = level().getBlockState(blockPosition().below());
-                server.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, surface),
-                        getX(), getY() + 0.12D, getZ(), 8,
-                        0.65D, 0.12D, 0.65D, 0.08D);
             }
             return;
         }
@@ -988,8 +967,6 @@ public final class CultivationBestiaryBeastEntity extends Monster implements Geo
         navigation.moveTo(target, 0.72D);
         if ((burrowTicks & 3) == 0) {
             BlockState surface = level().getBlockState(blockPosition().below());
-            server.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, surface),
-                    getX(), getY() + 0.08D, getZ(), 6, 0.45D, 0.08D, 0.45D, 0.05D);
         }
     }
 
@@ -1069,10 +1046,7 @@ public final class CultivationBestiaryBeastEntity extends Monster implements Geo
         if (nearest != null && (getTarget() == null || nearestDistance < distanceToSqr(getTarget()))) {
             startRatScentAnimation();
             setTarget(nearest);
-            if (level() instanceof ServerLevel server) {
-                server.sendParticles(ParticleTypes.HAPPY_VILLAGER,
-                        getX(), getEyeY(), getZ(), 3, 0.12D, 0.08D, 0.12D, 0.01D);
-            }
+
         }
     }
 
@@ -1127,11 +1101,7 @@ public final class CultivationBestiaryBeastEntity extends Monster implements Geo
                 if (fire) target.igniteForSeconds(3.0F);
             }
         }
-        if (level() instanceof ServerLevel server) {
-            server.sendParticles(fire ? ParticleTypes.FLAME : ParticleTypes.CLOUD,
-                    center.x, center.y + 0.25D, center.z, 28, radius * 0.35D, 0.35D,
-                    radius * 0.35D, 0.08D);
-        }
+
     }
 
     private List<LivingEntity> hostileTargets(AABB box) {
@@ -1388,22 +1358,6 @@ public final class CultivationBestiaryBeastEntity extends Monster implements Geo
 
         Vec3 center = tortoiseShellSectionCenter(section);
         int fragments = destroyed ? 34 : 7 + stage * 4;
-        server.sendParticles(
-                new BlockParticleOption(
-                        ParticleTypes.BLOCK,
-                        (destroyed ? Blocks.GILDED_BLACKSTONE : Blocks.DEEPSLATE_TILES)
-                                .defaultBlockState()),
-                center.x, center.y, center.z,
-                fragments,
-                destroyed ? 0.55D : 0.32D,
-                destroyed ? 0.36D : 0.22D,
-                destroyed ? 0.55D : 0.32D,
-                destroyed ? 0.16D : 0.09D);
-        server.sendParticles(
-                ParticleTypes.SMOKE,
-                center.x, center.y, center.z,
-                destroyed ? 12 : 3 + stage,
-                0.35D, 0.22D, 0.35D, 0.025D);
     }
 
     private Vec3 tortoiseShellSectionCenter(int section) {
@@ -1430,23 +1384,16 @@ public final class CultivationBestiaryBeastEntity extends Monster implements Geo
         if (tickCount % 3 != 0) return;
         switch (kind) {
             case SPIRIT_DEVOURING_RAT -> {
-                if (resource() > 0) level().addParticle(ParticleTypes.HAPPY_VILLAGER,
-                        getRandomX(0.7D), getRandomY(), getRandomZ(0.7D), 0.0D, 0.015D, 0.0D);
+
             }
-            case IRON_SCALE_SCORPION -> level().addParticle(ParticleTypes.SMALL_FLAME,
-                    getRandomX(0.9D), getY() + 0.4D, getRandomZ(0.9D), 0.0D, 0.01D, 0.0D);
+            case IRON_SCALE_SCORPION -> {}
             case WIND_FEATHER_CLIFF_DEER -> {
-                if (resource() >= 50) level().addParticle(ModParticles.METHOD_QI_WIND.get(),
-                        getRandomX(0.8D), getRandomY(), getRandomZ(0.8D), 0.0D, 0.02D, 0.0D);
+
             }
             case STONE_DEVOURING_TORTOISE -> {
-                if (hasVisualFlag(FLAG_FORTIFIED)) level().addParticle(
-                        new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DEEPSLATE.defaultBlockState()),
-                        getRandomX(1.0D), getY() + 0.4D, getRandomZ(1.0D), 0.0D, 0.03D, 0.0D);
+
             }
-            case EMBER_FEATHER_FIRE_OWL -> level().addParticle(
-                    hasVisualFlag(FLAG_INCANDESCENT) ? ParticleTypes.FLAME : ParticleTypes.SMALL_FLAME,
-                    getRandomX(1.5D), getRandomY(), getRandomZ(1.5D), 0.0D, 0.03D, 0.0D);
+            case EMBER_FEATHER_FIRE_OWL -> {}
         }
     }
 

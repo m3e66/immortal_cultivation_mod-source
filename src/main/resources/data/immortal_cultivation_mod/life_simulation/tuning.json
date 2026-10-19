@@ -1,0 +1,16 @@
+{
+  "raw_training": 25,
+  "method_growth": 6,
+  "earth_method": 2.5,
+  "heaven_method": 4,
+  "passive_training": 0.15,
+  "breathing_training": 0.45,
+  "seclusion_training": 1.7,
+  "cultivate_training": 1.25,
+  "realm_score": 1800,
+  "story_score": 1500,
+  "danger_score": 900,
+  "insight_divisor": 250,
+  "insight_cap": 400,
+  "crisis_chance": 0.18
+}

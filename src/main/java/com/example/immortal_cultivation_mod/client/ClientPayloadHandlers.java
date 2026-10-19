@@ -132,7 +132,7 @@ public class ClientPayloadHandlers {
     }
 
     public static void handleShieldData(ModPayloads.ClientboundShieldDataPayload payload, IPayloadContext ctx) {
-        ctx.enqueueWork(() -> ClientData.updateShield(payload.amount(), payload.max()));
+        ctx.enqueueWork(() -> ClientData.updateShield(payload.amount(), payload.max(),payload.layers()));
     }
 
     public static void handleCombatState(
@@ -208,6 +208,7 @@ public class ClientPayloadHandlers {
                             payload.difficulty(),
                             payload.talent(),
                             payload.assisted(),
+                            payload.playerLevel(),
                             payload.token())
                     : new LearningMatchScreen(
                             payload.learningType(),

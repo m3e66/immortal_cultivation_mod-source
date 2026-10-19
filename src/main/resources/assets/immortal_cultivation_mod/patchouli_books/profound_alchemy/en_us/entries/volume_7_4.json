@@ -1,0 +1,23 @@
+{
+  "name": "Incompatibility and Failure",
+  "icon": "immortal_cultivation_mod:qi_recovery_pill",
+  "category": "immortal_cultivation_mod:volume_7",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Scripture Account",
+      "text": "A batch fails and produces ashes if it contains incompatible additives, its conflict score reaches 35 or more, its stability falls below 20, or its toxicity reaches 60 or more."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Scripture Account",
+      "text": "Pills that retain nonzero toxicity after successful refinement inflict Poison for 10 seconds when consumed."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Scripture Account",
+      "text": "Ordinary material-purity and forging-success rules also apply to alchemy."
+    }
+  ]
+}

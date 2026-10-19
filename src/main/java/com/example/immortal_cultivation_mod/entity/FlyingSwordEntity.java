@@ -3,6 +3,7 @@ package com.example.immortal_cultivation_mod.entity;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.event.ServerEvents;
+import com.example.immortal_cultivation_mod.spell.JindanCreativeFlight;
 import com.example.immortal_cultivation_mod.item.ModItems;
 import com.example.immortal_cultivation_mod.item.ManifestedWeaponItem;
 import com.example.immortal_cultivation_mod.item.QiPouchStorage;
@@ -41,9 +42,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -57,11 +56,13 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
     private static final double LOOSE_SWORD_SPACING = 1.15D;
     private static final double LOOSE_SWORD_SPACING_SQR = LOOSE_SWORD_SPACING * LOOSE_SWORD_SPACING;
     private static final int LOOSE_SWORD_SEARCH_RINGS = 6;
-    private static final double RIDE_SPEED = 1.35D;
-    private static final Map<UUID, FlightSnapshot> RIDE_FLIGHT_GRANTS = new HashMap<>();
+    public static final double FLIGHT_BLADE_OFFSET = 0.08D;
+    public static final float FLIGHT_SPEED_MULTIPLIER = 1.5F;
 
     private static final EntityDataAccessor<Optional<UUID>> OWNER_UUID =
             SynchedEntityData.defineId(FlyingSwordEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Boolean> SWORD_FLIGHT =
+            SynchedEntityData.defineId(FlyingSwordEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> CONTROLLED =
             SynchedEntityData.defineId(FlyingSwordEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DISABLED =
@@ -88,6 +89,8 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
     private int swordMaxHealth = 1;
     private int shotTick = -1;
     private int pouchRecallTicks;
+    private int autoRecallTicks;
+    private boolean recoveryManaged;
     private ItemStack storedSwordStack = ItemStack.EMPTY;
 
     public FlyingSwordEntity(EntityType<? extends ThrowableItemProjectile> entityType, Level level) {
@@ -110,6 +113,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         super.defineSynchedData(builder);
         builder.define(OWNER_UUID, Optional.empty());
         builder.define(CONTROLLED, false);
+        builder.define(SWORD_FLIGHT, false);
         builder.define(DISABLED, false);
         builder.define(SHOT, false);
         builder.define(STUCK, false);
@@ -163,11 +167,14 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
     }
 
     public void setStoredSwordStack(ItemStack stack) {
+        com.example.immortal_cultivation_mod.item.WeaponBinding.prepare(stack);
         storedSwordStack = stack.isEmpty() ? new ItemStack(ModItems.FLYING_SWORD.get()) : stack.copyWithCount(1);
         setItem(storedSwordStack);
         setWeaponDamage(baseAttackDamage(storedSwordStack));
         resetSwordHealth(storedSwordStack);
     }
+
+    @Override public ItemStack getWeaponItem() { return storedSwordStack; }
 
     public int getSwordHealth() {
         return swordHealth;
@@ -176,6 +183,8 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
     public int getSwordMaxHealth() {
         return swordMaxHealth;
     }
+    public boolean isRecoveryManaged() { return recoveryManaged; }
+    public void setRecoveryManaged() { recoveryManaged=true; }
 
     @Override
     public Component getName() {
@@ -221,14 +230,41 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
 
     @Override
     public void tick() {
+        if(!level().isClientSide) {
+            if(!FlyingSwordRecovery.valid(this)){discard();return;}
+            if(isControlled()&&!recoveryManaged)FlyingSwordRecovery.track(this);
+        }
+        // Migrate legacy vehicle swords: the player now flies using vanilla abilities.
+        if (isVehicle() && !level().isClientSide) {
+            var passengers = List.copyOf(getPassengers());
+            ejectPassengers();
+            for (var passenger : passengers) if (passenger instanceof ServerPlayer player
+                    && !player.isCreative() && !player.isSpectator()) {
+                player.getAbilities().mayfly = false;
+                player.getAbilities().flying = false;
+                player.getAbilities().setFlyingSpeed(0.05F);
+                player.onUpdateAbilities();
+                JindanCreativeFlight.refreshFlightAbilities(player);
+            }
+        }
+        // Old saves may contain a Dao in this entity type. Return the exact item instead of letting it fly.
+        if (!level().isClientSide && !isFlyingWeapon(pickupSwordStack())) {
+            ejectPassengers();
+            entityData.set(SWORD_FLIGHT, false);
+            FlyingSwordRecovery.complete(this);
+            level().addFreshEntity(new ItemEntity(level(), getX(), getY(), getZ(), pickupSwordStack()));
+            discard();
+            return;
+        }
         if (!level().isClientSide && ManifestedWeaponItem.expireFlyingSword(this)) {
             return;
         }
         if (!level().isClientSide && tickAutomaticPouchRecall()) {
             return;
         }
-        if (isVehicle()) {
-            tickRidingSword();
+        if(!level().isClientSide&&tickAutomaticRecall())return;
+        if (isSwordFlight()) {
+            tickSwordFlight();
             return;
         }
 
@@ -255,6 +291,8 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
     }
 
     private boolean tickAutomaticPouchRecall() {
+        ServerPlayer recallOwner=ownerPlayer();
+        if(recallOwner!=null&&!FlyingSwordRecovery.autoRecallEnabled(recallOwner)){pouchRecallTicks=0;return false;}
         if (isVehicle() || isControlled() || isShot()) {
             pouchRecallTicks = 0;
             return false;
@@ -266,8 +304,21 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
             return false;
         }
         ejectPassengers();
+        FlyingSwordRecovery.complete(this);
         discard();
         return true;
+    }
+    private boolean tickAutomaticRecall() {
+        if(isControlled()||isVehicle()){autoRecallTicks=0;return false;}
+        ServerPlayer owner=ownerPlayer();
+        if(owner==null||!owner.isAlive()||!FlyingSwordRecovery.autoRecallEnabled(owner)){autoRecallTicks=0;return false;}
+        if(++autoRecallTicks<40)return false;
+        if(QiPouchStorage.tryRecallFlyingSword(this)){FlyingSwordRecovery.complete(this);discard();return true;}
+        if(owner.level()!=level()){if(recoveryManaged){FlyingSwordRecovery.park(this);return true;}return false;}
+        if(!isDisabled()&&controlledSwords(owner).size()<maxControlledSwords(owner)){
+            control(owner);setPos(orbitPosition(owner,0,1));return true;
+        }
+        return FlyingSwordRecovery.returnToInventory(this,owner);
     }
 
     private void tickStuckSword() {
@@ -285,14 +336,15 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
     }
 
     private void tickControlled() {
+        baseTick();
         ServerPlayer owner = ownerPlayer();
         if (owner == null || !owner.isAlive()) {
-            landAt(position());
+            FlyingSwordRecovery.park(this);
             return;
         }
+        if(owner.level()!=level()){FlyingSwordRecovery.park(this);return;}
         if (tooFarFromOwner(owner)) {
-            dropStraightDown();
-            return;
+            setPos(orbitPosition(owner,0,1));
         }
 
         qiTickCounter++;
@@ -302,7 +354,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
             int cost = TalismanWardEntity.adjustFlightQiCost(
                     this, CONTROL_QI_COST_PER_SECOND);
             if (!ServerEvents.spendSustainedQiOrBlood(owner, data, cost)) {
-                landAt(position());
+                FlyingSwordRecovery.park(this);
                 ServerEvents.syncPlayerData(owner);
                 return;
             }
@@ -322,7 +374,8 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         setNoGravity(true);
 
         Vec3 toTarget = target.subtract(position());
-        if (toTarget.lengthSqr() > 0.0025D) {
+        if(toTarget.lengthSqr()>64){setPos(target);setDeltaMovement(Vec3.ZERO);}
+        else if (toTarget.lengthSqr() > 0.0025D) {
             Vec3 step = toTarget.scale(0.22D);
             if (step.length() > 0.85D) {
                 step = step.normalize().scale(0.85D);
@@ -360,46 +413,73 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         }
     }
 
-    private void tickRidingSword() {
+    public boolean isSwordFlight() {
+        return entityData.get(SWORD_FLIGHT);
+    }
+
+    public void catchUpToOwner(ServerPlayer owner) {
+        setPos(isSwordFlight()?owner.position().add(0,-FLIGHT_BLADE_OFFSET,0):orbitPosition(owner,0,1));
+    }
+
+    /** A real owned blade follows the player; it never carries or moves the player. */
+    private void tickSwordFlight() {
         baseTick();
         noPhysics = true;
         setNoGravity(true);
         setDeltaMovement(Vec3.ZERO);
-
-        Entity passenger = getFirstPassenger();
-        if (!(passenger instanceof ServerPlayer rider) || !rider.isAlive() || !rider.getUUID().equals(getOwnerUuid())) {
-            if (!level().isClientSide) {
-                ejectPassengers();
+        Player owner = getOwner() instanceof Player player ? player
+                : ownerUuid().map(level()::getPlayerByUUID).orElse(null);
+        if (owner == null || !owner.isAlive() || !isControlled() || isDisabled()) {
+            if (!level().isClientSide) FlyingSwordRecovery.park(this);
+            return;
+        }
+        if (owner instanceof ServerPlayer serverPlayer) {
+            if(owner.level()!=level()){FlyingSwordRecovery.park(this);return;}
+            if (!JindanCreativeFlight.canUseSwordFlight(serverPlayer)) {
+                entityData.set(SWORD_FLIGHT, false);
+                FlyingSwordRecovery.track(this);
+                return;
             }
-            return;
+            if (++qiTickCounter >= 20) {
+                qiTickCounter = 0;
+                if (!ServerEvents.spendSustainedQiOrBlood(serverPlayer, ModAttachments.getData(serverPlayer),
+                        TalismanWardEntity.adjustFlightQiCost(this, CONTROL_QI_COST_PER_SECOND))) {
+                    FlyingSwordRecovery.park(this);
+                    JindanCreativeFlight.refreshFlightAbilities(serverPlayer);
+                    ServerEvents.syncPlayerData(serverPlayer);
+                    return;
+                }
+                ServerEvents.syncPlayerData(serverPlayer);
+            }
         }
-        if (tooFarFromOwner(rider)) {
-            dropStraightDown();
-            return;
-        }
+        setPos(owner.getX(), owner.getY() - FLIGHT_BLADE_OFFSET, owner.getZ());
+        setYRot(owner.getYRot());
+        setXRot(0.0F);
+    }
 
-        entityData.set(CONTROLLED, true);
-        entityData.set(SHOT, false);
-        entityData.set(STUCK, false);
-        enableRideFlight(rider);
-
-        Vec3 look = rider.getLookAngle();
-        Vec3 forward = horizontal(look);
-        Vec3 right = new Vec3(-forward.z, 0.0D, forward.x);
-        Vec3 movement = forward.scale(rider.zza).add(right.scale(rider.xxa * 0.75D));
-        if (Math.abs(rider.zza) > 0.01F) {
-            movement = movement.add(0.0D, look.y * rider.zza, 0.0D);
+    public static FlyingSwordEntity flightSword(Player owner) {
+        if (owner == null) return null;
+        if(owner instanceof ServerPlayer serverPlayer){
+            var live=FlyingSwordRecovery.flightSword(serverPlayer);if(live!=null)return live;
         }
-        if (movement.lengthSqr() > 0.0001D) {
-            movement = movement.normalize().scale(RIDE_SPEED);
-        }
+        return owner.level().getEntitiesOfClass(FlyingSwordEntity.class, owner.getBoundingBox().inflate(16),
+                sword -> sword.isSwordFlight() && isFlyingWeapon(sword.pickupSwordStack()) && sword.isControlled() && !sword.isDisabled()
+                        && !sword.isRemoved() && owner.getUUID().equals(sword.getOwnerUuid()))
+                .stream().findFirst().orElse(null);
+    }
 
-        setYRot(rider.getYRot());
-        setXRot(rider.getXRot());
-        setDeltaMovement(movement);
-        setPos(getX() + movement.x, getY() + movement.y, getZ() + movement.z);
-        rider.fallDistance = 0.0F;
-        rider.resetFallDistance();
+    public static void stopSwordFlight(Player owner) {
+        if (owner == null) return;
+        if(owner instanceof ServerPlayer serverPlayer){
+            var live=FlyingSwordRecovery.flightSword(serverPlayer);
+            if(live!=null){live.entityData.set(SWORD_FLIGHT,false);FlyingSwordRecovery.track(live);}
+        }
+        for (FlyingSwordEntity sword : owner.level().getEntitiesOfClass(FlyingSwordEntity.class,
+                owner.getBoundingBox().inflate(32), sword -> sword.isSwordFlight()
+                        && owner.getUUID().equals(sword.getOwnerUuid()))) {
+            sword.entityData.set(SWORD_FLIGHT, false);
+            if(!sword.level().isClientSide)FlyingSwordRecovery.track(sword);
+        }
     }
 
     private void pushAwayFromLooseSwords() {
@@ -425,7 +505,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
 
     public boolean canBeControlledBy(ServerPlayer player) {
         UUID owner = getOwnerUuid();
-        return !isDisabled() && !isControlled() && owner != null && owner.equals(player.getUUID());
+        return com.example.immortal_cultivation_mod.item.WeaponBinding.canUse(storedSwordStack,player)&&FlyingSwordRecovery.valid(this)&&isFlyingWeapon(pickupSwordStack()) && !isDisabled() && !isControlled() && owner != null && owner.equals(player.getUUID());
     }
 
     private void control(ServerPlayer owner) {
@@ -441,6 +521,8 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         noPhysics = true;
         setDeltaMovement(Vec3.ZERO);
         qiTickCounter = 0;
+        autoRecallTicks=0;
+        FlyingSwordRecovery.track(this);
     }
 
     private void fire(ServerPlayer owner) {
@@ -461,6 +543,8 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
                 * com.example.immortal_cultivation_mod.item.WeaponRestrictionSystem
                 .flyingSpeedMultiplier(storedSwordStack));
         shoot(look.x, look.y, look.z, speed, 0.0F);
+        autoRecallTicks=0;
+        FlyingSwordRecovery.track(this);
     }
 
     @Override
@@ -555,9 +639,9 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         DamageSource source = shooter instanceof Player player
                 ? damageSources().playerAttack(player)
                 : damageSources().thrown(this, shooter);
-        com.example.immortal_cultivation_mod.flame.FlameWeaponEffects.hurtWithWeapon(
+        boolean damaged = com.example.immortal_cultivation_mod.flame.FlameWeaponEffects.hurtWithWeapon(
                 storedSwordStack, target, source, damageAgainst(target));
-        if (target instanceof LivingEntity living) {
+        if (damaged && target instanceof LivingEntity living) {
             com.example.immortal_cultivation_mod.item.ForgingSystem.applyWeaponHitEffects(storedSwordStack, living);
             com.example.immortal_cultivation_mod.item.WeaponRestrictionSystem
                     .applyWeaponHitEffects(storedSwordStack, living);
@@ -587,6 +671,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
     }
 
     private void landAt(Vec3 pos) {
+        entityData.set(SWORD_FLIGHT, false);
         entityData.set(CONTROLLED, false);
         entityData.set(SHOT, false);
         entityData.set(STUCK, false);
@@ -595,9 +680,11 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         setDeltaMovement(Vec3.ZERO);
         Vec3 openPos = level().isClientSide ? pos : findOpenLooseSwordPosition(pos);
         setPos(openPos.x, openPos.y + 0.02D, openPos.z);
+        if(recoveryManaged)FlyingSwordRecovery.track(this);
     }
 
     private void dropStraightDown() {
+        entityData.set(SWORD_FLIGHT, false);
         if (!level().isClientSide) {
             ejectPassengers();
         }
@@ -616,6 +703,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
     }
 
     private void stickAt(Vec3 pos, Vec3 shotMotion) {
+        entityData.set(SWORD_FLIGHT, false);
         entityData.set(CONTROLLED, false);
         entityData.set(SHOT, false);
         entityData.set(STUCK, true);
@@ -626,6 +714,8 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
             setShotRotation(shotMotion.normalize());
         }
         setPos(pos.x, pos.y, pos.z);
+        autoRecallTicks=0;
+        if(recoveryManaged)FlyingSwordRecovery.track(this);
     }
 
     private void setShotRotation(Vec3 direction) {
@@ -681,29 +771,24 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         if (level().isClientSide) {
             return InteractionResult.SUCCESS;
         }
+        if(!FlyingSwordRecovery.valid(this)){discard();return InteractionResult.CONSUME;}
         UUID owner = getOwnerUuid();
         if (owner != null && !owner.equals(player.getUUID())) {
             return InteractionResult.PASS;
         }
-        if (player instanceof ServerPlayer serverPlayer
-                && player.isShiftKeyDown()
-                && isControlled()
-                && controlledSwords(serverPlayer).size() == 1
-                && getPassengers().isEmpty()) {
-            serverPlayer.startRiding(this, true);
-            enableRideFlight(serverPlayer);
+        if (player.isShiftKeyDown() || isVehicle() || isSwordFlight()) {
             return InteractionResult.CONSUME;
         }
-        if (player.isShiftKeyDown()) {
-            return InteractionResult.CONSUME;
-        }
+        if(player instanceof ServerPlayer serverPlayer){FlyingSwordRecovery.returnToInventory(this,serverPlayer);JindanCreativeFlight.refreshFlightAbilities(serverPlayer);return InteractionResult.CONSUME;}
         ItemStack stack = pickupSwordStack();
         if (!player.getInventory().add(stack)) {
             level().addFreshEntity(new ItemEntity(level(), getX(), getY(), getZ(), stack));
         }
         if (player instanceof ServerPlayer serverPlayer) {
-            disableRideFlight(serverPlayer);
+            entityData.set(SWORD_FLIGHT, false);
+            JindanCreativeFlight.refreshFlightAbilities(serverPlayer);
         }
+        FlyingSwordRecovery.complete(this);
         discard();
         return InteractionResult.CONSUME;
     }
@@ -714,11 +799,50 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
     }
 
     public static boolean interactLookingAt(ServerPlayer player, boolean ride) {
+        if (ride) return toggleRiding(player);
         FlyingSwordEntity sword = findInteractableSword(player);
         if (sword == null) {
             return false;
         }
         return sword.handlePlayerInteract(player, ride);
+    }
+
+    /** Selects an owned blade for Golden Core creative flight, without a passenger mount. */
+    public static boolean toggleRiding(ServerPlayer player) {
+        if (flightSword(player) != null) {
+            stopSwordFlight(player);
+            JindanCreativeFlight.refreshFlightAbilities(player);
+            return true;
+        }
+        if (player.isPassenger() || player.isSpectator() || player.isCreative()
+                || !player.isAlive() || player.isShiftKeyDown()) return false;
+        if (CultivationLevels.getRealmIndex(ModAttachments.getData(player).cultivationLevel()) < 3) {
+            player.displayClientMessage(Component.translatable("message.immortal_cultivation_mod.sword_ride.realm"), true);
+            return false;
+        }
+        var candidates = controlledSwords(player).stream()
+                .filter(sword -> com.example.immortal_cultivation_mod.item.WeaponBinding.canUse(sword.storedSwordStack,player) && !sword.isShot() && !sword.isStuck()
+                        && sword.distanceToSqr(player) <= 64 && player.hasLineOfSight(sword))
+                .sorted(Comparator.comparingDouble(sword -> sword.distanceToSqr(player))).toList();
+        if (candidates.isEmpty()) {
+            player.displayClientMessage(Component.translatable("message.immortal_cultivation_mod.sword_ride.no_sword"), true);
+            return false;
+        }
+        JindanCreativeFlight.setEnabled(player, true);
+        JindanCreativeFlight.refreshFlightAbilities(player);
+        if (!JindanCreativeFlight.canUseSwordFlight(player)) return false;
+        var sword = candidates.getFirst();
+        sword.entityData.set(SWORD_FLIGHT, true);
+        sword.tickSwordFlight();
+        JindanCreativeFlight.refreshFlightAbilities(player);
+        if (!player.getAbilities().mayfly) {
+            sword.entityData.set(SWORD_FLIGHT, false);
+            return false;
+        }
+        FlyingSwordRecovery.track(sword);
+        player.displayClientMessage(Component.translatable("message.immortal_cultivation_mod.sword_ride.controls",
+                Component.keybind("key.immortal_cultivation_mod.ride_flying_sword"), Component.keybind("key.sneak")), true);
+        return true;
     }
 
     private static FlyingSwordEntity findInteractableSword(ServerPlayer player) {
@@ -765,21 +889,12 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         if (!player.getUUID().equals(getOwnerUuid())) {
             return false;
         }
-        if (ride && isControlled() && controlledSwords(player).size() == 1 && getPassengers().isEmpty()) {
-            player.startRiding(this, true);
-            enableRideFlight(player);
-            return true;
-        }
-        if (ride) {
-            return false;
-        }
-        ItemStack stack = pickupSwordStack();
-        if (!player.getInventory().add(stack)) {
-            level().addFreshEntity(new ItemEntity(level(), getX(), getY(), getZ(), stack));
-        }
-        disableRideFlight(player);
-        discard();
-        return true;
+        if (ride) return toggleRiding(player);
+        if (isVehicle() || isSwordFlight() || player.isShiftKeyDown()) return false;
+        if(!FlyingSwordRecovery.valid(this)){discard();return false;}
+        boolean returned=FlyingSwordRecovery.returnToInventory(this,player);
+        JindanCreativeFlight.refreshFlightAbilities(player);
+        return returned;
     }
 
     @Override
@@ -787,11 +902,13 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         if (level().isClientSide || isRemoved()) {
             return true;
         }
+        if(!FlyingSwordRecovery.valid(this)){discard();return true;}
         swordHealth -= Math.max(1, (int) Math.ceil(amount));
         if (swordHealth <= 0) {
             entityData.set(DISABLED, true);
             landAt(position());
         }
+        if(recoveryManaged)FlyingSwordRecovery.track(this);
         return true;
     }
 
@@ -803,6 +920,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
             tag.putUUID("OwnerUuid", owner);
         }
         tag.putBoolean("Controlled", isControlled());
+        tag.putBoolean("SwordFlight", isSwordFlight());
         tag.putBoolean("Disabled", isDisabled());
         tag.putBoolean("Shot", isShot());
         tag.putBoolean("Stuck", isStuck());
@@ -815,6 +933,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         tag.putFloat("StuckYaw", getStuckYaw());
         tag.putFloat("StuckPitch", getStuckPitch());
         tag.putInt("PouchRecallTicks", pouchRecallTicks);
+        tag.putInt("AutoRecallTicks",autoRecallTicks);tag.putBoolean("RecoveryManaged",recoveryManaged);
         if (!storedSwordStack.isEmpty()) {
             tag.put("SwordStack", storedSwordStack.saveOptional(registryAccess()));
         }
@@ -830,6 +949,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         entityData.set(DISABLED, tag.getBoolean("Disabled"));
         entityData.set(SHOT, tag.getBoolean("Shot"));
         entityData.set(STUCK, tag.getBoolean("Stuck"));
+        entityData.set(SWORD_FLIGHT,tag.getBoolean("SwordFlight")&&isControlled()&&!isDisabled()&&!isShot()&&!isStuck());
         entityData.set(WEAPON_DAMAGE, tag.contains("WeaponDamage") ? tag.getFloat("WeaponDamage") : 10.0F);
         entityData.set(SWORD_INDEX, tag.getInt("SwordIndex"));
         entityData.set(TOTAL_CONTROLLED_SWORDS, Math.max(1, tag.getInt("TotalControlledSwords")));
@@ -837,6 +957,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         entityData.set(STUCK_YAW, tag.getFloat("StuckYaw"));
         entityData.set(STUCK_PITCH, tag.getFloat("StuckPitch"));
         pouchRecallTicks = Math.max(0, tag.getInt("PouchRecallTicks"));
+        autoRecallTicks=Math.max(0,tag.getInt("AutoRecallTicks"));recoveryManaged=tag.getBoolean("RecoveryManaged");
         if (tag.contains("SwordStack")) {
             storedSwordStack = ItemStack.parseOptional(registryAccess(), tag.getCompound("SwordStack"));
         }
@@ -870,6 +991,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
             return recalled;
         }
 
+        if (!com.example.immortal_cultivation_mod.item.WeaponBinding.checkUse(stack, player)) return false;
         Vec3 look = player.getLookAngle().normalize();
         Vec3 pos = player.getEyePosition().add(look.scale(0.9D));
         FlyingSwordEntity sword = new FlyingSwordEntity(player.level(), player, pos);
@@ -891,7 +1013,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         Vec3 center = player.position().subtract(forward.scale(1.1D)).add(0.0D, 1.35D, 0.0D);
         int released = 0;
         for (ItemStack weapon : weapons) {
-            if (!isFlyingWeapon(weapon)) {
+            if (!isFlyingWeapon(weapon) || !com.example.immortal_cultivation_mod.item.WeaponBinding.checkUse(weapon, player)) {
                 continue;
             }
             double sideOffset = (released - (weapons.size() - 1) * 0.5D) * 0.18D;
@@ -913,6 +1035,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
             if (isFlyingWeapon(stack)) {
                 collected.add(stack);
                 sword.ejectPassengers();
+                FlyingSwordRecovery.complete(sword);
                 sword.discard();
             }
         }
@@ -1014,7 +1137,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
     }
 
     public static boolean shootControlled(ServerPlayer player, boolean shootSix) {
-        List<FlyingSwordEntity> swords = controlledSwords(player);
+        List<FlyingSwordEntity> swords = controlledSwords(player).stream().filter(sword -> !sword.isSwordFlight() && !sword.isVehicle()).toList();
         if (swords.isEmpty()) {
             return false;
         }
@@ -1040,7 +1163,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
             return swords;
         }
         for (FlyingSwordEntity sword : level.getEntitiesOfClass(FlyingSwordEntity.class, owner.getBoundingBox().inflate(16.0D))) {
-            if (sword.isControlled() && !sword.isDisabled() && owner.getUUID().equals(sword.getOwnerUuid())) {
+            if (com.example.immortal_cultivation_mod.item.WeaponBinding.canUse(sword.storedSwordStack,owner)&&FlyingSwordRecovery.valid(sword)&&sword.isControlled() && isFlyingWeapon(sword.pickupSwordStack()) && !sword.isDisabled() && owner.getUUID().equals(sword.getOwnerUuid())) {
                 swords.add(sword);
             }
         }
@@ -1064,46 +1187,7 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
 
     @Override
     protected boolean canAddPassenger(Entity passenger) {
-        return getPassengers().isEmpty() && passenger instanceof ServerPlayer player && player.getUUID().equals(getOwnerUuid());
-    }
-
-    @Override
-    protected void positionRider(Entity passenger, Entity.MoveFunction callback) {
-        callback.accept(passenger, getX(), getY() + 0.45D, getZ());
-    }
-
-    @Override
-    protected void removePassenger(Entity passenger) {
-        super.removePassenger(passenger);
-        if (passenger instanceof ServerPlayer player) {
-            disableRideFlight(player);
-        }
-    }
-
-    private static void enableRideFlight(ServerPlayer player) {
-        RIDE_FLIGHT_GRANTS.computeIfAbsent(player.getUUID(), id -> new FlightSnapshot(
-                player.getAbilities().mayfly,
-                player.getAbilities().flying,
-                player.getAbilities().getFlyingSpeed()
-        ));
-        player.getAbilities().mayfly = true;
-        player.getAbilities().flying = true;
-        player.getAbilities().setFlyingSpeed(0.22F);
-        player.onUpdateAbilities();
-    }
-
-    private static void disableRideFlight(ServerPlayer player) {
-        FlightSnapshot snapshot = RIDE_FLIGHT_GRANTS.remove(player.getUUID());
-        if (snapshot == null) {
-            return;
-        }
-        player.getAbilities().mayfly = player.isCreative() || player.isSpectator() || snapshot.mayfly();
-        player.getAbilities().flying = (player.isCreative() || player.isSpectator() || snapshot.mayfly()) && snapshot.flying();
-        player.getAbilities().setFlyingSpeed(snapshot.flyingSpeed());
-        player.onUpdateAbilities();
-    }
-
-    private record FlightSnapshot(boolean mayfly, boolean flying, float flyingSpeed) {
+        return false;
     }
 
     private ServerPlayer ownerPlayer() {
@@ -1111,7 +1195,17 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
         if (owner == null || !(level() instanceof ServerLevel serverLevel)) {
             return null;
         }
-        return serverLevel.getServer().getPlayerList().getPlayer(owner);
+        ServerPlayer online=serverLevel.getServer().getPlayerList().getPlayer(owner);
+        return online!=null?online:getOwner() instanceof ServerPlayer player&&!player.isRemoved()&&owner.equals(player.getUUID())?player:null;
+    }
+    public static FlyingSwordEntity restoreControlled(ServerPlayer owner,ItemStack stack,int health,boolean swordFlight) {
+        if(stack.isEmpty()||health<=0||!isFlyingWeapon(stack)||!com.example.immortal_cultivation_mod.item.WeaponBinding.canUse(stack,owner)||controlledSwords(owner).size()>=maxControlledSwords(owner))return null;
+        var sword=new FlyingSwordEntity(owner.level(),owner,orbitPosition(owner,0,1));sword.setStoredSwordStack(stack);
+        sword.swordHealth=Math.min(sword.swordMaxHealth,health);
+        sword.entityData.set(SWORD_FLIGHT,swordFlight&&JindanCreativeFlight.canUseSwordFlight(owner));
+        sword.catchUpToOwner(owner);
+        if(!owner.level().addFreshEntity(sword))return null;
+        sword.control(owner);return sword;
     }
 
     private static Vec3 orbitPosition(ServerPlayer owner, int index, int count) {
@@ -1185,10 +1279,14 @@ public class FlyingSwordEntity extends ThrowableItemProjectile {
     }
 
     public static boolean isFlyingWeapon(ItemStack stack) {
-        return stack.is(ModItems.FLYING_SWORD.get())
-                || ManifestedWeaponItem.isManifested(stack)
-                || stack.is(ModItems.DAO.get())
-                || stack.is(ModItems.TAOMU_SWORD.get())
-                || stack.is(ModItems.COPPER_COIN_SWORD.get());
+        if (stack.isEmpty() || com.example.immortal_cultivation_mod.item.RigidSheathItem.isDaoWeapon(stack)) return false;
+        if (stack.getItem() instanceof com.example.immortal_cultivation_mod.item.FlyingSwordItem
+                || com.example.immortal_cultivation_mod.item.RigidSheathItem.isSwordWeapon(stack)) return true;
+        // Several mod fans, spears and bracers inherit SwordItem for melee attributes.
+        // Only actual mod swords pass above; vanilla/other mods use their sword class or tag.
+        if (net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()).getNamespace()
+                .equals(com.example.immortal_cultivation_mod.ImmortalCultivationMod.MODID)) return false;
+        return stack.is(net.minecraft.tags.ItemTags.SWORDS)
+                || stack.getItem() instanceof net.minecraft.world.item.SwordItem;
     }
 }

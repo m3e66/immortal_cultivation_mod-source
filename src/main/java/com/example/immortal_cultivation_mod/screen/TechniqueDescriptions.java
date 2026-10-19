@@ -2,6 +2,7 @@ package com.example.immortal_cultivation_mod.screen;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
+import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import com.example.immortal_cultivation_mod.client.ClientData;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
 import net.minecraft.client.resources.language.I18n;
@@ -52,7 +53,7 @@ public final class TechniqueDescriptions {
         if (element == null || element.isBlank() || "any".equals(element) || "none".equals(element)) {
             return Component.translatable(SCREEN_PREFIX + "none");
         }
-        return Component.literal(element);
+        return SpiritRoots.elementSpecDisplayName(element);
     }
 
     public static String methodEffectKey(String methodId) {

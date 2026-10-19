@@ -59,7 +59,8 @@ import static com.example.immortal_cultivation_mod.entity.BoneHitboxAnimation.sc
 /**
  * 空冥甲虫: a subterranean spatial beast with serialized, one-action-at-a-time combat.
  */
-public final class KongmingBeetleEntity extends Monster implements GeoEntity {
+public final class KongmingBeetleEntity extends RealmBeastMonster implements GeoEntity {
+    // Visuals use synchronized BeastAttackVfx; server combat and sounds remain unchanged.
     public static final float MODEL_SCALE = 1.0F;
 
     private static final EntityDataAccessor<Byte> ACTION_STATE =
@@ -219,7 +220,6 @@ public final class KongmingBeetleEntity extends Monster implements GeoEntity {
                 && spawnType != MobSpawnType.SPAWN_EGG
                 && spawnType != MobSpawnType.COMMAND) {
             if (pos.getY() > level.getSeaLevel() - 10
-                    || level.getMaxLocalRawBrightness(pos) > 7
                     || random.nextInt(5) != 0) {
                 return false;
             }
@@ -262,19 +262,8 @@ public final class KongmingBeetleEntity extends Monster implements GeoEntity {
         if ((tickCount & 3) == 0) {
             double orbit = tickCount * (isEnraged() ? 0.33D : 0.18D);
             double radius = isEnraged() ? 0.95D : 0.72D;
-            level().addParticle(ModParticles.METHOD_QI_DARK.get(),
-                    getX() + Math.cos(orbit) * radius,
-                    getY() + 0.72D + Math.sin(orbit * 0.5D) * 0.2D,
-                    getZ() + Math.sin(orbit) * radius,
-                    0.0D, 0.012D, 0.0D);
         }
-        if (isEnraged() && (tickCount & 1) == 0) {
-            level().addParticle(ParticleTypes.REVERSE_PORTAL,
-                    getX() + (random.nextDouble() - 0.5D) * 1.8D,
-                    getY() + 0.25D + random.nextDouble() * 0.9D,
-                    getZ() + (random.nextDouble() - 0.5D) * 1.8D,
-                    0.0D, 0.02D, 0.0D);
-        }
+
     }
 
     @Override
@@ -418,12 +407,6 @@ public final class KongmingBeetleEntity extends Monster implements GeoEntity {
         }
         BeastMoveBlockBreaker.breakSphere(level, this, center,
                 2.4D, 1.6D, 24, 5.0F);
-        level.sendParticles(ParticleTypes.REVERSE_PORTAL,
-                center.x, center.y, center.z,
-                65, 1.6D, 1.0D, 1.6D, 0.42D);
-        level.sendParticles(ModParticles.METHOD_QI_DARK.get(),
-                center.x, center.y, center.z,
-                36, 1.2D, 0.8D, 1.2D, 0.13D);
         level.playSound(null, BlockPos.containing(center),
                 SoundEvents.RESPAWN_ANCHOR_DEPLETE.value(),
                 SoundSource.HOSTILE, 1.2F, 0.62F);
@@ -432,12 +415,6 @@ public final class KongmingBeetleEntity extends Monster implements GeoEntity {
     private void tickCrystalRain(ServerLevel level, LivingEntity target, int ticks) {
         Vec3 shell = position().add(0.0D, 1.05D, 0.0D);
         if (ticks >= 27 && ticks % 2 == 0) {
-            level.sendParticles(ModParticles.METHOD_QI_DARK.get(),
-                    shell.x, shell.y, shell.z,
-                    10, 0.72D, 0.25D, 0.72D, 0.06D);
-            level.sendParticles(ParticleTypes.ENCHANT,
-                    shell.x, shell.y, shell.z,
-                    8, 0.55D, 0.2D, 0.55D, 0.18D);
         }
         if (ticks == 27) {
             level.playSound(null, blockPosition(), SoundEvents.AMETHYST_BLOCK_CHIME,
@@ -480,9 +457,6 @@ public final class KongmingBeetleEntity extends Monster implements GeoEntity {
         Vec3 center = getBoundingBox().getCenter();
         if (ticks >= 9) {
             double squeeze = Math.max(0.05D, (ticks - 8) / 8.0D);
-            level.sendParticles(ParticleTypes.REVERSE_PORTAL,
-                    center.x, center.y, center.z,
-                    12, 0.55D * squeeze, 0.55D, 0.55D * squeeze, 0.08D);
         }
         if (ticks != 8 || teleportDestination == null) {
             return;
@@ -548,14 +522,7 @@ public final class KongmingBeetleEntity extends Monster implements GeoEntity {
         for (int index = 0; index < points; index++) {
             double y = center.y - height * 0.5D
                     + height * index / Math.max(1, points - 1);
-            level.sendParticles(ModParticles.METHOD_QI_DARK.get(),
-                    center.x, y, center.z,
-                    1, 0.025D, 0.02D, 0.025D, 0.0D);
-            if ((index & 2) == 0) {
-                level.sendParticles(ParticleTypes.REVERSE_PORTAL,
-                        center.x, y, center.z,
-                        1, 0.04D, 0.02D, 0.04D, 0.01D);
-            }
+
         }
     }
 
@@ -590,12 +557,6 @@ public final class KongmingBeetleEntity extends Monster implements GeoEntity {
             movement.setBaseValue(ENRAGED_MOVE_SPEED);
         }
         if (level() instanceof ServerLevel level) {
-            level.sendParticles(ModParticles.METHOD_QI_DARK.get(),
-                    getX(), getY() + 0.65D, getZ(),
-                    90, 1.3D, 0.8D, 1.3D, 0.2D);
-            level.sendParticles(ParticleTypes.REVERSE_PORTAL,
-                    getX(), getY() + 0.65D, getZ(),
-                    75, 1.25D, 0.85D, 1.25D, 0.32D);
             level.playSound(null, blockPosition(), SoundEvents.WARDEN_ROAR,
                     SoundSource.HOSTILE, 0.9F, 1.55F);
         }
@@ -677,6 +638,9 @@ public final class KongmingBeetleEntity extends Monster implements GeoEntity {
         }
         float turn = random.nextBoolean() ? 0.65F : -0.65F;
         Vec3 redirected = movement.yRot(turn).scale(0.72D).add(0.0D, 0.12D, 0.0D);
+        com.example.immortal_cultivation_mod.network.BeastVfxPayloads.emit(this,
+                com.example.immortal_cultivation_mod.network.BeastVfxPayloads.Phase.DEFLECT,
+                projectile.position(),redirected,true);
         projectile.setDeltaMovement(redirected);
         projectile.setPos(projectile.getX() + redirected.x * 0.35D,
                 projectile.getY() + 0.12D,
@@ -693,14 +657,8 @@ public final class KongmingBeetleEntity extends Monster implements GeoEntity {
                 : direct.getBoundingBox().getCenter();
         for (int copy = 0; copy < 4; copy++) {
             double offset = (copy - 1.5D) * 0.12D;
-            level.sendParticles(ModParticles.METHOD_QI_DARK.get(),
-                    point.x + offset, point.y + random.nextDouble() * 0.18D,
-                    point.z - offset,
-                    redirected ? 5 : 3, 0.12D, 0.12D, 0.12D, 0.02D);
         }
-        level.sendParticles(ParticleTypes.REVERSE_PORTAL,
-                point.x, point.y, point.z,
-                redirected ? 18 : 9, 0.28D, 0.24D, 0.28D, 0.08D);
+        {}
     }
 
     private void beginAction(byte action, int ticks) {

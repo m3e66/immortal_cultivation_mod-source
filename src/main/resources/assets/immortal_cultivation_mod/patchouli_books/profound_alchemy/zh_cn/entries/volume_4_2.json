@@ -1,0 +1,18 @@
+{
+  "name": "定神丹",
+  "icon": "immortal_cultivation_mod:dingshen_pill",
+  "category": "immortal_cultivation_mod:volume_4",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "定神丹可安稳气机，驱散侵体之虚弱与迟滞。服丹之后，一段时间内气息不易受此类异力干扰，适用于遭敌术压制之际。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹效",
+      "text": "立即解除缓慢与虚弱，并于四十五息内防止两者再次生效。"
+    }
+  ]
+}

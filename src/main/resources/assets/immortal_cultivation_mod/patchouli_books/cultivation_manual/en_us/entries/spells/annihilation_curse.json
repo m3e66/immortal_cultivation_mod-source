@@ -1,0 +1,43 @@
+{
+  "name": "The Unfinished Curse",
+  "icon": "immortal_cultivation_mod:sealed_cradle_bottle",
+  "category": "immortal_cultivation_mod:spells",
+  "sortnum": 38,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "The Sealed Cradle",
+      "text": "A swaddled newborn rests inside the Sealed Cradle Bottle. Breaking it yields no item: black seals scatter, then swarm the nearest living player in that dimension and grant One Whom Annihilation Has Not Finished. Contact infection does not copy this innate ability."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "The Sealed Cradle",
+      "text": "The bottle currently comes from Creative inventory or /give @s immortal_cultivation_mod:sealed_cradle_bottle; it has no natural generation."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "A Borrowed Life",
+      "text": "At five percent HP, or when a hit would cross that threshold, the host is restored to full health once in that life. Restored HP appears black in both the mod health bar and AsteorBar and is spent first. The host cannot heal again until death. The thirty-minute cooldown advances only while online, survives death and reconnecting, and cannot be bypassed with another bottle."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Ink Beneath the Skin",
+      "text": "After rescue, black runes creep from the chest across the host over eight seconds without harming it. They coat the base skin and visible outer hat, jacket, sleeve and trouser layers, including first-person sleeves. Each rune drifts independently, rebounds at model edges and bumps away from other runes; transparent skin pixels remain clear."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Ink Beneath the Skin",
+      "text": "Once the bloom finishes, accepted attacks plant runes; repeated hits accelerate growth. Infected targets lose Qi and HP each second and cannot heal until death. Their saved coverage remains independent of the caster and survives departure or chunk unloading. Host death clears its own marks; infected players retain their target coverage on respawn."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Contact and Restraint",
+      "text": "Touching an infected entity spreads runes, capped at half its current coverage. Repeated touches do not add another half. Full coverage can pass at most fifty percent; that recipient can pass at most twenty-five percent. Contact does not grant the rescue ability. Creative and spectator players are protected."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Meditation Against the Curse",
+      "text": "Runes never expire on their own. Every full minute spent meditating removes one percentage point. Meditation pauses growth but grants neither cultivation progress nor method proficiency until all runes are gone. Remaining runes can resume growth after meditation stops. Full cleansing restores meditation experience; an existing healing lock still lasts until death."
+    }
+  ]
+}

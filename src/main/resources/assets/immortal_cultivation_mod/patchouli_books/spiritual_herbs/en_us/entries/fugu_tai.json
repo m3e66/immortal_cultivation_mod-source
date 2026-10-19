@@ -1,0 +1,23 @@
+{
+  "name": "Bone-Rot Moss",
+  "icon": "immortal_cultivation_mod:fugu_tai",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 9,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Bone-Rot Moss",
+      "text": "$(bold)Spawn attempt frequency: $()1/5"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Bone-Rot Moss grows in damp, decaying environments where sunlight rarely reaches. Its dark surface clings to stone and rotting soil, drawing nourishment from stagnant surroundings. It is commonly found in ancient caves and marshlands."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Dripstone caves, the deep dark, swamps, and mangrove swamps."
+    }
+  ]
+}

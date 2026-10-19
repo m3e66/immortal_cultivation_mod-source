@@ -65,7 +65,7 @@ public final class NpcBattlePlan {
                 advantage<-.40F?Momentum.COLLAPSING:advantage<-.15F?Momentum.DISADVANTAGE:Momentum.EVEN;
         long probeTicks=(long)(60+experience*100+(personality.equals("cautious")?60:personality.equals("aggressive")?-30:0));
         phase=s.enemyHealth()<=.20F?Phase.FINISH:s.opening()||advantage>.15F&&observations>=3?Phase.PRESSURE:
-                now-began<20?Phase.OBSERVE:now-began<probeTicks || observations<3?Phase.PROBE:Phase.COUNTER;
+                now-began<20?Phase.OBSERVE:now-began<probeTicks || observations<3&&now-began<probeTicks+60?Phase.PROBE:Phase.COUNTER;
     }
     public Mode mode(){return mode;}
     public Phase phase(){return phase;}
@@ -86,6 +86,6 @@ public final class NpcBattlePlan {
     public boolean canSpend(int cost,int qi,int maxQi,boolean emergency) {
         if(cost>qi)return false;
         return frenzy()||mode==Mode.SURVIVAL||emergency||cost==0
-                || qi-cost>=maxQi*reserveFraction() && (cost<qi*.4 || pressure());
+                || qi-cost>=maxQi*reserveFraction() && (cost<qi*.4 || !probing());
     }
 }

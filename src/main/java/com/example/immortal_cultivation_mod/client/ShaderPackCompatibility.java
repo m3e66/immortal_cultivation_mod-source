@@ -13,29 +13,32 @@ public final class ShaderPackCompatibility {
             "net.irisshaders.iris.api.v0.IrisApi",
             "net.coderbot.iris.api.v0.IrisApi"
     };
-    private static final long PROBE_INTERVAL_NANOS = 250_000_000L;
-
     private static boolean initialized;
     private static Object irisApi;
     private static Method isShaderPackInUse;
     private static Method isRenderingShadowPassMethod;
-    private static long lastProbeNanos = Long.MIN_VALUE;
-    private static boolean shaderPackActive;
-    private static boolean shadowPass;
 
     private ShaderPackCompatibility() {
     }
 
+    /** Keep the preference available even after the player switches shader packs off. */
+    public static boolean isShaderModPresent() {
+        initialize();
+        return irisApi != null && isShaderPackInUse != null;
+    }
+
     /** True only while an installed Iris-compatible shader pack is actively rendering. */
     public static boolean isShaderPackActive() {
-        refreshState();
-        return shaderPackActive;
+        initialize();
+        return query(isShaderPackInUse);
     }
 
     /** Prevents custom sky overlays from being submitted to an Iris shadow-map pass. */
     public static boolean isRenderingShadowPass() {
-        refreshState();
-        return shadowPass;
+        initialize();
+        // Iris switches this flag within a single frame. Caching even one frame can
+        // hide the normal sky or submit it to a shadow map, producing flashing.
+        return query(isRenderingShadowPassMethod);
     }
 
     /** Custom core shaders are replaced with Minecraft render shaders while a pack is active. */
@@ -43,28 +46,12 @@ public final class ShaderPackCompatibility {
         return !isShaderPackActive();
     }
 
-    private static void refreshState() {
-        initialize();
-        if (irisApi == null || isShaderPackInUse == null) {
-            shaderPackActive = false;
-            shadowPass = false;
-            return;
-        }
-
-        long now = System.nanoTime();
-        if (lastProbeNanos != Long.MIN_VALUE
-                && now - lastProbeNanos < PROBE_INTERVAL_NANOS) {
-            return;
-        }
-        lastProbeNanos = now;
+    private static boolean query(Method method) {
+        if (irisApi == null || method == null) return false;
         try {
-            shaderPackActive = Boolean.TRUE.equals(isShaderPackInUse.invoke(irisApi));
-            shadowPass = shaderPackActive && isRenderingShadowPassMethod != null
-                    && Boolean.TRUE.equals(
-                            isRenderingShadowPassMethod.invoke(irisApi));
+            return Boolean.TRUE.equals(method.invoke(irisApi));
         } catch (IllegalAccessException | InvocationTargetException | LinkageError ignored) {
-            shaderPackActive = false;
-            shadowPass = false;
+            return false;
         }
     }
 

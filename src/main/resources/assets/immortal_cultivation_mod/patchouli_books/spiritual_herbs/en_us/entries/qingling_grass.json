@@ -1,0 +1,23 @@
+{
+  "name": "Clear Spirit Grass",
+  "icon": "immortal_cultivation_mod:qingling_grass",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Clear Spirit Grass",
+      "text": "$(bold)Spawn attempt frequency: $()1/5"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Clear Spirit Grass grows where the spiritual energy of nature flows gently and without disturbance. Its bright green leaves carry a faint spiritual glow, most noticeable beneath the morning dew. Though not particularly rare, it is a familiar herb to cultivators beginning their journey into alchemy."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Meadows, groves, forests, rivers, lush caves, and old-growth pine taigas."
+    }
+  ]
+}

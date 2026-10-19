@@ -29,6 +29,10 @@ public abstract class FittedMenuScreen extends Screen {
 
     protected abstract void initMenu();
 
+    protected final double toMenuCoordinate(double coordinate) {
+        return viewport.toMenu(coordinate);
+    }
+
     @Override
     public final void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         graphics.pose().pushPose();

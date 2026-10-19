@@ -60,10 +60,10 @@ public final class TechniqueIcons {
             textureName = "scroll_ice";
         } else if (element.contains(SpiritRoots.WIND)) {
             textureName = "scroll_wind";
-        } else if (element.contains(SpiritRoots.LIGHT)) {
-            textureName = "scroll_light";
-        } else if (element.contains(SpiritRoots.DARK)) {
-            textureName = "scroll_dark";
+        } else if (element.contains(SpiritRoots.YANG)) {
+            textureName = "scroll_yang";
+        } else if (element.contains(SpiritRoots.YIN)) {
+            textureName = "scroll_yin";
         } else {
             textureName = "cultivation_manual";
         }

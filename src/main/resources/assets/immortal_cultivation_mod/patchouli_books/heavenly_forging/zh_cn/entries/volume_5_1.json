@@ -1,0 +1,13 @@
+{
+  "name": "材纯定成败",
+  "icon": "immortal_cultivation_mod:liujin_sand",
+  "category": "immortal_cultivation_mod:volume_5",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "炼器之成败，首重灵材纯度。诸材精华相融，其纯度按用量权重而定。纯度愈高，成器之机愈大；若诸材皆至至纯之境，则成器可保万无一失。"
+    }
+  ]
+}

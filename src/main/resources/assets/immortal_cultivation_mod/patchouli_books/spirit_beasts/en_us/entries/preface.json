@@ -1,0 +1,13 @@
+{
+  "name": "Preface",
+  "icon": "minecraft:book",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Spirit Beasts",
+      "text": "Where spiritual energy gathers, extraordinary beasts are born. Some are gentle and attuned to nature, while others are fierce creatures capable of bringing ruin to entire lands. A cultivator must learn their habitats and recognize their strength before venturing into the wilderness."
+    }
+  ]
+}

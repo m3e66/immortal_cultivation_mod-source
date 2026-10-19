@@ -7,6 +7,7 @@ import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.attachment.SpiritRoots;
 import com.example.immortal_cultivation_mod.attribute.ModAttributes;
 import com.example.immortal_cultivation_mod.client.ClientData;
+import com.example.immortal_cultivation_mod.client.ShentongClient;
 import com.example.immortal_cultivation_mod.client.DaoGuidanceClient;
 import com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent;
 import com.example.immortal_cultivation_mod.network.DaoGuidancePayloads;
@@ -124,7 +125,9 @@ public class StatMenuScreen extends FittedMenuScreen {
     private AbstractButton breakthroughBtn;
     private AbstractButton proficiencyBtn;
     private AbstractButton jindanBtn;
+    private AbstractButton shentongBtn;
     private AbstractButton voidBreakBtn;
+    private AbstractButton rootsBtn;
 
     public StatMenuScreen() {
         super(Component.translatable(
@@ -142,6 +145,17 @@ public class StatMenuScreen extends FittedMenuScreen {
         skillButtons.clear();
         int x = left();
         int y = top();
+
+        rootsBtn = addRenderableWidget(new InvisibleButton(
+                x + ROOT_X, y + ROOT_Y, ROOT_W, ROOT_H,
+                Component.translatable("screen.immortal_cultivation_mod.root_details"),
+                ignored -> minecraft.setScreen(new SpiritRootDetailsScreen(this))));
+        addRenderableWidget(new InvisibleButton(
+                x + TRAITS_X, y + TRAIT_START_Y, TRAITS_W, TRAIT_SPACING,
+                Component.translatable("screen.immortal_cultivation_mod.body_details"),
+                ignored -> minecraft.setScreen(new BodyTypeDetailsScreen(this))));
+        addRenderableWidget(new CultivationGuiButton(x+TRAITS_X,y+310,TRAITS_W,20,
+                Component.translatable("toxicity.title"),()->minecraft.setScreen(new PillToxicityScreen(this))));
 
         PacketDistributor.sendToServer(
                 new DaoGuidancePayloads.ServerboundDaoGuidanceActionPayload(
@@ -209,6 +223,16 @@ public class StatMenuScreen extends FittedMenuScreen {
                 },
                 JINDAN_BUTTON_TEXTURE));
 
+        shentongBtn = addRenderableWidget(new TexturedIconButton(
+                x + PROFILE_X + 5, y + PROFILE_Y + 5, 22, 22,
+                Component.translatable("screen.immortal_cultivation_mod.shentong_title"),
+                ignored -> minecraft.setScreen(new ShentongDetailsScreen(this)),
+                ShentongDetailsScreen.ICON,ShentongDetailsScreen.ICON_SIZE,ShentongDetailsScreen.ICON_SIZE));
+        shentongBtn.setTooltip(net.minecraft.client.gui.components.Tooltip.create(
+                Component.translatable("screen.immortal_cultivation_mod.shentong_open")));
+        shentongBtn.active = shentongBtn.visible = ShentongClient.hasShentong();
+        ShentongClient.request();
+
         voidBreakBtn = addRenderableWidget(new TexturedIconButton(
                 x + PROFILE_X + PROFILE_W - 27,
                 y + PROFILE_Y + 29,
@@ -230,6 +254,12 @@ public class StatMenuScreen extends FittedMenuScreen {
 
     private int left() {
         return (width - WINDOW_W) / 2;
+    }
+
+    private int shentongRefreshTicks;
+    @Override public void tick() {
+        super.tick();
+        if (++shentongRefreshTicks >= 20) { shentongRefreshTicks=0; ShentongClient.request(); }
     }
 
     private int top() {
@@ -281,7 +311,7 @@ public class StatMenuScreen extends FittedMenuScreen {
             setWidgetsVisible(false);
             drawCenteredScaled(
                     graphics,
-                    Component.literal("No data"),
+                    Component.translatable("screen.immortal_cultivation_mod.no_data"),
                     x + WINDOW_W / 2,
                     y + WINDOW_H / 2,
                     120,
@@ -309,10 +339,11 @@ public class StatMenuScreen extends FittedMenuScreen {
                         "zombie_rank." + ImmortalCultivationMod.MODID + "."
                                 + UndeadControl.rankIdForGrudge(zombieGrudge))
                 : CultivationLevels.displayName(level);
-        int maxHp = livingCorpse
-                ? Math.max(1, Math.round(minecraft.player.getMaxHealth()))
-                : Math.max(1, levelDef.maxHp() + data.maxHpBonus());
-        int maxQi = levelDef.maxQi() + data.maxQiBonus();
+        int maxHp = minecraft.player == null
+                ? Math.max(1, (int)Math.round((levelDef.maxHp() + data.maxHpBonus())
+                        * com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.healthMultiplier(data.bodyType())))
+                : Math.max(1, Math.round(minecraft.player.getMaxHealth()));
+        int maxQi = data.maxQi();
         boolean jindanOrHigher =
                 CultivationLevels.getStageIndex(level)
                         >= CultivationLevels.getStageIndex(
@@ -354,8 +385,16 @@ public class StatMenuScreen extends FittedMenuScreen {
         jindanBtn.visible = jindanOrHigher;
         voidBreakBtn.active = huashenOrHigher;
         voidBreakBtn.visible = huashenOrHigher;
+        shentongBtn.active = shentongBtn.visible = ShentongClient.hasShentong();
 
         super.renderMenu(graphics, mouseX, mouseY, partialTick);
+        if (mouseX >= x + TRAITS_X && mouseX < x + TRAITS_X + TRAITS_W
+                && mouseY >= y + TRAIT_START_Y && mouseY < y + TRAIT_START_Y + TRAIT_SPACING) {
+            var lines = new java.util.ArrayList<net.minecraft.util.FormattedCharSequence>();
+            lines.add(com.example.immortal_cultivation_mod.attachment.BodyTypes.rarityName(data.bodyType()).getVisualOrderText());
+            lines.addAll(minecraft.font.split(com.example.immortal_cultivation_mod.attachment.BodyTypes.description(data.bodyType()), 240));
+            graphics.renderTooltip(minecraft.font, lines, mouseX, mouseY);
+        }
     }
 
     private void renderPanels(
@@ -485,8 +524,10 @@ public class StatMenuScreen extends FittedMenuScreen {
                 PERSON_HEIGHT,
                 PERSON_WIDTH,
                 PERSON_HEIGHT);
-        int levelTextWidth = PROFILE_W - 12;
-        int levelTextCenter = x + PROFILE_X + PROFILE_W / 2;
+        int levelLeftInset = ShentongClient.hasShentong() ? 30 : 6;
+        int levelRightInset = jindanOrHigher ? 30 : 6;
+        int levelTextWidth = PROFILE_W - levelLeftInset - levelRightInset;
+        int levelTextCenter = x + PROFILE_X + levelLeftInset + levelTextWidth / 2;
         drawCenteredScaled(
                 graphics,
                 level,
@@ -539,7 +580,7 @@ public class StatMenuScreen extends FittedMenuScreen {
                 0,
                 labelled(
                         "body_type",
-                        Component.literal(data.bodyType())),
+                        com.example.immortal_cultivation_mod.attachment.BodyTypes.displayName(data.bodyType())),
                 x,
                 y,
                 VALUE_COLOR);
@@ -633,26 +674,7 @@ public class StatMenuScreen extends FittedMenuScreen {
             int maxQi,
             int x,
             int y) {
-        Component points = Component.translatable(
-                "screen." + ImmortalCultivationMod.MODID
-                        + ".skill_points",
-                data.skillPoints());
-        graphics.fill(
-                x + 300,
-                y + 42,
-                x + 399,
-                y + 58,
-                0xCC315E50);
-        graphics.renderOutline(
-                x + 300, y + 42, 99, 16, 0xFF203F36);
-        drawCenteredScaled(
-                graphics,
-                points,
-                x + 349,
-                y + 46,
-                91,
-                0xFFF8F3DF,
-                true);
+        renderSkillPointsBadge(graphics, data.skillPoints(), x, y);
 
         for (int row = 0; row < 6; row++) {
             int rowY = y + SKILL_BUTTON_Y
@@ -741,6 +763,10 @@ public class StatMenuScreen extends FittedMenuScreen {
             long zombieGrudge,
             int x,
             int y) {
+        if (rootsBtn.isHoveredOrFocused()) {
+            graphics.fill(x + ROOT_X + 3, y + ROOT_Y + 3,
+                    x + ROOT_X + ROOT_W - 3, y + ROOT_Y + ROOT_H - 3, 0x225CA994);
+        }
         drawCenteredScaled(
                 graphics,
                 Component.translatable(
@@ -753,9 +779,7 @@ public class StatMenuScreen extends FittedMenuScreen {
                 false);
         drawCenteredScaled(
                 graphics,
-                Component.literal(SpiritRoots.format(
-                        data.spiritRoots(),
-                        data.spiritRootGrade())),
+                SpiritRoots.displayName(data.spiritRoots(), data.spiritRootGrade()),
                 x + ROOT_X + ROOT_W / 2,
                 y + ROOT_Y + 19,
                 ROOT_W - 10,
@@ -955,6 +979,40 @@ public class StatMenuScreen extends FittedMenuScreen {
                 x, y, width, height, PANEL_BORDER);
     }
 
+    protected void renderSkillPointsBadge(GuiGraphics graphics, int points, int x, int y) {
+        int left = x + 287, top = y + 39, width = 112, height = 20;
+        Component value = Component.literal(Integer.toString(points));
+        int valueWidth = Math.clamp(font.width(value) + 12, 28, 49);
+        int valueX = left + width - valueWidth - 4;
+        boolean available = points > 0;
+
+        graphics.fill(left + 1, top + 2, left + width + 1, top + height + 2, 0x2038352E);
+        graphics.fill(left, top, left + width, top + height, 0xFF99886A);
+        graphics.fillGradient(left + 1, top + 1, left + width - 1, top + height - 1,
+                0xFFF4EFDF, 0xFFE2D9C6);
+        graphics.hLine(left + 2, left + width - 3, top + 1, 0xFFFFF9E9);
+        graphics.hLine(left + 2, left + width - 3, top + height - 2, 0xFFCEC1A7);
+        graphics.fill(left, top, left + 5, top + 1, GOLD);
+        graphics.fill(left, top, left + 1, top + 5, GOLD);
+        graphics.fill(left + width - 5, top + height - 1, left + width, top + height, GOLD);
+        graphics.fill(left + width - 1, top + height - 5, left + width, top + height, GOLD);
+
+        // A small gilded seal ties the counter to the surrounding manuscript frame.
+        graphics.fill(left + 8, top + 7, left + 9, top + 12, GOLD);
+        graphics.fill(left + 6, top + 9, left + 11, top + 10, GOLD);
+        graphics.fill(left + 7, top + 8, left + 10, top + 11, GOLD);
+        graphics.fill(left + 8, top + 9, left + 9, top + 10, 0xFFF9F0D3);
+        drawScaled(graphics, Component.translatable("screen." + ImmortalCultivationMod.MODID
+                + ".skill_points_label"), left + 17, top + 6, valueX - left - 23, INK, false);
+
+        graphics.fill(valueX, top + 3, left + width - 4, top + height - 3,
+                available ? 0xFF9B8352 : 0xFF7D8A79);
+        graphics.fillGradient(valueX + 1, top + 4, left + width - 5, top + height - 4,
+                available ? 0xFF426557 : 0xFF6A7A6F, available ? 0xFF2F4E42 : 0xFF53665A);
+        drawCenteredScaled(graphics, value, valueX + valueWidth / 2, top + 6,
+                valueWidth - 8, available ? 0xFFF9E3A8 : 0xFFECEADB, false);
+    }
+
     private void drawCenteredScaled(
             GuiGraphics graphics,
             Component text,
@@ -1019,6 +1077,7 @@ public class StatMenuScreen extends FittedMenuScreen {
     }
 
     private void setWidgetsVisible(boolean visible) {
+        if (rootsBtn != null) rootsBtn.visible = visible;
         skillButtons.forEach(button -> button.visible = visible);
         if (breakthroughBtn != null) {
             breakthroughBtn.visible = visible;
@@ -1032,6 +1091,7 @@ public class StatMenuScreen extends FittedMenuScreen {
         if (voidBreakBtn != null) {
             voidBreakBtn.visible = visible;
         }
+        if (shentongBtn != null) shentongBtn.visible = visible && ShentongClient.hasShentong();
     }
 
     private boolean hasBreakthroughPill(

@@ -68,8 +68,8 @@ public final class XuanjinRules {
     public static float resistance(String element) {
         return switch (element) {
             case "fire" -> .70F; case "water", "ice" -> 1.10F; case "metal" -> .90F;
-            case "earth", "wind" -> .85F; case "lightning" -> .30F; case "light" -> 1.20F;
-            case "dark" -> .60F; case "soul" -> .50F; case "poison", "fall" -> 0; default -> 1F;
+            case "earth", "wind" -> .85F; case "lightning" -> .30F; case "yang", "light" -> 1.20F;
+            case "yin", "dark" -> .60F; case "soul" -> .50F; case "poison", "fall" -> 0; default -> 1F;
         };
     }
     public static int lightningEnergy(float prevented) { return Math.min(2000, (int)(prevented * .5F)); }

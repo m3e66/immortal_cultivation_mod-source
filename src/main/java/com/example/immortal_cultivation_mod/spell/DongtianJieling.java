@@ -23,7 +23,7 @@ public final class DongtianJieling {
         }
 
         var data = ModAttachments.getData(player);
-        int maxQi = Math.max(1, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
+        int maxQi = Math.max(1, data.maxQi());
         if (data.qi() >= maxQi) {
             player.displayClientMessage(Component.translatable(
                     "message." + ImmortalCultivationMod.MODID + ".dongtian_jieling_full"), true);

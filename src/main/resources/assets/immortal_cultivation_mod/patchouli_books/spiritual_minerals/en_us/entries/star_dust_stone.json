@@ -1,0 +1,23 @@
+{
+  "name": "Stardust Stone",
+  "icon": "immortal_cultivation_mod:star_dust_stone",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 7,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Stardust Stone",
+      "text": "$(bold)Starting height: $()Y 96 to 256$(br2)$(bold)Attempt frequency: $()1/36 chunks"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Stardust Stone is said to form where celestial radiance meets the spiritual energy of towering mountains. Tiny luminous fragments shimmer within its dark surface, resembling stars scattered across the night sky. Rare and difficult to locate, it is primarily found among the highest mountain ridges and alpine meadows."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Found among jagged, frozen, and stony peaks, windswept hills, and meadows, with starting elevations between Y 96 and 256."
+    }
+  ]
+}

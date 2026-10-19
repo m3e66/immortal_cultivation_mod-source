@@ -1,0 +1,23 @@
+{
+  "name": "Artifact Ownership",
+  "icon": "immortal_cultivation_mod:flying_sword",
+  "category": "immortal_cultivation_mod:principles",
+  "sortnum": 31,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "The First Damaging Strike",
+      "text": "A Fabao-tier or higher weapon binds to the first player who deals actual damage with it. Picking it up, equipping it, charging, or missing does not bind it. A fully blocked hit that deals no damage does not count."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "A Weapon and Its Owner",
+      "text": "Once bound, only its owner can use that weapon. Inspect the owner name in its tooltip before wielding a recovered artifact. Passing it to another player or reconnecting does not remove ownership."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Lesser Weapons",
+      "text": "Mortal, Magic, and Spiritual weapons are below this binding threshold. Existing realm, Qi, and handling requirements still apply. Moving a bound artifact to another hand does not change its owner."
+    }
+  ]
+}

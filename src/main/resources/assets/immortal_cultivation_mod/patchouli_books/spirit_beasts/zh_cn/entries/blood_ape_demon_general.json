@@ -1,0 +1,23 @@
+{
+  "name": "血猿妖将",
+  "icon": "immortal_cultivation_mod:blood_ape_demon_general_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_5",
+  "sortnum": 12,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "血猿妖将",
+      "text": "$(bold)境界：$()金丹至化神"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《灵兽志》记载",
+      "text": "血猿妖将身躯魁梧，血气冲天，乃深山老林中极为凶悍的大妖。其力可碎岩裂地，战意极盛，寻常法器难挡其怒击。多潜伏于阴暗密林，待夜色掩护方显踪迹。若林中忽闻沉重猿啸，当速速退避。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻踪",
+      "text": "藏于密林与暗林深处，多立足泥土、苔藓及岩石。喜夜间或天光遮蔽之时出没，其踪迹极其稀少。"
+    }
+  ]
+}

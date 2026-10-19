@@ -91,7 +91,7 @@ public class DuanliuKongdunDomeEntity extends Entity {
     private void drainPlayerQi(ServerPlayer player) {
         if (player.tickCount % 20 == 0) {
             var data = ModAttachments.getData(player);
-            int maxQi = Math.max(1, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
+            int maxQi = Math.max(1, data.maxQi());
             ServerEvents.spendSustainedQiOrBlood(
                     player, data,
                     Math.max(1, maxQi * QI_DRAIN_PERCENT_PER_SECOND / 100));

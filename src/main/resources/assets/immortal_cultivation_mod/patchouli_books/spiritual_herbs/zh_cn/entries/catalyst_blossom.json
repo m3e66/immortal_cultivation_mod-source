@@ -1,0 +1,23 @@
+{
+  "name": "催化花",
+  "icon": "immortal_cultivation_mod:catalyst_blossom",
+  "category": "immortal_cultivation_mod:volume_4",
+  "sortnum": 12,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "催化花",
+      "text": "$(bold)生成尝试频率：$()1/12"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《百草录》记载",
+      "text": "催化花善应天地灵气之变，花蕊活跃，灵息流转迅疾。丹道中有药引催化之说，此花因其灵性而得名。常现于风气通达、百花争放之地。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻药",
+      "text": "草甸、狂风山丘、狂风森林及繁花森林。"
+    }
+  ]
+}

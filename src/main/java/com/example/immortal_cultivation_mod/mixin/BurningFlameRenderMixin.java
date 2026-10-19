@@ -17,6 +17,11 @@ public abstract class BurningFlameRenderMixin {
     @Inject(method = "renderFlame", at = @At("HEAD"), cancellable = true)
     private void cultivation$burnFlame(PoseStack poses, MultiBufferSource buffers, Entity entity,
             Quaternionf rotation, CallbackInfo callback) {
+        if(entity instanceof LivingEntity living&&(com.example.immortal_cultivation_mod.client.QiAuraRenderer.hasDomainFire(living)
+                ||com.example.immortal_cultivation_mod.client.qi.IceCoatingClient.appearance(living,0)!=null)) {
+            // Confirmed domain fire is already drawn in world space; frost stays visible on the real model.
+            callback.cancel();return;
+        }
         if (entity instanceof LivingEntity living && BurningFlameVisuals.color(living) != -1) {
             BurningFlameVisuals.render(poses, buffers, living, rotation);
             callback.cancel();

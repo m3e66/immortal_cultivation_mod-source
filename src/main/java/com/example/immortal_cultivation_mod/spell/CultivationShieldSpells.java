@@ -286,8 +286,8 @@ public final class CultivationShieldSpells {
             if (!player.isAlive()) {
                 stopWind(player, false, false);
             } else if (player.tickCount % 20 == 0
-                    && !ServerEvents.spendSustainedQiOrBlood(
-                    player, ModAttachments.getData(player), WIND_SUSTAIN_COST)) {
+                    && !ServerEvents.spendSustainedSpellQiOrBlood(
+                    player, ModAttachments.getData(player), WIND_SUSTAIN_COST, ModSpells.LIUFENG_XIEJIN)) {
                 stopWind(player, true, true);
             } else {
                 if (player.tickCount % 2 == 0) {
@@ -323,8 +323,8 @@ public final class CultivationShieldSpells {
             if (!player.isAlive()) {
                 stopDomain(player, false, false);
             } else if (player.tickCount % 20 == 0
-                    && !ServerEvents.spendSustainedQiOrBlood(
-                    player, ModAttachments.getData(player), domain.sustainCost)) {
+                    && !ServerEvents.spendSustainedSpellQiOrBlood(
+                    player, ModAttachments.getData(player), domain.sustainCost, ModSpells.YUANGANG_HUJIE)) {
                 stopDomain(player, true, true);
             } else {
                 if (player.tickCount % 4 == 0) {
@@ -602,7 +602,7 @@ public final class CultivationShieldSpells {
                 WeaponRestrictionSystem.RestrictionType.ARMOR_BREAKING) > 0) {
             multiplier = Math.max(multiplier, 1.25F);
         }
-        return multiplier;
+        return multiplier * com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.shieldMultiplier(source);
     }
 
     private static float directShieldMultiplier(DamageSource source) {
@@ -1170,7 +1170,7 @@ public final class CultivationShieldSpells {
             double angle = fragment * Math.PI * 2.0D / 12.0D;
             Vec3 p = center.add(Math.cos(angle) * 1.28D,
                     Math.sin(angle * 2.0D) * 0.58D, Math.sin(angle) * 1.28D);
-            level.sendParticles(fragment % 2 == 0 ? MIRROR_WHITE : ModParticles.METHOD_QI_LIGHT.get(),
+            level.sendParticles(fragment % 2 == 0 ? MIRROR_WHITE : ModParticles.METHOD_QI_YANG.get(),
                     p.x, p.y, p.z, 3, 0.08D, 0.08D, 0.08D, 0.025D);
             if (previous != null) {
                 emitLine(level, MIRROR_GOLD, previous, p, 0.20D);
@@ -1193,7 +1193,7 @@ public final class CultivationShieldSpells {
             Vec3 p = center.add(Math.cos(angle) * 1.42D,
                     Math.sin(angle * 1.7D + fragment) * 0.66D,
                     Math.sin(angle) * 1.42D);
-            point(level, fragment % 2 == 0 ? MIRROR_GOLD : ModParticles.METHOD_QI_LIGHT.get(), p);
+            point(level, fragment % 2 == 0 ? MIRROR_GOLD : ModParticles.METHOD_QI_YANG.get(), p);
         }
         int cracks = Math.min(7, Math.max(0, (int) ((1.0F - ratio) * 9.0F)));
         Vec3 crackCenter = state.lastHitAt == Long.MIN_VALUE
@@ -1245,7 +1245,7 @@ public final class CultivationShieldSpells {
             ServerLevel level, ServerPlayer caster, Vec3 projectilePosition, UUID originalOwnerId) {
         level.sendParticles(ParticleTypes.FLASH, projectilePosition.x, projectilePosition.y,
                 projectilePosition.z, 1, 0.0D, 0.0D, 0.0D, 0.0D);
-        level.sendParticles(ModParticles.METHOD_QI_LIGHT.get(), projectilePosition.x,
+        level.sendParticles(ModParticles.METHOD_QI_YANG.get(), projectilePosition.x,
                 projectilePosition.y, projectilePosition.z, 34, 0.55D, 0.55D, 0.55D, 0.13D);
         level.sendParticles(MIRROR_GOLD, projectilePosition.x, projectilePosition.y,
                 projectilePosition.z, 20, 0.42D, 0.42D, 0.42D, 0.10D);
@@ -1269,7 +1269,7 @@ public final class CultivationShieldSpells {
     private static void emitMirrorBreak(ServerLevel level, ServerPlayer player) {
         Vec3 center = shieldCenter(player);
         emitSphere(level, MIRROR_WHITE, center, 1.25D, 54, player.tickCount * 0.04D);
-        level.sendParticles(ModParticles.METHOD_QI_LIGHT.get(), center.x, center.y, center.z,
+        level.sendParticles(ModParticles.METHOD_QI_YANG.get(), center.x, center.y, center.z,
                 180, 1.45D, 1.15D, 1.45D, 0.18D);
         level.sendParticles(MIRROR_GOLD, center.x, center.y, center.z,
                 96, 1.25D, 1.0D, 1.25D, 0.14D);

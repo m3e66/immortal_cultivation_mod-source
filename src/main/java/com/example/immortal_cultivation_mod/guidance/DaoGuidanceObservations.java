@@ -70,6 +70,8 @@ public final class DaoGuidanceObservations {
                 }
             }
             if (WeaponRestrictionSystem.isWeapon(stack)) DaoGuidanceSystem.discover(player, "weapon_growth");
+            if (WeaponBinding.eligible(stack)) DaoGuidanceSystem.discover(player, "weapon_binding");
+            if (stack.is(ModItems.YINYANG_COMPASS.get())) DaoGuidanceSystem.discover(player, "exploration_tools");
             if (stack.getItem() instanceof com.example.immortal_cultivation_mod.alchemy.AlchemyPillItem
                     || stack.getItem() instanceof com.example.immortal_cultivation_mod.alchemy.LegacyPillItem)
                 record(player, "pill_obtained");
@@ -119,10 +121,12 @@ public final class DaoGuidanceObservations {
         });
         if (player.containerMenu instanceof HairMenu) record(player, "hair_opened");
         var data = ModAttachments.getData(player);
+        if (CultivationLevels.getRealmIndex(data.cultivationLevel()) >= 3)
+            DaoGuidanceSystem.discover(player, "qi_blast");
         if (data.cultivationLevel().equals(CultivationLevels.REALM_HALF_JINDAN)) {
             record(player, "core_failed");
             if (data.cultivationProgress() >= CultivationLevels.getTotalQiNeeded(data.cultivationLevel())
-                    && data.qi() >= CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus())
+                    && data.qi() >= data.maxQi())
                 record(player, "core_ready");
         }
         if (player.tickCount % 40 == 0 && !player.serverLevel().getEntitiesOfClass(

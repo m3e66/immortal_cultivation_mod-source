@@ -1,6 +1,7 @@
 package com.example.immortal_cultivation_mod.client.renderer;
 
-import com.example.immortal_cultivation_mod.magicritual.block.custom.CircleType;
+import com.example.immortal_cultivation_mod.client.FormationLayers;
+
 import com.example.immortal_cultivation_mod.magicritual.block.custom.MagicCenterBlockEntity;
 import com.example.immortal_cultivation_mod.magicritual.block.custom.MagicCircleBlock;
 import com.example.immortal_cultivation_mod.magicritual.block.custom.MagicCircleBlockEntity;
@@ -31,32 +32,7 @@ import org.joml.Matrix4f;
 public class MagicRitualGlyphRenderer<T extends BlockEntity> implements BlockEntityRenderer<T> {
    private static final double ORPHAN_RENDER_DISTANCE = (double)96.0F;
    private static final float ENTRY_EXPANSION_TICKS = 30.0F;
-   private static final ResourceLocation CENTER_TEXTURE = texture("magic_center_glyph");
-   private static final ResourceLocation ATTACK_TEXTURE = texture("magic_circle_glyph");
-   private static final ResourceLocation DEFENSE_TEXTURE = texture("magic_circle_defense_glyph");
-   private static final ResourceLocation REGENERATION_TEXTURE = texture("magic_circle_regeneration_glyph");
-   private static final ResourceLocation FOG_TEXTURE_1 = texture("magic_center_fog_1");
-   private static final ResourceLocation FOG_TEXTURE_2 = texture("magic_center_fog_2");
-   private static final ResourceLocation INVERTED_TEXTURE_1 = texture("magic_center_inverted_1");
-   private static final ResourceLocation INVERTED_TEXTURE_2 = texture("magic_center_inverted_2");
-   private static final ResourceLocation FORCEFIELD_TEXTURE_1 = texture("magic_center_forcefield_1");
-   private static final ResourceLocation FORCEFIELD_TEXTURE_2 = texture("magic_center_forcefield_2");
-   private static final ResourceLocation SCORCHING_TEXTURE_1 = texture("magic_center_scorching_1");
-   private static final ResourceLocation SCORCHING_TEXTURE_2 = texture("magic_center_scorching_2");
-   private static final ResourceLocation SANCTUARY_TEXTURE_1 = texture("magic_center_sanctuary_1");
-   private static final ResourceLocation SANCTUARY_TEXTURE_2 = texture("magic_center_sanctuary_2");
-   private static final ResourceLocation FROST_TEXTURE_1 = texture("magic_center_frost_1");
-   private static final ResourceLocation FROST_TEXTURE_2 = texture("magic_center_frost_2");
-   private static final ResourceLocation DECAY_TEXTURE_1 = texture("magic_center_decay_1");
-   private static final ResourceLocation DECAY_TEXTURE_2 = texture("magic_center_decay_2");
-   private static final ResourceLocation THUNDER_TEXTURE_1 = texture("magic_center_thunder_1");
-   private static final ResourceLocation THUNDER_TEXTURE_2 = texture("magic_center_thunder_2");
-   private static final ResourceLocation DETECTION_TEXTURE_1 = texture("magic_center_detection_1");
-   private static final ResourceLocation DETECTION_TEXTURE_2 = texture("magic_center_detection_2");
-   private static final ResourceLocation REFORGE_BLADE_TEXTURE_1 = texture("magic_center_reforge_blade_1");
-   private static final ResourceLocation REFORGE_BLADE_TEXTURE_2 = texture("magic_center_reforge_blade_2");
-   private static final ResourceLocation TELEPORT_TEXTURE_1 = texture("magic_center_teleport_1");
-   private static final ResourceLocation TELEPORT_TEXTURE_2 = texture("magic_center_teleport_2");
+
    private static final ResourceLocation WHITE_TEXTURE = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/misc/white.png");
    private static final int FORCEFIELD_MIN_LONGITUDE_SEGMENTS = 32;
    private static final int FORCEFIELD_MAX_LONGITUDE_SEGMENTS = 64;
@@ -117,20 +93,16 @@ public class MagicRitualGlyphRenderer<T extends BlockEntity> implements BlockEnt
                long gameTime = blockEntity.getLevel() == null ? 0L : blockEntity.getLevel().getGameTime();
                float time = (float)gameTime + partialTick;
                if (!center) {
-                  renderGlyph(poseStack, bufferSource, circleTexture(blockEntity), halfSize, time * 1.8F, 0.09F, red, green, blue, alpha, active);
+                  renderFormation(poseStack, bufferSource, FormationLayers.circle(blockEntity.getBlockState().getValue(MagicCircleBlock.CIRCLE_TYPE)),
+                          halfSize, (double)gameTime + partialTick, 0.09F, red, green, blue, alpha, active);
                } else {
-                  ResourceLocation[] textures = typedCenterTextures(renderedCenter);
-                  boolean basicPattern = CENTER_TEXTURE.equals(textures[0]) && CENTER_TEXTURE.equals(textures[1]);
+                  var textures = FormationLayers.center(renderedCenter.getCenterTypeId());
                   if (glyphEnabled || authorizedReveal) {
                      float revealScale = entryReveal ? entryExpansionScale(renderedCenter, time) : 1.0F;
                      float glyphSize = halfSize * revealScale;
                      float glyphAlpha = entryReveal ? Math.max(alpha, 0.7F) : alpha;
-                     boolean blank = MagicCenterTypeRegistry.BLANK.equals(renderedCenter.getCenterTypeId());
-                     float firstSpin = !entryReveal && blank ? time * 0.45F : -time * 0.65F;
-                     renderGlyph(poseStack, bufferSource, textures[0], glyphSize, firstSpin, 0.08F, red, green, blue, glyphAlpha, active);
-                     if (!basicPattern) {
-                        renderGlyph(poseStack, bufferSource, textures[1], glyphSize, time * 0.52F, 0.086F, red, green, blue, glyphAlpha, active);
-                     }
+                     renderFormation(poseStack, bufferSource, textures, glyphSize, (double)gameTime + partialTick,
+                             0.08F, red, green, blue, glyphAlpha, active);
                   }
 
                   if (forcefieldCenter) {
@@ -232,8 +204,12 @@ public class MagicRitualGlyphRenderer<T extends BlockEntity> implements BlockEnt
             float glyphRadius = Math.max(1.05F, player.getBbWidth() + 0.65F);
             poseStack.pushPose();
             poseStack.translate(relative.x - (double)0.5F, relative.y, relative.z - (double)0.5F);
-            renderGlyph(poseStack, bufferSource, TELEPORT_TEXTURE_1, glyphRadius, -time * 3.2F, lowerHeight, red, green, blue, alpha, true);
-            renderGlyph(poseStack, bufferSource, TELEPORT_TEXTURE_2, glyphRadius, time * 3.8F, upperHeight, red, green, blue, alpha, true);
+            var textures = FormationLayers.center(MagicCenterTypeRegistry.TELEPORT);
+            double ticks = center.getLevel().getGameTime() + (double)(time - (float)Math.floor(time));
+            renderFormation(poseStack, bufferSource, textures, glyphRadius, ticks * 6.0,
+                    lowerHeight, red, green, blue, alpha, true);
+            renderFormation(poseStack, bufferSource, textures, glyphRadius, -ticks * 6.0,
+                    upperHeight, red, green, blue, alpha, true);
             poseStack.popPose();
          }
       }
@@ -247,6 +223,15 @@ public class MagicRitualGlyphRenderer<T extends BlockEntity> implements BlockEnt
          float progress = Math.max(0.0F, Math.min(1.0F, (time - (float)entryTime) / 30.0F));
          float remaining = 1.0F - progress;
          return 1.0F - remaining * remaining * remaining;
+      }
+   }
+
+   private static void renderFormation(PoseStack poseStack, MultiBufferSource bufferSource,
+                                       java.util.List<ResourceLocation> textures, float halfSize, double ticks,
+                                       float height, float red, float green, float blue, float alpha, boolean active) {
+      for (int layer = 0; layer < FormationLayers.COUNT; layer++) {
+         renderGlyph(poseStack, bufferSource, textures.get(layer), halfSize, FormationLayers.angle(ticks, layer),
+                 height + layer * 0.006F, red, green, blue, alpha, active);
       }
    }
 
@@ -342,47 +327,6 @@ public class MagicRitualGlyphRenderer<T extends BlockEntity> implements BlockEnt
       return center == null ? (double)96.0F : (double)(center.getRadius() + 128);
    }
 
-   private static ResourceLocation texture(String name) {
-      return ResourceLocation.fromNamespaceAndPath("immortal_cultivation_mod", "textures/particle/" + name + ".png");
-   }
-
-   private static ResourceLocation circleTexture(BlockEntity blockEntity) {
-      CircleType type = (CircleType)blockEntity.getBlockState().getValue(MagicCircleBlock.CIRCLE_TYPE);
-      ResourceLocation var10000;
-      switch (type) {
-         case DEFENSE -> var10000 = DEFENSE_TEXTURE;
-         case REGENERATION -> var10000 = REGENERATION_TEXTURE;
-         default -> var10000 = ATTACK_TEXTURE;
-      }
-
-      return var10000;
-   }
-
-   private static ResourceLocation[] typedCenterTextures(MagicCenterBlockEntity center) {
-      if (MagicCenterTypeRegistry.FOG.equals(center.getCenterTypeId())) {
-         return new ResourceLocation[]{FOG_TEXTURE_1, FOG_TEXTURE_2};
-      } else if (MagicCenterTypeRegistry.INVERTED.equals(center.getCenterTypeId())) {
-         return new ResourceLocation[]{INVERTED_TEXTURE_1, INVERTED_TEXTURE_2};
-      } else if (MagicCenterTypeRegistry.FORCEFIELD.equals(center.getCenterTypeId())) {
-         return new ResourceLocation[]{FORCEFIELD_TEXTURE_1, FORCEFIELD_TEXTURE_2};
-      } else if (MagicCenterTypeRegistry.SCORCHING.equals(center.getCenterTypeId())) {
-         return new ResourceLocation[]{SCORCHING_TEXTURE_1, SCORCHING_TEXTURE_2};
-      } else if (MagicCenterTypeRegistry.SANCTUARY.equals(center.getCenterTypeId())) {
-         return new ResourceLocation[]{SANCTUARY_TEXTURE_1, SANCTUARY_TEXTURE_2};
-      } else if (MagicCenterTypeRegistry.FROST.equals(center.getCenterTypeId())) {
-         return new ResourceLocation[]{FROST_TEXTURE_1, FROST_TEXTURE_2};
-      } else if (MagicCenterTypeRegistry.DECAY.equals(center.getCenterTypeId())) {
-         return new ResourceLocation[]{DECAY_TEXTURE_1, DECAY_TEXTURE_2};
-      } else if (MagicCenterTypeRegistry.THUNDER.equals(center.getCenterTypeId())) {
-         return new ResourceLocation[]{THUNDER_TEXTURE_1, THUNDER_TEXTURE_2};
-      } else if (MagicCenterTypeRegistry.DETECTION.equals(center.getCenterTypeId())) {
-         return new ResourceLocation[]{DETECTION_TEXTURE_1, DETECTION_TEXTURE_2};
-      } else if (MagicCenterTypeRegistry.REFORGE_BLADE.equals(center.getCenterTypeId())) {
-         return new ResourceLocation[]{REFORGE_BLADE_TEXTURE_1, REFORGE_BLADE_TEXTURE_2};
-      } else {
-         return MagicCenterTypeRegistry.TELEPORT.equals(center.getCenterTypeId()) ? new ResourceLocation[]{TELEPORT_TEXTURE_1, TELEPORT_TEXTURE_2} : new ResourceLocation[]{CENTER_TEXTURE, CENTER_TEXTURE};
-      }
-   }
 
    private static MagicCenterBlockEntity findOwningCenter(BlockEntity blockEntity) {
       if (blockEntity instanceof MagicCenterBlockEntity center) {

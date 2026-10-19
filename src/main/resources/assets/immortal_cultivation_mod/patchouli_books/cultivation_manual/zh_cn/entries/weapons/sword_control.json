@@ -1,0 +1,23 @@
+{
+  "name": "御剑与收剑",
+  "icon": "immortal_cultivation_mod:flying_sword",
+  "category": "immortal_cultivation_mod:weapons",
+  "sortnum": 32,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "御剑起行",
+      "text": "准备可御使的飞剑，按御剑飞行键（默认N）起落；御使与放出兵器仍使用各自按键。背后盘旋的护身剑与脚下所乘飞剑各有用途，不必反复放出。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "失剑自回",
+      "text": "自动召回默认开启。失去御使的飞剑会尝试回到主人身边、对应气囊或背包；背包满时须先腾出位置。打开修炼设置中的飞剑自动召回，可关闭此功能。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "越境行远",
+      "text": "正常御剑可连续穿过区块边界，背后护身剑也随主人保留。若飞剑暂时未归，先确认召回开关、背包空位及气囊联系，再使用收剑操作。"
+    }
+  ]
+}

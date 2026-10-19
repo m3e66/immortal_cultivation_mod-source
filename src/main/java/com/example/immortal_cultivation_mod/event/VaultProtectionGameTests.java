@@ -36,13 +36,14 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @PrefixGameTestTemplate(false)
 public final class VaultProtectionGameTests {
     @GameTest(template = "npc_combat_arena")
-    public static void heavyLandingCannotExcavateGuardedSect(GameTestHelper h) {
+    public static void guardianAttackCannotExcavateGuardedSect(GameTestHelper h) {
         try (var sect = new Sect(h, Blocks.DIRT.defaultBlockState())) {
             var guardian = sect.guardian();
             var feet = Vec3.atBottomCenterOf(sect.block.above());
-            com.example.immortal_cultivation_mod.combat.CombatFeedbackEvents.landingCrater(guardian, feet, .95F);
+            com.example.immortal_cultivation_mod.entity.BeastMoveBlockBreaker.breakSphere(
+                    h.getLevel(), guardian, feet, 2.5, 2, 18, 3);
             h.assertTrue(h.getLevel().getBlockState(sect.block).is(Blocks.DIRT),
-                    "New landing destruction keeps live guardian terrain protection");
+                    "Explicit creature attacks keep live guardian terrain protection");
         }
         h.succeed();
     }
@@ -69,7 +70,7 @@ public final class VaultProtectionGameTests {
             SmallSectProtection.guardianDefeated(h.getLevel(), guardian);
             guardian.discard();
             h.assertTrue(!SmallSectProtection.isLocked(h.getLevel(), sect.block), "Fixture has stale defeat state");
-            var restored = ModEntities.JINDAN_VAULT_GUARDIAN.get().create(h.getLevel());
+            var restored = ModEntities.VAULT_GUARDIAN.get().create(h.getLevel());
             restored.load(saved);
             h.getLevel().addFreshEntity(restored);
             sect.guardians.add(restored);
@@ -206,7 +207,7 @@ public final class VaultProtectionGameTests {
         }
 
         VaultGuardianEntity guardian() {
-            var guardian = ModEntities.JINDAN_VAULT_GUARDIAN.get().create(level);
+            var guardian = ModEntities.VAULT_GUARDIAN.get().create(level);
             guardian.configureAsSmallSectGuardian(key);
             guardian.setNoAi(true);
             guardian.setNoGravity(true);

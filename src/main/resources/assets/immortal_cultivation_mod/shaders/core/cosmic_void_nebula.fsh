@@ -25,13 +25,17 @@ float valueNoise(vec2 point) {
     return mix(mix(a, b, local.x), mix(c, d, local.x), local.y);
 }
 
-float fbm(vec2 point) {
+float fbm(vec2 point, float otherMaximum, float weight) {
     float value = 0.0;
     float amplitude = 0.56;
     for (int octave = 0; octave < 4; octave++) {
         value += valueNoise(point) * amplitude;
         point = mat2(1.63, -1.12, 1.12, 1.63) * point + 7.19;
         amplitude *= 0.48;
+        // Conservative bounds for all remaining positive octaves. Keep every
+        // octave for visible pixels, including arbitrarily faint cloud edges.
+        float remaining = octave == 0 ? 0.460 : octave == 1 ? 0.191 : octave == 2 ? 0.062 : 0.0;
+        if ((value + remaining) * weight + otherMaximum <= 0.50) discard;
     }
     return value;
 }
@@ -39,17 +43,22 @@ float fbm(vec2 point) {
 void main() {
     float ticks = GameTime * 24000.0;
     float seed = dot(vertexColor.rgb, vec3(17.3, 43.1, 71.7));
-    vec2 drift = vec2(ticks * (0.000010 + seed * 0.0000015),
-                      -ticks * (0.000006 + seed * 0.0000008));
-    vec2 point = texCoord0 * vec2(3.25, 2.15) + drift + seed;
-    float broad = fbm(point);
-    float detail = fbm(point * 1.83 - drift * 0.31 + 12.7);
-    float cloud = smoothstep(0.50, 0.83, broad * 0.74 + detail * 0.26);
+    // Mask invisible sheet borders before evaluating eight octaves of noise.
     float centralBand = smoothstep(0.0, 0.22,
             0.5 - abs(texCoord0.y - 0.5 + sin(texCoord0.x * 5.0 + seed) * 0.07));
     vec2 edge = smoothstep(vec2(0.0), vec2(0.16), texCoord0)
               * (1.0 - smoothstep(vec2(0.84), vec2(1.0), texCoord0));
     float edgeFade = edge.x * edge.y;
+    if (vertexColor.a * centralBand * edgeFade * ColorModulator.a <= 0.0) discard;
+    vec2 drift = vec2(ticks * (0.000010 + seed * 0.0000015),
+                      -ticks * (0.000006 + seed * 0.0000008));
+    vec2 point = texCoord0 * vec2(3.25, 2.15) + drift + seed;
+    float broad = fbm(point, 1.021 * 0.26, 0.74);
+    // Four positive noise octaves sum to less than 1.021. If even that
+    // maximum detail cannot reach the cloud threshold, this pixel is transparent.
+    if (broad * 0.74 + 1.021 * 0.26 <= 0.50) discard;
+    float detail = fbm(point * 1.83 - drift * 0.31 + 12.7, broad * 0.74, 0.26);
+    float cloud = smoothstep(0.50, 0.83, broad * 0.74 + detail * 0.26);
     float alpha = vertexColor.a * cloud * centralBand * edgeFade;
     vec3 color = vertexColor.rgb * (0.54 + detail * 0.56);
     fragColor = vec4(color, alpha) * ColorModulator;

@@ -226,7 +226,7 @@ public final class SwordTechniqueMarkEntity extends Entity implements DefensePie
             float damage = SpellDamageHelper.damage(owner,
                     SpellCharge.damage(baseDamage, entityData.get(DATA_CHARGE)),
                     ModSpells.get(spellId));
-            target.hurt(damageSources().indirectMagic(this, owner), damage);
+            target.hurt(com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.spellSource(damageSources().indirectMagic(this, owner), spellId), damage);
         }
         level.sendParticles(ModParticles.METHOD_QI_METAL.get(),
                 target.getX(), target.getY() + target.getBbHeight() * 0.55D, target.getZ(),

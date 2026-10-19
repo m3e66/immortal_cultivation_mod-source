@@ -1,10 +1,6 @@
 {
   "type": "neoforge:add_spawns",
-  "biomes": [
-    "minecraft:badlands",
-    "minecraft:eroded_badlands",
-    "minecraft:jagged_peaks"
-  ],
+  "biomes": "#immortal_cultivation_mod:beast_spawns/ember_feather_fire_owl",
   "spawners": {
     "type": "immortal_cultivation_mod:ember_feather_fire_owl",
     "weight": 1,

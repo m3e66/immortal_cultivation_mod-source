@@ -1,0 +1,18 @@
+{
+  "name": "炼器失手",
+  "icon": "immortal_cultivation_mod:liujin_sand",
+  "category": "immortal_cultivation_mod:volume_5",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "炼器本是逆凡成灵之术，非每炉皆可成功。一念失火候，一材含杂质，皆可能使精华尽毁，徒留灰烬。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "若重铸残兵时炉火中断，尚有部分材料可存，不至于尽数损失。然寻常炼器若告失败，则投入灵材皆付之一炬。"
+    }
+  ]
+}

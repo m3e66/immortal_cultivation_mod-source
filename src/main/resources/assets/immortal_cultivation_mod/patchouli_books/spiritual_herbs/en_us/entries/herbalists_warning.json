@@ -1,0 +1,18 @@
+{
+  "name": "The Herbalist's Warning",
+  "icon": "minecraft:book",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "The Herbalist's Warning",
+      "text": "Every spiritual herb possesses its own nature. Fire-aligned plants may conflict with frost-born flowers, while herbs of shadow may resist those of pure yang. True alchemy requires more than rare ingredients: one must understand harmony, opposition, and the delicate balance of spiritual energies."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Closing Words",
+      "text": "Those who recognize the hundred herbs may discover the treasures of heaven and earth. Those who understand their nature may finally approach the path of alchemy."
+    }
+  ]
+}

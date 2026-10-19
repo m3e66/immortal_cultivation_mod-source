@@ -9,6 +9,7 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.registration.ISubtypeRegistration;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -24,6 +25,14 @@ import java.util.List;
 public final class ForgingJeiPlugin implements IModPlugin {
     public static final RecipeType<ForgingJeiRecipe> FORGING =
             RecipeType.create(ImmortalCultivationMod.MODID, "forging", ForgingJeiRecipe.class);
+    public static final RecipeType<AcquisitionRecipe> MOB_DROPS = acquisitionType("mob_drops");
+    public static final RecipeType<AcquisitionRecipe> BLOCK_DROPS = acquisitionType("block_drops");
+    public static final RecipeType<AcquisitionRecipe> CHEST_LOOT = acquisitionType("chest_loot");
+    public static final RecipeType<AcquisitionRecipe> FLAME_CAPTURE = acquisitionType("flame_capture");
+
+    private static RecipeType<AcquisitionRecipe> acquisitionType(String path) {
+        return RecipeType.create(ImmortalCultivationMod.MODID, path, AcquisitionRecipe.class);
+    }
 
     private static final ResourceLocation PLUGIN_ID =
             ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "forging_jei");
@@ -35,13 +44,45 @@ public final class ForgingJeiPlugin implements IModPlugin {
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
+        var helper = registration.getJeiHelpers().getGuiHelper();
         registration.addRecipeCategories(
-                new ForgingRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
+                new ForgingRecipeCategory(helper),
+                new AcquisitionRecipeCategory(helper, MOB_DROPS, AcquisitionRecipe.Kind.MOB, new ItemStack(Items.ROTTEN_FLESH)),
+                new AcquisitionRecipeCategory(helper, BLOCK_DROPS, AcquisitionRecipe.Kind.BLOCK, new ItemStack(Items.IRON_PICKAXE)),
+                new AcquisitionRecipeCategory(helper, CHEST_LOOT, AcquisitionRecipe.Kind.CHEST, new ItemStack(Items.CHEST)),
+                new AcquisitionRecipeCategory(helper, FLAME_CAPTURE, AcquisitionRecipe.Kind.FLAME,
+                        new ItemStack(com.example.immortal_cultivation_mod.item.ModItems.FLAME_VESSEL.get())));
     }
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
+        registration.addRecipes(mezz.jei.api.constants.RecipeTypes.CRAFTING, WoolStripJeiRecipes.collect());
         registration.addRecipes(FORGING, collectRecipes());
+        var acquisition = AcquisitionCatalog.collect();
+        registration.addRecipes(MOB_DROPS, acquisition.stream().filter(r -> r.kind() == AcquisitionRecipe.Kind.MOB).toList());
+        registration.addRecipes(BLOCK_DROPS, acquisition.stream().filter(r -> r.kind() == AcquisitionRecipe.Kind.BLOCK).toList());
+        registration.addRecipes(CHEST_LOOT, acquisition.stream().filter(r -> r.kind() == AcquisitionRecipe.Kind.CHEST).toList());
+        registration.addRecipes(FLAME_CAPTURE, acquisition.stream().filter(r -> r.kind() == AcquisitionRecipe.Kind.FLAME).toList());
+    }
+
+    @Override
+    public void registerItemSubtypes(ISubtypeRegistration registration) {
+        // Ignore random captured-entity UUIDs; match bottles by the flame actually inside.
+        registration.registerSubtypeInterpreter(com.example.immortal_cultivation_mod.item.ModItems.FLAME_VESSEL.get(),
+                new mezz.jei.api.ingredients.subtypes.ISubtypeInterpreter<ItemStack>() {
+                    @Override public Object getSubtypeData(ItemStack stack, mezz.jei.api.ingredients.subtypes.UidContext context) {
+                        var flame = com.example.immortal_cultivation_mod.flame.FlameVesselItem.flame(stack);
+                        return flame == null ? "empty" : flame.id();
+                    }
+                    @Override public String getLegacyStringSubtypeInfo(ItemStack stack, mezz.jei.api.ingredients.subtypes.UidContext context) {
+                        return (String) getSubtypeData(stack, context);
+                    }
+                });
+    }
+
+    @Override
+    public void registerExtraIngredients(mezz.jei.api.registration.IExtraIngredientRegistration registration) {
+        registration.addExtraItemStacks(AcquisitionCatalog.flames().stream().map(AcquisitionRecipe::result).toList());
     }
 
     @Override
@@ -51,6 +92,7 @@ public final class ForgingJeiPlugin implements IModPlugin {
                 ModBlocks.CU_TIE_XIAODING.get(),
                 ModBlocks.QINGTONG_YINHUO_DING.get(),
                 ModBlocks.CHI_JIN_SANYANG_DING.get());
+        registration.addRecipeCatalysts(FLAME_CAPTURE, com.example.immortal_cultivation_mod.item.ModItems.FLAME_VESSEL.get());
     }
 
     private static List<ForgingJeiRecipe> collectRecipes() {

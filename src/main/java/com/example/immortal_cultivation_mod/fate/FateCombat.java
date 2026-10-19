@@ -116,7 +116,7 @@ public final class FateCombat {
                 }
                 if (take > 0 && attacker instanceof ServerPlayer player) {
                     var data = ModAttachments.getData(player);
-                    int max = com.example.immortal_cultivation_mod.attachment.CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus();
+                    int max = data.maxQi();
                     ModAttachments.setData(player, data.withQi(Math.min(max, data.qi() + take)));
                 }
             }

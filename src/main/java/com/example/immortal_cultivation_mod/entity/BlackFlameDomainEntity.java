@@ -398,6 +398,8 @@ public final class BlackFlameDomainEntity extends Entity {
         } else if (target instanceof CultivationNpc npc) {
             realm = CultivationLevels.getRealmIndex(npc.npcRealm());
             qi = npc.npcQi();
+        } else if (target instanceof RealmBeast beast) {
+            realm = beast.beastRealm();
         } else if (target instanceof CrimsonSkyFlameFloodDragonEntity
                 || target instanceof BloodApeDemonGeneralEntity
                 || target instanceof EscapedYuanyingCoreEntity) {

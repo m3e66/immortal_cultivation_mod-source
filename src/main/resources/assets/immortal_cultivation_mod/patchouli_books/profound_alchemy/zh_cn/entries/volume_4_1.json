@@ -1,0 +1,18 @@
+{
+  "name": "明目丹",
+  "icon": "immortal_cultivation_mod:mingmu_pill",
+  "category": "immortal_cultivation_mod:volume_4",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "明目丹可清明双目，使修士于幽暗之地亦能辨物。夜行山林、探寻洞府之时，服之可免受昏暗遮蔽之苦。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹效",
+      "text": "一百八十息内，获得夜视之能。"
+    }
+  ]
+}

@@ -20,6 +20,7 @@ import com.example.immortal_cultivation_mod.item.MysteriousRingItem;
 import com.example.immortal_cultivation_mod.item.RestrictionInsightItem;
 import com.example.immortal_cultivation_mod.item.TalismanRecipes;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
+import com.example.immortal_cultivation_mod.spell.ShieldDisplay;
 import com.example.immortal_cultivation_mod.system.OuterSystemManager;
 import com.example.immortal_cultivation_mod.system.OuterSystemType;
 import com.example.immortal_cultivation_mod.world.JindanPocketWorlds;
@@ -118,11 +119,18 @@ public class ModPayloads {
     public static void openDebugStatEditor(ServerPlayer viewer, ServerPlayer target, int page) {
         PacketDistributor.sendToPlayer(viewer, new ClientboundOpenDebugStatEditorPayload(
                 target.getUUID(), target.getGameProfile().getName(),
-                OuterSystemManager.debugSystemType(target).id(), Math.clamp(page, 0, 6)));
+                OuterSystemManager.debugSystemType(target).id(), Math.clamp(page, 0, 8)));
         com.example.immortal_cultivation_mod.event.ServerEvents
                 .syncPlayerDataTo(target, viewer);
         PacketDistributor.sendToPlayer(viewer, new ClientboundDebugHintCountPayload(
                 RestrictionInsightItem.hintCount(target)));
+    }
+
+    public static ServerPlayer resolveDebugTarget(ServerPlayer editor, UUID targetId) {
+        boolean holdingEditor = editor.getMainHandItem().is(ModItems.DEBUG_STAT_EDITOR.get())
+                || editor.getOffhandItem().is(ModItems.DEBUG_STAT_EDITOR.get());
+        if (!holdingEditor || editor.getServer() == null) return null;
+        return editor.getServer().getPlayerList().getPlayer(targetId);
     }
 
     public static void beginNpcLearning(ServerPlayer player, int npcEntityId, String learningType,
@@ -558,7 +566,16 @@ public class ModPayloads {
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
 
-    public record ClientboundShieldDataPayload(float amount, float max) implements CustomPacketPayload {
+    public record ClientboundShieldDataPayload(float amount, float max,List<ShieldDisplay.Layer> layers) implements CustomPacketPayload {
+        public ClientboundShieldDataPayload(float amount,float max){this(amount,max,List.of());}
+        public ClientboundShieldDataPayload {
+            layers=List.copyOf(layers);
+            if(layers.size()>ShieldDisplay.Kind.values().length)throw new IllegalArgumentException("Too many shield layers");
+            var kinds=java.util.EnumSet.noneOf(ShieldDisplay.Kind.class);
+            for(var layer:layers)if(!kinds.add(layer.kind()))throw new IllegalArgumentException("Duplicate shield layer");
+            if(!layers.isEmpty()){amount=ShieldDisplay.total(layers,false);max=ShieldDisplay.total(layers,true);}
+            if(!Float.isFinite(amount)||!Float.isFinite(max)||amount<0||max<amount)throw new IllegalArgumentException("Invalid shield totals");
+        }
         public static final CustomPacketPayload.Type<ClientboundShieldDataPayload> TYPE =
                 new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "shield_data"));
 
@@ -567,8 +584,19 @@ public class ModPayloads {
                         (buf, data) -> {
                             buf.writeFloat(data.amount());
                             buf.writeFloat(data.max());
+                            buf.writeVarInt(data.layers().size());
+                            for(var layer:data.layers()){buf.writeByte(layer.kind().ordinal());buf.writeFloat(layer.amount());buf.writeFloat(layer.max());}
                         },
-                        buf -> new ClientboundShieldDataPayload(buf.readFloat(), buf.readFloat())
+                        buf -> {
+                            float amount=buf.readFloat(),max=buf.readFloat();int count=buf.readVarInt();var kinds=ShieldDisplay.Kind.values();
+                            if(count<0||count>kinds.length)throw new IllegalArgumentException("Too many shield layers");
+                            var layers=new ArrayList<ShieldDisplay.Layer>(count);
+                            for(int i=0;i<count;i++){
+                                int kind=buf.readUnsignedByte();if(kind>=kinds.length)throw new IllegalArgumentException("Unknown shield layer");
+                                layers.add(new ShieldDisplay.Layer(kinds[kind],buf.readFloat(),buf.readFloat()));
+                            }
+                            return new ClientboundShieldDataPayload(amount,max,layers);
+                        }
                 );
 
         @Override
@@ -928,6 +956,7 @@ public class ModPayloads {
             float difficulty,
             float talent,
             boolean assisted,
+            String playerLevel,
             long token
     ) implements CustomPacketPayload {
         public static final CustomPacketPayload.Type<ClientboundOpenLearningGamePayload> TYPE =
@@ -942,6 +971,7 @@ public class ModPayloads {
                             ByteBufCodecs.FLOAT.encode(buf, data.difficulty());
                             ByteBufCodecs.FLOAT.encode(buf, data.talent());
                             ByteBufCodecs.BOOL.encode(buf, data.assisted());
+                            ByteBufCodecs.STRING_UTF8.encode(buf, data.playerLevel());
                             buf.writeLong(data.token());
                         },
                         buf -> new ClientboundOpenLearningGamePayload(
@@ -951,6 +981,7 @@ public class ModPayloads {
                                 ByteBufCodecs.FLOAT.decode(buf),
                                 ByteBufCodecs.FLOAT.decode(buf),
                                 ByteBufCodecs.BOOL.decode(buf),
+                                ByteBufCodecs.STRING_UTF8.decode(buf),
                                 buf.readLong()));
 
         @Override
@@ -1123,6 +1154,11 @@ public class ModPayloads {
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
 
+    public record ServerboundFlyingSwordAutoRecallPayload(boolean enabled) implements CustomPacketPayload {
+        public static final Type<ServerboundFlyingSwordAutoRecallPayload> TYPE=new Type<>(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID,"flying_sword_auto_recall"));
+        public static final StreamCodec<RegistryFriendlyByteBuf,ServerboundFlyingSwordAutoRecallPayload> STREAM_CODEC=StreamCodec.composite(ByteBufCodecs.BOOL,ServerboundFlyingSwordAutoRecallPayload::enabled,ServerboundFlyingSwordAutoRecallPayload::new);
+        @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
+    }
     public record ServerboundSetQiUseParticlesPayload(boolean enabled)
             implements CustomPacketPayload {
         public static final CustomPacketPayload.Type<ServerboundSetQiUseParticlesPayload> TYPE =
@@ -1349,7 +1385,7 @@ public class ModPayloads {
         private static final long LEARNING_SESSION_TICKS = 20L * 60L * 15L;
         @SubscribeEvent
         public static void register(RegisterPayloadHandlersEvent event) {
-            final PayloadRegistrar registrar = event.registrar("1");
+            final PayloadRegistrar registrar = event.registrar("3");
             registrar.playToClient(ClientboundSyncPlayerDataPayload.TYPE, ClientboundSyncPlayerDataPayload.STREAM_CODEC, ModPayloadsHandler::handleSyncPlayerDataOnClient);
             registrar.playToClient(ClientboundMeditationStatePayload.TYPE, ClientboundMeditationStatePayload.STREAM_CODEC, ModPayloadsHandler::handleMeditationStateOnClient);
             registrar.playToClient(ClientboundCastAnimationPayload.TYPE, ClientboundCastAnimationPayload.STREAM_CODEC, ModPayloadsHandler::handleCastAnimationOnClient);
@@ -1430,6 +1466,8 @@ public class ModPayloads {
             registrar.playToServer(ServerboundSetQiUseParticlesPayload.TYPE,
                     ServerboundSetQiUseParticlesPayload.STREAM_CODEC,
                     ModPayloadsHandler::handleSetQiUseParticlesOnServer);
+            registrar.playToServer(ServerboundFlyingSwordAutoRecallPayload.TYPE,ServerboundFlyingSwordAutoRecallPayload.STREAM_CODEC,
+                    (payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer p)com.example.immortal_cultivation_mod.entity.FlyingSwordRecovery.setAutoRecall(p,payload.enabled());}));
             registrar.playToServer(ServerboundSetDroughtDomainPayload.TYPE,
                     ServerboundSetDroughtDomainPayload.STREAM_CODEC,
                     ModPayloadsHandler::handleSetDroughtDomainOnServer);
@@ -1731,15 +1769,15 @@ public class ModPayloads {
                         syncDebugHintCount(target, editor, hints);
                         return;
                     }
+                    if("age".equals(payload.stat())) {
+                        com.example.immortal_cultivation_mod.event.ServerEvents.adjustDebugRemainingAge(target,payload.delta());
+                        syncDebugTarget(target,editor);
+                        return;
+                    }
                     var data = ModAttachments.getData(target);
                     var updated = switch (payload.stat()) {
                         case "cultivation_level" -> data.withCultivationLevel(nextCultivationLevel(data.cultivationLevel(), payload.delta()));
                         case "body_type" -> data.withBodyType(BodyTypes.next(data.bodyType(), payload.delta()));
-                        case "age" -> data.withAgePenalty(clamp(
-                                data.agePenalty() - payload.delta(),
-                                0,
-                                Math.max(0, com.example.immortal_cultivation_mod.attachment.CultivationLevels.getLevelDef(data.cultivationLevel()).maxAge() - 1)
-                        ));
                         case "moral" -> data.withMoral(clamp(data.moral() + payload.delta(), 0, 100));
                         case "luck" -> data.withLuck(clamp(data.luck() + payload.delta(), 0, 100));
                         case "soul" -> data.withSoul(clamp(data.soul() + payload.delta(), 0, 1000));
@@ -1765,15 +1803,6 @@ public class ModPayloads {
                     }
                 }
             });
-        }
-
-        private static ServerPlayer resolveDebugTarget(ServerPlayer editor, UUID targetId) {
-            boolean holdingEditor = editor.getMainHandItem().is(ModItems.DEBUG_STAT_EDITOR.get())
-                    || editor.getOffhandItem().is(ModItems.DEBUG_STAT_EDITOR.get());
-            if (!holdingEditor || editor.getServer() == null) {
-                return null;
-            }
-            return editor.getServer().getPlayerList().getPlayer(targetId);
         }
 
         private static void syncDebugTarget(ServerPlayer target, ServerPlayer editor) {
@@ -1928,6 +1957,10 @@ public class ModPayloads {
                             .withBodyType(bodyType);
                     ModAttachments.setData(sp, updated);
                     sp.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".enlightenment_success"));
+                    if (sp.getRandom().nextInt(1000) == 0) {
+                        sp.getInventory().placeItemBackInInventory(
+                                new net.minecraft.world.item.ItemStack(ModItems.MYSTERIOUS_RING.get()));
+                    }
                     com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
                     com.example.immortal_cultivation_mod.guidance.DaoGuidanceSystem.record(
                             sp, com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent.ENTER_LIANQI);
@@ -1941,15 +1974,18 @@ public class ModPayloads {
             }
             var pill = ModItems.ENLIGHTENMENT_PILL.get();
             if (sp.getMainHandItem().is(pill)) {
+                com.example.immortal_cultivation_mod.alchemy.PillToxicity.consumed(sp,sp.getMainHandItem());
                 sp.getMainHandItem().shrink(1);
                 return true;
             }
             if (sp.getOffhandItem().is(pill)) {
+                com.example.immortal_cultivation_mod.alchemy.PillToxicity.consumed(sp,sp.getOffhandItem());
                 sp.getOffhandItem().shrink(1);
                 return true;
             }
             for (var stack : sp.getInventory().items) {
                 if (stack.is(pill)) {
+                    com.example.immortal_cultivation_mod.alchemy.PillToxicity.consumed(sp,stack);
                     stack.shrink(1);
                     return true;
                 }
@@ -2013,10 +2049,7 @@ public class ModPayloads {
         }
 
         private static boolean beginRestrictionInsightLearning(ServerPlayer player) {
-            PendingLearning existing = PENDING_LEARNING.get(player.getUUID());
-            if (existing != null && player.level().getGameTime() <= existing.expiresAt()) {
-                return false;
-            }
+            if (!player.isAlive()) return false;
             PENDING_LEARNING.remove(player.getUUID());
             long token = player.getRandom().nextLong() ^ player.level().getGameTime();
             PendingLearning pending = new PendingLearning(
@@ -2030,18 +2063,13 @@ public class ModPayloads {
             PENDING_LEARNING.put(player.getUUID(), pending);
             PacketDistributor.sendToPlayer(player, new ClientboundOpenLearningGamePayload(
                     pending.learningType(), pending.targetId(), pending.requiredPoints(),
-                    1.0F, 1.0F, NoobAchievement.hasReward(player), token));
+                    1.0F, 1.0F, NoobAchievement.hasReward(player), ModAttachments.getData(player).cultivationLevel(), token));
             MysteriousRingItem.onLearningStarted(player);
             return true;
         }
 
         private static boolean beginDunwuSteleLearning(ServerPlayer player, String requestedSpellId) {
-            PendingLearning existing = PENDING_LEARNING.get(player.getUUID());
-            if (existing != null
-                    && player.level().getGameTime() <= existing.expiresAt()
-                    && !"dunwu_stele".equals(existing.source())) {
-                return false;
-            }
+            if (!player.isAlive()) return false;
             PENDING_LEARNING.remove(player.getUUID());
             ModAttachments.CultivationData data = ModAttachments.getData(player);
             String spellId = ModSpells.normalizeId(requestedSpellId);
@@ -2051,11 +2079,12 @@ public class ModPayloads {
                     || !ModSpells.meetsRequirement(data.cultivationLevel(), spell)) {
                 return false;
             }
+            com.example.immortal_cultivation_mod.guidance.DaoGuidanceSystem.discover(player, "learning_puzzles");
             if (player.getAbilities().instabuild) {
                 completeDunwuSteleLearning(player, spellId);
                 return true;
             }
-            int maxQi = Math.max(1, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
+            int maxQi = Math.max(1, data.maxQi());
             int requiredPoints = (int) Math.min(Integer.MAX_VALUE, Math.max(1L, maxQi * 75L));
             long token = player.getRandom().nextLong() ^ player.level().getGameTime();
             PendingLearning pending = new PendingLearning(
@@ -2069,17 +2098,18 @@ public class ModPayloads {
             PENDING_LEARNING.put(player.getUUID(), pending);
             PacketDistributor.sendToPlayer(player, new ClientboundOpenLearningGamePayload(
                     pending.learningType(), pending.targetId(), pending.requiredPoints(),
-                    1.0F, 1.0F, NoobAchievement.hasReward(player), token));
+                    1.0F, 1.0F, NoobAchievement.hasReward(player), data.cultivationLevel(), token));
             MysteriousRingItem.onLearningStarted(player);
             return true;
         }
 
         private static void beginLearningSession(ServerPlayer player, String source, String learningType,
                                                  String targetId, int npcEntityId, String teacherLevel) {
-            if (targetId == null || targetId.isBlank()
+            if (!player.isAlive() || targetId == null || targetId.isBlank()
                     || (!("spell".equals(learningType)) && !("method".equals(learningType)))) {
                 return;
             }
+            com.example.immortal_cultivation_mod.guidance.DaoGuidanceSystem.discover(player, "learning_puzzles");
             if (player.getAbilities().instabuild) {
                 switch (source) {
                     case "scroll" -> completeScrollSpellLearning(player, targetId);
@@ -2107,7 +2137,7 @@ public class ModPayloads {
             PENDING_LEARNING.put(player.getUUID(), pending);
             PacketDistributor.sendToPlayer(player, new ClientboundOpenLearningGamePayload(
                     learningType, targetId, requiredPoints, difficulty, talent,
-                    NoobAchievement.hasReward(player), token));
+                    NoobAchievement.hasReward(player), data.cultivationLevel(), token));
             MysteriousRingItem.onLearningStarted(player);
         }
 
@@ -2135,7 +2165,7 @@ public class ModPayloads {
                     return;
                 }
                 PendingLearning pending = PENDING_LEARNING.get(player.getUUID());
-                if (pending == null
+                if (!player.isAlive() || pending == null
                         || pending.token() != payload.token()
                         || player.level().getGameTime() > pending.expiresAt()
                         || payload.score() < pending.requiredPoints()) {
@@ -2212,15 +2242,12 @@ public class ModPayloads {
         }
 
         private static boolean beginLianshenSpellPuzzle(ServerPlayer player, ModAttachments.CultivationData data) {
-            PendingLearning existing = PENDING_LEARNING.get(player.getUUID());
-            if (existing != null && player.level().getGameTime() <= existing.expiresAt()) {
-                return false;
-            }
+            if (!player.isAlive()) return false;
             if (!data.knownSpells().contains(ModSpells.LIANSHEN_SHU) || data.hasLianshenThoughtBonus()) {
                 return false;
             }
-            int maxQi = Math.max(1, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
-            int qiCost = Math.max(1, maxQi * 75 / 100);
+            int maxQi = Math.max(1, data.maxQi());
+            int qiCost = Math.max(1, (int)((long)maxQi * 75 / 100));
             if (data.qi() < qiCost) {
                 sendNotEnoughQi(player);
                 return false;
@@ -2242,7 +2269,7 @@ public class ModPayloads {
             PENDING_LEARNING.put(player.getUUID(), pending);
             PacketDistributor.sendToPlayer(player, new ClientboundOpenLearningGamePayload(
                     pending.learningType(), pending.targetId(), pending.requiredPoints(),
-                    1.0F, 1.0F, NoobAchievement.hasReward(player), token));
+                    1.0F, 1.0F, NoobAchievement.hasReward(player), data.cultivationLevel(), token));
             MysteriousRingItem.onLearningStarted(player);
             return true;
         }
@@ -2530,6 +2557,9 @@ public class ModPayloads {
             ctx.enqueueWork(() -> {
                 if (ctx.player() instanceof ServerPlayer sp) {
                     String spellId = ModSpells.normalizeId(payload.spellName());
+                    if (!ModSpells.ZIBAO.equals(spellId)) {
+                        com.example.immortal_cultivation_mod.spell.SelfExplosionConfirmation.cancel(sp);
+                    }
                     if (!CombatStateManager.finishSpellPreparation(
                             sp, spellId, payload.chargeScale())) {
                         return;
@@ -2547,9 +2577,13 @@ public class ModPayloads {
                     return;
                 }
                 if (payload.preparing()) {
+                    if (!ModSpells.ZIBAO.equals(ModSpells.normalizeId(payload.spellName()))) {
+                        com.example.immortal_cultivation_mod.spell.SelfExplosionConfirmation.cancel(sp);
+                    }
                     CombatStateManager.beginSpellPreparation(sp, payload.spellName());
                 } else {
                     CombatStateManager.cancelSpellPreparation(sp);
+                    com.example.immortal_cultivation_mod.spell.SelfExplosionConfirmation.cancel(sp);
                 }
             });
         }
@@ -2579,6 +2613,10 @@ public class ModPayloads {
                     if (spell == null) {
                         return;
                     }
+                    if(ModSpells.YANMIE_WEIJIN_ZHIREN.equals(spellId)) {
+                        com.example.immortal_cultivation_mod.curse.AnnihilationCurse.showStatus(sp);
+                        return;
+                    }
                     var data = ModAttachments.getData(sp);
                     if (CombatStateManager.isSpellcastingBlocked(sp)) {
                         return;
@@ -2603,6 +2641,10 @@ public class ModPayloads {
                         return;
                     }
                     if (isSpellOnCooldown(sp, spellId)) {
+                        return;
+                    }
+                    if (ModSpells.ZIBAO.equals(spellId)
+                            && !com.example.immortal_cultivation_mod.spell.SelfExplosionConfirmation.confirm(sp)) {
                         return;
                     }
                     com.example.immortal_cultivation_mod.magicritual.center.CenterEffectSupport
@@ -2690,9 +2732,9 @@ public class ModPayloads {
                     } else if (ModSpells.ZIBAO.equals(spellId)) {
                         castZibao(sp, data);
                     } else if (ModSpells.ABSORB_CULTIVATION.equals(spellId)) {
-                        castAbsorbCultivation(sp, data, spell, chargeScale);
+                        castSucceeded = castAbsorbCultivation(sp, data, spell, chargeScale);
                     } else if (ModSpells.TUNTIAN.equals(spellId)) {
-                        castTuntian(sp, data, chargeScale);
+                        castSucceeded = castTuntian(sp, data, chargeScale);
                     } else if (ModSpells.FENGYA.equals(spellId)) {
                         com.example.immortal_cultivation_mod.spell.Fengya.toggle(sp);
                     } else if (ModSpells.DINGSHEN.equals(spellId)) {
@@ -2720,9 +2762,9 @@ public class ModPayloads {
                     } else if (ModSpells.KONGSHI_SHU.equals(spellId)) {
                         castKongshiShu(sp, data, spell, chargeScale);
                     } else if (ModSpells.HANJING_SUOZHUA.equals(spellId)) {
-                        com.example.immortal_cultivation_mod.spell.HantiBingqin.castClaw(sp, chargeScale);
+                        castSucceeded = com.example.immortal_cultivation_mod.spell.HantiBingqin.castClaw(sp, chargeScale);
                     } else if (ModSpells.SHUANGTIAN_QI.equals(spellId)) {
-                        castFrostCry(sp, data, chargeScale);
+                        castSucceeded = castFrostCry(sp, data, chargeScale);
                     } else if (ModSpells.SUISHUANG_LINGXIAO.equals(spellId)) {
                         com.example.immortal_cultivation_mod.spell.HantiBingqin.toggleFrostFlight(sp);
                     } else if (ModSpells.YUQI_SHU.equals(spellId)) {
@@ -2753,6 +2795,7 @@ public class ModPayloads {
                         com.example.immortal_cultivation_mod.spell.GangtingXiaokongLu
                                 .onTechniqueCast(sp, spellId);
                         sendCastAnimation(sp, spellId);
+                        com.example.immortal_cultivation_mod.shentong.ShentongActivations.announce(sp,spellId);
                         if (!com.example.immortal_cultivation_mod.fate.FateTechniques.isTechnique(spellId)
                                 && !com.example.immortal_cultivation_mod.spell.CultivationShieldSpells
                                 .handlesOwnCooldown(spellId)) {
@@ -2767,8 +2810,7 @@ public class ModPayloads {
                         }
                         var guidanceData = ModAttachments.getData(sp);
                         int guidanceMaxQi = Math.max(1,
-                                CultivationLevels.getLevelDef(guidanceData.cultivationLevel()).maxQi()
-                                        + guidanceData.maxQiBonus());
+                                guidanceData.maxQi());
                         if (guidanceData.qi() * 5 >= guidanceMaxQi) {
                             com.example.immortal_cultivation_mod.guidance.DaoGuidanceSystem.record(
                                     sp, com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent.MANAGE_QI);
@@ -2876,6 +2918,7 @@ public class ModPayloads {
             int ticks = ModSpells.CUIGU_LIANSHEN.equals(spellId)
                     ? com.example.immortal_cultivation_mod.spell.BodyCultivation.cooldownTicks(player)
                     : spellCooldownTicks(spellId);
+            ticks = com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.cooldown(player, ticks);
             if (ticks <= 0) {
                 return;
             }
@@ -2912,12 +2955,12 @@ public class ModPayloads {
 
         private static int baseChargeCost(ServerPlayer player, String spellId, ModAttachments.CultivationData data) {
             if (ModSpells.HANJING_SUOZHUA.equals(spellId)) {
-                int maxQi = Math.max(1, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
-                return Math.max(1, maxQi * 3 / 100);
+                int maxQi = Math.max(1, data.maxQi());
+                return Math.max(1, (int)((long)maxQi * 3 / 100));
             }
             if (ModSpells.SHUANGTIAN_QI.equals(spellId)) {
-                int maxQi = Math.max(1, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
-                return Math.max(1, maxQi * 5 / 100);
+                int maxQi = Math.max(1, data.maxQi());
+                return Math.max(1, (int)((long)maxQi * 5 / 100));
             }
             if (ModSpells.SUOKONG_SHU.equals(spellId)) {
                 return suokongQiCost(data);
@@ -3361,26 +3404,27 @@ public class ModPayloads {
             return cast;
         }
 
-        private static void castAbsorbCultivation(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
+        private static boolean castAbsorbCultivation(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
             if (!com.example.immortal_cultivation_mod.attachment.CultivationMethods.isReincarnationTrueArt(data.activeCultivationMethod())) {
-                return;
+                return false;
             }
             if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendSpellQiOrBlood(sp, data, chargedCost(spell.qiCost(), chargeScale))) {
                 sendNotEnoughQi(sp);
-                return;
+                return false;
             }
             var projectile = new com.example.immortal_cultivation_mod.entity.AbsorbCultivationProjectileEntity(sp.level(), sp);
             projectile.shootFromRotation(sp, sp.getXRot(), sp.getYRot(), 0, 1.8f, 0.0f);
             sp.level().addFreshEntity(projectile);
             com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            return true;
         }
 
-        private static void castTuntian(ServerPlayer sp, ModAttachments.CultivationData data, float chargeScale) {
+        private static boolean castTuntian(ServerPlayer sp, ModAttachments.CultivationData data, float chargeScale) {
             if (!com.example.immortal_cultivation_mod.attachment.CultivationMethods.isTuntianDemonArt(data.activeCultivationMethod())) {
-                return;
+                return false;
             }
             if (!(sp.level() instanceof net.minecraft.server.level.ServerLevel serverLevel)) {
-                return;
+                return false;
             }
 
             final int radius = Math.max(1, Math.round(5.0F * chargedAreaScale(chargeScale)));
@@ -3395,7 +3439,7 @@ public class ModPayloads {
                         var current = ModAttachments.getData(sp);
                         long need = Math.max(1L, CultivationLevels.getTotalQiNeeded(current.cultivationLevel()));
                         ModAttachments.setData(sp, current.withCultivationProgress(
-                                Math.min(need, current.cultivationProgress() + consumed * 10L)));
+                                Math.min(need, current.cultivationProgress() + com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.cultivationGain(sp, consumed * 10L))));
                         com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
                     });
             long progressGain = 0;
@@ -3425,9 +3469,10 @@ public class ModPayloads {
 
             if (progressGain > 0L) {
                 long need = Math.max(1L, com.example.immortal_cultivation_mod.attachment.CultivationLevels.getTotalQiNeeded(data.cultivationLevel()));
-                ModAttachments.setData(sp, data.withCultivationProgress(Math.min(need, data.cultivationProgress() + progressGain)));
+                ModAttachments.setData(sp, data.withCultivationProgress(Math.min(need, data.cultivationProgress() + com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.cultivationGain(sp, progressGain))));
             }
             com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            return true;
         }
 
         private static boolean castDingshen(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell, float chargeScale) {
@@ -3655,21 +3700,22 @@ public class ModPayloads {
             return cast;
         }
 
-        private static void castFrostCry(ServerPlayer sp, ModAttachments.CultivationData data, float chargeScale) {
+        private static boolean castFrostCry(ServerPlayer sp, ModAttachments.CultivationData data, float chargeScale) {
             if (!com.example.immortal_cultivation_mod.attachment.CultivationMethods.isHantiBingqin(data.activeCultivationMethod())) {
-                return;
+                return false;
             }
-            int maxQi = Math.max(1, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
-            int cost = Math.max(1, maxQi * 5 / 100);
+            int maxQi = Math.max(1, data.maxQi());
+            int cost = Math.max(1, (int)((long)maxQi * 5 / 100));
             if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendSpellQiOrBlood(sp, data, chargedCost(cost, chargeScale))) {
                 sendNotEnoughQi(sp);
-                return;
+                return false;
             }
             var projectile = new com.example.immortal_cultivation_mod.entity.FrostCryProjectileEntity(sp.level(), sp);
             projectile.getPersistentData().putFloat("ChargeScale", chargedAreaScale(chargeScale));
             projectile.shootFromRotation(sp, sp.getXRot(), sp.getYRot(), 0, 1.75f, 0.1f);
             sp.level().addFreshEntity(projectile);
             com.example.immortal_cultivation_mod.event.ServerEvents.syncPlayerData(sp);
+            return true;
         }
 
         private static void handleMeditateOnServer(ServerboundMeditatePayload payload, IPayloadContext ctx) {

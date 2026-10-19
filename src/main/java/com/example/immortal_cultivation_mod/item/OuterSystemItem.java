@@ -1,14 +1,20 @@
 package com.example.immortal_cultivation_mod.item;
 
 import com.example.immortal_cultivation_mod.system.OuterSystemType;
+import com.example.immortal_cultivation_mod.system.OuterSystemData;
+import com.example.immortal_cultivation_mod.system.OuterSystemManager;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.level.Level;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
@@ -19,6 +25,22 @@ public class OuterSystemItem extends Item implements ICurioItem {
 
     public OuterSystemItem(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (OuterSystemData.equipped(player).isPresent()) {
+            return InteractionResultHolder.pass(stack);
+        }
+        if (level.isClientSide) {
+            return InteractionResultHolder.sidedSuccess(stack, true);
+        }
+        if (player instanceof ServerPlayer serverPlayer
+                && OuterSystemManager.bindFromItem(serverPlayer, stack)) {
+            return InteractionResultHolder.sidedSuccess(stack, false);
+        }
+        return InteractionResultHolder.pass(stack);
     }
 
     public static ItemStack create(OuterSystemType type) {

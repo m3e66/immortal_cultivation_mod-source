@@ -1,0 +1,18 @@
+{
+  "name": "赤炎火",
+  "icon": "immortal_cultivation_mod:crimson_flame_seed",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "赤炎火",
+      "text": "火候上限 ：5,000°C | 灵气消耗 ：20"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "赤炎火色泽深红，炎势炽烈，较凡火更具穿透之力。此火可炼化部分筑基层次灵材，乃修士踏入真正灵器锻造之途的重要火种。"
+    }
+  ]
+}

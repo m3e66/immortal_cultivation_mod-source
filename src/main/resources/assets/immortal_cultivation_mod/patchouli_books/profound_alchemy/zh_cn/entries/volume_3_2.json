@@ -1,0 +1,18 @@
+{
+  "name": "凝气丹",
+  "icon": "immortal_cultivation_mod:ningqi_pill",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "凝气丹可令体内灵气短暂凝聚，减少下一次术法施展时的灵力损耗。其药力只护持一术，术出则散，若久不施法，丹气亦自行消退。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹效",
+      "text": "六十息内，下一次消耗灵气的术法减少百分之十的灵气消耗。"
+    }
+  ]
+}

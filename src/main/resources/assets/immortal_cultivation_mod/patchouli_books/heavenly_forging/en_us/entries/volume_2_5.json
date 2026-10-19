@@ -1,0 +1,23 @@
+{
+  "name": "Golden Sun True Flame",
+  "icon": "immortal_cultivation_mod:solar_flame_seed",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Golden Sun True Flame",
+      "text": "Maximum temperature: 7,500°C"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Golden Sun True Flame",
+      "text": "Qi per pulse: 40"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Golden Sun True Flame radiates intense yang energy, shining like a miniature sun. Its powerful heat allows the refinement of Golden Core-grade weapons, but maintaining its flames demands substantial Qi."
+    }
+  ]
+}

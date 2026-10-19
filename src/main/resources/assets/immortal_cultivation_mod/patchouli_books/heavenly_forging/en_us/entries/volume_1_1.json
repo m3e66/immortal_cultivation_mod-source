@@ -1,0 +1,23 @@
+{
+  "name": "Crude Iron Cauldron",
+  "icon": "immortal_cultivation_mod:cu_tie_xiaoding",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Crude Iron Cauldron",
+      "text": "Material capacity: 10 slots"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "The Crude Iron Cauldron is a basic vessel used by those beginning their journey into artifact refinement. Forged from ordinary iron, it lacks the intricate spiritual patterns of higher-grade cauldrons but is sufficient for fundamental forging."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "It can hold up to 10 materials and must be placed directly above a suitable heat source."
+    }
+  ]
+}

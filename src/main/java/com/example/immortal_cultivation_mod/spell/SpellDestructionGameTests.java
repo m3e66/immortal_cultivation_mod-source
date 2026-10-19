@@ -65,7 +65,8 @@ public final class SpellDestructionGameTests {
         var lizard=com.example.immortal_cultivation_mod.entity.ModEntities.CRIMSON_SCALE_FLAME_LIZARD.get().create(level);
         var ape=com.example.immortal_cultivation_mod.entity.ModEntities.BLOOD_APE_DEMON_GENERAL.get().create(level);
         var bear=com.example.immortal_cultivation_mod.entity.ModEntities.FROSTSPINE_CAVE_BEAR.get().create(level);
-        var lowFox=com.example.immortal_cultivation_mod.entity.ModEntities.ZHUJI_PHANTOM_VEIL_FOX.get().create(level);
+        var lowFox=com.example.immortal_cultivation_mod.entity.ModEntities.PHANTOM_VEIL_FOX.get().create(level);
+        lowFox.setBeastRealm(2);
         var highFox=com.example.immortal_cultivation_mod.entity.ModEntities.PHANTOM_VEIL_FOX.get().create(level);
         h.assertTrue(com.example.immortal_cultivation_mod.entity.BeastMoveBlockBreaker.blockLimit(lizard,24)==1536,
                 "Golden Core attacks get sixty-four times the old solid-block budget");

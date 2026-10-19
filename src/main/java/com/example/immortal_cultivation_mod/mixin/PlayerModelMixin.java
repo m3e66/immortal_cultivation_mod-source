@@ -77,6 +77,32 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
             return;
         }
 
+        if (!meditationVisual && player.getAbilities().flying
+                && com.example.immortal_cultivation_mod.entity.FlyingSwordEntity.flightSword(player) != null) {
+            immortalCultivation$poseApplied = true;
+            crouching = false;
+            body.xRot = 0.0F;
+            body.y = 0.0F;
+            head.y = 0.0F;
+            leftArm.y = rightArm.y = 2.0F;
+            leftArm.z = rightArm.z = 0.0F;
+            leftLeg.setPos(1.9F, 12.0F, -0.7F);
+            rightLeg.setPos(-1.9F, 12.0F, 0.7F);
+            leftLeg.xRot = rightLeg.xRot = 0.0F;
+            leftLeg.yRot = -0.05F;
+            rightLeg.yRot = 0.05F;
+            leftPants.copyFrom(leftLeg);
+            rightPants.copyFrom(rightLeg);
+            jacket.copyFrom(body);
+            if (!player.isUsingItem() && !player.swinging) {
+                leftArm.xRot = rightArm.xRot = -0.08F;
+                leftArm.zRot = -0.06F;
+                rightArm.zRot = 0.06F;
+                leftSleeve.copyFrom(leftArm);
+                rightSleeve.copyFrom(rightArm);
+            }
+        }
+
         if (ClientData.isPlayerCasting(player.getUUID()) && !meditationVisual) {
             rightArm.xRot = -2.15F;
             rightArm.yRot = -0.22F;

@@ -1,11 +1,6 @@
 {
   "type": "neoforge:add_spawns",
-  "biomes": [
-    "minecraft:desert",
-    "minecraft:badlands",
-    "minecraft:eroded_badlands",
-    "minecraft:dripstone_caves"
-  ],
+  "biomes": "#immortal_cultivation_mod:beast_spawns/red_backed_iron_scale_scorpion",
   "spawners": {
     "type": "immortal_cultivation_mod:red_backed_iron_scale_scorpion",
     "weight": 7,

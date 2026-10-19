@@ -228,32 +228,33 @@ public final class VoidRuinFeature extends Feature<NoneFeatureConfiguration> {
     }
 
     private static boolean hasNearbyRuin(WorldGenLevel level, BlockPos center) {
-        int minX = Math.floorDiv(center.getX() - MIN_RUIN_SPACING, RUIN_SEARCH_GRID)
-                * RUIN_SEARCH_GRID;
-        int minZ = Math.floorDiv(center.getZ() - MIN_RUIN_SPACING, RUIN_SEARCH_GRID)
-                * RUIN_SEARCH_GRID;
+        int minX = Math.floorDiv(center.getX() - MIN_RUIN_SPACING, RUIN_SEARCH_GRID) * RUIN_SEARCH_GRID;
+        int minZ = Math.floorDiv(center.getZ() - MIN_RUIN_SPACING, RUIN_SEARCH_GRID) * RUIN_SEARCH_GRID;
         int maxX = center.getX() + MIN_RUIN_SPACING;
         int maxZ = center.getZ() + MIN_RUIN_SPACING;
         int radiusSquared = MIN_RUIN_SPACING * MIN_RUIN_SPACING;
         BlockPos.MutableBlockPos probe = new BlockPos.MutableBlockPos();
-        for (int x = minX; x <= maxX; x += RUIN_SEARCH_GRID) {
-            for (int z = minZ; z <= maxZ; z += RUIN_SEARCH_GRID) {
-                int dx = x - center.getX();
-                int dz = z - center.getZ();
-                if (dx * dx + dz * dz > radiusSquared) {
-                    continue;
-                }
-                probe.set(x, center.getY(), z);
-                if (!level.hasChunkAt(probe)) {
-                    continue;
-                }
-                int top = Math.min(level.getMaxBuildHeight() - 1,
-                        level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z));
-                int bottom = Math.max(level.getMinBuildHeight(), top - 8);
-                for (int y = top; y >= bottom; y--) {
-                    probe.set(x, y, z);
-                    if (level.getBlockState(probe).is(CORE.getBlock())) {
-                        return true;
+        // Skip unavailable chunks before scanning columns. Preserve the 500-block
+        // marker radius without tens of thousands of failed world lookups per ruin.
+        for (int chunkX = minX >> 4; chunkX <= maxX >> 4; chunkX++) {
+            for (int chunkZ = minZ >> 4; chunkZ <= maxZ >> 4; chunkZ++) {
+                probe.set(chunkX << 4, center.getY(), chunkZ << 4);
+                if (!level.hasChunkAt(probe)) continue;
+                int startX = Math.max(minX, chunkX << 4);
+                int startZ = Math.max(minZ, chunkZ << 4);
+                int endX = Math.min(maxX, (chunkX << 4) + 15);
+                int endZ = Math.min(maxZ, (chunkZ << 4) + 15);
+                for (int x = startX; x <= endX; x += RUIN_SEARCH_GRID) {
+                    for (int z = startZ; z <= endZ; z += RUIN_SEARCH_GRID) {
+                        int dx = x - center.getX(), dz = z - center.getZ();
+                        if (dx * dx + dz * dz > radiusSquared) continue;
+                        int top = Math.min(level.getMaxBuildHeight() - 1,
+                                level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z));
+                        int bottom = Math.max(level.getMinBuildHeight(), top - 8);
+                        for (int y = top; y >= bottom; y--) {
+                            probe.set(x, y, z);
+                            if (level.getBlockState(probe).is(CORE.getBlock())) return true;
+                        }
                     }
                 }
             }

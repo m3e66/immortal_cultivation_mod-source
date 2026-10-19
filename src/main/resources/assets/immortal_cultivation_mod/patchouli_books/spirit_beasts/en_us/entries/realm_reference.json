@@ -1,0 +1,38 @@
+{
+  "name": "Realm Index and Warning",
+  "icon": "minecraft:book",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Realm Reference",
+      "text": "Azure Spirit Silkworm: Mortal – Foundation Establishment$(br2)Azure-Marked Spirit-Devouring Rat: Mortal – Foundation Establishment$(br2)Phantom-Faced Spirit Fox: Foundation Establishment – Nascent Soul"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Realm Reference",
+      "text": "Iron-Scaled Crimsonback Scorpion: Mortal – Foundation Establishment$(br2)Voidspace Beetle: Qi Refining – Golden Core$(br2)Thunderhorn Rock Badger: Qi Refining – Golden Core"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Realm Reference",
+      "text": "Black-Armored Stone-Devouring Tortoise: Qi Refining – Golden Core$(br2)Frostspine Cave Bear: Qi Refining – Golden Core$(br2)Windfeather Cliff Deer: Qi Refining – Golden Core"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Realm Reference",
+      "text": "Crimson-Scaled Flame Lizard: Foundation Establishment – Nascent Soul$(br2)Ashfeather Fire Owl: Foundation Establishment – Nascent Soul$(br2)Crimson Sky Flame Jiao: Golden Core – Spirit Transformation"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Realm Reference",
+      "text": "Blood Ape General: Golden Core – Spirit Transformation"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Final Warning",
+      "text": "The world is vast, and its spirit beasts are countless. A beast's cultivation realm alone does not determine its danger. Bloodline, innate abilities, and terrain may decide the outcome of an encounter. A wise cultivator knows not only when to fight, but when to retreat."
+    }
+  ]
+}

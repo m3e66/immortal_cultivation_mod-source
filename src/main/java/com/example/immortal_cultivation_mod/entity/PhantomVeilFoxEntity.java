@@ -60,7 +60,8 @@ import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 /** Realm-scaled illusion controller and assassin. */
-public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
+public final class PhantomVeilFoxEntity extends RealmBeastMonster implements GeoEntity {
+    // Visuals use synchronized BeastAttackVfx; server combat and sounds remain unchanged.
     private static final EntityDataAccessor<Integer> MASKS =
             SynchedEntityData.defineId(PhantomVeilFoxEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Byte> ACTION_STATE =
@@ -72,6 +73,8 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
     private static final EntityDataAccessor<Integer> REVEALED_TICKS =
             SynchedEntityData.defineId(PhantomVeilFoxEntity.class, EntityDataSerializers.INT);
 
+    private static final EntityDataAccessor<Integer> VISUAL_MOVE =
+            SynchedEntityData.defineId(PhantomVeilFoxEntity.class, EntityDataSerializers.INT);
     private static final byte ACTION_NONE = 0;
     private static final byte ACTION_POUNCE = 1;
     private static final byte ACTION_VANISH = 2;
@@ -155,17 +158,15 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
     }
 
     public PhantomVeilFoxTier realmTier() {
-        if (getType() == ModEntities.ZHUJI_PHANTOM_VEIL_FOX.get()) {
-            return PhantomVeilFoxTier.ZHUJI;
-        }
-        if (getType() == ModEntities.JINDAN_PHANTOM_VEIL_FOX.get()) {
-            return PhantomVeilFoxTier.JINDAN;
-        }
-        return PhantomVeilFoxTier.YUANYING;
+        return switch (beastRealm()) {
+            case 2 -> PhantomVeilFoxTier.ZHUJI;
+            case 3 -> PhantomVeilFoxTier.JINDAN;
+            default -> PhantomVeilFoxTier.YUANYING;
+        };
     }
 
     public String cultivationRealm() {
-        return realmTier().cultivationRealm();
+        return beastCultivationLevel();
     }
 
     @Override
@@ -186,7 +187,7 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
                                           MobSpawnType spawnType,
                                           BlockPos pos,
                                           net.minecraft.util.RandomSource random) {
-        if (!Monster.checkMonsterSpawnRules(type, level, spawnType, pos, random)) return false;
+        if (!Monster.checkAnyLightMonsterSpawnRules(type, level, spawnType, pos, random)) return false;
         BlockPos floor = pos.below();
         return level.getBlockState(floor).isFaceSturdy(level, floor, Direction.UP)
                 && level.getFluidState(pos).isEmpty()
@@ -210,11 +211,15 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(MASKS, 3);
+        builder.define(VISUAL_MOVE, 0);
         builder.define(ACTION_STATE, ACTION_NONE);
         builder.define(ACTION_TICKS, 0);
         builder.define(HUNDRED_FACES, false);
         builder.define(REVEALED_TICKS, 0);
     }
+
+    public int visualMove() { return entityData.get(ACTION_STATE) == ACTION_NONE ? 0 : entityData.get(VISUAL_MOVE); }
+    public int visualActionTicks() { return entityData.get(ACTION_TICKS); }
 
     public int maskCount() {
         return entityData.get(MASKS);
@@ -341,6 +346,7 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
             return;
         }
         setAction(ACTION_VANISH, 16);
+        entityData.set(VISUAL_MOVE, 1);
         burst(level, ParticleTypes.REVERSE_PORTAL, oldPosition.add(0.0D, 0.8D, 0.0D),
                 34, 0.8D, 0.09D);
         teleportTo(destination.x, destination.y, destination.z);
@@ -365,6 +371,7 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
     /** 2. 迷心狐火 */
     private void useBewilderingFoxfire(ServerLevel level, LivingEntity target) {
         setAction(ACTION_MAJOR_ILLUSION, 18);
+        entityData.set(VISUAL_MOVE, 2);
         UUID castId = UUID.randomUUID();
         foxfireHitCounts.put(castId, 0);
         Vec3 forward = target.getEyePosition().subtract(getEyePosition()).normalize();
@@ -410,6 +417,7 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
     /** 3. 镜身七相 */
     private void useSevenAspects(ServerLevel level, LivingEntity target) {
         setAction(ACTION_MAJOR_ILLUSION, 28);
+        entityData.set(VISUAL_MOVE, 3);
         int count = realmTier().sevenAspectsClones()
                 + (entityData.get(HUNDRED_FACES) ? 2 : 0);
         mistCurtain(level, position(), 4.0D);
@@ -427,6 +435,7 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
     /** 4. 幻雾迷域 */
     private void useIllusionFog(ServerLevel level) {
         setAction(ACTION_MAJOR_ILLUSION, 25);
+        entityData.set(VISUAL_MOVE, 4);
         fogCenter = position();
         fogTicks = 200;
         wasInsideFog = true;
@@ -490,6 +499,7 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
         boolean backAttack = safe != null;
         if (safe != null) {
             setAction(ACTION_VANISH, 11);
+        entityData.set(VISUAL_MOVE, 5);
             teleportTo(safe.x, safe.y, safe.z);
             getLookControl().setLookAt(target, 90.0F, 90.0F);
         }
@@ -519,6 +529,7 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
     /** 6. 灵狐照影 */
     private void useSpiritReflection(ServerLevel level, LivingEntity target) {
         setAction(ACTION_MAJOR_ILLUSION, 20);
+        entityData.set(VISUAL_MOVE, 6);
         hurtWithTechnique(target, techniqueDamage(420.0F));
         long until = level.getGameTime() + 140L;
         target.getPersistentData().putLong("PhantomVeilWrongDistanceUntil", until);
@@ -541,6 +552,7 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
     /** 7. 幻面夺识, including its real 1.2-second cast. */
     private void beginSeizeSense(LivingEntity target) {
         setAction(ACTION_MAJOR_ILLUSION, 28);
+        entityData.set(VISUAL_MOVE, 7);
         pendingTechnique = PendingTechnique.SEIZE_SENSE;
         pendingCastTarget = target.getUUID();
         pendingCastTicks = 24;
@@ -583,6 +595,7 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
     /** 8. 千幻回廊 */
     private void useThousandIllusionCorridor(ServerLevel level, LivingEntity target) {
         setAction(ACTION_MAJOR_ILLUSION, 30);
+        entityData.set(VISUAL_MOVE, 8);
         corridorCenter = target.position();
         corridorTicks = 160;
         for (int i = 0; i < 3; i++) {
@@ -635,6 +648,7 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
         entityData.set(HUNDRED_FACES, true);
         setMasks(realmTier().maxMasks());
         setAction(ACTION_MAJOR_ILLUSION, 40);
+        entityData.set(VISUAL_MOVE, 9);
         mistCurtain(level, position(), 7.0D);
         burst(level, ParticleTypes.END_ROD, position().add(0.0D, 1.1D, 0.0D),
                 70, 1.8D, 0.08D);
@@ -652,6 +666,7 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
         pendingCastTarget = target.getUUID();
         pendingCastTicks = 12;
         setAction(ACTION_ULTIMATE, 28);
+        entityData.set(VISUAL_MOVE, 10);
         getNavigation().stop();
         if (level() instanceof ServerLevel serverLevel) {
             for (int i = 0; i < consumed; i++) {
@@ -842,6 +857,7 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
     public boolean doHurtTarget(Entity target) {
         if (BeastDazeControl.blocksMoves(this)) return false;
         setAction(ACTION_POUNCE, 15);
+        entityData.set(VISUAL_MOVE, 11);
         boolean hurt = super.doHurtTarget(target);
         if (hurt && target instanceof LivingEntity living) {
             if (fogExitBonusReady) {
@@ -895,9 +911,9 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
 
     private float adjustedIncomingDamage(DamageSource source, float amount) {
         String element = recentSpellElement(source);
-        if (SpiritRoots.elementMatches(element, SpiritRoots.LIGHT)) return amount * 1.20F;
+        if (SpiritRoots.elementMatches(element, SpiritRoots.YANG)) return amount * 1.20F;
         if (SpiritRoots.elementMatches(element, SpiritRoots.WIND)
-                || SpiritRoots.elementMatches(element, SpiritRoots.DARK)) {
+                || SpiritRoots.elementMatches(element, SpiritRoots.YIN)) {
             return amount * 0.70F;
         }
         if (source.is(DamageTypes.MAGIC) || source.is(DamageTypes.INDIRECT_MAGIC)) {
@@ -908,7 +924,7 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
 
     private boolean isLightOrPurification(DamageSource source) {
         return source.getDirectEntity() instanceof LightBeamProjectileEntity
-                || SpiritRoots.elementMatches(recentSpellElement(source), SpiritRoots.LIGHT);
+                || SpiritRoots.elementMatches(recentSpellElement(source), SpiritRoots.YANG);
     }
 
     private boolean isStrongSenseStrike(DamageSource source, float amount) {
@@ -939,6 +955,7 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
         Vec3 safe = findSafePositionNear(old, 4.0D, 7.0D);
         if (safe != null) teleportTo(safe.x, safe.y, safe.z);
         setAction(ACTION_VANISH, 14);
+        entityData.set(VISUAL_MOVE, 12);
         burst(level, ParticleTypes.WITCH, old.add(0.0D, 0.8D, 0.0D),
                 24, 0.75D, 0.08D);
         burst(level, ParticleTypes.REVERSE_PORTAL, position().add(0.0D, 0.8D, 0.0D),
@@ -952,6 +969,7 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
         Vec3 safe = findSafePositionNear(position(), 3.0D, 5.5D);
         if (safe != null) teleportTo(safe.x, safe.y, safe.z);
         setAction(ACTION_VANISH, 10);
+        entityData.set(VISUAL_MOVE, 12);
         burst(level, ParticleTypes.WITCH, position().add(0.0D, 0.8D, 0.0D),
                 12, 0.5D, 0.04D);
     }
@@ -1008,30 +1026,12 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
 
     private void clientIllusionEffects() {
         if (!isAlive()) return;
-        if (tickCount % 4 == 0 && getDeltaMovement().horizontalDistanceSqr() > 0.005D) {
-            level().addParticle(ParticleTypes.CLOUD,
-                    getX() + (random.nextDouble() - 0.5D) * 0.7D,
-                    getY() + 0.08D,
-                    getZ() + (random.nextDouble() - 0.5D) * 0.7D,
-                    0.0D, 0.005D, 0.0D);
-        }
-        if (tickCount % 3 == 0 && (isSpiritMaskVisible()
-                || entityData.get(ACTION_STATE) == ACTION_VANISH)) {
-            level().addParticle(ParticleTypes.WITCH,
-                    getX() + (random.nextDouble() - 0.5D) * 1.1D,
-                    getY() + 0.3D + random.nextDouble() * 1.25D,
-                    getZ() + (random.nextDouble() - 0.5D) * 1.1D,
-                    0.0D, 0.015D, 0.0D);
-        }
+
+
         int masks = maskCount();
         if (masks > 0 && tickCount % 5 == 0) {
             for (int i = 0; i < masks; i++) {
                 double angle = tickCount * 0.08D + Math.PI * 2.0D * i / masks;
-                level().addParticle(ParticleTypes.END_ROD,
-                        getX() + Math.cos(angle) * 1.0D,
-                        getY() + 1.05D + Math.sin(angle * 2.0D) * 0.18D,
-                        getZ() + Math.sin(angle) * 1.0D,
-                        0.0D, 0.0D, 0.0D);
             }
         }
     }
@@ -1083,16 +1083,11 @@ public final class PhantomVeilFoxEntity extends Monster implements GeoEntity {
                     (random.nextDouble() - 0.5D) * 2.0D,
                     Math.sin(angle) * 5.5D);
             Vec3 velocity = center.subtract(outer).normalize().scale(0.18D);
-            level.sendParticles(ParticleTypes.WITCH,
-                    outer.x, outer.y, outer.z, 1, 0.0D, 0.0D, 0.0D, velocity.length());
         }
     }
 
     private static void burst(ServerLevel level, ParticleOptions particle,
-                              Vec3 position, int count, double spread, double speed) {
-        level.sendParticles(particle, position.x, position.y, position.z,
-                count, spread, spread, spread, speed);
-    }
+                              Vec3 position, int count, double spread, double speed) {}
 
     private static Vec3 horizontalLook(LivingEntity entity) {
         Vec3 look = entity.getLookAngle();

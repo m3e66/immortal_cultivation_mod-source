@@ -6,7 +6,6 @@ import com.example.immortal_cultivation_mod.event.ServerEvents;
 import com.example.immortal_cultivation_mod.flame.FlameKind;
 import com.example.immortal_cultivation_mod.flame.SpiritFlameBlock;
 import com.example.immortal_cultivation_mod.item.ForgingSystem;
-import com.example.immortal_cultivation_mod.item.IdentityItems;
 import com.example.immortal_cultivation_mod.item.ModItems;
 import com.example.immortal_cultivation_mod.screen.DingMenu;
 import net.minecraft.core.BlockPos;
@@ -357,7 +356,7 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
             if (FlameKind.fromId(activeFireType).special()) { com.example.immortal_cultivation_mod.guidance.DaoGuidanceObservations.record(player, "special_forge"); }
             if (com.example.immortal_cultivation_mod.item.WeaponShardSystem.REFORGE.equals(activeRecipeId)) { com.example.immortal_cultivation_mod.guidance.DaoGuidanceObservations.record(player, "weapon_reforged"); }
             else if (snapshotStacks().stream().anyMatch(com.example.immortal_cultivation_mod.item.WeaponShardSystem::populated)) { com.example.immortal_cultivation_mod.guidance.DaoGuidanceObservations.record(player, "shard_forge"); }
-            IdentityItems.recordSuccessfulForging(player);
+            com.example.immortal_cultivation_mod.alchemy.AlchemyForgeRecipes.recordSuccessfulBatch(player, activeRecipeId);
             com.example.immortal_cultivation_mod.guidance.DaoGuidanceSystem.record(
                     player,
                     com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent.FORGE_COMPLETE);
@@ -690,7 +689,7 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
     private boolean refreshDisplayItems() {
         boolean changed = false;
         for (int slot = 0; slot < SLOT_COUNT; slot++) {
-            ItemStack next = items.get(slot).copyWithCount(1);
+            ItemStack next = items.get(slot).copy();
             if (!ItemStack.matches(next, displayItems.get(slot))) {
                 displayItems.set(slot, next);
                 changed = true;

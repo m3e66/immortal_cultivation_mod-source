@@ -35,13 +35,14 @@ public class DingBlock extends GeoRockBlock {
     public static final int MAX_SCALE = GeoRockBlock.MAX_SCALE;
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final IntegerProperty SCALE = GeoRockBlock.SCALE;
-    private static final VoxelShape CU_TIE_NORTH_SHAPE = DingCubeShapes.iron();
+    private static final VoxelShape CU_TIE_NORTH_SHAPE = Shapes.or(
+            DingCubeShapes.iron(), DingSealedFloorShapes.iron()).optimize();
     private static final VoxelShape CU_TIE_EAST_SHAPE = rotateHorizontal(CU_TIE_NORTH_SHAPE, Direction.EAST);
     private static final VoxelShape CU_TIE_SOUTH_SHAPE = rotateHorizontal(CU_TIE_NORTH_SHAPE, Direction.SOUTH);
     private static final VoxelShape CU_TIE_WEST_SHAPE = rotateHorizontal(CU_TIE_NORTH_SHAPE, Direction.WEST);
     // Small dings use one hull; enlarged dings retain the native model details.
     private static final VoxelShape QINGTONG_YINHUO_DING_SHAPE =
-            DingCubeShapes.bronze();
+            Shapes.or(DingCubeShapes.bronze(), DingSealedFloorShapes.bronze()).optimize();
     private static final VoxelShape QINGTONG_EAST_SHAPE =
             rotateHorizontal(QINGTONG_YINHUO_DING_SHAPE, Direction.EAST);
     private static final VoxelShape QINGTONG_SOUTH_SHAPE =
@@ -54,7 +55,7 @@ public class DingBlock extends GeoRockBlock {
             QINGTONG_YINHUO_DING_SHAPE, QINGTONG_EAST_SHAPE,
             QINGTONG_SOUTH_SHAPE, QINGTONG_WEST_SHAPE);
     private static final VoxelShape SANYANG_NORTH_SHAPE =
-            SanyangDingShape.create();
+            Shapes.or(SanyangDingShape.create(), DingSealedFloorShapes.sanyang()).optimize();
     private static final VoxelShape[][] SANYANG_SHAPES = createDingDetailVariants(
             SANYANG_NORTH_SHAPE, rotateHorizontal(SANYANG_NORTH_SHAPE, Direction.EAST),
             rotateHorizontal(SANYANG_NORTH_SHAPE, Direction.SOUTH),
@@ -125,7 +126,7 @@ public class DingBlock extends GeoRockBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (canScaleWithHeldTool(state, player) && tryCycleScale(state, level, pos, player)) {
+        if (tryCycleScale(state, level, pos, player)) {
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
         openDingMenu(state, level, pos, player);
@@ -135,7 +136,7 @@ public class DingBlock extends GeoRockBlock {
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
                                                   Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (canScaleWithHeldTool(state, player) && tryCycleScale(state, level, pos, player)) {
+        if (tryCycleScale(state, level, pos, player)) {
             return ItemInteractionResult.sidedSuccess(level.isClientSide);
         }
         openDingMenu(state, level, pos, player);
@@ -165,13 +166,6 @@ public class DingBlock extends GeoRockBlock {
         com.example.immortal_cultivation_mod.guidance.DaoGuidanceSystem.record(
                 serverPlayer,
                 com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent.OPEN_DING);
-    }
-
-    private boolean canScaleWithHeldTool(BlockState state, Player player) {
-        // Lidded dings reserve ordinary sneak-use for their lid. Debug scaling remains
-        // available by holding the stat editor while Debug Eye is enabled.
-        return state.is(ModBlocks.CU_TIE_XIAODING.get())
-                || player.getMainHandItem().is(com.example.immortal_cultivation_mod.item.ModItems.DEBUG_STAT_EDITOR.get());
     }
 
     private DingBlockEntity getOrRepairDingBlockEntity(Level level, BlockPos pos, BlockState state) {

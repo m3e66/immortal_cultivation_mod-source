@@ -1,0 +1,23 @@
+{
+  "name": "调和草",
+  "icon": "immortal_cultivation_mod:harmonizing_herb",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "调和草",
+      "text": "$(bold)生成尝试频率：$()1/6"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《百草录》记载",
+      "text": "调和草生于平和沃土，不喜极寒酷热。其叶脉柔顺，灵息温润，草木之气相融而不相争。丹师常言，炼丹之道不仅在于取其精华，更在于调和诸般药性，此草因而得名。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻药",
+      "text": "平原、向日葵平原、森林与白桦林。"
+    }
+  ]
+}

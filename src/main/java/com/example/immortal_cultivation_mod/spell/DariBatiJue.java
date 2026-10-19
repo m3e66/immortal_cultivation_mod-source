@@ -281,7 +281,7 @@ public final class DariBatiJue {
         Vec3 center = target.getBoundingBox().getCenter();
         if (solar >= 35.0F) {
             SolarTechniques.emitRing(level, center, 0.8D + solar / 100.0D, 22,
-                    ModParticles.METHOD_QI_LIGHT.get());
+                    ModParticles.METHOD_QI_YANG.get());
         }
         if (solar >= 35.0F) {
             Vec3 away = target.position().subtract(player.position());
@@ -390,7 +390,7 @@ public final class DariBatiJue {
             if (!player.onGround()) player.getPersistentData().putBoolean(LEAP_AIRBORNE, true);
             Vec3 back = player.position().subtract(player.getDeltaMovement().normalize().scale(0.45D))
                     .add(0.0D, 0.5D, 0.0D);
-            level.sendParticles(ModParticles.METHOD_QI_LIGHT.get(), back.x, back.y, back.z,
+            level.sendParticles(ModParticles.METHOD_QI_YANG.get(), back.x, back.y, back.z,
                     6, 0.18D, 0.20D, 0.18D, 0.06D);
             level.sendParticles(ParticleTypes.FLAME, back.x, back.y, back.z,
                     4, 0.16D, 0.16D, 0.16D, 0.035D);
@@ -431,7 +431,7 @@ public final class DariBatiJue {
         ServerLevel level = player.serverLevel();
         double width = player.getBbWidth() * (extreme ? 1.2D : 0.8D);
         int count = extreme ? 7 : peak ? 5 : solar >= 70.0F ? 3 : 1;
-        level.sendParticles(solar >= 70.0F ? ModParticles.METHOD_QI_LIGHT.get() : SOLAR_GOLD,
+        level.sendParticles(solar >= 70.0F ? ModParticles.METHOD_QI_YANG.get() : SOLAR_GOLD,
                 player.getX(), player.getY() + player.getBbHeight() * 0.55D, player.getZ(),
                 count, width, player.getBbHeight() * 0.48D, width, 0.018D);
         if (solar >= 70.0F && player.tickCount % 5 == 0) {

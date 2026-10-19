@@ -1,0 +1,13 @@
+{
+  "name": "Preface",
+  "icon": "minecraft:book",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Spiritual Herbs",
+      "text": "All things beneath heaven possess spiritual essence, and plants are no exception. The energy of mountains gathers within their roots, while the essence of sun and moon settles upon their leaves and flowers. Some flourish in secluded valleys, others upon frozen peaks or scorched lands. Those who pursue the path of alchemy must first learn to recognize these spiritual herbs and the lands in which they grow."
+    }
+  ]
+}

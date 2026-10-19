@@ -1,0 +1,2891 @@
+{
+  "stories": [
+    {
+      "id": "life_story_third_bell",
+      "version": 5,
+      "replacement": true,
+      "category": "adventure",
+      "minimum_realm": 0,
+      "maximum_realm": 27,
+      "minimum_age": 16,
+      "start_node": "S01",
+      "title_key": "life.replacement.third_bell.title",
+      "nodes": [
+        {
+          "id": "S01",
+          "text_key": "life.replacement.third_bell.S01.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.S01.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S01.en_us.11",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.third_bell.S01.A",
+              "requirement_key": "life.replacement.third_bell.S01.A.requires",
+              "next": "S02",
+              "story_effects": [
+                "protection"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.third_bell.S01.B",
+              "requirement_key": "life.replacement.third_bell.S01.B.requires",
+              "next": "S03"
+            }
+          ],
+          "enter_effects": [
+            "document:message",
+            "report_owed"
+          ],
+          "seen_roles": [
+            "du",
+            "qiao"
+          ]
+        },
+        {
+          "id": "S02",
+          "text_key": "life.replacement.third_bell.S02.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.S02.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S02.en_us.10",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.third_bell.S02.A",
+              "requirement_key": "life.replacement.third_bell.S02.A.requires",
+              "next": "S04",
+              "requires": "mobile",
+              "story_effects": [
+                "braced",
+                "trust",
+                "delayed",
+                "time:1"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.third_bell.S02.B",
+              "requirement_key": "life.replacement.third_bell.S02.B.requires",
+              "next": "S04",
+              "story_effects": [
+                "braced"
+              ],
+              "stone_cost": 12
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.third_bell.S02.C",
+              "requirement_key": "life.replacement.third_bell.S02.C.requires",
+              "next": "S03"
+            }
+          ],
+          "enter_effects": [
+            "order"
+          ],
+          "seen_roles": [
+            "du",
+            "qiao",
+            "tao",
+            "ren"
+          ]
+        },
+        {
+          "id": "S03",
+          "text_key": "life.replacement.third_bell.S03.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.S03.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S03.en_us.15",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.third_bell.S03.A",
+              "requirement_key": "life.replacement.third_bell.S03.A.requires",
+              "next": "S05",
+              "story_effects": [
+                "pass",
+                "document:pass"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.third_bell.S03.B",
+              "requirement_key": "life.replacement.third_bell.S03.B.requires",
+              "next": "S04"
+            }
+          ],
+          "enter_effects": [
+            "order"
+          ],
+          "seen_roles": [
+            "qiao",
+            "tao",
+            "xu"
+          ]
+        },
+        {
+          "id": "S04",
+          "text_key": "life.replacement.third_bell.S04.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.S04.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S04.en_us.10",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.third_bell.S04.A",
+              "requirement_key": "life.replacement.third_bell.S04.A.requires",
+              "next": "S06",
+              "requires": "braced|ability:movement",
+              "ability": "movement",
+              "ability_unless": "braced"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.third_bell.S04.B",
+              "requirement_key": "life.replacement.third_bell.S04.B.requires",
+              "next": "S06",
+              "requires": "mobile",
+              "check": {
+                "purpose": "insight",
+                "attribute": "Comprehension",
+                "proficiency": "Combat",
+                "dc": 11
+              },
+              "failure": "S07",
+              "no_strain": true
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.third_bell.S04.C",
+              "requirement_key": "life.replacement.third_bell.S04.C.requires",
+              "next": "S07"
+            }
+          ],
+          "seen_roles": [
+            "qiao",
+            "tao",
+            "ren"
+          ]
+        },
+        {
+          "id": "S05",
+          "text_key": "life.replacement.third_bell.S05.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.S05.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S05.en_us.13",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.third_bell.S05.A",
+              "requirement_key": "life.replacement.third_bell.S05.A.requires",
+              "next": "S06",
+              "requires": "pass"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.third_bell.S05.B",
+              "requirement_key": "life.replacement.third_bell.S05.B.requires",
+              "next": "S07"
+            }
+          ],
+          "seen_roles": [
+            "du",
+            "qiao",
+            "tao",
+            "ren"
+          ]
+        },
+        {
+          "id": "S06",
+          "text_key": "life.replacement.third_bell.S06.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.S06.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S06.en_us.14",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.third_bell.S06.A",
+              "requirement_key": "life.replacement.third_bell.S06.A.requires",
+              "next": "S07",
+              "story_effects": [
+                "backup"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.third_bell.S06.B",
+              "requirement_key": "life.replacement.third_bell.S06.B.requires",
+              "next": "S07",
+              "story_effects": [
+                "secrecy"
+              ]
+            }
+          ],
+          "enter_effects": [
+            "register",
+            "document:register"
+          ],
+          "seen_roles": [
+            "du",
+            "tao",
+            "ren"
+          ]
+        },
+        {
+          "id": "S07",
+          "text_key": "life.replacement.third_bell.S07.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.20",
+              "requires": "protection"
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.zh_cn.21",
+              "requires": "delayed"
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.20",
+              "requires": "protection"
+            },
+            {
+              "text_key": "life.replacement.third_bell.S07.en_us.21",
+              "requires": "delayed"
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.third_bell.S07.A",
+              "requirement_key": "life.replacement.third_bell.S07.A.requires",
+              "next": "S08",
+              "story_effects": [
+                "signed",
+                "trust",
+                "document:confession"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.third_bell.S07.B",
+              "requirement_key": "life.replacement.third_bell.S07.B.requires",
+              "next": "S08"
+            }
+          ],
+          "seen_roles": [
+            "du",
+            "qiao",
+            "tao",
+            "ren"
+          ]
+        },
+        {
+          "id": "S08",
+          "text_key": "life.replacement.third_bell.S08.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.S08.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S08.en_us.13",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.third_bell.S08.A",
+              "requirement_key": "life.replacement.third_bell.S08.A.requires",
+              "next": "S09"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.third_bell.S08.B",
+              "requirement_key": "life.replacement.third_bell.S08.B.requires",
+              "next": "S12",
+              "requires": "pass&signed"
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.third_bell.S08.C",
+              "requirement_key": "life.replacement.third_bell.S08.C.requires",
+              "next": "S16",
+              "story_effects": [
+                "custody",
+                "breach:protection"
+              ]
+            }
+          ],
+          "enter_effects": [
+            "test"
+          ],
+          "seen_roles": [
+            "qiao",
+            "tao",
+            "xu"
+          ]
+        },
+        {
+          "id": "S09",
+          "text_key": "life.replacement.third_bell.S09.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.S09.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S09.en_us.12",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.third_bell.S09.A",
+              "requirement_key": "life.replacement.third_bell.S09.A.requires",
+              "next": "S12",
+              "story_effects": [
+                "custody",
+                "breach:protection"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.third_bell.S09.B",
+              "requirement_key": "life.replacement.third_bell.S09.B.requires",
+              "next": "S11",
+              "requires": "pass|trust"
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.third_bell.S09.C",
+              "requirement_key": "life.replacement.third_bell.S09.C.requires",
+              "next": "S10",
+              "requires": "combat"
+            },
+            {
+              "id": "D",
+              "text_key": "life.replacement.third_bell.S09.D",
+              "requirement_key": "life.replacement.third_bell.S09.D.requires",
+              "next": "S16",
+              "story_effects": [
+                "custody",
+                "breach:protection"
+              ]
+            }
+          ],
+          "seen_roles": [
+            "qiao",
+            "tao",
+            "xu",
+            "ren"
+          ]
+        },
+        {
+          "id": "S10",
+          "text_key": "life.replacement.third_bell.S10.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.S10.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S10.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S10.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S10.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S10.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S10.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S10.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S10.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S10.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S10.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S10.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S10.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S10.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S10.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S10.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S10.en_us.7",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.third_bell.S10.A",
+              "requirement_key": "life.replacement.third_bell.S10.A.requires",
+              "next": "S12",
+              "requires": "combat",
+              "story_effects": [
+                "battle_started"
+              ],
+              "failure": "S16",
+              "battle": {
+                "arena": "temple",
+                "stakes": "retreat",
+                "escape": "S16",
+                "surrender": "S16",
+                "enemies": [
+                  {
+                    "name_key": "life.replacement.enemy.escort",
+                    "realm": 1,
+                    "profile": "defensive",
+                    "sprite": "cultivator_front"
+                  },
+                  {
+                    "name_key": "life.replacement.enemy.escort",
+                    "realm": 1,
+                    "profile": "defensive",
+                    "sprite": "cultivator_front"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.third_bell.S10.B",
+              "requirement_key": "life.replacement.third_bell.S10.B.requires",
+              "next": "S12",
+              "story_effects": [
+                "custody",
+                "breach:protection"
+              ]
+            }
+          ],
+          "seen_roles": [
+            "qiao",
+            "tao",
+            "xu",
+            "ren"
+          ]
+        },
+        {
+          "id": "S11",
+          "text_key": "life.replacement.third_bell.S11.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.S11.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S11.en_us.12",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.third_bell.S11.A",
+              "requirement_key": "life.replacement.third_bell.S11.A.requires",
+              "next": "S13"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.third_bell.S11.B",
+              "requirement_key": "life.replacement.third_bell.S11.B.requires",
+              "next": "S12"
+            }
+          ],
+          "seen_roles": [
+            "qiao",
+            "tao",
+            "ren"
+          ]
+        },
+        {
+          "id": "S12",
+          "text_key": "life.replacement.third_bell.S12.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.20",
+              "requires": "protection_broken"
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.zh_cn.21",
+              "requires": "!signed"
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.19",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.20",
+              "requires": "protection_broken"
+            },
+            {
+              "text_key": "life.replacement.third_bell.S12.en_us.21",
+              "requires": "!signed"
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.third_bell.S12.A",
+              "requirement_key": "life.replacement.third_bell.S12.A.requires",
+              "next": "S13"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.third_bell.S12.B",
+              "requirement_key": "life.replacement.third_bell.S12.B.requires",
+              "next": "S14"
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.third_bell.S12.C",
+              "requirement_key": "life.replacement.third_bell.S12.C.requires",
+              "next": "S15"
+            },
+            {
+              "id": "D",
+              "text_key": "life.replacement.third_bell.S12.D",
+              "requirement_key": "life.replacement.third_bell.S12.D.requires",
+              "next": "S16"
+            }
+          ],
+          "seen_roles": [
+            "du",
+            "qiao",
+            "tao",
+            "xu",
+            "ren"
+          ]
+        },
+        {
+          "id": "S13",
+          "text_key": "life.replacement.third_bell.S13.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.S13.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S13.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S13.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S13.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S13.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S13.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S13.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S13.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S13.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S13.zh_cn.9",
+              "requires": "secrecy"
+            },
+            {
+              "text_key": "life.replacement.third_bell.S13.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S13.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S13.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S13.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S13.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S13.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S13.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S13.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S13.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S13.en_us.9",
+              "requires": "secrecy"
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.third_bell.S13.A",
+              "requirement_key": "life.replacement.third_bell.S13.A.requires",
+              "next": "E1",
+              "requires": "register&order&test",
+              "story_effects": [
+                "breach:secrecy",
+                "document:ruling"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.third_bell.S13.B",
+              "requirement_key": "life.replacement.third_bell.S13.B.requires",
+              "next": "S14"
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.third_bell.S13.C",
+              "requirement_key": "life.replacement.third_bell.S13.C.requires",
+              "next": "S15"
+            }
+          ],
+          "seen_roles": [
+            "du",
+            "qiao",
+            "tao",
+            "xu"
+          ]
+        },
+        {
+          "id": "S14",
+          "text_key": "life.replacement.third_bell.S14.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.S14.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S14.en_us.15",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.third_bell.S14.A",
+              "requirement_key": "life.replacement.third_bell.S14.A.requires",
+              "next": "E2"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.third_bell.S14.B",
+              "requirement_key": "life.replacement.third_bell.S14.B.requires",
+              "next": "S15"
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.third_bell.S14.C",
+              "requirement_key": "life.replacement.third_bell.S14.C.requires",
+              "next": "S16"
+            }
+          ],
+          "seen_roles": [
+            "du",
+            "qiao",
+            "tao",
+            "xu",
+            "ren"
+          ]
+        },
+        {
+          "id": "S15",
+          "text_key": "life.replacement.third_bell.S15.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.S15.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S15.en_us.12",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.third_bell.S15.A",
+              "requirement_key": "life.replacement.third_bell.S15.A.requires",
+              "next": "E3"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.third_bell.S15.B",
+              "requirement_key": "life.replacement.third_bell.S15.B.requires",
+              "next": "S16"
+            }
+          ],
+          "seen_roles": [
+            "du",
+            "qiao",
+            "tao",
+            "xu"
+          ]
+        },
+        {
+          "id": "S16",
+          "text_key": "life.replacement.third_bell.S16.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.S16.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S16.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S16.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S16.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S16.zh_cn.4",
+              "requires": "custody"
+            },
+            {
+              "text_key": "life.replacement.third_bell.S16.zh_cn.5",
+              "requires": "!custody"
+            },
+            {
+              "text_key": "life.replacement.third_bell.S16.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S16.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S16.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S16.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S16.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S16.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S16.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S16.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S16.en_us.4",
+              "requires": "custody"
+            },
+            {
+              "text_key": "life.replacement.third_bell.S16.en_us.5",
+              "requires": "!custody"
+            },
+            {
+              "text_key": "life.replacement.third_bell.S16.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S16.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S16.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.S16.en_us.9",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.third_bell.S16.A",
+              "requirement_key": "life.replacement.third_bell.S16.A.requires",
+              "next": "E4",
+              "requires": "conscious",
+              "story_effects": [
+                "stayed",
+                "time:14",
+                "report_done"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.third_bell.S16.B",
+              "requirement_key": "life.replacement.third_bell.S16.B.requires",
+              "next": "E4",
+              "requires": "conscious",
+              "story_effects": [
+                "petitioned",
+                "report_done"
+              ]
+            }
+          ],
+          "seen_roles": [
+            "du",
+            "qiao",
+            "tao",
+            "xu"
+          ]
+        },
+        {
+          "id": "E1",
+          "text_key": "life.replacement.third_bell.E1.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.E1.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.zh_cn.11",
+              "requires": "secrecy_broken"
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E1.en_us.11",
+              "requires": "secrecy_broken"
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.replacement.finish",
+              "ending": true,
+              "next": "E1"
+            }
+          ],
+          "enter_effects": [
+            "!custody",
+            "report_done"
+          ],
+          "seen_roles": [
+            "du",
+            "qiao",
+            "tao",
+            "xu",
+            "ren"
+          ]
+        },
+        {
+          "id": "E2",
+          "text_key": "life.replacement.third_bell.E2.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.E2.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E2.en_us.10",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.replacement.finish",
+              "ending": true,
+              "next": "E2"
+            }
+          ],
+          "enter_effects": [
+            "!custody",
+            "report_done"
+          ],
+          "seen_roles": [
+            "du",
+            "qiao",
+            "tao",
+            "ren"
+          ]
+        },
+        {
+          "id": "E3",
+          "text_key": "life.replacement.third_bell.E3.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.E3.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E3.en_us.10",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.replacement.finish",
+              "ending": true,
+              "next": "E3"
+            }
+          ],
+          "enter_effects": [
+            "!custody",
+            "report_done"
+          ],
+          "seen_roles": [
+            "du",
+            "qiao",
+            "tao"
+          ]
+        },
+        {
+          "id": "E4",
+          "text_key": "life.replacement.third_bell.E4.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.third_bell.E4.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.zh_cn.10",
+              "requires": "stayed"
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.zh_cn.11",
+              "requires": "petitioned"
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.en_us.10",
+              "requires": "stayed"
+            },
+            {
+              "text_key": "life.replacement.third_bell.E4.en_us.11",
+              "requires": "petitioned"
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.replacement.finish",
+              "ending": true,
+              "next": "E4"
+            }
+          ],
+          "enter_effects": [
+            "report_done"
+          ],
+          "seen_roles": [
+            "du",
+            "qiao",
+            "tao"
+          ]
+        }
+      ],
+      "cast": [
+        {
+          "role": "du",
+          "name": "杜芬",
+          "name_key": "life.replacement.third_bell.cast.du",
+          "realm": 0,
+          "age": 48,
+          "kind": "human",
+          "occupation": "laborer",
+          "rootless": true,
+          "gender": "female"
+        },
+        {
+          "role": "qiao",
+          "name": "乔生",
+          "name_key": "life.replacement.third_bell.cast.qiao",
+          "realm": 0,
+          "age": 27,
+          "kind": "human",
+          "occupation": "laborer",
+          "rootless": true,
+          "gender": "male"
+        },
+        {
+          "role": "tao",
+          "name": "陶闻",
+          "name_key": "life.replacement.third_bell.cast.tao",
+          "realm": 0,
+          "age": 42,
+          "kind": "human",
+          "occupation": "laborer",
+          "rootless": true,
+          "gender": "male"
+        },
+        {
+          "role": "xu",
+          "name": "许岚",
+          "name_key": "life.replacement.third_bell.cast.xu",
+          "realm": 4,
+          "age": 38,
+          "kind": "human",
+          "occupation": "sect_disciple",
+          "rootless": false,
+          "gender": "male"
+        },
+        {
+          "role": "ren",
+          "name": "任柏",
+          "name_key": "life.replacement.third_bell.cast.ren",
+          "realm": 0,
+          "age": 46,
+          "kind": "human",
+          "occupation": "laborer",
+          "rootless": true,
+          "gender": "male"
+        }
+      ],
+      "battle_win_effects": [],
+      "battle_loss_effects": [
+        "custody",
+        "breach:protection"
+      ],
+      "battle_escape_effects": [
+        "custody",
+        "breach:protection"
+      ],
+      "unconscious_node": "E4",
+      "fallback_node": "S16"
+    }
+  ]
+}

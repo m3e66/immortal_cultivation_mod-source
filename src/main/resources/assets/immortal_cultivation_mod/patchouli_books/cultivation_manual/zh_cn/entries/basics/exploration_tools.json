@@ -1,0 +1,23 @@
+{
+  "name": "寻脉访灵",
+  "icon": "immortal_cultivation_mod:yinyang_compass",
+  "category": "immortal_cultivation_mod:basics",
+  "sortnum": 37,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "罗盘辨气",
+      "text": "阴阳罗盘可查看阴气与灵气分布，读数须看具体数值，不能只凭颜色浓淡。图中位置有对应坐标，可点选目标；手持罗盘时仍可在HUD查看当前位置与导航。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "循向而行",
+      "text": "标记后查看目标X/Z、方向、距离与坐标差，便可边走边辨路，无需每走几步重新开图。罗盘标记只属于当前世界，换维度或世界后应重新确认。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "灵木成林",
+      "text": "天然灵木聚生于主世界的灵木林，不再遍地生长。可在新生成的温带林地区域寻觅；已探索地区不会自动改换群系。收集树苗后可自行栽植，生长仍须满足环境条件。"
+    }
+  ]
+}

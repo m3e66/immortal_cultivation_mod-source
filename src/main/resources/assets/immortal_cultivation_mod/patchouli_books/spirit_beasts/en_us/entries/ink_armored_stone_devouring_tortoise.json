@@ -1,0 +1,23 @@
+{
+  "name": "Black-Armored Stone-Devouring Tortoise",
+  "icon": "immortal_cultivation_mod:ink_armored_stone_devouring_tortoise_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Black-Armored Stone-Devouring Tortoise",
+      "text": "$(bold)Realm: $()Qi Refining – Golden Core"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Covered in heavy black armor, the Stone-Devouring Tortoise draws nourishment from rock and mineral essence. Though slow-moving, its defenses are formidable. It can be found upon exposed mountain summits or deep within lightless caverns, where its shell resembles ordinary stone."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Found in stony and jagged peaks or dripstone caves. Requires open sky above Y=100, or zero skylight below Y=40, with stone, deepslate, tuff, calcite, gravel, or terracotta beneath it."
+    }
+  ]
+}

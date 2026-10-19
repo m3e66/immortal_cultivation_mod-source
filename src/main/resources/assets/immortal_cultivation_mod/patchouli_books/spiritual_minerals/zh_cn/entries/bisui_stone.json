@@ -1,0 +1,23 @@
+{
+  "name": "碧髓石",
+  "icon": "immortal_cultivation_mod:bisui_stone",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "碧髓石",
+      "text": "$(bold)起始高度：$()Y −32 至 48$(br2)$(bold)尝试频率：$()1/24 区块"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《灵矿录》记载",
+      "text": "碧髓石生于水木灵气交融之地，石色青碧，纹理温润。终年受湿气滋养，其内灵息柔和绵长。多藏于湿泽密林及幽深水洞之中，常伴苔痕与草木而生。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻脉",
+      "text": "沼泽、红树林沼泽、河流及繁茂洞穴。可于 Y −32 至 48 的湿润区域寻觅。"
+    }
+  ]
+}

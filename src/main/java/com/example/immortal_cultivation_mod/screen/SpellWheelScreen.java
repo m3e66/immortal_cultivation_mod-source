@@ -21,6 +21,8 @@ public class SpellWheelScreen extends Screen {
 
     public SpellWheelScreen() {
         super(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".spell_wheel"));
+        if (ClientData.cultivationData != null)
+            ClientData.reconcileWheelSelection(ClientData.cultivationData.knownSpells());
     }
 
     private List<WheelEntry> getEntries() {

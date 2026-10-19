@@ -226,6 +226,7 @@ public final class LifeSimulationWorldMap {
 
     public static void advanceYear(CompoundTag life, RandomSource random) {
         normalize(life);
+        processStoryObligations(life);
         CompoundTag map = state(life).copy();
         map.putInt("TravelQi", maximumTravelQi(life));
         updateMovingMarket(map, random);
@@ -359,6 +360,106 @@ public final class LifeSimulationWorldMap {
             }
         }
         return true;
+    }
+
+    /** Applies an ending to its saved simulated location, never to the player's current real world. */
+    public static void applyStoryEffect(CompoundTag life, String sourceLocation, String operation) {
+        normalize(life);
+        if (location(sourceLocation) == null) sourceLocation = state(life).getString(CURRENT_LOCATION);
+        if (location(sourceLocation) == null) return;
+        CompoundTag map = state(life), local = mutableLocationState(life, sourceLocation);
+        String[] fields = operation.split(":", 3);
+        if (fields.length < 2) return;
+        switch (fields[0]) {
+            case "danger", "prosperity", "reputation", "wanted" -> {
+                String key = switch (fields[0]) { case "danger" -> "Danger"; case "prosperity" -> "Prosperity"; case "reputation" -> "LocalReputation"; default -> "LocalWanted"; };
+                try { local.putInt(key, Mth.clamp(local.getInt(key) + Integer.parseInt(fields[1]), key.equals("LocalReputation") ? -100 : 0, key.equals("Danger") ? 5 : 100)); }
+                catch (NumberFormatException ignored) { }
+            }
+            case "condition" -> {
+                if (List.of("NORMAL", "PROSPEROUS", "WAR", "PLAGUE", "OCCUPIED", "SEALED", "HAUNTED", "ABANDONED", "DESTROYED").contains(fields[1])) {
+                    local.putString("Condition", fields[1]);
+                    if (List.of("ABANDONED", "DESTROYED").contains(fields[1])) local.putBoolean("StoryLocked", true);
+                }
+            }
+            case "site" -> {
+                if (fields.length < 3) return;
+                CompoundTag sites = local.getCompound("StorySites"); sites.putString(fields[1], fields[2]); local.put("StorySites", sites);
+                if (fields[1].equals("mine")) {
+                    boolean usable = List.of("shared", "restored").contains(fields[2]);
+                    local.putBoolean("MineAccessible", usable);
+                    local.putInt("SpiritualDensity", usable ? location(sourceLocation).spiritualDensity() : Math.max(0, local.getInt("SpiritualDensity") - 1));
+                }
+                if (fields[1].equals("ferry") && fields[2].equals("safe")) local.putBoolean("SafeFerry", true);
+            }
+            case "sect" -> {
+                CompoundTag sect = life.getCompound("SectState"); sect.putString("SourceLocation", sourceLocation);
+                if (sect.getString("Location").isBlank()) sect.putString("Location", sourceLocation);
+                if (fields[1].equals("reform")) { sect.putBoolean("Reformed", true); sect.putInt("Resources", Math.min(100, sect.getInt("Resources") + 25)); }
+                if (fields[1].equals("recovered")) { sect.putString("Status", "recovered"); sect.putInt("Resources", Math.min(100, sect.getInt("Resources") + 10)); }
+                if (fields[1].equals("truce")) { sect.putString("Status", "truce"); local.putInt("Danger", Math.max(0, local.getInt("Danger") - 1)); }
+                if (fields[1].equals("anchor_upkeep")) {
+                    sect.putInt("AnnualUpkeep", 20); sect.putInt("NextUpkeepYear", life.getInt("Age") + 1);
+                    sect.putInt("Resources", Math.max(60, sect.getInt("Resources")));
+                    local.putInt("SpiritualDensity", Math.min(4, local.getInt("SpiritualDensity") + 1));
+                }
+                if (fields[1].equals("relocate")) {
+                    String origin = sourceLocation;
+                    LocationDefinition source = location(origin);
+                    String destination = LOCATIONS.stream().filter(candidate -> !candidate.id().equals(origin) && !candidate.hidden() && !isSealed(map, candidate.id()))
+                            .min(Comparator.comparingInt(candidate -> Math.abs(candidate.mapX() - source.mapX()) + Math.abs(candidate.mapY() - source.mapY())))
+                            .map(LocationDefinition::id).orElse(origin);
+                    sect.putString("Status", "relocated"); sect.putString("Location", destination); sect.putString("PreviousLocation", origin);
+                    map.putString(RESIDENCE, destination); map.putString(CURRENT_LOCATION, destination); map.putString(SELECTED_DESTINATION, destination);
+                    discoverLocation(map, destination); addUnique(map.getList(VISITED_LOCATIONS, Tag.TAG_STRING), destination);
+                    for (var person : life.getList("Relationships", Tag.TAG_COMPOUND)) {
+                        CompoundTag npc = (CompoundTag) person;
+                        if (npc.getBoolean("Alive") && List.of("sect_disciple", "sect_elder").contains(npc.getString("Occupation"))) npc.putString("Location", destination);
+                    }
+                    local.putString("Condition", "ABANDONED"); local.putBoolean("StoryLocked", true);
+                }
+                life.put("SectState", sect);
+            }
+            case "government" -> {
+                local.putString("Government", fields[1]); local.putBoolean("StoryLocked", true);
+                if (fields[1].equals("council")) { local.putString("ControllingFaction", "provincial_council"); local.putInt("Prosperity", Math.min(100, local.getInt("Prosperity") + 10)); }
+                else if (fields[1].equals("governor")) {
+                    local.putString("ControllingFaction", "none".equals(life.getString("Sect")) ? "tianheng_dynasty" : life.getString("Sect"));
+                    local.putInt("AnnualGovernanceCost", 30); local.putInt("NextGovernanceYear", life.getInt("Age") + 1);
+                }
+            }
+            default -> { return; }
+        }
+        map.getCompound(LOCATION_STATES).put(sourceLocation, local); life.put(ROOT, map);
+    }
+
+    private static void processStoryObligations(CompoundTag life) {
+        CompoundTag map = state(life), sect = life.getCompound("SectState");
+        int year = life.getInt("Age");
+        if (sect.getInt("AnnualUpkeep") > 0 && year >= sect.getInt("NextUpkeepYear")) {
+            sect.putInt("NextUpkeepYear", year + 1);
+            boolean paid = life.getLong("Wealth") >= sect.getInt("AnnualUpkeep");
+            if (paid) life.putLong("Wealth", life.getLong("Wealth") - sect.getInt("AnnualUpkeep"));
+            else {
+                sect.putInt("Resources", Math.max(0, sect.getInt("Resources") - 10));
+                CompoundTag local = locationState(map, sect.getString("SourceLocation"));
+                local.putInt("Danger", Math.min(5, local.getInt("Danger") + 1));
+            }
+            LifeSimulationSystem.addLog(life, paid ? "life.expansion.anchor_upkeep_paid" : "life.expansion.anchor_upkeep_missed");
+        }
+        for (String id : map.getCompound(LOCATION_STATES).getAllKeys()) {
+            CompoundTag local = locationState(map, id);
+            if (local.getInt("AnnualGovernanceCost") > 0 && year >= local.getInt("NextGovernanceYear")) {
+                local.putInt("NextGovernanceYear", year + 1);
+                boolean paid = life.getLong("Wealth") >= local.getInt("AnnualGovernanceCost");
+                if (paid) {
+                    life.putLong("Wealth", life.getLong("Wealth") - local.getInt("AnnualGovernanceCost"));
+                    local.putInt("Prosperity", Math.min(100, local.getInt("Prosperity") + 1));
+                } else { local.putInt("Danger", Math.min(5, local.getInt("Danger") + 1)); local.putInt("Prosperity", Math.max(0, local.getInt("Prosperity") - 2)); }
+                LifeSimulationSystem.addLog(life, paid ? "life.expansion.governance_paid" : "life.expansion.governance_missed");
+            }
+            if (id.equals(map.getString(CURRENT_LOCATION)) && local.getCompound("StorySites").getString("infirmary").equals("supported")) life.putInt("Health", Math.min(100, life.getInt("Health") + 1));
+        }
     }
 
     public static TravelPreview preview(
@@ -714,29 +815,10 @@ public final class LifeSimulationWorldMap {
         }
         CompoundTag map = state(life);
         String current = map.getString(CURRENT_LOCATION);
-        QuestDefinition endingRules = QUESTS.get(current);
-        if (endingRules == null) {
-            return false;
-        }
         CompoundTag local = mutableLocationState(life, current);
-        if (local.getBoolean("MainQuestCompleted")) {
-            return false;
-        }
-        String questId = "immortal_cultivation_mod:location_" + current;
-        LifeSimulationQuests.Definition quest = LifeSimulationQuests.find(
-                player.server.getResourceManager(), questId);
-        if (quest == null) {
-            return false;
-        }
-        CompoundTag saved = life.getCompound("QuestProgress")
-                .getCompound(questId);
-        String node = saved.getString("CurrentNode");
-        if (node.isBlank()) {
-            node = quest.startNode();
-        }
-        local.putInt("MainQuestStage", Math.max(1, saved.getList(
-                "Path", Tag.TAG_STRING).size() + 1));
-        return LifeSimulationSystem.openQuestNode(life, quest, node);
+        if (List.of("DESTROYED", "ABANDONED", "SEALED").contains(local.getString("Condition"))) return false;
+        return LifeSimulationStories.select(life, player.server.getResourceManager(), "adventure",
+                RandomSource.create(life.getLong("Seed") ^ life.getInt("Age") * 93187L));
     }
 
     private static void completeQuest(
@@ -763,6 +845,9 @@ public final class LifeSimulationWorldMap {
         }
         CompoundTag map = state(life);
         String current = map.getString(CURRENT_LOCATION);
+        CompoundTag local = mutableLocationState(life, current);
+        if (List.of("DESTROYED", "ABANDONED", "SEALED").contains(local.getString("Condition"))) return false;
+        long previousWealth = life.getLong("Wealth");
         switch (current) {
             case "tianheng_capital" -> {
                 life.putLong("Wealth", life.getLong("Wealth") + random.nextInt(90, 181));
@@ -807,7 +892,7 @@ public final class LifeSimulationWorldMap {
             }
         }
         life.putInt("AnnualActionPoints", life.getInt("AnnualActionPoints") - 1);
-        CompoundTag local = mutableLocationState(life, current);
+        if (life.getLong("Wealth") > previousWealth) life.putLong("Wealth", previousWealth + (life.getLong("Wealth") - previousWealth) * Mth.clamp(local.getInt("Prosperity"), 0, 100) / 50);
         local.putInt("LocalReputation", Mth.clamp(
                 local.getInt("LocalReputation") + 2, -100, 100));
         LifeSimulationSystem.addLog(
@@ -871,6 +956,7 @@ public final class LifeSimulationWorldMap {
                 .filter(location -> discovered(map, location.id()))
                 .filter(location -> !locationState(map, location.id())
                         .getBoolean("MainQuestCompleted"))
+                .filter(location -> !locationState(map, location.id()).getBoolean("StoryLocked"))
                 .toList();
         if (mutable.isEmpty()) {
             return;

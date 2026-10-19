@@ -31,7 +31,18 @@ public final class PillData {
         return stack;
     }
     public static CompoundTag raw(ItemStack stack) {
-        return stack.getOrDefault(DataComponents.CUSTOM_DATA,CustomData.EMPTY).copyTag().getCompound(KEY);
+        CompoundTag data = stack.getOrDefault(DataComponents.CUSTOM_DATA,CustomData.EMPTY).copyTag().getCompound(KEY);
+        // Read old crafted pills as Yin/Yang, preserving strength and all unrelated data.
+        CompoundTag elements = data.getCompound("Elements");
+        migrateElement(elements, "LIGHT", "YANG");
+        migrateElement(elements, "DARK", "YIN");
+        return data;
+    }
+
+    private static void migrateElement(CompoundTag elements, String oldName, String newName) {
+        if (!elements.contains(oldName)) return;
+        elements.putDouble(newName, elements.getDouble(newName) + elements.getDouble(oldName));
+        elements.remove(oldName);
     }
     public static Map<Effect,Dose> effects(ItemStack stack) {
         if(!(stack.getItem() instanceof AlchemyPillItem pill))return Map.of();
@@ -120,7 +131,6 @@ public final class PillData {
             }
             case "blood_qi_pill" -> {
                 legacyLine(lines, "blood_qi", ChatFormatting.GREEN, 5);
-                legacyLine(lines, "blood_qi_hint", ChatFormatting.GRAY);
             }
             case "bigu_pill" -> {
                 legacyLine(lines, "hunger", ChatFormatting.GREEN, 100);
@@ -149,8 +159,8 @@ public final class PillData {
             case WOOD, WIND -> ChatFormatting.GREEN;
             case WATER, ICE -> ChatFormatting.AQUA;
             case FIRE -> ChatFormatting.RED;
-            case THUNDER, DARK -> ChatFormatting.LIGHT_PURPLE;
-            case LIGHT -> ChatFormatting.YELLOW;
+            case THUNDER, YIN -> ChatFormatting.LIGHT_PURPLE;
+            case YANG -> ChatFormatting.YELLOW;
         };
     }
 }

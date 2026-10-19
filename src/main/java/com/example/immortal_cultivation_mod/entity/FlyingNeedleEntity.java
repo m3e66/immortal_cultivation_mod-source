@@ -48,6 +48,7 @@ public class FlyingNeedleEntity extends ThrowableItemProjectile {
             boolean explosive) {
         super(ModEntities.FLYING_NEEDLE.get(), owner, level);
         setOwner(owner);
+        com.example.immortal_cultivation_mod.item.WeaponBinding.prepare(stack);
         weaponStack = stack.copyWithCount(1);
         setItem(weaponStack);
         this.injectedQiDamage = Math.max(0.0F, injectedQiDamage);
@@ -58,6 +59,8 @@ public class FlyingNeedleEntity extends ThrowableItemProjectile {
                 .add(0.0D, -0.08D, 0.0D);
         setPos(origin.x, origin.y, origin.z);
     }
+
+    @Override public ItemStack getWeaponItem() { return weaponStack; }
 
     @Override
     protected Item getDefaultItem() {

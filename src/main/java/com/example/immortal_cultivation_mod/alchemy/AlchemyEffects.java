@@ -33,9 +33,15 @@ public final class AlchemyEffects {
     public static boolean consume(LivingEntity player,ItemStack pill) {
         if(player.level().isClientSide || !(pill.getItem() instanceof AlchemyPillItem)||pill.isEmpty()||!player.isAlive())return false;
         long now=player.level().getGameTime();
+        if(player instanceof ServerPlayer server && PillToxicity.pillId(pill).equals("qingdu") && !PillToxicity.canDetox(server,true))return false;
         if(player.getPersistentData().getLong("NextCultivationPill")>now)return false;
         var effects=PillData.effects(pill);
         if(effects.isEmpty())return false;
+        if(player instanceof ServerPlayer server) {
+            if(PillToxicity.pillId(pill).equals("qingdu")) {
+                if(!PillToxicity.detox(server))return false;
+            } else PillToxicity.consumed(server,pill);
+        }
         ListTag active=player.getPersistentData().getList(ACTIVE,Tag.TAG_COMPOUND);
         effects.forEach((effect,dose)->{
             if(activation(effect) && player.getRandom().nextDouble()*100>=Math.min(100,dose.amount()))return;
@@ -78,10 +84,11 @@ public final class AlchemyEffects {
             if(tag.getString("Effect").equals(effect.name())&&tag.getInt("Elapsed")<tag.getInt("Ticks"))
                 value=Math.max(value,tag.getDouble("Amount")/100.);
         }
+        if(!activation(effect))value*=PillToxicity.multiplier(player,"Benefit");
         return Double.isFinite(value)?Math.max(0,Math.min(effect==Effect.DEFENSE||effect==Effect.FIRE_RESIST||effect==Effect.COLD_RESIST?.8:3,value)):0;
     }
     public static int cultivationGain(Player player,int base) {
-        return Math.max(0,(int)Math.round(base*(1+bonus(player,Effect.CULTIVATION_GAIN))));
+        return (int)Math.max(0,Math.min(Integer.MAX_VALUE,Math.round(base*(1+bonus(player,Effect.CULTIVATION_GAIN))*com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.cultivationMultiplier(player))));
     }
     @SubscribeEvent public static void tick(PlayerTickEvent.Post event) {
         if(event.getEntity() instanceof ServerPlayer player)tickPlayer(player);
@@ -130,7 +137,15 @@ public final class AlchemyEffects {
         if(changed&&player.tickCount%20==0&&player instanceof ServerPlayer server)ServerEvents.syncPlayerData(server);
     }
     private static void restore(LivingEntity entity,Effect effect,double amount) {
-        if(effect==Effect.HEALTH){entity.heal((float)amount);return;}
+        amount*=PillToxicity.multiplier(entity,effect==Effect.HEALTH||effect==Effect.QI?"Restore":"Benefit");
+        if(entity instanceof ServerPlayer && effect!=Effect.HEALTH) {
+            String key="PillRestoreFraction_"+effect.name();
+            amount+=entity.getPersistentData().getDouble(key);
+            double whole=Math.floor(amount+1e-9);
+            entity.getPersistentData().putDouble(key,Math.max(0,amount-whole));
+            amount=whole;
+        }
+        if(effect==Effect.HEALTH){entity.heal(com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.pillHealing(entity, (float)amount));return;}
         if(entity instanceof PathfinderMob npc && entity instanceof CultivationNpc cultivation) {
             String archetype=cultivation.npcArchetype();
             switch(effect) {
@@ -144,9 +159,9 @@ public final class AlchemyEffects {
         if(!(entity instanceof ServerPlayer player))return;
         var data=ModAttachments.getData(player);
         switch(effect){
-            case HEALTH->player.heal((float)amount);
+            case HEALTH->player.heal(com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.pillHealing(player, (float)amount));
             case QI->ModAttachments.setData(player,data.withQi(data.qi()+(int)Math.min(amount,Math.max(0,
-                CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi()+data.maxQiBonus()-data.qi()))));
+                data.maxQi()-data.qi()))));
             case SENSE->ModAttachments.setData(player,data.withThoughts(data.thoughts()+(int)Math.min(amount,Math.max(0,data.maxThoughts()-data.thoughts()))));
             case CULTIVATION->ModAttachments.setData(player,data.withCultivationProgress(data.cultivationProgress()+(long)Math.min(amount,Math.max(0,
                 CultivationLevels.getTotalQiNeeded(data.cultivationLevel())-data.cultivationProgress()))));
@@ -168,13 +183,15 @@ public final class AlchemyEffects {
         } else if(entity instanceof ServerPlayer player){
             var data=ModAttachments.getData(player);
             maximum=switch(effect){
-                case QI->(double)CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi()+data.maxQiBonus();
+                case QI->(double)data.maxQi();
                 case SENSE->data.maxThoughts();
                 case CULTIVATION->CultivationLevels.getTotalQiNeeded(data.cultivationLevel());
                 default->0;
             };
         }
-        return Math.max(0,maximum)*percentage/100.;
+        double recovery = Math.max(0,maximum)*percentage/100.;
+        if(effect==Effect.CULTIVATION && entity instanceof Player player) recovery *= com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.cultivationMultiplier(player);
+        return recovery;
     }
     private static void syncSpeed(LivingEntity player){
         var attribute=player.getAttribute(Attributes.MOVEMENT_SPEED);
@@ -257,9 +274,9 @@ public final class AlchemyEffects {
                         case WOOD -> 0x9DBE93;
                         case EARTH,METAL -> 0xC3B58C;
                         case FIRE -> 0xCC9C88;
-                        case THUNDER,DARK -> 0xB2A0C7;
+                        case THUNDER,YIN -> 0xB2A0C7;
                         case WIND -> 0xA3C6BC;
-                        case LIGHT -> 0xD0C69E;
+                        case YANG -> 0xD0C69E;
                     }));
         }
         for(Effect effect:Effect.values()){

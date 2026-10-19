@@ -154,6 +154,10 @@ public final class NpcCultivationGameTests {
         NpcProfile.ensure(mob, mob.npcArchetype());
         CompoundTag inventoryBefore = new CompoundTag();
         inventoryBefore.put("Inventory", profile.get("Inventory").copy());
+        var withPill = NpcProfile.inventory(mob);
+        NpcProfile.insertInventory(withPill, new net.minecraft.world.item.ItemStack(
+                com.example.immortal_cultivation_mod.item.ModItems.BREAKTHROUGH_PILL.get()));
+        NpcProfile.writeInventory(mob, profile, withPill);
         profile.getCompound("Relationships").putString("test-bond", "retained");
         String name = profile.getString("Name");
         int age = profile.getInt("Age");
@@ -172,7 +176,7 @@ public final class NpcCultivationGameTests {
         helper.assertTrue(mob.getAttributeValue(Attributes.ATTACK_DAMAGE) > 4, "Melee strength grows");
         helper.assertTrue(profile.getInt("Age") == age + level.maxAge() - CultivationLevels.getLevelDef(LATE).maxAge(), "Breakthrough extends remaining lifespan");
         helper.assertTrue(uuid.equals(mob.getUUID()) && name.equals(profile.getString("Name")), "NPC identity survives promotion");
-        helper.assertTrue(inventoryBefore.get("Inventory").equals(profile.get("Inventory")), "Promotion preserves inventory");
+        helper.assertTrue(inventoryBefore.get("Inventory").equals(profile.get("Inventory")), "Promotion preserves other inventory and consumes exactly one breakthrough pill");
         helper.assertTrue("retained".equals(profile.getCompound("Relationships").getString("test-bond")), "Promotion preserves relationships");
         mob.discard(); helper.succeed();
     }

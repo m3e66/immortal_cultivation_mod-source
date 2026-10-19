@@ -104,6 +104,7 @@ public final class ForgingSystem {
                 || stack.is(ModItems.EMBER_FEATHER.get())
                 || stack.is(ModItems.FIRE_OWL_CLAW.get())
                 || stack.is(ModItems.FLAME_RADIANCE_BONE.get())
+                || stack.is(ModItems.MORTAL_BEAST_MEAT.get())
                 || stack.is(ModItems.LIANQI_BEAST_MEAT.get())
                 || stack.is(ModItems.ZHUJI_BEAST_MEAT.get())
                 || stack.is(ModItems.JINDAN_BEAST_MEAT.get())
@@ -236,6 +237,7 @@ public final class ForgingSystem {
         if(slipId.endsWith("_formula") && com.example.immortal_cultivation_mod.alchemy.AlchemyForgeRecipes.LEGACY_REQUIRED.containsKey(slipId.substring(0,slipId.length()-8)))
             return recipeById("legacy_alchemy/"+slipId.substring(0,slipId.length()-8));
         if(slipId.equals("jade_pill_bottle_yujian"))return recipeById("jade_pill_bottle");
+        if(slipId.equals("qingtong_yinhuo_ding_yujian"))return recipeById("qingtong_yinhuo_ding");
         if(slipId.equals("chi_jin_sanyang_ding_yujian"))return recipeById("chi_jin_sanyang_ding");
         if(slipId.equals("crimson_flame_seed_yujian"))return recipeById("crimson_flame_seed");
         if(slipId.equals("dragon_flame_seed_yujian"))return recipeById("dragon_flame_seed");
@@ -343,6 +345,11 @@ public final class ForgingSystem {
     }
 
     public static ForgingRecipe recipeById(String id) {
+        if ("qingtong_yinhuo_ding".equals(id)) return new ForgingRecipe(id,
+                ModBlocks.QINGTONG_YINHUO_DING.get(), 2500,
+                Map.of(ModBlocks.CU_TIE_XIAODING.get().asItem(), 1,
+                        ModBlocks.CHITONG_SUI.get().asItem(), 7),
+                true, RECIPE_SPIRIT_STONE_COUNT);
         if ("chi_jin_sanyang_ding".equals(id)) return new ForgingRecipe(id,
                 ModBlocks.CHI_JIN_SANYANG_DING.get(), 6500,
                 Map.of(ModBlocks.QINGTONG_YINHUO_DING.get().asItem(), 1,
@@ -851,7 +858,7 @@ public final class ForgingSystem {
         if (recipe == null) {
             return Items.AIR;
         }
-        if(HigherWeaponSpec.find(recipe.id())!=null || ("baota".equals(recipe.id()) || "jin_hulu".equals(recipe.id())))return HigherWeaponRecipes.item(recipe.id());
+        if(HigherWeaponSpec.find(recipe.id())!=null)return HigherWeaponRecipes.item(recipe.id());
         if (recipe.directOutput()) {
             return recipe.moldItem();
         }
@@ -872,7 +879,7 @@ public final class ForgingSystem {
     /** Native weapon rank is fixed by its item type, not by later restriction breakthroughs. */
     private static int originalWeaponTemperature(String id, int fallback) {
         HigherWeaponSpec spec = HigherWeaponSpec.find(id);
-        int realm = spec != null ? spec.realm : ("baota".equals(id) || "jin_hulu".equals(id) ? 2 : 0);
+        int realm = spec != null ? spec.realm : 0;
         return realm == 0 ? fallback : Math.clamp(4500 + (realm - 2) * 2000, 0, MAX_TEMP);
     }
 
@@ -1021,6 +1028,7 @@ public final class ForgingSystem {
 
     /**
      * The weighted average material purity is also the forge success percentage.
+     * Each spirit-stone stack contributes one unit, regardless of its stone count.
      * A 100-purity batch is guaranteed; a 1-purity batch has a 1% chance.
      */
     public static double forgingSuccessChancePercent(List<ItemStack> materials) {
@@ -1201,12 +1209,12 @@ public final class ForgingSystem {
                 && !"flying_needle".equals(recipe)
                 && !"tiegu_shan".equals(recipe)
                 && !"fuchen".equals(recipe)
-                && !"whip".equals(recipe) && !"baota".equals(recipe) && !"jin_hulu".equals(recipe) && HigherWeaponSpec.find(recipe)==null) {
+                && !"whip".equals(recipe) && HigherWeaponSpec.find(recipe)==null) {
             return ItemStack.EMPTY;
         }
         forging.putString("tempering", "cool_water");
         tag.put(TAG_FORGING, forging);
-        ItemStack weapon = new ItemStack(HigherWeaponSpec.find(recipe)!=null || ("baota".equals(recipe) || "jin_hulu".equals(recipe))?HigherWeaponRecipes.item(recipe):switch (recipe) {
+        ItemStack weapon = new ItemStack(HigherWeaponSpec.find(recipe)!=null?HigherWeaponRecipes.item(recipe):switch (recipe) {
             case "dao" -> ModItems.DAO.get();
             case "jingtie_spear" -> ModItems.JINGTIE_SPEAR.get();
             case "heavy_iron_bracer" -> ModItems.HEAVY_IRON_BRACER.get();
@@ -1520,6 +1528,11 @@ public final class ForgingSystem {
     }
 
     private static PurityContribution effectivePurity(ItemStack stack) {
+        // Stones are a stack-sized recipe cost, not dozens of separate purity inputs.
+        // Keep their consumed quantity intact for recipes and ingredient history.
+        if (isRecipeSpiritStone(stack)) {
+            return new PurityContribution(purity(stack), 1);
+        }
         CompoundTag inherited = forgingData(stack);
         if (inherited.contains("average_purity")) {
             double purity = Math.max(1.0D, Math.min(100.0D, inherited.getDouble("average_purity")));

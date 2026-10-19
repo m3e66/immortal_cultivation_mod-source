@@ -1,6 +1,6 @@
 {
   "type": "neoforge:add_spawns",
-  "biomes": "minecraft:basalt_deltas",
+  "biomes": "#immortal_cultivation_mod:beast_spawns/ember_feather_fire_owl",
   "spawners": {
     "type": "immortal_cultivation_mod:ember_feather_fire_owl",
     "weight": 2,

@@ -1,0 +1,38 @@
+{
+  "name": "寻矿要诀",
+  "icon": "minecraft:iron_pickaxe",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "寻矿要诀",
+      "text": "世间灵矿并非处处成山，寻矿之道，贵在观地势、辨灵气、察岩脉。荒原寻火金，寒岭觅冰玉，绝峰采天晶，深地探玄铁。至于灵石地脉，则可循灵木而寻其源。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "实际寻矿规则",
+      "text": "普通灵矿多以地表或洞中裸露的小片形式生成，须有坚实干燥的地面承托。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "实际寻矿规则",
+      "text": "普通灵矿每次通过区块生成判定后，通常尝试放置三次；流金沙则尝试六次。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "实际寻矿规则",
+      "text": "所列高度为起始寻矿高度，实际矿块可能因附近搜索而略微超出范围。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "实际寻矿规则",
+      "text": "生成判定仅为尝试机会，并非必然出现矿物。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "卷末",
+      "text": "天地灵材，有缘者得之；地脉深浅，可察而不可强求。"
+    }
+  ]
+}

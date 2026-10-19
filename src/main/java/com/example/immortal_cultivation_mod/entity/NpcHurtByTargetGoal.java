@@ -15,11 +15,14 @@ final class NpcHurtByTargetGoal extends HurtByTargetGoal {
 
     @Override
     public boolean canUse() {
+        LivingEntity attacker = npc.getLastHurtByMob();
+        if (NpcCombatBrain.hasValidCombatTarget(npc) && npc.getTarget() != attacker) return false;
         if (!super.canUse()) {
             return false;
         }
-        LivingEntity attacker = npc.getLastHurtByMob();
-        return !(attacker instanceof ServerPlayer player) || NpcProfile.shouldAttackPlayer(npc, player);
+        if (!NpcCombatBrain.hasValidCombatTarget(npc) && NpcCombatBrain.acquirePriorityBeastTarget(npc)) return false;
+        return !(attacker instanceof ServerPlayer player)
+                || NpcProfile.shouldAttackPlayer(npc, player);
     }
 
     @Override

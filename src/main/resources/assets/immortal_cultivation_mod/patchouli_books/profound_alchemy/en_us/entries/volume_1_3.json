@@ -1,0 +1,18 @@
+{
+  "name": "Rejuvenation Pill",
+  "icon": "immortal_cultivation_mod:huichun_pill",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Scripture Account",
+      "text": "The Rejuvenation Pill contains restorative life essence that gradually heals injuries. Its medicinal power spreads throughout the body, replenishing lost vitality and helping a wounded cultivator recover."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Effect",
+      "text": "Restores 6% of maximum HP over 6 seconds."
+    }
+  ]
+}

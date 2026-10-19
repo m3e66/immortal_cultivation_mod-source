@@ -350,7 +350,7 @@ public final class PetalTechniqueEntity extends Projectile implements Forcefield
         target.invulnerableTime = 0;
         float damage = SpellDamageHelper.damage(owner,
                 SpellCharge.damage(baseDamage, chargeScale()), ModSpells.get(spellId));
-        if (!target.hurt(damageSources().indirectMagic(this, owner), damage)) {
+        if (!target.hurt(com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.spellSource(damageSources().indirectMagic(this, owner), spellId), damage)) {
             target.invulnerableTime = priorInvulnerability;
         }
     }

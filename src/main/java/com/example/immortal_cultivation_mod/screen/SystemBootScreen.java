@@ -22,7 +22,7 @@ public class SystemBootScreen extends Screen {
     private boolean complete;
 
     public SystemBootScreen(String systemType) {
-        super(Component.literal("Outer Sequence"));
+        super(Component.translatable("screen.immortal_cultivation_mod.system.boot_title"));
         this.systemType = systemType;
         this.lines = bootLines(systemType);
     }
@@ -83,7 +83,7 @@ public class SystemBootScreen extends Screen {
                 0xFF010713);
         graphics.drawString(
                 font,
-                "OUTER_SEQUENCE.EXE",
+                Component.translatable("screen.immortal_cultivation_mod.system.boot_header"),
                 x + 13,
                 y + 13,
                 0xFFFFFFFF,

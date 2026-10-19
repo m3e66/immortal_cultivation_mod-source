@@ -47,7 +47,7 @@ final class SpellParticleAccents {
         SimpleParticleType type;
         boolean blood = element.contains("血") || spell.startsWith("xue");
         boolean thunder = element.contains("雷") || spell.contains("lei");
-        if (spell.contains("kong") || element.contains("暗")) type = ModParticles.SPELL_VOID.get();
+        if (spell.contains("kong") || element.contains("阴")) type = ModParticles.SPELL_VOID.get();
         else if (element.contains("火") || spell.equals("fireball")) type = ModParticles.AMBIENT_EMBER.get();
         else if (element.contains("冰") || element.contains("水") || id.startsWith("ice") || id.startsWith("water") || id.equals("puddle")) type = ModParticles.AMBIENT_FROST.get();
         else if (element.contains("木")) type = ModParticles.AMBIENT_LEAF.get();

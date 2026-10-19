@@ -1,0 +1,18 @@
+{
+  "name": "辟邪丹",
+  "icon": "immortal_cultivation_mod:bixie_pill",
+  "category": "immortal_cultivation_mod:volume_4",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "辟邪丹蕴驱邪清浊之力，可散侵体枯败之气。服之能驱除凋零之害，并于短时间内护持肉身，不受同类邪气侵蚀。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹效",
+      "text": "立即解除凋零，并于六十息内免受凋零影响。"
+    }
+  ]
+}

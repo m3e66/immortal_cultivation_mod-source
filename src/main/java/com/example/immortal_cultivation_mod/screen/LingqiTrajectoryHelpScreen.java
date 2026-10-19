@@ -95,6 +95,13 @@ public final class LingqiTrajectoryHelpScreen extends Screen {
         graphics.enableScissor(panelX + 9, listTop(), panelX + panelWidth - 9, listBottom());
         int y = listTop() - scroll;
         int rowIndex = 0;
+        for (String key : List.of("difficulty", "realm_examples")) {
+            int rowHeight = specialRowHeight(key);
+            if (y + rowHeight >= listTop() && y < listBottom())
+                drawSpecialEntry(graphics, key, "?", 0xFF80642D, y, rowHeight, rowIndex);
+            y += rowHeight + ROW_GAP;
+            rowIndex++;
+        }
         for (LingqiTrajectoryConfig.NodeType type : NODE_TYPES) {
             int rowHeight = rowHeight(type);
             if (y + rowHeight >= listTop() && y < listBottom()) {
@@ -171,7 +178,8 @@ public final class LingqiTrajectoryHelpScreen extends Screen {
     }
 
     private int contentHeight() {
-        int height = 0;
+        int height = specialRowHeight("difficulty") + ROW_GAP
+                + specialRowHeight("realm_examples") + ROW_GAP;
         for (LingqiTrajectoryConfig.NodeType type : NODE_TYPES) {
             height += rowHeight(type) + ROW_GAP;
         }

@@ -1,0 +1,23 @@
+{
+  "name": "腐骨苔",
+  "icon": "immortal_cultivation_mod:fugu_tai",
+  "category": "immortal_cultivation_mod:volume_3",
+  "sortnum": 9,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "腐骨苔",
+      "text": "$(bold)生成尝试频率：$()1/5"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《百草录》记载",
+      "text": "腐骨苔生于阴湿腐败之所，常依附岩隙与朽土而存。其色暗沉，散发微弱腐朽之气，能于寻常草木难存之地滋生。采药之人若见此苔，当知附近湿阴之气甚重。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻药",
+      "text": "钟乳石洞穴、深暗之域、沼泽及红树林沼泽。"
+    }
+  ]
+}

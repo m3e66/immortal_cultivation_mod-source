@@ -1,0 +1,23 @@
+{
+  "name": "Sword Flight and Recall",
+  "icon": "immortal_cultivation_mod:flying_sword",
+  "category": "immortal_cultivation_mod:weapons",
+  "sortnum": 32,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Take Flight",
+      "text": "Prepare a usable flying sword and press Ride Flying Sword (default N) to mount or dismount. Control and weapon release retain their own keybindings. Orbiting swords and the sword beneath your feet serve different roles; avoid repeatedly deploying replacements."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Automatic Recall",
+      "text": "Automatic recall is enabled by default. An uncontrolled sword attempts to return to its owner, linked Qi Pouch, or inventory. Free inventory space when needed. The Flying Sword Auto Recall option in cultivation settings disables automatic recall."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Crossing Distant Terrain",
+      "text": "Sword flight can cross chunk boundaries, while orbiting guardian swords remain associated with their owner. If a sword has not returned, check the recall setting, inventory space, and linked pouch before using manual recall."
+    }
+  ]
+}

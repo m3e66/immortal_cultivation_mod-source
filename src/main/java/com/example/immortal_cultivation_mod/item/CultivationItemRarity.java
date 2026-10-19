@@ -37,6 +37,8 @@ public final class CultivationItemRarity {
                 case UNCOMMON -> Tier.UNCOMMON;
                 case RARE -> Tier.RARE;
                 case EPIC -> Tier.EPIC;
+                // NeoForge allows other mods to extend Rarity beyond the four vanilla values.
+                default -> Tier.COMMON;
             };
         }
         return Tier.COMMON;
@@ -54,6 +56,7 @@ public final class CultivationItemRarity {
             case UNCOMMON -> 7;
             case RARE -> 22;
             case EPIC -> 70;
+            default -> 2;
         };
         if (stack.has(DataComponents.FOOD)) {
             value = Math.min(value, 3);
@@ -104,8 +107,7 @@ public final class CultivationItemRarity {
                 "crimson_scale_flame_lizard_spawn_egg",
                 "crimson_sky_flame_flood_dragon_spawn_egg",
                 "blood_ape_demon_general_spawn_egg",
-                "zhuji_vault_guardian_spawn_egg",
-                "jindan_vault_guardian_spawn_egg",
+                "vault_guardian_spawn_egg",
                 "azure_spirit_silkworm_spawn_egg",
                 "kongming_beetle_spawn_egg");
 

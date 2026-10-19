@@ -1,7 +1,9 @@
 package com.example.immortal_cultivation_mod.worldgen;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.level.levelgen.DensityFunction;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.structure.StructureType;
@@ -19,6 +21,10 @@ public class ModFeatures {
             DeferredRegister.create(Registries.STRUCTURE_PROCESSOR, ImmortalCultivationMod.MODID);
     public static final DeferredRegister<StructureType<?>> STRUCTURE_TYPES =
             DeferredRegister.create(Registries.STRUCTURE_TYPE, ImmortalCultivationMod.MODID);
+    public static final DeferredRegister<MapCodec<? extends DensityFunction>> DENSITY_FUNCTION_TYPES =
+            DeferredRegister.create(Registries.DENSITY_FUNCTION_TYPE, ImmortalCultivationMod.MODID);
+    public static final DeferredHolder<MapCodec<? extends DensityFunction>, MapCodec<ScaledVoidIslands>>
+            SCALED_VOID_ISLANDS = DENSITY_FUNCTION_TYPES.register("scaled_void_islands", () -> ScaledVoidIslands.MAP_CODEC);
 
     public static final DeferredHolder<Feature<?>, SurfacePatchFeature> SURFACE_PATCH =
             FEATURES.register("surface_patch", () -> new SurfacePatchFeature(SurfacePatchConfiguration.CODEC));
@@ -56,5 +62,6 @@ public class ModFeatures {
         FEATURES.register(eventBus);
         STRUCTURE_PROCESSORS.register(eventBus);
         STRUCTURE_TYPES.register(eventBus);
+        DENSITY_FUNCTION_TYPES.register(eventBus);
     }
 }

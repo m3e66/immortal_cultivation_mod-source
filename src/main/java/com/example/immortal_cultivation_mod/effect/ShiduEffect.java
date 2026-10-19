@@ -12,7 +12,7 @@ public class ShiduEffect extends MobEffect {
 
     @Override
     public boolean applyEffectTick(LivingEntity entity, int amplifier) {
-        entity.hurt(entity.damageSources().magic(), 4.0F * (amplifier + 1));
+        entity.hurt(com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.poisonSource(entity, entity.damageSources().magic()), 4.0F * (amplifier + 1));
         if (entity.level() instanceof ServerLevel level) {
             UndeadEffectParticles.corpsePoison(level, entity);
         }

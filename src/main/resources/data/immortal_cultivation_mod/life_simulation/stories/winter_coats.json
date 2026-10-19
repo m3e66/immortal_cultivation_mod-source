@@ -1,0 +1,2733 @@
+{
+  "stories": [
+    {
+      "id": "life_story_winter_coats",
+      "version": 5,
+      "replacement": true,
+      "category": "adventure",
+      "minimum_realm": 0,
+      "maximum_realm": 27,
+      "minimum_age": 18,
+      "start_node": "S01",
+      "title_key": "life.replacement.winter_coats.title",
+      "nodes": [
+        {
+          "id": "S01",
+          "text_key": "life.replacement.winter_coats.S01.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.S01.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S01.en_us.10",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.winter_coats.S01.A",
+              "requirement_key": "life.replacement.winter_coats.S01.A.requires",
+              "next": "S02",
+              "story_effects": [
+                "privacy"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.winter_coats.S01.B",
+              "requirement_key": "life.replacement.winter_coats.S01.B.requires",
+              "next": "S03"
+            }
+          ],
+          "enter_effects": [
+            "document:receipt",
+            "report_owed"
+          ],
+          "seen_roles": [
+            "duan",
+            "jian"
+          ]
+        },
+        {
+          "id": "S02",
+          "text_key": "life.replacement.winter_coats.S02.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.S02.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S02.en_us.13",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.winter_coats.S02.A",
+              "requirement_key": "life.replacement.winter_coats.S02.A.requires",
+              "next": "S04"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.winter_coats.S02.B",
+              "requirement_key": "life.replacement.winter_coats.S02.B.requires",
+              "next": "S03"
+            }
+          ],
+          "seen_roles": [
+            "tang",
+            "gu"
+          ]
+        },
+        {
+          "id": "S03",
+          "text_key": "life.replacement.winter_coats.S03.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.S03.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S03.en_us.11",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.winter_coats.S03.A",
+              "requirement_key": "life.replacement.winter_coats.S03.A.requires",
+              "next": "S05",
+              "story_effects": [
+                "warrant",
+                "document:warrant"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.winter_coats.S03.B",
+              "requirement_key": "life.replacement.winter_coats.S03.B.requires",
+              "next": "S04"
+            }
+          ],
+          "seen_roles": [
+            "tang",
+            "gu",
+            "pei",
+            "jian"
+          ]
+        },
+        {
+          "id": "S04",
+          "text_key": "life.replacement.winter_coats.S04.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.S04.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S04.en_us.16",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.winter_coats.S04.A",
+              "requirement_key": "life.replacement.winter_coats.S04.A.requires",
+              "next": "S05",
+              "story_effects": [
+                "ledger",
+                "document:ledger"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.winter_coats.S04.B",
+              "requirement_key": "life.replacement.winter_coats.S04.B.requires",
+              "next": "S06"
+            }
+          ],
+          "seen_roles": [
+            "tang",
+            "gu"
+          ]
+        },
+        {
+          "id": "S05",
+          "text_key": "life.replacement.winter_coats.S05.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.S05.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S05.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S05.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S05.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S05.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S05.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S05.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S05.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S05.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S05.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S05.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S05.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S05.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S05.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S05.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S05.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S05.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S05.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S05.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S05.en_us.9",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.winter_coats.S05.A",
+              "requirement_key": "life.replacement.winter_coats.S05.A.requires",
+              "next": "S06",
+              "story_effects": [
+                "delayed",
+                "order",
+                "document:order",
+                "time:1"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.winter_coats.S05.B",
+              "requirement_key": "life.replacement.winter_coats.S05.B.requires",
+              "next": "S06",
+              "requires": "ability:retrieve",
+              "story_effects": [
+                "order",
+                "document:order"
+              ],
+              "ability": "retrieve"
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.winter_coats.S05.C",
+              "requirement_key": "life.replacement.winter_coats.S05.C.requires",
+              "next": "S06"
+            }
+          ],
+          "seen_roles": [
+            "tang",
+            "jian"
+          ]
+        },
+        {
+          "id": "S06",
+          "text_key": "life.replacement.winter_coats.S06.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.S06.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S06.en_us.17",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.winter_coats.S06.A",
+              "requirement_key": "life.replacement.winter_coats.S06.A.requires",
+              "next": "S07",
+              "story_effects": [
+                "statements",
+                "document:statements"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.winter_coats.S06.B",
+              "requirement_key": "life.replacement.winter_coats.S06.B.requires",
+              "next": "S08",
+              "story_effects": [
+                "protection"
+              ]
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.winter_coats.S06.C",
+              "requirement_key": "life.replacement.winter_coats.S06.C.requires",
+              "next": "S08"
+            }
+          ],
+          "seen_roles": [
+            "tang",
+            "gu",
+            "shao",
+            "pei",
+            "jian"
+          ]
+        },
+        {
+          "id": "S07",
+          "text_key": "life.replacement.winter_coats.S07.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.S07.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S07.en_us.12",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.winter_coats.S07.A",
+              "requirement_key": "life.replacement.winter_coats.S07.A.requires",
+              "next": "S08",
+              "story_effects": [
+                "fee:2"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.winter_coats.S07.B",
+              "requirement_key": "life.replacement.winter_coats.S07.B.requires",
+              "next": "S08",
+              "requires": "!fee_settled",
+              "story_effects": [
+                "donated",
+                "fee_settled"
+              ]
+            }
+          ],
+          "enter_effects": [
+            "informed",
+            "report_done"
+          ],
+          "seen_roles": [
+            "duan",
+            "tang",
+            "shao"
+          ]
+        },
+        {
+          "id": "S08",
+          "text_key": "life.replacement.winter_coats.S08.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.S08.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.zh_cn.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.zh_cn.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.zh_cn.18",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.en_us.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.en_us.16",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.en_us.17",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S08.en_us.18",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.winter_coats.S08.A",
+              "requirement_key": "life.replacement.winter_coats.S08.A.requires",
+              "next": "S09"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.winter_coats.S08.B",
+              "requirement_key": "life.replacement.winter_coats.S08.B.requires",
+              "next": "S12"
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.winter_coats.S08.C",
+              "requirement_key": "life.replacement.winter_coats.S08.C.requires",
+              "next": "S13",
+              "requires": "!custody&!battle_started"
+            },
+            {
+              "id": "D",
+              "text_key": "life.replacement.winter_coats.S08.D",
+              "requirement_key": "life.replacement.winter_coats.S08.D.requires",
+              "next": "S16",
+              "story_effects": [
+                "custody",
+                "breach:protection"
+              ]
+            }
+          ],
+          "seen_roles": [
+            "tang",
+            "gu",
+            "shao",
+            "pei"
+          ]
+        },
+        {
+          "id": "S09",
+          "text_key": "life.replacement.winter_coats.S09.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.S09.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S09.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S09.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S09.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S09.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S09.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S09.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S09.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S09.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S09.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S09.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S09.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S09.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S09.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S09.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S09.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S09.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S09.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S09.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S09.en_us.9",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.winter_coats.S09.A",
+              "requirement_key": "life.replacement.winter_coats.S09.A.requires",
+              "next": "S11",
+              "story_effects": [
+                "custody",
+                "breach:protection"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.winter_coats.S09.B",
+              "requirement_key": "life.replacement.winter_coats.S09.B.requires",
+              "next": "S11",
+              "requires": "warrant&statements"
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.winter_coats.S09.C",
+              "requirement_key": "life.replacement.winter_coats.S09.C.requires",
+              "next": "S10",
+              "requires": "combat",
+              "story_effects": [
+                "coercion"
+              ],
+              "high_realm_next": "S11"
+            },
+            {
+              "id": "D",
+              "text_key": "life.replacement.winter_coats.S09.D",
+              "requirement_key": "life.replacement.winter_coats.S09.D.requires",
+              "next": "S12",
+              "story_effects": [
+                "custody",
+                "breach:protection"
+              ]
+            }
+          ],
+          "seen_roles": [
+            "tang",
+            "gu",
+            "shao",
+            "pei"
+          ]
+        },
+        {
+          "id": "S10",
+          "text_key": "life.replacement.winter_coats.S10.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.S10.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S10.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S10.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S10.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S10.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S10.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S10.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S10.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S10.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S10.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S10.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S10.en_us.5",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.winter_coats.S10.A",
+              "requirement_key": "life.replacement.winter_coats.S10.A.requires",
+              "next": "S11",
+              "requires": "combat",
+              "story_effects": [
+                "battle_started"
+              ],
+              "failure": "S16",
+              "battle": {
+                "arena": "temple",
+                "stakes": "retreat",
+                "escape": "S16",
+                "surrender": "S16",
+                "enemies": [
+                  {
+                    "name_key": "life.replacement.enemy.escort",
+                    "realm": 1,
+                    "profile": "defensive",
+                    "sprite": "cultivator_front"
+                  },
+                  {
+                    "name_key": "life.replacement.enemy.escort",
+                    "realm": 1,
+                    "profile": "defensive",
+                    "sprite": "cultivator_front"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.winter_coats.S10.B",
+              "requirement_key": "life.replacement.winter_coats.S10.B.requires",
+              "next": "S11",
+              "story_effects": [
+                "custody",
+                "breach:protection"
+              ]
+            }
+          ],
+          "seen_roles": [
+            "tang",
+            "shao"
+          ]
+        },
+        {
+          "id": "S11",
+          "text_key": "life.replacement.winter_coats.S11.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.S11.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.zh_cn.1",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.zh_cn.2",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.zh_cn.3",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.zh_cn.4",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.zh_cn.5",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.zh_cn.6",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.zh_cn.7",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.zh_cn.8",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.zh_cn.9",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.zh_cn.10",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.zh_cn.11",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.zh_cn.12",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.zh_cn.13",
+              "requires": "!order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.zh_cn.14",
+              "requires": "!order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.zh_cn.15",
+              "requires": "!order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.zh_cn.16",
+              "requires": "!order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.zh_cn.17",
+              "requires": "!order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.zh_cn.18",
+              "requires": "privacy_broken"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.en_us.1",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.en_us.2",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.en_us.3",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.en_us.4",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.en_us.5",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.en_us.6",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.en_us.7",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.en_us.8",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.en_us.9",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.en_us.10",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.en_us.11",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.en_us.12",
+              "requires": "order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.en_us.13",
+              "requires": "!order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.en_us.14",
+              "requires": "!order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.en_us.15",
+              "requires": "!order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.en_us.16",
+              "requires": "!order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.en_us.17",
+              "requires": "!order"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S11.en_us.18",
+              "requires": "privacy_broken"
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.winter_coats.S11.A",
+              "requirement_key": "life.replacement.winter_coats.S11.A.requires",
+              "next": "E1",
+              "requires": "order"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.winter_coats.S11.B",
+              "requirement_key": "life.replacement.winter_coats.S11.B.requires",
+              "next": "S12"
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.winter_coats.S11.C",
+              "requirement_key": "life.replacement.winter_coats.S11.C.requires",
+              "next": "S13",
+              "requires": "!custody&!battle_started"
+            },
+            {
+              "id": "D",
+              "text_key": "life.replacement.winter_coats.S11.D",
+              "requirement_key": "life.replacement.winter_coats.S11.D.requires",
+              "next": "S16"
+            }
+          ],
+          "enter_effects": [
+            "privacy_check"
+          ],
+          "seen_roles": [
+            "duan",
+            "gu",
+            "shao",
+            "pei",
+            "jian"
+          ]
+        },
+        {
+          "id": "S12",
+          "text_key": "life.replacement.winter_coats.S12.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.S12.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.zh_cn.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.zh_cn.15",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.en_us.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.en_us.14",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S12.en_us.15",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.winter_coats.S12.A",
+              "requirement_key": "life.replacement.winter_coats.S12.A.requires",
+              "next": "S14"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.winter_coats.S12.B",
+              "requirement_key": "life.replacement.winter_coats.S12.B.requires",
+              "next": "S13",
+              "requires": "!custody&!battle_started"
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.winter_coats.S12.C",
+              "requirement_key": "life.replacement.winter_coats.S12.C.requires",
+              "next": "S16"
+            }
+          ],
+          "seen_roles": [
+            "tang",
+            "gu",
+            "shao",
+            "pei"
+          ]
+        },
+        {
+          "id": "S13",
+          "text_key": "life.replacement.winter_coats.S13.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.S13.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.zh_cn.10",
+              "requires": "delayed"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.zh_cn.11",
+              "requires": "!delayed"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.en_us.10",
+              "requires": "delayed"
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S13.en_us.11",
+              "requires": "!delayed"
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.winter_coats.S13.A",
+              "requirement_key": "life.replacement.winter_coats.S13.A.requires",
+              "next": "S15"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.winter_coats.S13.B",
+              "requirement_key": "life.replacement.winter_coats.S13.B.requires",
+              "next": "S15",
+              "requires": "delayed",
+              "story_effects": [
+                "tools_shipped"
+              ],
+              "stone_cost": 8
+            },
+            {
+              "id": "C",
+              "text_key": "life.replacement.winter_coats.S13.C",
+              "requirement_key": "life.replacement.winter_coats.S13.C.requires",
+              "next": "S16"
+            }
+          ],
+          "seen_roles": [
+            "tang",
+            "gu",
+            "shao",
+            "pei"
+          ]
+        },
+        {
+          "id": "S14",
+          "text_key": "life.replacement.winter_coats.S14.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.S14.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S14.en_us.10",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.winter_coats.S14.A",
+              "requirement_key": "life.replacement.winter_coats.S14.A.requires",
+              "next": "E2"
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.winter_coats.S14.B",
+              "requirement_key": "life.replacement.winter_coats.S14.B.requires",
+              "next": "E2",
+              "story_effects": [
+                "dissent"
+              ]
+            }
+          ],
+          "seen_roles": [
+            "duan",
+            "tang",
+            "gu",
+            "shao",
+            "pei"
+          ]
+        },
+        {
+          "id": "S15",
+          "text_key": "life.replacement.winter_coats.S15.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.S15.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.zh_cn.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.zh_cn.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.zh_cn.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.zh_cn.13",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.en_us.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.en_us.10",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.en_us.11",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.en_us.12",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S15.en_us.13",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.winter_coats.S15.A",
+              "requirement_key": "life.replacement.winter_coats.S15.A.requires",
+              "next": "E3",
+              "story_effects": [
+                "packet_duan"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.winter_coats.S15.B",
+              "requirement_key": "life.replacement.winter_coats.S15.B.requires",
+              "next": "E3",
+              "story_effects": [
+                "packet_shao"
+              ]
+            }
+          ],
+          "seen_roles": [
+            "duan",
+            "tang",
+            "shao",
+            "pei",
+            "jian"
+          ]
+        },
+        {
+          "id": "S16",
+          "text_key": "life.replacement.winter_coats.S16.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.S16.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S16.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S16.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S16.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S16.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S16.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S16.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S16.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S16.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S16.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S16.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S16.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S16.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S16.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S16.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S16.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S16.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S16.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S16.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.S16.en_us.9",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "A",
+              "text_key": "life.replacement.winter_coats.S16.A",
+              "requirement_key": "life.replacement.winter_coats.S16.A.requires",
+              "next": "E4",
+              "requires": "conscious",
+              "story_effects": [
+                "petitioned",
+                "report_done"
+              ]
+            },
+            {
+              "id": "B",
+              "text_key": "life.replacement.winter_coats.S16.B",
+              "requirement_key": "life.replacement.winter_coats.S16.B.requires",
+              "next": "E4",
+              "requires": "conscious",
+              "story_effects": [
+                "private_report",
+                "report_done"
+              ]
+            }
+          ],
+          "seen_roles": [
+            "duan",
+            "tang",
+            "pei"
+          ]
+        },
+        {
+          "id": "E1",
+          "text_key": "life.replacement.winter_coats.E1.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.E1.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E1.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E1.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E1.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E1.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E1.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E1.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E1.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E1.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E1.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E1.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E1.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E1.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E1.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E1.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E1.en_us.7",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.replacement.finish",
+              "ending": true,
+              "next": "E1"
+            }
+          ],
+          "enter_effects": [
+            "!custody",
+            "report_done",
+            "fee:2"
+          ],
+          "seen_roles": [
+            "duan",
+            "gu",
+            "shao",
+            "pei",
+            "jian"
+          ]
+        },
+        {
+          "id": "E2",
+          "text_key": "life.replacement.winter_coats.E2.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.E2.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E2.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E2.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E2.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E2.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E2.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E2.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E2.zh_cn.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E2.zh_cn.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E2.zh_cn.9",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E2.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E2.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E2.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E2.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E2.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E2.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E2.en_us.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E2.en_us.7",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E2.en_us.8",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E2.en_us.9",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.replacement.finish",
+              "ending": true,
+              "next": "E2"
+            }
+          ],
+          "enter_effects": [
+            "!custody",
+            "report_done",
+            "fee:2"
+          ],
+          "seen_roles": [
+            "duan",
+            "shao",
+            "pei"
+          ]
+        },
+        {
+          "id": "E3",
+          "text_key": "life.replacement.winter_coats.E3.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.E3.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E3.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E3.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E3.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E3.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E3.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E3.zh_cn.6",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E3.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E3.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E3.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E3.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E3.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E3.en_us.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E3.en_us.6",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.replacement.finish",
+              "ending": true,
+              "next": "E3"
+            }
+          ],
+          "enter_effects": [
+            "!custody",
+            "report_done",
+            "fee:2"
+          ],
+          "seen_roles": [
+            "duan",
+            "tang",
+            "gu",
+            "shao",
+            "jian"
+          ]
+        },
+        {
+          "id": "E4",
+          "text_key": "life.replacement.winter_coats.E4.title",
+          "parts": [
+            {
+              "text_key": "life.replacement.winter_coats.E4.zh_cn.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E4.zh_cn.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E4.zh_cn.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E4.zh_cn.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E4.zh_cn.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E4.zh_cn.5",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E4.en_us.0",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E4.en_us.1",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E4.en_us.2",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E4.en_us.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E4.en_us.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.replacement.winter_coats.E4.en_us.5",
+              "requires": ""
+            }
+          ],
+          "choices": [
+            {
+              "id": "finish",
+              "text_key": "life.replacement.finish",
+              "ending": true,
+              "next": "E4"
+            }
+          ],
+          "enter_effects": [
+            "custody",
+            "breach:protection",
+            "report_done",
+            "fee:2"
+          ],
+          "seen_roles": [
+            "duan",
+            "tang",
+            "jian"
+          ]
+        }
+      ],
+      "cast": [
+        {
+          "role": "duan",
+          "name": "段禾",
+          "name_key": "life.replacement.winter_coats.cast.duan",
+          "realm": 0,
+          "age": 37,
+          "kind": "human",
+          "occupation": "laborer",
+          "rootless": true,
+          "gender": "female"
+        },
+        {
+          "role": "tang",
+          "name": "唐七",
+          "name_key": "life.replacement.winter_coats.cast.tang",
+          "realm": 0,
+          "age": 45,
+          "kind": "human",
+          "occupation": "laborer",
+          "rootless": true,
+          "gender": "male"
+        },
+        {
+          "role": "gu",
+          "name": "顾棠",
+          "name_key": "life.replacement.winter_coats.cast.gu",
+          "realm": 0,
+          "age": 34,
+          "kind": "human",
+          "occupation": "laborer",
+          "rootless": true,
+          "gender": "male"
+        },
+        {
+          "role": "shao",
+          "name": "邵宁",
+          "name_key": "life.replacement.winter_coats.cast.shao",
+          "realm": 1,
+          "age": 24,
+          "kind": "human",
+          "occupation": "sect_disciple",
+          "rootless": false,
+          "gender": "male"
+        },
+        {
+          "role": "pei",
+          "name": "裴循",
+          "name_key": "life.replacement.winter_coats.cast.pei",
+          "realm": 5,
+          "age": 44,
+          "kind": "human",
+          "occupation": "sect_disciple",
+          "rootless": false,
+          "gender": "male"
+        },
+        {
+          "role": "jian",
+          "name": "简诚",
+          "name_key": "life.replacement.winter_coats.cast.jian",
+          "realm": 0,
+          "age": 40,
+          "kind": "memory",
+          "occupation": "laborer",
+          "rootless": true,
+          "gender": "male"
+        }
+      ],
+      "battle_win_effects": [],
+      "battle_loss_effects": [
+        "custody",
+        "breach:protection"
+      ],
+      "battle_escape_effects": [
+        "custody",
+        "breach:protection"
+      ],
+      "unconscious_node": "E4",
+      "fallback_node": "S16"
+    }
+  ]
+}

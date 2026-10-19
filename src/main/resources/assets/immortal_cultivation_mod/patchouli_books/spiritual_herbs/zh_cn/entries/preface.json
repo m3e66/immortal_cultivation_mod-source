@@ -1,0 +1,13 @@
+{
+  "name": "序言",
+  "icon": "minecraft:book",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "百草灵植录",
+      "text": "天地生万物，草木亦有灵。山川之气蕴于根茎，日月之精凝于花叶。或生于幽谷，或长于绝峰，或沐烈火，或饮寒霜。修士欲习丹道，须先识百草，辨其生境，察其灵性，方可采天地之精华，炼造化之玄丹。"
+    }
+  ]
+}

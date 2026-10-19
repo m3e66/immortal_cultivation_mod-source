@@ -66,6 +66,16 @@ public class ModClientLayerEvents {
                 new SpiritualReconstructionLayer(livingRenderer));
         ((LivingEntityRenderer) livingRenderer).addLayer(
                 new BlackFlameDeathRenderer.Layer(livingRenderer));
+        ((LivingEntityRenderer) livingRenderer).addLayer(
+                new com.example.immortal_cultivation_mod.client.qi.IceCoatingClient.Layer(livingRenderer));
+        ((LivingEntityRenderer) livingRenderer).addLayer(
+                new com.example.immortal_cultivation_mod.client.curse.CurseClient.Layer(livingRenderer));
+        ((LivingEntityRenderer) livingRenderer).addLayer(
+                new com.example.immortal_cultivation_mod.client.qi.BloodLilyClient.Layer(livingRenderer));
+        ((LivingEntityRenderer) livingRenderer).addLayer(
+                new com.example.immortal_cultivation_mod.client.qi.ReincarnationEchoClient.Layer(livingRenderer));
+        if(livingRenderer.getModel() instanceof HumanoidModel)
+            ((LivingEntityRenderer)livingRenderer).addLayer(new com.example.immortal_cultivation_mod.client.qi.QiHandLayer(livingRenderer));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

@@ -1,0 +1,33 @@
+{
+  "name": "Bronze Cauldron",
+  "icon": "immortal_cultivation_mod:qingtong_yinhuo_ding",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Bronze Cauldron",
+      "text": "Material capacity: 15 slots"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "The Bronze Cauldron is a more advanced forging vessel with greater material capacity and an operable lid. Its sturdier construction allows refiners to work with more complex combinations of spiritual materials."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "To access its contents, the lid must first be opened."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Operating the Cauldron",
+      "text": "Shift + Right-click: Open or close the lid."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Operating the Cauldron",
+      "text": "Right-click with the lid open: Access the forging interface."
+    }
+  ]
+}

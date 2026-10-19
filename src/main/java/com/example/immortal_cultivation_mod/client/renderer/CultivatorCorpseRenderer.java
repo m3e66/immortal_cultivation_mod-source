@@ -33,7 +33,8 @@ public class CultivatorCorpseRenderer extends LivingEntityRenderer<CultivatorCor
       } else {
          poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - entity.getCorpseYaw()));
          poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
-         poseStack.translate((double)0.0F, (double)-0.5F, (double)0.0F);
+         // Center the two-block body on its flat collision box and rest its back on the ground.
+         poseStack.translate(0.0F, -1.0F, -0.25F);
       }
    }
 }

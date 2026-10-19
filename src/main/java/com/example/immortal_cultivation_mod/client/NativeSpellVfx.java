@@ -192,10 +192,17 @@ public final class NativeSpellVfx {
         for (boolean filaments : new boolean[]{false, true}) {
             var type = filaments ? FilamentVfx.TYPE : OriginalSpellVfxRender.TYPE;
             var vertices = buffers.getBuffer(type);
-            for (var emitters : EMITTERS.values()) for (var emitter : emitters) {
-                // AFTER_PARTICLES already has the world camera transform in ModelViewMat.
-                // Vertices are camera-relative; applying that transform here rotates them twice.
-                emitter.render(vertices, event.getPoseStack().last().pose(), event.getCamera(), partial, filaments);
+            for (var entry : EMITTERS.entrySet()) {
+                var matrix = event.getPoseStack().last().pose();
+                var key = entry.getKey();
+                Entity anchor = key.entity ? mc.level.getEntity((int) key.anchor) : null;
+                if (anchor instanceof net.minecraft.world.entity.projectile.Projectile) {
+                    Vec3 pivot = anchor.getPosition(partial).add(0, anchor.getEyeHeight(), 0).subtract(event.getCamera().getPosition());
+                    matrix = new org.joml.Matrix4f(matrix).translate((float)pivot.x, (float)pivot.y, (float)pivot.z)
+                            .scale(SpellProjectileVisuals.SCALE).translate((float)-pivot.x, (float)-pivot.y, (float)-pivot.z);
+                }
+                // Scale projectile-local geometry without changing emission, movement, or world telegraphs.
+                for (var emitter : entry.getValue()) emitter.render(vertices, matrix, event.getCamera(), partial, filaments);
             }
             buffers.endBatch(type);
         }

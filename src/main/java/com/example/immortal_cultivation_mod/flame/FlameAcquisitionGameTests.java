@@ -46,6 +46,7 @@ public final class FlameAcquisitionGameTests {
         var zombie = EntityType.ZOMBIE.create(h.getLevel());
         var lizard = ModEntities.CRIMSON_SCALE_FLAME_LIZARD.get().create(h.getLevel());
         var dragon = ModEntities.CRIMSON_SKY_FLAME_FLOOD_DRAGON.get().create(h.getLevel());
+        var spirit = new com.example.immortal_cultivation_mod.entity.EscapedYuanyingCoreEntity(h.getLevel(),dragon);
         try {
             NpcProfile.ensure(npc, npc.npcArchetype());
             var profile = npc.getPersistentData().getCompound("ImmortalCultivationNpc");
@@ -68,10 +69,11 @@ public final class FlameAcquisitionGameTests {
                     "Actual flying-undead grudge rank gets the better Nether chance");
             h.assertTrue(FlameAcquisition.deathKind(lizard) == FlameKind.CRIMSON,
                     "The actual Crimson Scale Flame Lizard is a Crimson source");
-            h.assertTrue(FlameAcquisition.deathKind(dragon) == FlameKind.DRAGON
-                            && FlameAcquisition.deathChance(dragon, FlameKind.DRAGON) == 64,
-                    "The actual Crimson Sky Flame Flood Dragon has a rare one-in-64 Dragon Flame opportunity");
-        } finally { npc.discard(); zombie.discard(); lizard.discard(); dragon.discard(); }
+            h.assertTrue(FlameAcquisition.deathKind(dragon) == null
+                            && FlameAcquisition.deathKind(spirit) == FlameKind.DRAGON
+                            && FlameAcquisition.deathChance(spirit, FlameKind.DRAGON) == 64,
+                    "Only the escaped dragon spirit has the existing one-in-64 Dragon Flame opportunity");
+        } finally { npc.discard(); zombie.discard(); lizard.discard(); dragon.discard(); spirit.discard(); }
         h.succeed();
     }
 
@@ -85,10 +87,11 @@ public final class FlameAcquisitionGameTests {
         var loaded = FlameAcquisitionData.load(data.save(new CompoundTag(), h.getLevel().registryAccess()), h.getLevel().registryAccess());
         h.assertTrue(loaded.contains(wood) && loaded.contains(thunder) && !loaded.claim(wood),
                 "Restarting and revisiting cannot reroll a claimed natural source");
-        h.assertTrue(FlameAcquisition.isTomb(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "tomb2"))
+        h.assertTrue(!FlameAcquisition.isSolarRuin(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "tomb1"))
+                        && !FlameAcquisition.isSolarRuin(ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "tomb2"))
                         && FlameAcquisition.isSolarRuin(ResourceLocation.withDefaultNamespace("ruined_portal_mountain"))
                         && !FlameAcquisition.isSolarRuin(ResourceLocation.withDefaultNamespace("village_plains")),
-                "Only real tombs and metal/fire ruin structures are eligible");
+                "Only solar ruins are eligible; neither tomb can spawn a structure flame");
         h.succeed();
     }
 

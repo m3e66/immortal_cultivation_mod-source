@@ -70,8 +70,10 @@ public final class IdentityItems {
             ItemStack stack = player.getItemInHand(hand);
             if (!level.isClientSide) {
                 if (player instanceof ServerPlayer sp) com.example.immortal_cultivation_mod.fate.FateCrafting.consumedPill(sp, stack);
-                player.getFoodData().setFoodLevel(20);
-                player.getFoodData().setSaturation(20.0F);
+                double benefit=com.example.immortal_cultivation_mod.alchemy.PillToxicity.multiplier(player,"Benefit");
+                var food=player.getFoodData();
+                food.setFoodLevel(food.getFoodLevel()+(int)Math.ceil((20-food.getFoodLevel())*benefit));
+                food.setSaturation((float)(food.getSaturationLevel()+(20-food.getSaturationLevel())*benefit));
                 consumeOne(player, stack);
             }
             return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
@@ -396,9 +398,9 @@ public final class IdentityItems {
             return;
         }
         var data = ModAttachments.getData(player);
-        int maxQi = Math.max(0, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
+        int maxQi = Math.max(0, data.maxQi());
         if (maxQi > 0) {
-            ModAttachments.setData(player, data.withQi(Math.min(maxQi, data.qi() + tag.getInt(RECOVERY_RATE))));
+            ModAttachments.setData(player, data.withQi(Math.min(maxQi, data.qi() + (int)Math.floor(tag.getInt(RECOVERY_RATE)*com.example.immortal_cultivation_mod.alchemy.PillToxicity.multiplier(player,"Restore")))));
             ServerEvents.syncPlayerData(player);
         }
         if (ticks <= 1) {

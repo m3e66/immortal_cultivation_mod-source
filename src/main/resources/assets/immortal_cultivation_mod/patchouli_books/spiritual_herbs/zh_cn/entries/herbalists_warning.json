@@ -1,0 +1,18 @@
+{
+  "name": "采药之戒",
+  "icon": "minecraft:book",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "采药之戒",
+      "text": "百草虽生于天地，其性各异。火草不可妄配寒莲，阴植不可轻入阳丹。炼丹之道，在于识药性、明相生、辨相克。纵得千年奇珍，若不通丹理，亦不过暴殄天物。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "卷末",
+      "text": "识百草者，可寻天地之珍；通药理者，方窥丹道之门。"
+    }
+  ]
+}

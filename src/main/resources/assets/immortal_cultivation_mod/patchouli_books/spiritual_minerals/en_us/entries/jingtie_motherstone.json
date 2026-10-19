@@ -1,0 +1,23 @@
+{
+  "name": "Refined Iron Motherstone",
+  "icon": "immortal_cultivation_mod:jingtie_motherstone",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Refined Iron Motherstone",
+      "text": "$(bold)Starting height: $()Y −16 to 96$(br2)$(bold)Attempt frequency: $()1/24 chunks"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Refined Iron Motherstone forms when the earth's metallic essence gathers and slowly sheds its impurities. Though unremarkable in appearance, its dense structure surpasses ordinary iron. It can be found throughout the Overworld and is a familiar mineral to cultivators beginning their journey into artifact forging."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Found across all Overworld biomes, with generation starting between Y −16 and 96."
+    }
+  ]
+}

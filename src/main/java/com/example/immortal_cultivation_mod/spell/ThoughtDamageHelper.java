@@ -16,7 +16,7 @@ public final class ThoughtDamageHelper {
     }
 
     public static int total(Entity source, int baseDamage) {
-        return (int)Math.round(total(baseDamage, bonus(source)) * com.example.immortal_cultivation_mod.pagoda.GourdSystem.multiplier(source));
+        return total(baseDamage, bonus(source));
     }
 
     public static int total(int baseDamage, int bonus) {

@@ -120,6 +120,9 @@ public final class ForgingRecipeCategory implements IRecipeCategory<ForgingJeiRe
                 .setOutputSlotBackground()
                 .setSlotName("result")
                 .addItemStack(displayRecipe.result());
+        // Acquisition should also be discoverable from an item's JEI Uses view.
+        builder.addInvisibleIngredients(mezz.jei.api.recipe.RecipeIngredientRole.INPUT)
+                .addItemStack(displayRecipe.result());
     }
 
     private static mezz.jei.api.gui.builder.IRecipeSlotBuilder addMaterialSlot(

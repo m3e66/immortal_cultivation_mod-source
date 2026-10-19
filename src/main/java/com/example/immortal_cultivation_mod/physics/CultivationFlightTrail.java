@@ -94,10 +94,10 @@ public final class CultivationFlightTrail {
 
     public static int color(String element) {
         if (SpiritRoots.elementMatches(element, SpiritRoots.ICE) || SpiritRoots.elementMatches(element, SpiritRoots.WATER)) return 0x91E9FF;
-        if (SpiritRoots.elementMatches(element, SpiritRoots.THUNDER) || SpiritRoots.elementMatches(element, SpiritRoots.DARK)) return 0xD898FF;
+        if (SpiritRoots.elementMatches(element, SpiritRoots.THUNDER) || SpiritRoots.elementMatches(element, SpiritRoots.YIN)) return 0xD898FF;
         if (SpiritRoots.elementMatches(element, SpiritRoots.FIRE)) return 0xFFAD70;
         if (SpiritRoots.elementMatches(element, SpiritRoots.EARTH)) return 0xFFE19A;
-        if (SpiritRoots.elementMatches(element, SpiritRoots.METAL) || SpiritRoots.elementMatches(element, SpiritRoots.LIGHT)) return 0xEFFFF0;
+        if (SpiritRoots.elementMatches(element, SpiritRoots.METAL) || SpiritRoots.elementMatches(element, SpiritRoots.YANG)) return 0xEFFFF0;
         return 0x8AFF77;
     }
 }

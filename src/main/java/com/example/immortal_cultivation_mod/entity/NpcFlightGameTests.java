@@ -207,11 +207,11 @@ public final class NpcFlightGameTests {
     }
 
     @GameTest(template = "npc_combat_arena")
-    public static void innateFlightAlwaysEmitsAndFallingDoesNot(GameTestHelper h) {
+    public static void innateNpcFlightNeverEmitsTrails(GameTestHelper h) {
         var npc = flyer(h);
         h.assertTrue(!npc.hasEffect(ModEffects.YUFENG_JUE), "Fixture uses innate flight without a spell");
         for (double speed : new double[]{0, .001, .04, .12, 1.62}) {
-            h.assertTrue(CultivationFlightVisuals.shouldEmit(npc, speed), "Innate flight emits even while hovering or descending slowly");
+            h.assertTrue(!CultivationFlightVisuals.shouldEmit(npc, speed), "Innate NPC flight never emits trails at any speed");
         }
         h.assertTrue(!CultivationFlightVisuals.shouldEmit(npc, 11)
                 && !CultivationFlightVisuals.shouldEmit(npc, Double.NaN), "Invalid movement and teleports cannot make trail segments");

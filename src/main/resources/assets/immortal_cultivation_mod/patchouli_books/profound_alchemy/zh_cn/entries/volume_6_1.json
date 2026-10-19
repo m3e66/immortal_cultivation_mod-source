@@ -1,0 +1,23 @@
+{
+  "name": "悟道丹",
+  "icon": "immortal_cultivation_mod:enlightenment_pill",
+  "category": "immortal_cultivation_mod:volume_6",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "悟道丹乃开启修行仙途之关键丹药。凡人服之，可感应自身潜藏灵根，初窥天地灵气之玄妙。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "传闻服丹悟道之际，偶有奇异机缘降临，得神秘古戒者，或许自此踏上一条不同寻常的修仙之路。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹效",
+      "text": "开启或选择灵根。成功使用时，有千分之一的机会获得神秘戒指。"
+    }
+  ]
+}

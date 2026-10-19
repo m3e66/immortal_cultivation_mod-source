@@ -1,0 +1,13 @@
+{
+  "name": "Preface",
+  "icon": "minecraft:book",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Spiritual Minerals",
+      "text": "Spiritual energy flows through the veins of heaven and earth, slowly transforming ordinary stone into extraordinary minerals. Some lie hidden beneath ancient mountains, while others emerge upon frozen peaks or barren wastelands. To forge spiritual weapons and treasures, a cultivator must first learn to recognize these hidden riches."
+    }
+  ]
+}

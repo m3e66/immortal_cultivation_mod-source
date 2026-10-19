@@ -1,0 +1,23 @@
+{
+  "name": "精铁母石",
+  "icon": "immortal_cultivation_mod:jingtie_motherstone",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "精铁母石",
+      "text": "$(bold)起始高度：$()Y −16 至 96$(br2)$(bold)尝试频率：$()1/24 区块"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《灵矿录》记载",
+      "text": "精铁母石乃地脉铁精汇聚之物，岁月洗去杂质，留下坚韧精华。外貌朴实无华，质地却远胜寻常凡铁。天下山川皆可孕育此矿，乃修士初涉炼器之道时常寻之材。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻脉",
+      "text": "主世界各地皆有机会发现，常见于 Y −16 至 96 的山地、丘陵与地下岩层附近。"
+    }
+  ]
+}

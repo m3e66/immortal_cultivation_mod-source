@@ -27,6 +27,7 @@ public final class ElementalTechniqueProjectileRenderer extends EntityRenderer<E
    public void render(ElementalTechniqueProjectileEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
       try (var support = com.example.immortal_cultivation_mod.client.SpellGlowBuffers.support(com.example.immortal_cultivation_mod.client.SpellRibbonRenderer.spell(entity) != null)) {
       poseStack.pushPose();
+      com.example.immortal_cultivation_mod.client.SpellProjectileVisuals.enlarge(poseStack);
       Vec3 facing = entity.getDeltaMovement();
       if (entity.kind() == ElementalTechniqueProjectileEntity.Kind.WANREN_CHUANXIN && entity.launchDelay() > 0 && entity.getOwner() != null) {
          facing = entity.getOwner().getLookAngle();

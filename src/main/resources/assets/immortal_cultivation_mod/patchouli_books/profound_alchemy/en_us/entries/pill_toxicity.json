@@ -1,0 +1,53 @@
+{
+  "name": "Pill Toxicity",
+  "icon": "immortal_cultivation_mod:qingdu_pill",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Sources and repeat use",
+      "text": "Every successfully consumed pill adds toxicity once, including doses that restore over time. Potency and quality use current server rules, even for old saved pills. Default base gain is 4 × pill potency; common / fine / superior quality multiply it by 1 / 0.75 / 0.5. Pills have a configured medicinal realm (most ordinary pills: Qi Refining; breakthrough pill: Foundation)."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Sources and repeat use",
+      "text": "Each realm above you multiplies toxicity by 1.75; each below multiplies it by 0.85. Saved pill realm metadata, when present, is respected. Each earlier repeat of the SAME pill in a chain that resets after 120 online seconds without that pill adds 35% gain, up to five repeats. Different pill types track separately. The tooltip previews your next gain."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Stages and warnings",
+      "text": "Default stages: 0–19 Pure; 20–39 Mild; 40–59 Accumulated; 60–79 Meridian Poisoning; 80–100 Marrow Poisoning. Screen corners begin with green mist, progressing to green-purple edges, slow purple veins and deep violet miasma. The aiming center stays clear. A brief edge label announces a worse stage; recovery allows a later warning. Open Pill Toxicity from statistics for the ACTUAL server multipliers."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Stages and warnings",
+      "text": "Open Toxicity Visual Settings from the main configuration menu or toxicity details page to disable screen effects or adjust opacity (default 60%). Mist and veins blend continuously with your actual toxicity; the center stays clear. These client settings change no mechanics."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Total penalties",
+      "text": "Each stage uses its total multiplier once. Mild: pill healing/Qi 90%. Accumulated: healing/Qi 75%, other numeric pill benefits 90%, natural Qi 85%. Meridian: 60% / 80% / 70%, cultivation 85%, spell costs 115%. Marrow: 40% / 65% / 50%, cultivation 65%, spell costs 130%; lose 1% maximum HP every 10 seconds, never below 1 HP. Trigger chances, permanent legacy unlocks and fixed vanilla effects retain their behavior."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Total penalties",
+      "text": "Restoration penalties apply to instant and ongoing doses without compounding per tick. Natural Qi and pill restoration are separate."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Recovering safely",
+      "text": "Online play removes 0.01 points/second. Meditation adds 0.04 points/second. Leaving meditation stops the bonus; damage interrupts meditation and blocks its bonus for 5 seconds. No offline detox. Death clears toxicity and repeat records; logout and changing dimensions do not. Qingdu Pill removes 25 points, adds no toxicity, requires Qi Refining or higher, and has a server-enforced 300-second ONLINE cooldown."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Recovering safely",
+      "text": "During cooldown, below its realm requirement, or while already clean, it cannot be consumed. Its tooltip shows the limit and remaining time."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Qingdu formula",
+      "text": "Refine 3 Harmonizing Herbs, 2 Spirit Spring Leaves and 1 Profound Ice Lotus using the Qingdu Pill Formula at 1200°C in a ding. Base yield: 5. Obtain the formula through the usual formula shop or merchant routes. All numbers here describe defaults; server config may change them. Statistics and tooltips show your current server rules."
+    }
+  ]
+}

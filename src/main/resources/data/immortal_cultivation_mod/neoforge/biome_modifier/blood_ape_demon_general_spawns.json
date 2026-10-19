@@ -1,0 +1,10 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": "#immortal_cultivation_mod:beast_spawns/blood_ape_demon_general",
+  "spawners": {
+    "type": "immortal_cultivation_mod:blood_ape_demon_general",
+    "weight": 2,
+    "minCount": 1,
+    "maxCount": 1
+  }
+}

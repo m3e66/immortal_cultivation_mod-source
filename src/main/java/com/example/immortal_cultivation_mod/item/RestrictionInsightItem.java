@@ -32,8 +32,6 @@ public final class RestrictionInsightItem extends Item {
                 && ModPayloads.beginRestrictionInsightLearning(serverPlayer)) {
             return InteractionResultHolder.sidedSuccess(stack, false);
         }
-        player.displayClientMessage(Component.translatable(
-                "message." + ImmortalCultivationMod.MODID + ".restriction_insight.busy"), true);
         return InteractionResultHolder.fail(stack);
     }
 

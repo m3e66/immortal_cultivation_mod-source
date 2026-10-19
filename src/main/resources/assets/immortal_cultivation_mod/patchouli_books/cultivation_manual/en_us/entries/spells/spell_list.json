@@ -26,7 +26,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Beam: Lianqi Early, light, costs 30 qi.$(br)Condense spiritual power into a unique streak of light visible only to the caster. The phenomenon lingers for ten breaths before fading."
+      "text": "$(br)Beam: Lianqi Early, Yang, costs 30 qi.$(br)Condense spiritual power into a unique streak of light visible only to the caster. The phenomenon lingers for ten breaths before fading."
     },
     {
       "type": "patchouli:text",
@@ -78,7 +78,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Spirit Sight: Lianqi Early, light, costs 5 qi per second.$(br)A spiritual eye technique that may be freely toggled. When active, night appears as bright as day. Consumes 5 qi per second."
+      "text": "$(br)Spirit Sight: Lianqi Early, Yang, costs 5 qi per second.$(br)A spiritual eye technique that may be freely toggled. When active, night appears as bright as day. Consumes 5 qi per second."
     },
     {
       "type": "patchouli:text",
@@ -86,7 +86,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Light Ball: Foundation Establishment Late, light, costs 90 qi to summon and 30 qi per shot.$(br)Expend 90 qi to summon six hexagonal spirit orbs behind you, stacking up to three layers. A punch fires a single orb, while a concealed strike releases them all at once. Each orb possesses immense destructive power, capable of devastating powerful foes and shattering large areas of terrain."
+      "text": "$(br)Light Ball: Foundation Establishment Late, Yang, costs 90 qi to summon and 30 qi per shot.$(br)Expend 90 qi to summon six hexagonal spirit orbs behind you, stacking up to three layers. A punch fires a single orb, while a concealed strike releases them all at once. Each orb possesses immense destructive power, capable of devastating powerful foes and shattering large areas of terrain."
     },
     {
       "type": "patchouli:text",
@@ -106,11 +106,11 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Absorb: granted by Reincarnation True Art, dark, costs 80 qi.$(br)Launch a dark-aspected spirit projectile. If it strikes someone with lower cultivation, one-tenth of their cultivation progress is extracted and added to your own."
+      "text": "$(br)Absorb: granted by Reincarnation True Art, Yin, costs 80 qi.$(br)Launch a Yin-aspected spirit projectile. If it strikes someone with lower cultivation, one-tenth of their cultivation progress is extracted and added to your own."
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Devour Heaven: granted by Heaven Devouring Demon Art, dark.$(br)Devour all earth and stone within a five-meter radius, leaving nothing behind. Each block consumed advances your cultivation. The technique also devastates nearby living beings, and slain foes have their essence absorbed to greatly increase your cultivation."
+      "text": "$(br)Devour Heaven: granted by Heaven Devouring Demon Art, Yin.$(br)Devour all earth and stone within a five-meter radius, leaving nothing behind. Each block consumed advances your cultivation. The technique also devastates nearby living beings, and slain foes have their essence absorbed to greatly increase your cultivation."
     },
     {
       "type": "patchouli:text",
@@ -138,7 +138,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Shattered Orbit Starfall: Golden Core Middle, light, costs 1500 qi, 20-second cooldown.$(br)Compress the star paths around your body into five falling meteors, or ten at full charge. Each impact damages enemies within 30 blocks, carves a small crater roughly 8 blocks in radius, and leaves a permanent carpet-like star mark that suppresses undead and evil spirits within 5 blocks."
+      "text": "$(br)Shattered Orbit Starfall: Golden Core Middle, Yang, costs 1500 qi, 20-second cooldown.$(br)Compress the star paths around your body into five falling meteors, or ten at full charge. Each impact damages enemies within 30 blocks, carves a small crater roughly 8 blocks in radius, and leaves a permanent carpet-like star mark that suppresses undead and evil spirits within 5 blocks."
     },
     {
       "type": "patchouli:text",

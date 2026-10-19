@@ -1,0 +1,23 @@
+{
+  "name": "Phantom-Faced Spirit Fox",
+  "icon": "immortal_cultivation_mod:phantom_veil_fox_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Phantom-Faced Spirit Fox",
+      "text": "$(bold)Realm: $()Foundation Establishment – Nascent Soul"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "The Phantom-Faced Spirit Fox is an elusive creature of exceptional intelligence, capable of altering its appearance and deceiving the senses. Legends tell of cultivators who followed one into the woods, only to awaken far from where they began. Neither daylight nor darkness restricts its movements."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "Found in dark forests, old-growth taigas, groves, and cherry groves. May appear at any light level."
+    }
+  ]
+}

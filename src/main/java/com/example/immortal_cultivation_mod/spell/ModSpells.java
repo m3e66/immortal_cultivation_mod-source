@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class ModSpells {
+    public static final String YANMIE_WEIJIN_ZHIREN="yanmie_weijin_zhiren";
     public static final String FIREBALL = "fireball";
     public static final String LINGBENG = "lingbeng";
     public static final String REGENERATION = "regeneration";
@@ -306,7 +307,7 @@ public class ModSpells {
                 "weiya",
                 CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_EARLY,
                 0,
-                SpiritRoots.DARK,
+                SpiritRoots.YIN,
                 "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_lingbeng.png")
         ));
@@ -324,7 +325,7 @@ public class ModSpells {
                 "absorb_cultivation",
                 "",
                 80,
-                SpiritRoots.DARK,
+                SpiritRoots.YIN,
                 "heaven",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_lingbeng.png")
         ));
@@ -333,7 +334,7 @@ public class ModSpells {
                 "tuntian",
                 "",
                 0,
-                SpiritRoots.DARK,
+                SpiritRoots.YIN,
                 "heaven",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_tuntian.png")
         ));
@@ -405,7 +406,7 @@ public class ModSpells {
                 "beam",
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
                 30,
-                SpiritRoots.LIGHT,
+                SpiritRoots.YANG,
                 "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_beam.png")
         ));
@@ -522,7 +523,7 @@ public class ModSpells {
                 "spirit_sight",
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
                 5,
-                SpiritRoots.LIGHT,
+                SpiritRoots.YANG,
                 "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_spirit_sight.png")
         ));
@@ -540,7 +541,7 @@ public class ModSpells {
                 "light_beam_attack",
                 CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE,
                 90,
-                SpiritRoots.LIGHT,
+                SpiritRoots.YANG,
                 "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_beam.png")
         ));
@@ -603,7 +604,7 @@ public class ModSpells {
                 "jingling_fanzhao",
                 CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE,
                 1200,
-                SpiritRoots.LIGHT,
+                SpiritRoots.YANG,
                 "earth",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_beam.png")
         ));
@@ -630,7 +631,7 @@ public class ModSpells {
                 "kongshi_shu",
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_LATE,
                 30,
-                SpiritRoots.DARK,
+                SpiritRoots.YIN,
                 "human",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/gui/spell_lingbeng.png")
         ));
@@ -675,7 +676,7 @@ public class ModSpells {
                 "xuying_ta",
                 CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_MID,
                 50,
-                SpiritRoots.DARK,
+                SpiritRoots.YIN,
                 "earth",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/mob_effect/unknown.png")
         ));
@@ -693,7 +694,7 @@ public class ModSpells {
                 "yihen_ci",
                 CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_LATE,
                 100,
-                SpiritRoots.DARK,
+                SpiritRoots.YIN,
                 "earth",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/mob_effect/unknown.png")
         ));
@@ -720,7 +721,7 @@ public class ModSpells {
                 "suigui_xingyun",
                 CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_MID,
                 1500,
-                SpiritRoots.LIGHT,
+                SpiritRoots.YANG,
                 "earth",
                 ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "textures/mob_effect/unknown.png")
         ));
@@ -819,13 +820,13 @@ public class ModSpells {
                 1300, SpiritRoots.ICE, "earth");
         putTechnique(spells, YAOGUANG_SHAN,
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_LATE,
-                75, SpiritRoots.LIGHT, "human");
+                75, SpiritRoots.YANG, "human");
         putTechnique(spells, TIANGUANG_GUANSHA,
                 CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE,
-                1600, SpiritRoots.LIGHT, "earth");
+                1600, SpiritRoots.YANG, "earth");
         putTechnique(spells, YINGXI,
                 CultivationLevels.REALM_ZHUJI + CultivationLevels.STAGE_EARLY,
-                130, SpiritRoots.DARK, "earth");
+                130, SpiritRoots.YIN, "earth");
         putTechnique(spells, TIANFENG_ZHUI,
                 CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_MID,
                 1200, SpiritRoots.WIND, "earth");
@@ -840,19 +841,19 @@ public class ModSpells {
                 480, SpiritRoots.WOOD, "earth");
         putTechnique(spells, YANGYAN_FUTI,
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
-                150, SpiritRoots.FIRE + "," + SpiritRoots.LIGHT, "heaven");
+                150, SpiritRoots.FIRE + "," + SpiritRoots.YANG, "heaven");
         putTechnique(spells, DARI_ZHEN,
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
-                450, SpiritRoots.FIRE + "," + SpiritRoots.LIGHT, "heaven");
+                450, SpiritRoots.FIRE + "," + SpiritRoots.YANG, "heaven");
         putTechnique(spells, LIEYANG_BU,
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
-                250, SpiritRoots.FIRE + "," + SpiritRoots.LIGHT, "heaven");
+                250, SpiritRoots.FIRE + "," + SpiritRoots.YANG, "heaven");
         putTechnique(spells, RILUN,
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
-                800, SpiritRoots.FIRE + "," + SpiritRoots.LIGHT, "heaven");
+                800, SpiritRoots.FIRE + "," + SpiritRoots.YANG, "heaven");
         putTechnique(spells, JIYANG_YIKE,
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_EARLY,
-                0, SpiritRoots.FIRE + "," + SpiritRoots.LIGHT, "heaven");
+                0, SpiritRoots.FIRE + "," + SpiritRoots.YANG, "heaven");
         putTechnique(spells, LEIXIAO_GUANYUN,
                 CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_EARLY,
                 700, SpiritRoots.WIND + "," + SpiritRoots.THUNDER, "heaven");
@@ -885,8 +886,9 @@ public class ModSpells {
         putTechnique(spells, QINGTENG_FU,
                 "", 300, SpiritRoots.WOOD, "earth");
         for (String abilityId : UndeadAbilitySystem.playerAbilityIds()) {
-            putTechnique(spells, abilityId, "", 0, SpiritRoots.DARK, "innate");
+            putTechnique(spells, abilityId, "", 0, SpiritRoots.YIN, "innate");
         }
+        putTechnique(spells,YANMIE_WEIJIN_ZHIREN,"",0,"none","innate");
         putTechnique(spells, "jietian_duoyun_shu",
                 CultivationLevels.REALM_JINDAN + CultivationLevels.STAGE_LATE, 1800, "none", "heaven");
         putTechnique(spells, "bijie_shu",
@@ -987,6 +989,7 @@ public class ModSpells {
 
     public static int cooldownTicks(String spellId) {
         String normalized = normalizeId(spellId);
+        if(YANMIE_WEIJIN_ZHIREN.equals(normalized))return 30*60*20;
         if ("jietian_duoyun_shu".equals(normalized)) return 6000;
         if ("bijie_shu".equals(normalized)) return 4800;
         if ("guanyun_shu".equals(normalized)) return 100;
@@ -1089,7 +1092,8 @@ public class ModSpells {
     /** Spells whose existing client flow prepares and charges before release. */
     public static boolean requiresPreparation(String spellId) {
         String normalized = normalizeId(spellId);
-        return UndeadAbilitySystem.requiresPlayerPreparation(normalized)
+        return ZIBAO.equals(normalized)
+                || UndeadAbilitySystem.requiresPlayerPreparation(normalized)
                 || PREPARED_CAST_SPELLS.contains(normalized)
                 || ATTACK_SPELLS.contains(normalized);
     }
@@ -1101,6 +1105,7 @@ public class ModSpells {
 
     public static String cooldownText(String spellId) {
         String normalized = normalizeId(spellId);
+        if(YANMIE_WEIJIN_ZHIREN.equals(normalized))return "30 min (online)";
         if (CUIGU_LIANSHEN.equals(normalized)) {
             return "ceil(5% Max HP / 10) min";
         }
@@ -1477,6 +1482,7 @@ public class ModSpells {
                 || SPIRIT_SIGHT.equals(normalized)
                 || WIND_STEP.equals(normalized)
                 || YUFENG_JUE.equals(normalized)
+                || HUTI_QI.equals(normalized)
                 || XUYING_TA.equals(normalized)
                 || SHIXU_CHILIU.equals(normalized)
                 || WEIYA.equals(normalized)

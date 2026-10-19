@@ -1,0 +1,23 @@
+{
+  "name": "岁时安排",
+  "icon": "immortal_cultivation_mod:cultivation_manual",
+  "category": "immortal_cultivation_mod:worldly",
+  "sortnum": 34,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "一年三事",
+      "text": "人生页可直接按“执行年度计划”，无需每次进入安排界面。年度计划有三个行动位置，使用与手动活动相同的条件；无法进行的活动会置灰。普通活动耗一点，闭关耗两点且每年仅一次。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "量力而行",
+      "text": "每项可选无条件、任意、气血、劳损或稳定条件。条件未合，或身体过于虚弱、劳损过重时，会改作休养。尚未启灵、未学功法或不属宗门时，修炼与宗门活动仍受限制。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "遇事先决",
+      "text": "计划遇到剧情选择、突破、斗法或行程阻碍时会停下，先处理眼前之事，再继续。它不会代替你作出剧情选择。计划完成后才可推进岁月，每年恢复三个行动点。"
+    }
+  ]
+}

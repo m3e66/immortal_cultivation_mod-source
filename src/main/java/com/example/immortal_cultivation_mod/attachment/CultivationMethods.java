@@ -52,10 +52,10 @@ public class CultivationMethods {
             BLOOD_DEMON_HUASHEN, new MethodDef(BLOOD_DEMON_HUASHEN, "method.immortal_cultivation_mod.blood_demon_huashen", "any", "heaven",
                     CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_LATE, true)),
             Map.entry(
-            REINCARNATION_TRUE_ART, new MethodDef(REINCARNATION_TRUE_ART, "method.immortal_cultivation_mod.reincarnation_true_art", SpiritRoots.DARK, "heaven",
+            REINCARNATION_TRUE_ART, new MethodDef(REINCARNATION_TRUE_ART, "method.immortal_cultivation_mod.reincarnation_true_art", SpiritRoots.YIN, "heaven",
                     CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_LATE, false)),
             Map.entry(
-            TUNTIAN_DEMON_ART, new MethodDef(TUNTIAN_DEMON_ART, "method.immortal_cultivation_mod.tuntian_demon_art", SpiritRoots.DARK, "heaven",
+            TUNTIAN_DEMON_ART, new MethodDef(TUNTIAN_DEMON_ART, "method.immortal_cultivation_mod.tuntian_demon_art", SpiritRoots.YIN, "heaven",
                     CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_LATE, false)),
             Map.entry(
             POKONG_JUE, new MethodDef(POKONG_JUE, "method.immortal_cultivation_mod.pokong_jue", SpiritRoots.WIND, "earth",
@@ -73,10 +73,10 @@ public class CultivationMethods {
             CUIGU_LIANSHEN_JUE, new MethodDef(CUIGU_LIANSHEN_JUE, "method.immortal_cultivation_mod.cuigu_lianshen_jue", "none", "heaven",
                     CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_EARLY, false)),
             Map.entry(
-            JIUYOU_LIANSHI_JUE, new MethodDef(JIUYOU_LIANSHI_JUE, "method.immortal_cultivation_mod.jiuyou_lianshi_jue", SpiritRoots.DARK, "heaven",
+            JIUYOU_LIANSHI_JUE, new MethodDef(JIUYOU_LIANSHI_JUE, "method.immortal_cultivation_mod.jiuyou_lianshi_jue", SpiritRoots.YIN, "heaven",
                     CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_EARLY, false)),
             Map.entry(
-            DARI_BATI_JUE, new MethodDef(DARI_BATI_JUE, "method.immortal_cultivation_mod.dari_bati_jue", SpiritRoots.FIRE + "," + SpiritRoots.LIGHT, "heaven",
+            DARI_BATI_JUE, new MethodDef(DARI_BATI_JUE, "method.immortal_cultivation_mod.dari_bati_jue", SpiritRoots.FIRE + "," + SpiritRoots.YANG, "heaven",
                     CultivationLevels.REALM_HUASHEN + CultivationLevels.STAGE_LATE, false)),
             Map.entry(
             GANGTING_XIAOKONG_LU, new MethodDef(GANGTING_XIAOKONG_LU, "method.immortal_cultivation_mod.gangting_xiaokong_lu", SpiritRoots.WIND + "," + SpiritRoots.THUNDER, "heaven",

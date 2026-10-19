@@ -1,0 +1,18 @@
+{
+  "name": "幽冥阴火",
+  "icon": "immortal_cultivation_mod:nether_flame_seed",
+  "category": "immortal_cultivation_mod:volume_2",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "幽冥阴火",
+      "text": "火候上限 ：8,000°C | 灵气消耗 ：30"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《天工录》记载",
+      "text": "幽冥阴火，焰性阴寒，外观幽暗，却藏极强熔炼之力。其火不似烈阳之焰耀目，反有幽沉诡谲之势。炼器者须知，阴火虽名为阴，其炼化之能绝不可小觑。"
+    }
+  ]
+}

@@ -37,9 +37,10 @@ public class ModParticles {
             registerSimple("method_qi_ice");
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> METHOD_QI_WIND =
             registerSimple("method_qi_wind");
-    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> METHOD_QI_LIGHT =
+    // Keep registry IDs stable for saved particle settings and existing resource packs.
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> METHOD_QI_YANG =
             registerSimple("method_qi_light");
-    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> METHOD_QI_DARK =
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> METHOD_QI_YIN =
             registerSimple("method_qi_dark");
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> METHOD_QI_BLOOD =
             registerSimple("method_qi_blood");

@@ -1,0 +1,128 @@
+{
+  "name": "Qi Domains",
+  "icon": "immortal_cultivation_mod:changqing_jue_method",
+  "category": "immortal_cultivation_mod:spells",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Release and Flow",
+      "text": "Golden Core or higher, in combat mode: press G to release qi. Shift + scroll changes intensity by 10%, between 100% and 200%. Press G again to stop.$(br2)Ordinary qi use produces drifting motes. Attacks wrap the fist or held weapon; release wraps your whole body. Active method determines color."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Costs and Domain",
+      "text": "Release costs qi each second: 0.25% of maximum qi at 100%, rising quadratically to 1% at 200%, before existing cost modifiers. Blood methods can use blood.$(br2)At 200%, your moving domain reaches 20 blocks. Leaving combat, losing Golden Core, or exhausting resources stops release."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Domain Clashes",
+      "text": "At 200% release, a bright membrane marks your moving twenty-block domain. Hostile fields compress against one another; both membranes shudder and rebound as sparks, opposing streams and pressure waves erupt along their contact seam. Domain effects remain within the compressed boundary. After four seconds, the active method with the higher cultivation ceiling wins. Equal ceilings compare method proficiency; exact ties remain locked until separation or a changed advantage. The losing domain shatters while body Qi remains. Reopening requires three seconds of recovery. Players and NPCs follow the same rules."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Great Mastery Required",
+      "text": "At 500 active-method proficiency (Great), special domain effects awaken. Blood lilies progressively cover enemies; pollen reacts to contact; wind seams show brief mint-white cuts only on confirmed contact. Reincarnation and Devouring roll independently per eligible enemy each second. Creative and spectator players, allies, owned pets and the caster are protected. NPCs use their actual proficiency."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Breath and Heart",
+      "text": "Basic Breathing: cyan, soft rising currents; punches release compressed-air rings.$(br2)Clear Heart: smooth pale mint flames, suspended light droplets and clean circular hit ripples.$(br2)Breathing Field and Stillwater Mirror have no special gameplay effects. They do not damage, push, weaken, heal or cleanse."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Blood Lily Bloom",
+      "text": "All three Blood Demon tiers grow 3D red spider lilies over the actual animated enemy model. Maximum HP sets base growth speed; wounds do not accelerate it. Every landed attack adds 0.1 to that caster's growth multiplier on this target (1.0, 1.1, 1.2, etc.), until the flowers fully wilt. Only full coverage drains real HP and Qi each second into the caster. Partial flowers fade slowly outside the domain and resume on return. Stopping the domain stops drain immediately. Flowers do not freeze targets. Own shoulder thorns are hidden in first person. NPCs use the same rules."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Wood, Wind and Flame",
+      "text": "Evergreen pollen drifts irregularly and raises real wood on contact. Green-veined spikes obstruct and damage enemies, then crack and dissolve in stages over two seconds. Read Wood in Bloom and Decay, Ashes into Life and Solar Furnace for details."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Wheel of Rebirth",
+      "text": "Open black-and-white wheels turn through the Reincarnation domain, with paired inner curves. Opposing violet-jade currents cover the caster, while three staggered ghost rings echo each hit. Each eligible enemy independently rolls 1% each second for one added level of Slowness and Weakness lasting ten seconds. A brief ground formation, opposing spirals and actual-model afterimages mark the proc. Orbiting particles collapse at expiry. Another proc adds a level and refreshes ten seconds."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Devouring Maw",
+      "text": "Dark ripples and black-purple wisps drift between activations. Each target gains one percentage point of warp chance each second, starting at 1% and capped at 100%. A warp resets only that target to zero; the next second starts at 1%. Leaving or ending the domain clears its accumulated chance. The proc creates a sudden inward vortex that warps its silhouette, contracts to a black point and bursts into dark fragments. Base HP damage is 10% of the caster's maximum Qi; existing defenses and domain suppression apply."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Rending Gale",
+      "text": "Void Breaking uses its original mint-white palette throughout its aura, weapons and cuts. No idle wind currents or red ground haze are shown. Wind collision paths still sweep horizontally and diagonally, changing every 1.6 seconds; only confirmed hits produce brief crossing cuts, refraction, dust and upward pressure. Domain cutting damage is halved for players and NPCs. Respawning paths cannot hit across the field. The twenty-block range, visible domain border and one-second damage cooldown per caster and victim remain. Terrain is not destroyed."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Heavenly Thunder Resonance",
+      "text": "Violet flames carry turquoise branches beneath slowly turning thundercloud currents. Enemies within six blocks of one another exchange automatic arcs each second. After three seconds of exposure, charged enemies periodically release extra branches; isolated enemies can draw a cloud discharge. No attack is required. Each caster can deal domain lightning damage to a victim at most once per second."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Ten Thousand Mountains' Weight",
+      "text": "Profound Mountain Edge-Shattering forms heavy earth-gold strata and floating stone. Enemies throughout the domain are slowed and gently pressed downward. Movement stirs dust and golden cracks; mountain shadows gather above them. Close groups intensify the pressure visuals without destroying terrain."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Eternal Abyssal Current",
+      "text": "Cold-Tide fills its domain with deep-blue spiritual water. Each block actually travelled inside adds one Damp stack, capped at eight. Back-and-forth travel counts; standing still and teleports do not. Damp lasts ten seconds and continued movement refreshes it. Higher stacks show denser water currents. Steps leave world-anchored ripples that expand and fade. Existing Damp interactions with water and ice spells remain. The caster still heals 0.2% of maximum HP each second, capped at four, and extinguishes fire."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Ice Remembers",
+      "text": "Cold Cry Ice-Seizing grows ice more slowly over targets with higher maximum HP; wounds do not change the rate. Full buildup takes twice the square root of maximum HP in seconds, at least five seconds: 100 max HP takes 20 seconds. Outside the domain, partial ice melts over at least a minute per full coat and four times more slowly than buildup. Re-entry resumes from the remainder. Reloading preserves it."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Five Minutes in Ice",
+      "text": "Targets fully frozen by Cold Cry Ice-Seizing cannot move, attack, cast spells or use beast abilities. The domain maintains the lock; after its last contact, full freezing lasts five minutes even if the caster stops. Then the ice shatters and actions resume. Slimes and magma cubes are immune to this domain's frost, slow and full freeze."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Ashes into Life",
+      "text": "Orange-red spiritual fire rises beneath enemies and breaks into gold embers that return to the caster's chest. Flame contact burns each second and restores health equal to 5% of actual HP damage dealt. Blocked damage yields no free vitality. These flames do not ignite terrain."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Silent Winter",
+      "text": "Pale blue crystalline flames spread frost from feet through legs, torso, arms and head, following each mob's actual animated model. Thin transparent frost grows at the same maximum-HP base rate as red lilies: max(5, twice the square root of target maximum HP) seconds to full coverage. A 100-max-HP target takes 20 seconds; 400 takes 40 seconds. Wounds do not change this rate. Slowness builds from I to IV as coverage increases. Full coverage locks movement, attacks, spells and beast abilities for five minutes after the last domain contact. Partial ice slowly thaws outside and resumes from the remainder on reentry. Slimes and magma cubes are immune. Each second the caster heals 0.2% of maximum HP, capped at four, and extinguishes fire. When freezing ends, the coating cracks and shatters into fragments sampled from the real model surface. It is never a separate ice cube."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Bone Bell",
+      "text": "Bone Bell compares innate attack plus trained physical attack plus one point for every twenty maximum HP. Bone-tempering health gains count; wounds and weapon attack modifiers do not. Strictly weaker bodies suffer thirty percent movement suppression, separate from ordinary Slowness and its cleanses. Equal or stronger bodies are unaffected. Ivory waves, foot dust and deep bell vibrations express physical presence without gravity. Your own rings are hidden in first-person and remain visible in third-person."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Nether Procession",
+      "text": "Nine Nether Corpse-Refining wears violet-black flame and ghost-green wisps; hits leave smoky decaying marks. Nether Procession has no additional passive domain damage, Wither, Weakness, suppression or healing."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Solar Furnace",
+      "text": "Solar motes erupt into golden-white pillars each second. Base damage is caster maximum HP × current Sun Energy percentage value ÷ 1000: 10%, 25%, 50%, 75% and 100% Sun Energy deal 1%, 2.5%, 5%, 7.5% and 10% of the caster's maximum HP per pillar. Current HP and target HP do not set this damage. Zero Sun Energy deals no pillar damage. Suppression and existing defenses apply. Brightness, density and heat shimmer rise with current Sun Energy."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Blood Returning to Its Source",
+      "text": "Flowers follow feet, limbs, torso and head, not a bounding box. At full coverage, each second drains ordinary domain HP damage and twice that amount of real Qi. Actual HP lost and Qi removed return to the caster, capped by its maxima. Partial coverage, leaving range or stopping the domain prevents drain. Hit counts are saved separately per caster and target, resetting when flowers fully wilt. Misses, fully blocked hits and passive lily drain add no stacks. Overlapping domains use the strongest growth multiplier, without stacking base growth or drain pulses."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Shadows Between Lives",
+      "text": "On a Reincarnation proc, an open black-and-white wheel with paired inner curves briefly appears beneath opposing body currents. Two translucent copies of the enemy's actual model separate to either side and trail its movement. Orbiting particles collapse when ten seconds end. Another proc adds a level and refreshes ten seconds; an older, longer lower-level effect can resume afterward."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Wind Along the Rift",
+      "text": "Void Breaking retains its original mint-white palette. Idle currents, floating wind fragments and red ground haze are absent. Wind paths change every 1.6 seconds; confirmed hits alone show brief crossing cuts, scene refraction, dust and upward pressure. Domain cutting damage is halved for both players and NPCs. No terrain edits are created. Devouring instead folds the victim's silhouette inward, contracts to a black point and bursts into dark fragments."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Wood in Bloom and Decay",
+      "text": "Evergreen's green-gold pollen drifts irregularly. Contact raises real collidable oak-log spikes with leaves, bark and green veins. Over two seconds the wood cracks and withers, dissolving in stages during the final half-second. Further contacts may erupt again. Existing terrain and later player edits are preserved."
+    }
+  ]
+}

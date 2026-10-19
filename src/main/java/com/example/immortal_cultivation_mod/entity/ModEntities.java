@@ -12,6 +12,17 @@ public class ModEntities {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
             DeferredRegister.create(Registries.ENTITY_TYPE, ImmortalCultivationMod.MODID);
 
+    static {
+        for (String old : java.util.List.of("zhuji_vault_guardian", "jindan_vault_guardian")) {
+            ENTITY_TYPES.addAlias(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, old),
+                    net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "vault_guardian"));
+        }
+        for (String old : java.util.List.of("zhuji_phantom_veil_fox", "jindan_phantom_veil_fox")) {
+            ENTITY_TYPES.addAlias(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, old),
+                    net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "phantom_veil_fox"));
+        }
+    }
+
     public static final DeferredHolder<EntityType<?>, EntityType<com.example.immortal_cultivation_mod.flame.SpiritFlameEntity>> SPIRIT_FLAME =
             ENTITY_TYPES.register("spirit_flame", () -> EntityType.Builder.<com.example.immortal_cultivation_mod.flame.SpiritFlameEntity>of(
                     com.example.immortal_cultivation_mod.flame.SpiritFlameEntity::new, MobCategory.MISC)
@@ -21,10 +32,6 @@ public class ModEntities {
                     com.example.immortal_cultivation_mod.flame.FlameShotEntity::new, MobCategory.MISC)
                     .sized(.3F, .3F).clientTrackingRange(8).updateInterval(1).fireImmune().build("flame_shot"));
 
-    public static final DeferredHolder<EntityType<?>, EntityType<com.example.immortal_cultivation_mod.pagoda.PagodaEntity>> PAGODA =
-            ENTITY_TYPES.register("pagoda", () -> EntityType.Builder.<com.example.immortal_cultivation_mod.pagoda.PagodaEntity>of(
-                    com.example.immortal_cultivation_mod.pagoda.PagodaEntity::new, MobCategory.MISC)
-                    .sized(6,14).clientTrackingRange(32).updateInterval(1).build("pagoda"));
 
     public static final DeferredHolder<EntityType<?>, EntityType<XuanjinZhengEntity>> XUANJIN_ZHENG =
             ENTITY_TYPES.register("xuanjin_zheng", () -> EntityType.Builder.<XuanjinZhengEntity>of(
@@ -537,6 +544,10 @@ public class ModEntities {
                             .updateInterval(2)
                             .build("jindan_cultivator"));
 
+    public static final DeferredHolder<EntityType<?>,EntityType<TrainingDummyEntity>> TRAINING_DUMMY =
+            ENTITY_TYPES.register("training_dummy",()->EntityType.Builder.<TrainingDummyEntity>of(TrainingDummyEntity::new,MobCategory.MISC)
+                    .sized(.6F,1.9F).clientTrackingRange(12).updateInterval(2).build("training_dummy"));
+
     public static final DeferredHolder<EntityType<?>, EntityType<FanrenNpcEntity>> FANREN_NPC =
             ENTITY_TYPES.register("fanren_npc",
                     () -> EntityType.Builder.<FanrenNpcEntity>of(
@@ -545,6 +556,16 @@ public class ModEntities {
                             .clientTrackingRange(10)
                             .updateInterval(2)
                             .build("fanren_npc"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<RecipeMerchantEntity>> RECIPE_MERCHANT =
+            ENTITY_TYPES.register("recipe_merchant",
+                    () -> EntityType.Builder.<RecipeMerchantEntity>of(RecipeMerchantEntity::new, MobCategory.CREATURE)
+                            .sized(0.6F, 1.8F).clientTrackingRange(10).updateInterval(2).build("recipe_merchant"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<SpellMerchantEntity>> SPELL_MERCHANT =
+            ENTITY_TYPES.register("spell_merchant",
+                    () -> EntityType.Builder.<SpellMerchantEntity>of(SpellMerchantEntity::new, MobCategory.CREATURE)
+                            .sized(0.6F, 1.8F).clientTrackingRange(10).updateInterval(2).build("spell_merchant"));
 
     public static final DeferredHolder<EntityType<?>, EntityType<HotelNpcEntity>> HOTEL_NPC =
             ENTITY_TYPES.register("hotel_npc",
@@ -581,34 +602,17 @@ public class ModEntities {
             ENTITY_TYPES.register("blood_ape_demon_general",
                     () -> EntityType.Builder.<BloodApeDemonGeneralEntity>of(
                                     BloodApeDemonGeneralEntity::new, MobCategory.MONSTER)
-                            .sized(1.15F, 2.8F)
+                            .sized(BloodApeDemonGeneralEntity.BODY_WIDTH,
+                                    BloodApeDemonGeneralEntity.BODY_HEIGHT)
                             .clientTrackingRange(14)
                             .updateInterval(1)
                             .build("blood_ape_demon_general"));
 
-    public static final DeferredHolder<EntityType<?>, EntityType<VaultGuardianEntity>>
-            ZHUJI_VAULT_GUARDIAN =
-            ENTITY_TYPES.register("zhuji_vault_guardian",
-                    () -> EntityType.Builder.<VaultGuardianEntity>of(
-                                    (type, level) -> new VaultGuardianEntity(type, level, false),
-                                    MobCategory.MONSTER)
-                            .sized(3.9F, 7.8F)
-                            .fireImmune()
-                            .clientTrackingRange(16)
-                            .updateInterval(1)
-                            .build("zhuji_vault_guardian"));
-
-    public static final DeferredHolder<EntityType<?>, EntityType<VaultGuardianEntity>>
-            JINDAN_VAULT_GUARDIAN =
-            ENTITY_TYPES.register("jindan_vault_guardian",
-                    () -> EntityType.Builder.<VaultGuardianEntity>of(
-                                    (type, level) -> new VaultGuardianEntity(type, level, true),
-                                    MobCategory.MONSTER)
-                            .sized(3.9F, 7.8F)
-                            .fireImmune()
-                            .clientTrackingRange(18)
-                            .updateInterval(1)
-                            .build("jindan_vault_guardian"));
+    public static final DeferredHolder<EntityType<?>, EntityType<VaultGuardianEntity>> VAULT_GUARDIAN =
+            ENTITY_TYPES.register("vault_guardian",
+                    () -> EntityType.Builder.<VaultGuardianEntity>of(VaultGuardianEntity::new, MobCategory.MONSTER)
+                            .sized(3.9F, 7.8F).fireImmune().clientTrackingRange(18).updateInterval(1)
+                            .build("vault_guardian"));
 
     public static final DeferredHolder<EntityType<?>, EntityType<EscapedYuanyingCoreEntity>>
             ESCAPED_YUANYING_CORE =
@@ -654,7 +658,8 @@ public class ModEntities {
             ENTITY_TYPES.register("frostspine_cave_bear",
                     () -> EntityType.Builder.<FrostspineCaveBearEntity>of(
                                     FrostspineCaveBearEntity::new, MobCategory.MONSTER)
-                            .sized(2.8F, 2.2F)
+                            .sized(FrostspineCaveBearEntity.BODY_WIDTH,
+                                    FrostspineCaveBearEntity.BODY_HEIGHT)
                             .clientTrackingRange(16)
                             .updateInterval(1)
                             .build("frostspine_cave_bear"));
@@ -736,31 +741,11 @@ public class ModEntities {
                             .fireImmune()
                             .build("cultivation_beast_fire_patch"));
     public static final DeferredHolder<EntityType<?>, EntityType<PhantomVeilFoxEntity>>
-            ZHUJI_PHANTOM_VEIL_FOX =
-            ENTITY_TYPES.register("zhuji_phantom_veil_fox",
-                    () -> EntityType.Builder.<PhantomVeilFoxEntity>of(
-                                    PhantomVeilFoxEntity::new, MobCategory.MONSTER)
-                            .sized(0.95F, 1.05F)
-                            .clientTrackingRange(16)
-                            .updateInterval(1)
-                            .build("zhuji_phantom_veil_fox"));
-
-    public static final DeferredHolder<EntityType<?>, EntityType<PhantomVeilFoxEntity>>
-            JINDAN_PHANTOM_VEIL_FOX =
-            ENTITY_TYPES.register("jindan_phantom_veil_fox",
-                    () -> EntityType.Builder.<PhantomVeilFoxEntity>of(
-                                    PhantomVeilFoxEntity::new, MobCategory.MONSTER)
-                            .sized(1.10F, 1.25F)
-                            .clientTrackingRange(16)
-                            .updateInterval(1)
-                            .build("jindan_phantom_veil_fox"));
-
-    public static final DeferredHolder<EntityType<?>, EntityType<PhantomVeilFoxEntity>>
             PHANTOM_VEIL_FOX =
             ENTITY_TYPES.register("phantom_veil_fox",
                     () -> EntityType.Builder.<PhantomVeilFoxEntity>of(
                                     PhantomVeilFoxEntity::new, MobCategory.MONSTER)
-                            .sized(1.25F, 1.4F)
+                            .sized(2.5F, 2.8F)
                             .clientTrackingRange(16)
                             .updateInterval(1)
                             .build("phantom_veil_fox"));
@@ -770,7 +755,7 @@ public class ModEntities {
             ENTITY_TYPES.register("phantom_veil_fox_clone",
                     () -> EntityType.Builder.<PhantomVeilFoxCloneEntity>of(
                                     PhantomVeilFoxCloneEntity::new, MobCategory.MISC)
-                            .sized(1.25F, 1.4F)
+                            .sized(2.5F, 2.8F)
                             .clientTrackingRange(16)
                             .updateInterval(1)
                             .build("phantom_veil_fox_clone"));
@@ -914,5 +899,7 @@ public class ModEntities {
                             .build("asteroid"));
 
 
-    public static void register(IEventBus bus) { ENTITY_TYPES.register(bus); }
+    public static void register(IEventBus bus) {
+        ENTITY_TYPES.register(bus);
+    }
 }

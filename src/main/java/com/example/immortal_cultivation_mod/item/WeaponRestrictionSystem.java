@@ -382,7 +382,7 @@ public final class WeaponRestrictionSystem {
         }
         if (target instanceof ServerPlayer player) {
             var data = ModAttachments.getData(player);
-            int maxQi = Math.max(0, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
+            int maxQi = Math.max(0, data.maxQi());
             int drain = drainAmount(maxQi, layers);
             if (drain > 0) {
                 ModAttachments.setData(player, data.withQi(Math.max(0, data.qi() - drain)));

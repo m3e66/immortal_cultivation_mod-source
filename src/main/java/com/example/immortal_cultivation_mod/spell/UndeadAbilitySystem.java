@@ -1567,8 +1567,7 @@ public final class UndeadAbilitySystem {
     private static void drainQi(LivingEntity target, float fraction, boolean maximum) {
         if (target instanceof ServerPlayer player) {
             ModAttachments.CultivationData data = ModAttachments.getData(player);
-            int maxQi = Math.max(0, CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi()
-                    + data.maxQiBonus());
+            int maxQi = Math.max(0, data.maxQi());
             int basis = maximum ? maxQi : data.qi();
             int drain = Math.max(0, Mth.floor(basis * fraction));
             ModAttachments.setData(player, data.withQi(Math.max(0, data.qi() - drain)));
@@ -1822,6 +1821,7 @@ public final class UndeadAbilitySystem {
     }
 
     private static void setCooldown(LivingEntity entity, String id, long now, long ticks) {
+        if (entity instanceof net.minecraft.world.entity.player.Player player) ticks = com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.cooldown(player, (int)Math.min(Integer.MAX_VALUE, ticks));
         entity.getPersistentData().putLong(TAG_PREFIX + "cooldown." + id, now + ticks);
     }
 

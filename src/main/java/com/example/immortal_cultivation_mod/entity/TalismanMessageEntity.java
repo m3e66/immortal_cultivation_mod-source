@@ -102,7 +102,7 @@ public final class TalismanMessageEntity extends ThrowableItemProjectile
                 guideToRecipient();
             }
             if (tickCount > 160) {
-                fail("传音符未能抵达目标。");
+                fail("message.immortal_cultivation_mod.talisman_message.unreachable");
                 return;
             }
         }
@@ -120,7 +120,7 @@ public final class TalismanMessageEntity extends ThrowableItemProjectile
         ServerLevel level = (ServerLevel) level();
         ServerPlayer target = target(level);
         if (target == null || !target.isAlive()) {
-            fail("目标已不在此界。");
+            fail("message.immortal_cultivation_mod.talisman_message.other_dimension");
             return;
         }
         level.sendParticles(ParticleTypes.END_ROD,
@@ -148,7 +148,7 @@ public final class TalismanMessageEntity extends ThrowableItemProjectile
         ServerLevel level = (ServerLevel) level();
         ServerPlayer target = target(level);
         if (target == null || !target.isAlive()) {
-            fail("目标已不在此界。");
+            fail("message.immortal_cultivation_mod.talisman_message.other_dimension");
             return;
         }
         Vec3 targetCenter = target.position().add(
@@ -162,11 +162,9 @@ public final class TalismanMessageEntity extends ThrowableItemProjectile
     }
 
     private void deliver(ServerPlayer target) {
-        target.sendSystemMessage(Component.literal(
-                "[传音] " + senderName + "：" + message));
+        target.sendSystemMessage(Component.translatable("message.immortal_cultivation_mod.talisman_message.received", senderName, message));
         if (getOwner() instanceof ServerPlayer sender) {
-            sender.displayClientMessage(Component.literal(
-                    "传音已送达 " + target.getGameProfile().getName()), true);
+            sender.displayClientMessage(Component.translatable("message.immortal_cultivation_mod.talisman_message.delivered", target.getGameProfile().getName()), true);
         }
         ((ServerLevel) level()).sendParticles(ParticleTypes.END_ROD,
                 target.getX(),
@@ -177,7 +175,7 @@ public final class TalismanMessageEntity extends ThrowableItemProjectile
 
     private void fail(String reason) {
         if (getOwner() instanceof ServerPlayer sender) {
-            sender.displayClientMessage(Component.literal(reason), true);
+            sender.displayClientMessage(Component.translatable(reason), true);
         }
         discard();
     }
@@ -193,7 +191,7 @@ public final class TalismanMessageEntity extends ThrowableItemProjectile
     @Override
     protected void onHitBlock(BlockHitResult result) {
         if (!level().isClientSide) {
-            fail("传音符受到阻隔，未能送达。");
+            fail("message.immortal_cultivation_mod.talisman_message.blocked");
         }
     }
 

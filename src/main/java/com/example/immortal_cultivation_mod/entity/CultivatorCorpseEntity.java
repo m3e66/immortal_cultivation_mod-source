@@ -11,6 +11,8 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -24,9 +26,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.resources.ResourceLocation;
 
 public class CultivatorCorpseEntity extends PathfinderMob {
+    private static final float PRONE_WIDTH = 1.0F;
+    private static final float PRONE_LENGTH = 2.0F;
+    private static final float PRONE_HEIGHT = 0.5F;
     private static final EntityDataAccessor<Optional<UUID>> PLAYER_UUID =
             SynchedEntityData.defineId(CultivatorCorpseEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<String> PLAYER_NAME =
@@ -45,6 +51,35 @@ public class CultivatorCorpseEntity extends PathfinderMob {
         setNoAi(true);
         setPersistenceRequired();
         xpReward = 0;
+        refreshDimensions();
+    }
+
+    @Override
+    protected EntityDimensions getDefaultDimensions(Pose pose) {
+        return entityData != null && !isRaised()
+                ? EntityDimensions.scalable(PRONE_WIDTH, PRONE_HEIGHT).withEyeHeight(PRONE_HEIGHT / 2)
+                : super.getDefaultDimensions(pose);
+    }
+
+    @Override
+    protected AABB makeBoundingBox() {
+        if (entityData == null || isRaised()) return super.makeBoundingBox();
+        // Keep the box centered on the entity: movement derives its position from this center.
+        // Minecraft uses an axis-aligned envelope around the yaw-aligned, horizontal body.
+        double scale = getScale();
+        double yaw = Math.toRadians(getCorpseYaw());
+        double sin = Math.abs(Math.sin(yaw)), cos = Math.abs(Math.cos(yaw));
+        double halfX = (PRONE_WIDTH * cos + PRONE_LENGTH * sin) * scale / 2;
+        double halfZ = (PRONE_LENGTH * cos + PRONE_WIDTH * sin) * scale / 2;
+        return new AABB(getX()-halfX, getY(), getZ()-halfZ,
+                getX()+halfX, getY()+PRONE_HEIGHT*scale, getZ()+halfZ);
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
+        super.onSyncedDataUpdated(key);
+        if (RAISED.equals(key)) refreshDimensions();
+        else if (CORPSE_YAW.equals(key)) setBoundingBox(makeBoundingBox());
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -89,6 +124,7 @@ public class CultivatorCorpseEntity extends PathfinderMob {
 
         copyAttributesFrom(player);
         setHealth(Math.max(1.0F, getMaxHealth() * 0.5F));
+        refreshDimensions();
     }
 
     public void copyFromNpc(LivingEntity npc, String name, ResourceLocation texture) {
@@ -108,6 +144,7 @@ public class CultivatorCorpseEntity extends PathfinderMob {
         copyAttributesFrom(npc);
         copyNpcCoreAttributes(npc);
         setHealth(Math.max(1.0F, getMaxHealth() * 0.5F));
+        refreshDimensions();
     }
 
     public Optional<UUID> getPlayerUuid() {
@@ -137,7 +174,6 @@ public class CultivatorCorpseEntity extends PathfinderMob {
     public void setRaised(boolean raised) {
         entityData.set(RAISED, raised);
         setNoAi(!raised || isSealed());
-        refreshDimensions();
     }
 
     public boolean isSealed() {
@@ -218,6 +254,7 @@ public class CultivatorCorpseEntity extends PathfinderMob {
         setNoGravity(false);
         setPersistenceRequired();
         lockFacing();
+        refreshDimensions();
     }
 
     private void applyPinnedGravity() {

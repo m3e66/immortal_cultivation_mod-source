@@ -15,7 +15,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ModTabs {
-   private static final List<String> SPELL_ELEMENT_ORDER = List.of("\u91d1", "\u6728", "\u6c34", "\u706b", "\u571f", "\u96f7", "\u98ce", "\u51b0", "\u5149", "\u6697", "blood");
+   private static final List<String> SPELL_ELEMENT_ORDER = List.of("\u91d1", "\u6728", "\u6c34", "\u706b", "\u571f", "\u96f7", "\u98ce", "\u51b0", "\u9633", "\u9634", "blood");
    public static final DeferredRegister<CreativeModeTab> CREATIVE_TABS;
    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> IMMORTAL_TAB;
    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> IMMORTAL_WEAPONS_TAB;
@@ -59,6 +59,8 @@ public class ModTabs {
       IMMORTAL_TAB = CREATIVE_TABS.register("immortal_tab", () -> CreativeModeTab.builder().title(Component.translatable("itemGroup.immortal_cultivation_mod.drops")).icon(() -> ((Item)ModItems.ZHUJI_YAODAN.get()).getDefaultInstance()).displayItems((parameters, output) -> {
             output.accept((ItemLike)ModItems.DEBUG_STAT_EDITOR.get());
             output.accept((ItemLike)ModItems.DEBUG_TIME_CONTROLLER.get());
+            output.accept((ItemLike)ModItems.TRAINING_DUMMY.get());
+            output.accept((ItemLike)ModItems.DUMMY_CONTROL_STICK.get());
             output.accept((ItemLike)ModItems.RESTRICTION_INSIGHT.get());
             output.accept((ItemLike)ModItems.BLOOD.get());
             output.accept((ItemLike)ModItems.BLOOD_CRYSTAL.get());
@@ -98,6 +100,7 @@ public class ModTabs {
             output.accept((ItemLike)ModItems.EMBER_FEATHER.get());
             output.accept((ItemLike)ModItems.FIRE_OWL_CLAW.get());
             output.accept((ItemLike)ModItems.FLAME_RADIANCE_BONE.get());
+            output.accept((ItemLike)ModItems.MORTAL_BEAST_MEAT.get());
             output.accept((ItemLike)ModItems.LIANQI_BEAST_MEAT.get());
             output.accept((ItemLike)ModItems.ZHUJI_BEAST_MEAT.get());
             output.accept((ItemLike)ModItems.JINDAN_BEAST_MEAT.get());
@@ -147,8 +150,6 @@ public class ModTabs {
             output.accept((ItemLike)ModItems.FLYING_NEEDLE.get());
             output.accept((ItemLike)ModItems.TIEGU_SHAN.get());
             output.accept(ModItems.BLACK_IRON_JIAN.get());
-            output.accept(ModItems.BAOTA.get());
-            output.accept(ModItems.JIN_HULU.get());
             output.accept(ModItems.BLACK_IRON_GREATSWORD.get());
             output.accept(ModItems.MOON_CRESCENT_HALBERD.get());
             output.accept(ModItems.SPIRIT_SILK_WHIP.get());
@@ -185,6 +186,7 @@ public class ModTabs {
             output.accept((ItemLike)ModItems.SPEAR_MOLD.get());
             output.accept((ItemLike)ModItems.WEAPON_MOLD.get());
             output.accept((ItemLike)ModItems.FEIJIAN_YUJIAN.get());
+            output.accept(ModItems.QINGTONG_YINHUO_DING_YUJIAN.get());
             output.accept(ModItems.CHI_JIN_SANYANG_DING_YUJIAN.get());
             output.accept((ItemLike)ModItems.DAO_YUJIAN.get());
             output.accept((ItemLike)ModItems.JINGTIE_SPEAR_YUJIAN.get());
@@ -193,8 +195,6 @@ public class ModTabs {
             output.accept((ItemLike)ModItems.FLYING_NEEDLE_YUJIAN.get());
             output.accept((ItemLike)ModItems.TIEGU_SHAN_YUJIAN.get());
             output.accept(ModItems.BLACK_IRON_JIAN_YUJIAN.get());
-            output.accept(ModItems.BAOTA_YUJIAN.get());
-            output.accept(ModItems.JIN_HULU_YUJIAN.get());
             output.accept(ModItems.BLACK_IRON_GREATSWORD_YUJIAN.get());
             output.accept(ModItems.MOON_CRESCENT_HALBERD_YUJIAN.get());
             output.accept(ModItems.SPIRIT_SILK_WHIP_YUJIAN.get());
@@ -228,7 +228,6 @@ public class ModTabs {
             output.accept((ItemLike)ModItems.BLINDFOLD2.get());
             output.accept((ItemLike)ModItems.STRAW_HAT.get());
             output.accept((ItemLike)ModItems.NOOB_HAT.get());
-            output.accept(ModItems.JIN_HULU.get());
             output.accept((ItemLike)ModItems.JADE_PENDANT.get());
             output.accept((ItemLike)ModItems.DAOFU_CHESTPLATE.get());
             output.accept((ItemLike)ModItems.NEIJIA_CHESTPLATE.get());
@@ -259,6 +258,7 @@ public class ModTabs {
             output.accept(ModItems.PRECISE_FORTUNE_MIRROR.get());
             output.accept(ModItems.FORTUNE_GUARD_COIN.get());
             output.accept(com.example.immortal_cultivation_mod.block.ModBlocks.FORTUNE_LAMP.get());
+            output.accept(ModBlocks.SEALED_CRADLE_BOTTLE.get());
             output.accept(ModItems.PURIFIED_TRIBULATION_DOLL.get());
             output.accept(ModItems.TRIBULATION_DOLL_YUJIAN.get());
             output.accept(ModItems.FORTUNE_MIRROR_YUJIAN.get());
@@ -404,7 +404,6 @@ public class ModTabs {
             output.accept((ItemLike)com.example.immortal_cultivation_mod.magicritual.block.ModBlocks.SPIRIT_ORE.get());
             output.accept((ItemLike)com.example.immortal_cultivation_mod.magicritual.block.ModBlocks.MAGIC_CENTER_BLOCK.get());
             output.accept((ItemLike)com.example.immortal_cultivation_mod.magicritual.block.ModBlocks.MAGIC_CIRCLE_BLOCK.get());
-            output.accept((ItemLike)ModBlocks.SPRUCE_PLANK_PANEL.get());
             output.accept((ItemLike)ModBlocks.OAK_PLANK_WALL.get());
             output.accept((ItemLike)ModBlocks.SPRUCE_PLANK_WALL.get());
             output.accept((ItemLike)ModBlocks.BIRCH_PLANK_WALL.get());
@@ -458,13 +457,14 @@ public class ModTabs {
             output.accept((ItemLike)ModItems.JINDAN_CULTIVATOR_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.FANREN_NPC_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.HOTEL_NPC_SPAWN_EGG.get());
+            output.accept((ItemLike)ModItems.RECIPE_MERCHANT_SPAWN_EGG.get());
+            output.accept((ItemLike)ModItems.SPELL_MERCHANT_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.CRIMSON_SCALE_FLAME_LIZARD_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.CRIMSON_SKY_FLAME_FLOOD_DRAGON_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.BLOOD_APE_DEMON_GENERAL_SPAWN_EGG.get());
             output.accept(ModItems.XUANJIN_SEAL.get());
             output.accept(ModItems.XUANJIN_ZHENG_SPAWN_EGG.get());
-            output.accept((ItemLike)ModItems.ZHUJI_VAULT_GUARDIAN_SPAWN_EGG.get());
-            output.accept((ItemLike)ModItems.JINDAN_VAULT_GUARDIAN_SPAWN_EGG.get());
+            output.accept((ItemLike)ModItems.VAULT_GUARDIAN_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.AZURE_SPIRIT_SILKWORM_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.KONGMING_BEETLE_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.THUNDERHORN_ROCK_BADGER_SPAWN_EGG.get());
@@ -474,8 +474,6 @@ public class ModTabs {
             output.accept((ItemLike)ModItems.WIND_FEATHER_CLIFF_DEER_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.INK_ARMORED_STONE_DEVOURING_TORTOISE_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.EMBER_FEATHER_FIRE_OWL_SPAWN_EGG.get());
-            output.accept((ItemLike)ModItems.ZHUJI_PHANTOM_VEIL_FOX_SPAWN_EGG.get());
-            output.accept((ItemLike)ModItems.JINDAN_PHANTOM_VEIL_FOX_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.PHANTOM_VEIL_FOX_SPAWN_EGG.get());
          }).build());
    }

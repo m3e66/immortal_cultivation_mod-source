@@ -1,6 +1,5 @@
 package com.example.immortal_cultivation_mod.combat;
 
-import com.example.immortal_cultivation_mod.config.BlockBreakingSettings;
 
 import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
@@ -15,7 +14,6 @@ import com.example.immortal_cultivation_mod.spell.ModSpells;
 import com.example.immortal_cultivation_mod.network.CombatFeedbackPayloads;
 import com.example.immortal_cultivation_mod.network.CombatFeedbackPayloads.Effect;
 import com.example.immortal_cultivation_mod.network.CombatFeedbackPayloads.Kind;
-import com.example.immortal_cultivation_mod.spell.SpellDestruction;
 import java.util.Map;
 import java.util.WeakHashMap;
 import net.minecraft.core.BlockPos;
@@ -149,7 +147,7 @@ public final class CombatFeedbackEvents {
         if (target instanceof ServerPlayer player) {
             var data = ModAttachments.getData(player);
             if (CultivationLevels.isMortal(data.cultivationLevel())) return false;
-            long maximum = Math.max(1L, (long) CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
+            long maximum = Math.max(1L, (long) data.maxQi());
             return maximum > 1 && data.qi() < maximum * .15;
         }
         if (target instanceof CultivationNpc npc && !CultivationLevels.isMortal(npc.npcRealm())) {
@@ -209,6 +207,7 @@ public final class CombatFeedbackEvents {
     /** Call only after a dash ability succeeds, never from ordinary speed or walking detection. */
     public static void dashStarted(LivingEntity entity, Vec3 direction, float intensity, int maximumTicks) {
         if (!(entity.level() instanceof ServerLevel level) || direction.lengthSqr() < .0001) return;
+        com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.dodged(entity);
         State state = state(entity);
         if (state.previous == null) {
             state.previous = entity.position(); state.dimension = level.dimension().location();
@@ -238,6 +237,7 @@ public final class CombatFeedbackEvents {
 
     private static void dashTravel(LivingEntity entity, Vec3 start, Vec3 end, float intensity, int flags) {
         if (start.distanceToSqr(end) < .16 || !(entity.level() instanceof ServerLevel)) return;
+        com.example.immortal_cultivation_mod.attachment.BodyTypeEffects.dodged(entity);
         Vec3 direction = end.subtract(start).normalize();
         send(entity, Kind.DASH_START, start, direction, intensity, flags);
         send(entity, Kind.DASH_STOP, end, direction, intensity, flags);
@@ -277,8 +277,9 @@ public final class CombatFeedbackEvents {
             } else if (!state.onGround) {
                 float intensity = CombatFeedbackProfile.landingIntensity(state.peakY - position.y,
                         state.downwardSpeed, state.airTicks);
-                if (intensity > 0 && send(entity, Kind.LANDING, position, new Vec3(0, -1, 0), intensity, 0)
-                        && CombatFeedbackProfile.heavy(intensity)) landingCrater(entity, position, intensity);
+                // Gravity is not an attack. Keep landing feedback visual for players, NPCs and
+                // beasts alike; removing their support here can drop them into another fall.
+                if (intensity > 0) send(entity, Kind.LANDING, position, new Vec3(0, -1, 0), intensity, 0);
                 state.airTicks = 0; state.downwardSpeed = 0; state.peakY = position.y;
             }
             if (state.dash && (now >= state.dashUntil || entity.horizontalCollision
@@ -287,30 +288,6 @@ public final class CombatFeedbackEvents {
         state.onGround = entity.onGround(); state.previous = position;
         state.previousStep = discontinuity || skip ? Vec3.ZERO : step;
         state.dimension = level.dimension().location();
-    }
-
-    /** Small irregular topsoil crater; all guardian, ruin, claim and mob-griefing checks stay authoritative. */
-    public static int landingCrater(LivingEntity entity, Vec3 center, float intensity) {
-        // Player landings are visual only, regardless of fall speed or impact intensity.
-        if (entity instanceof net.minecraft.world.entity.player.Player) return 0;
-        if (!BlockBreakingSettings.enabled(entity,
-                BlockBreakingSettings.Category.COMPANIONS)) return 0;
-        if (!(entity.level() instanceof ServerLevel level) || !CombatFeedbackProfile.heavy(intensity)) return 0;
-        int removed = 0;
-        BlockPos floor = BlockPos.containing(center.x, center.y - .15, center.z);
-        double radius = 1.1 + intensity * 1.45;
-        for (int x = -2; x <= 2; x++) for (int z = -2; z <= 2; z++) {
-            BlockPos pos = floor.offset(x, 0, z);
-            double irregular = .82 + ((Mth.getSeed(pos) >>> 4) & 255) / 255.0 * .36;
-            if (x * x + z * z > radius * radius * irregular || removed >= 18) continue;
-            var block = level.getBlockState(pos);
-            if (block.getDestroySpeed(level, pos) < 0 || block.getDestroySpeed(level, pos) > 3
-                    || block.hasBlockEntity() || !block.getFluidState().isEmpty()) continue;
-            if (BlockBreakingSettings.withSource(
-                    BlockBreakingSettings.Category.COMPANIONS, entity,
-                    () -> SpellDestruction.breakBlock(level, pos, false, entity))) removed++;
-        }
-        return removed;
     }
 
     static boolean send(LivingEntity entity, Kind kind, Vec3 position, Vec3 direction, float intensity, int flags) {

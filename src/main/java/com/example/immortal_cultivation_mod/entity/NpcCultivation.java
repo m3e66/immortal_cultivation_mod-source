@@ -99,7 +99,8 @@ public final class NpcCultivation {
         }
         if (profile.getLong("CultivationProgress") >= goal
                 && profile.getInt("Qi") >= profile.getInt("MaxQi") * .9
-                && mob.getHealth() >= mob.getMaxHealth() * .8F) {
+                && mob.getHealth() >= mob.getMaxHealth() * .8F
+                && (!CultivationLevels.needsBreakthroughPill(realm) || NpcProfile.hasBreakthroughPill(mob))) {
             training.putString("AttemptRealm", realm);
             profile.putInt("Qi", Math.max(0, profile.getInt("Qi") - Math.max(1, profile.getInt("MaxQi") / 5)));
             setState(npc, training, BREAKTHROUGH, CHANNEL_TICKS);
@@ -115,6 +116,12 @@ public final class NpcCultivation {
 
     private static void finish(PathfinderMob mob, CultivationNpc npc, CompoundTag profile,
                                CompoundTag training, String realm, long goal) {
+        // Consume from the same inventory used by gifts, trading and loot. Recheck at
+        // resolution so removing the pill during a saved channel cannot grant a free promotion.
+        if (CultivationLevels.needsBreakthroughPill(realm) && !NpcProfile.consumeBreakthroughPill(mob)) {
+            interrupt(mob, "missing_pill");
+            return;
+        }
         int luck = LuckSystem.luck(mob);
         double chance = 1.0 - CultivationLevels.getBreakthroughFailChance(luck, realm);
         double draw = mob.getRandom().nextDouble();

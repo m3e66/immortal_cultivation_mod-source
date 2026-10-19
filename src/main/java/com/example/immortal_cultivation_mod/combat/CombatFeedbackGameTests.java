@@ -2,12 +2,9 @@ package com.example.immortal_cultivation_mod.combat;
 
 import com.example.immortal_cultivation_mod.network.CombatFeedbackPayloads;
 import com.example.immortal_cultivation_mod.network.CombatFeedbackPayloads.Kind;
-import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.damagesource.DamageContainer;
 import net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent;
@@ -171,34 +168,9 @@ public final class CombatFeedbackGameTests {
         });
     }
 
-    @GameTest(template = "npc_combat_arena")
-    public static void landingCraterHonorsWorldRulesAndProtectedMaterials(GameTestHelper h) {
-        var pig = EntityType.PIG.create(h.getLevel());
-        BlockPos center = h.absolutePos(new BlockPos(10, 5, 10));
-        Vec3 feet = Vec3.atBottomCenterOf(center.above()); pig.setPos(feet);
-        for (int x = -2; x <= 2; x++) for (int z = -2; z <= 2; z++)
-            h.getLevel().setBlockAndUpdate(center.offset(x, 0, z), Blocks.DIRT.defaultBlockState());
-        h.getLevel().setBlockAndUpdate(center, Blocks.BEDROCK.defaultBlockState());
-        h.getLevel().setBlockAndUpdate(center.east(), Blocks.CHEST.defaultBlockState());
-        var rule = h.getLevel().getGameRules().getRule(GameRules.RULE_MOBGRIEFING);
-        boolean previous = rule.get();
-        try {
-            rule.set(false, h.getLevel().getServer());
-            h.assertTrue(CombatFeedbackEvents.landingCrater(pig, feet, .9F) == 0, "Mob griefing disables all landing destruction");
-            rule.set(true, h.getLevel().getServer());
-            var player = new net.neoforged.neoforge.common.util.FakePlayer(h.getLevel(),
-                    new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "landing-test"));
-            player.setPos(feet);
-            h.assertTrue(CombatFeedbackEvents.landingCrater(player, feet, 1F) == 0
-                    && h.getLevel().getBlockState(center.west()).is(Blocks.DIRT),
-                    "Even the strongest player landing leaves terrain intact");
-            player.discard();
-            h.assertTrue(CombatFeedbackEvents.landingCrater(pig, feet, .2F) == 0, "Ordinary landings remain visual only");
-            int broken = CombatFeedbackEvents.landingCrater(pig, feet, .9F);
-            h.assertTrue(broken > 0 && broken <= 18, "Heavy landing produces only small bounded irregular crater");
-            h.assertTrue(h.getLevel().getBlockState(center).is(Blocks.BEDROCK)
-                    && h.getLevel().getBlockState(center.east()).is(Blocks.CHEST), "Unbreakable blocks and stored inventory survive");
-        } finally { rule.set(previous, h.getLevel().getServer()); pig.discard(); }
-        h.succeed();
+    @GameTest(template = "npc_combat_arena", timeoutTicks = 70)
+    public static void fallingPlayerKeepsItsLandingGround(GameTestHelper h) {
+        MovementTerrainGameTests.checkFall(h, new net.neoforged.neoforge.common.util.FakePlayer(h.getLevel(),
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "landing-test")));
     }
 }

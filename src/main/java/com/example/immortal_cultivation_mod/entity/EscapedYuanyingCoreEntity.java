@@ -8,6 +8,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
@@ -20,12 +21,32 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-/** The vulnerable Yuanying that escapes when the dragon's body dies. */
+/** The vulnerable beast spirit carries the dragon's rewards until defeated or captured. */
 public final class EscapedYuanyingCoreEntity extends PathfinderMob {
+    @Override public void die(DamageSource source) {
+        if (dead || isRemoved() || resolved) return;
+        if (!ownsEscape()) { discard(); return; }
+        super.die(source);
+        if (dead) resolveEscape();
+    }
+
+    private static final net.minecraft.network.syncher.EntityDataAccessor<Integer> CORE_REALM =
+            net.minecraft.network.syncher.SynchedEntityData.defineId(EscapedYuanyingCoreEntity.class,
+                    net.minecraft.network.syncher.EntityDataSerializers.INT);
+
+    @Override protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(CORE_REALM, 4);
+    }
+    public int coreRealm() { return entityData.get(CORE_REALM); }
+    @Override public net.minecraft.network.chat.Component getName() {
+        return BeastRealms.prefix(coreRealm(), super.getName());
+    }
     public static final int ESCAPE_TICKS = 20 * 10;
     public static final float CORE_HEALTH = 18_000.0F * 0.20F;
 
     private int revivalTicks = ESCAPE_TICKS;
+    private boolean resolved;
     private java.util.UUID originalDragon;
 
     public java.util.UUID originalDragon() { return originalDragon; }
@@ -46,7 +67,9 @@ public final class EscapedYuanyingCoreEntity extends PathfinderMob {
             ServerLevel level, CrimsonSkyFlameFloodDragonEntity dragon) {
         this(ModEntities.ESCAPED_YUANYING_CORE.get(), level);
         setPos(dragon.getX(), dragon.getY() + dragon.getBbHeight() * 0.7D, dragon.getZ());
-        setHealth(CORE_HEALTH);
+        entityData.set(CORE_REALM, dragon.beastRealm());
+        getAttribute(Attributes.MAX_HEALTH).setBaseValue(dragon.getMaxHealth() * .2);
+        setHealth(getMaxHealth());
         originalDragon = dragon.getUUID();
         revivalX = dragon.getX();
         revivalY = dragon.getY();
@@ -70,6 +93,8 @@ public final class EscapedYuanyingCoreEntity extends PathfinderMob {
 
     @Override
     public void tick() {
+        if (isRemoved()) return;
+        if (!level().isClientSide && (resolved || !ownsEscape())) { discard(); return; }
         super.tick();
         setNoGravity(true);
         if (level().isClientSide || !isAlive()) {
@@ -115,14 +140,34 @@ public final class EscapedYuanyingCoreEntity extends PathfinderMob {
     }
 
     private void reviveDragon(ServerLevel level) {
+        if (resolved || isRemoved() || !ownsEscape()) { discard(); return; }
+        var original = originalDragon == null ? null : level.getEntity(originalDragon);
+        if (original != null) {
+            if (original.isAlive()) {
+                // Never create another body beside a surviving/recovered original.
+                resolveEscape();
+                discard();
+            } else revivalTicks = 20; // Allow the original corpse to finish its death animation.
+            return;
+        }
         CrimsonSkyFlameFloodDragonEntity dragon =
                 ModEntities.CRIMSON_SKY_FLAME_FLOOD_DRAGON.get().create(level);
         if (dragon != null) {
+            if (originalDragon != null) dragon.setUUID(originalDragon);
             dragon.moveTo(revivalX, revivalY, revivalZ, revivalYaw, 0.0F);
+            dragon.setBeastRealm(coreRealm());
             dragon.setHealth(dragon.getMaxHealth() * 0.20F);
             dragon.markRevivedFromCore();
             dragon.setTarget(level.getNearestPlayer(dragon, 48.0D));
-            level.addFreshEntity(dragon);
+            // Claim before spawning, so callbacks and duplicate saved spirits cannot revive twice.
+            var ownership = DragonSpiritData.get(level);
+            if (!ownership.finish(escapeSource(), getUUID())) { discard(); return; }
+            if (!level.addFreshEntity(dragon)) {
+                ownership.begin(escapeSource(), getUUID());
+                revivalTicks = 20;
+                return;
+            }
+            resolved = true;
             level.sendParticles(ParticleTypes.EXPLOSION_EMITTER,
                     revivalX, revivalY + 1.0D, revivalZ,
                     2, 0.0D, 0.0D, 0.0D, 0.0D);
@@ -135,8 +180,23 @@ public final class EscapedYuanyingCoreEntity extends PathfinderMob {
         discard();
     }
 
+    private java.util.UUID escapeSource() { return originalDragon == null ? getUUID() : originalDragon; }
+
+    private boolean ownsEscape() {
+        return !(level() instanceof ServerLevel serverLevel)
+                || DragonSpiritData.get(serverLevel).owns(escapeSource(), getUUID());
+    }
+
+    private void resolveEscape() {
+        resolved = true;
+        if (level() instanceof ServerLevel serverLevel)
+            DragonSpiritData.get(serverLevel).finish(escapeSource(), getUUID());
+    }
+
     @Override
     protected InteractionResult mobInteract(Player player, InteractionHand hand) {
+        if (!isAlive() || isRemoved() || resolved) return InteractionResult.PASS;
+        if (!ownsEscape()) { discard(); return InteractionResult.PASS; }
         ItemStack held = player.getItemInHand(hand);
         boolean glassBottle = held.is(Items.GLASS_BOTTLE);
         boolean storageCrystal = held.is(
@@ -148,13 +208,25 @@ public final class EscapedYuanyingCoreEntity extends PathfinderMob {
             return InteractionResult.SUCCESS;
         }
 
-        if (!player.getAbilities().instabuild) {
-            held.shrink(1);
+        var drops = new java.util.ArrayList<net.minecraft.world.entity.item.ItemEntity>();
+        captureDrops(drops);
+        try {
+            lastHurtByPlayer = player;
+            if (level().getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBLOOT))
+                dropFromLootTable(damageSources().playerAttack(player), true);
+            else spawnAtLocation(BeastRealmEvents.realmDrop(new ItemStack(ModItems.YUANYING_YAODAN.get()), coreRealm()));
+        } finally { captureDrops(null); }
+        if (net.neoforged.neoforge.common.CommonHooks.onLivingDrops(this,
+                damageSources().playerAttack(player), drops, true)) return InteractionResult.FAIL;
+        resolveEscape();
+        if (!player.getAbilities().instabuild) held.shrink(1);
+        for (var drop : drops) {
+            ItemStack stack = drop.getItem();
+            if (BeastRealmEvents.isCore(stack)) {
+                if (!player.addItem(stack)) player.drop(stack, false);
+            } else level().addFreshEntity(drop);
         }
-        ItemStack captured = new ItemStack(ModItems.YUANYING_YAODAN.get());
-        if (!player.addItem(captured)) {
-            player.drop(captured, false);
-        }
+        com.example.immortal_cultivation_mod.flame.FlameAcquisition.onDragonSpiritCaptured(this);
         if (level() instanceof ServerLevel serverLevel) {
             serverLevel.sendParticles(ParticleTypes.FLAME,
                     getX(), getY() + getBbHeight() * 0.5D, getZ(),
@@ -184,6 +256,8 @@ public final class EscapedYuanyingCoreEntity extends PathfinderMob {
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putInt("RevivalTicks", revivalTicks);
+        tag.putBoolean("Resolved", resolved);
+        tag.putInt(BeastRealms.NBT_KEY, coreRealm());
         if (originalDragon != null) tag.putUUID("OriginalDragon", originalDragon);
         tag.putDouble("RevivalX", revivalX);
         tag.putDouble("RevivalY", revivalY);
@@ -194,6 +268,9 @@ public final class EscapedYuanyingCoreEntity extends PathfinderMob {
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
+        entityData.set(CORE_REALM, tag.contains(BeastRealms.NBT_KEY)
+                ? BeastRealms.clamp(ModEntities.CRIMSON_SKY_FLAME_FLOOD_DRAGON.get(), tag.getInt(BeastRealms.NBT_KEY)) : 4);
+        resolved = tag.getBoolean("Resolved") || tag.getBoolean("LootClaimed");
         revivalTicks = Math.max(1, tag.getInt("RevivalTicks"));
         originalDragon = tag.hasUUID("OriginalDragon") ? tag.getUUID("OriginalDragon") : null;
         revivalX = tag.getDouble("RevivalX");

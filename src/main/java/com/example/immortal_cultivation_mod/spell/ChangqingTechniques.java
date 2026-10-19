@@ -158,7 +158,7 @@ public final class ChangqingTechniques {
                 center.x, center.y, center.z,
                 growth ? 30 : 16, 0.55D, 0.75D, 0.55D, 0.045D);
         if (growth) {
-            level.sendParticles(ModParticles.METHOD_QI_LIGHT.get(),
+            level.sendParticles(ModParticles.METHOD_QI_YANG.get(),
                     center.x, center.y, center.z,
                     8, 0.38D, 0.60D, 0.38D, 0.025D);
         }

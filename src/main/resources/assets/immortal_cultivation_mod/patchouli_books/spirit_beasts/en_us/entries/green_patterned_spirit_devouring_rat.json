@@ -1,0 +1,23 @@
+{
+  "name": "Azure-Marked Spirit-Devouring Rat",
+  "icon": "immortal_cultivation_mod:green_patterned_spirit_devouring_rat_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Azure-Marked Spirit-Devouring Rat",
+      "text": "$(bold)Realm: $()Mortal – Foundation Establishment"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compendium Account",
+      "text": "Marked with faint azure patterns, this creature burrows beneath the earth and feeds upon scattered spiritual energy. It avoids sunlight, emerging at night or dwelling deep underground. Travelers who hear scratching beneath the soil in shadowed forests would be wise to remain alert."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where to Find",
+      "text": "In dark forests, old-growth taigas, swamps, and lush caves. Appears outdoors at night or underground where no skylight reaches, on dirt, mud, moss, or stone."
+    }
+  ]
+}

@@ -215,7 +215,7 @@ public final class OuterSystemPayloads {
 
         @SubscribeEvent
         public static void register(RegisterPayloadHandlersEvent event) {
-            var registrar = event.registrar("1");
+            var registrar = event.registrar("2");
             registrar.playToClient(
                     ClientboundSync.TYPE,
                     ClientboundSync.STREAM_CODEC,
@@ -228,6 +228,10 @@ public final class OuterSystemPayloads {
                     ClientboundOpen.TYPE,
                     ClientboundOpen.STREAM_CODEC,
                     Handler::handleOpen);
+            registrar.playToClient(ShopCatalogPayloads.CatalogPart.TYPE,
+                    ShopCatalogPayloads.CatalogPart.STREAM_CODEC, Handler::handleShopCatalog);
+            registrar.playToClient(ShopCatalogPayloads.StockUpdate.TYPE,
+                    ShopCatalogPayloads.StockUpdate.STREAM_CODEC, Handler::handleShopStock);
             registrar.playToServer(
                     ServerboundOpen.TYPE,
                     ServerboundOpen.STREAM_CODEC,
@@ -288,6 +292,16 @@ public final class OuterSystemPayloads {
                 context.enqueueWork(() ->
                         OuterSystemClient.openOrUpdate(payload.state()));
             }
+        }
+
+        private static void handleShopCatalog(ShopCatalogPayloads.CatalogPart payload, IPayloadContext context) {
+            if (FMLEnvironment.dist == Dist.CLIENT)
+                context.enqueueWork(() -> OuterSystemClient.receiveShopCatalog(payload));
+        }
+
+        private static void handleShopStock(ShopCatalogPayloads.StockUpdate payload, IPayloadContext context) {
+            if (FMLEnvironment.dist == Dist.CLIENT)
+                context.enqueueWork(() -> OuterSystemClient.receiveShopStock(payload));
         }
 
         private static void handleOpenRequest(

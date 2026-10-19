@@ -22,8 +22,6 @@ import org.joml.Vector3f;
 public final class CosmicVoidSkyRenderer {
     private static final float PI = (float) Math.PI;
     private static final float TAU = PI * 2.0F;
-    private static final int COMPATIBILITY_LATITUDE_SEGMENTS = 18;
-    private static final int COMPATIBILITY_LONGITUDE_SEGMENTS = 36;
     private static final ResourceLocation SKYBOX_TEXTURE = ResourceLocation.fromNamespaceAndPath(
             ImmortalCultivationMod.MODID, "textures/environment/cosmic_void_sky.png");
     private static final ResourceLocation STAR_GLOW = ResourceLocation.fromNamespaceAndPath(
@@ -40,7 +38,7 @@ public final class CosmicVoidSkyRenderer {
         float time = ticks + partialTick;
         Vec3 cameraPos = camera.getPosition();
 
-        beginSkyPass();
+        SkyPassState state=beginSkyPass();
         try {
             float dayTime = TimeFastForwardClientState.interpolatedTimeOfDay(
                     level.getDayTime(), partialTick);
@@ -65,7 +63,7 @@ public final class CosmicVoidSkyRenderer {
                     modelViewMatrix, time, cameraPos, 0.0F, 0.0F,
                     earthNight, dayOrbitAngle);
         } finally {
-            endSkyPass();
+            state.restore();
         }
     }
 
@@ -78,31 +76,33 @@ public final class CosmicVoidSkyRenderer {
         if (ShaderPackCompatibility.isRenderingShadowPass()) {
             return;
         }
-        beginSkyPass();
+        SkyPassState state=beginSkyPass();
         try {
             renderSkyboxWithTrails(matrix, alpha, dayOrbitAngle);
             renderNearStars(matrix, time, dayOrbitAngle, alpha * 0.72F);
         } finally {
-            endSkyPass();
+            state.restore();
         }
     }
 
-    private static void beginSkyPass() {
+    private static SkyPassState beginSkyPass() {
+        SkyPassState previous=SkyPassState.capture();
         RenderSystem.depthMask(false);
         RenderSystem.disableDepthTest();
         RenderSystem.disableCull();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
+        return previous;
     }
 
-    private static void endSkyPass() {
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.depthMask(true);
-        RenderSystem.enableDepthTest();
-        RenderSystem.enableCull();
-        RenderSystem.disableBlend();
-        RenderSystem.lineWidth(1.0F);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+    /** Restore the caller's sky pass, including pack-specific blending and samplers. */
+    record SkyPassState(WorldRenderState state) {
+        static SkyPassState capture() {
+            return new SkyPassState(WorldRenderState.capture());
+        }
+        void restore() {
+            state.restore();
+        }
     }
 
     private static void renderSkyboxWithTrails(
@@ -164,53 +164,21 @@ public final class CosmicVoidSkyRenderer {
             Matrix4f matrix, float alpha, float sampleRotation) {
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         CosmicVoidTextureFiltering.bindSkybox(0, SKYBOX_TEXTURE);
-        RenderSystem.disableCull();
+        // PANORAMA is wound inward. The far hemisphere must not overwrite the
+        // near one through a shader pack's temporal jittered projection.
+        RenderSystem.enableCull();
         BufferBuilder buffer = Tesselator.getInstance().begin(
                 VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
         float radius = 16.0F;
-        for (int latitude = 0;
-             latitude < COMPATIBILITY_LATITUDE_SEGMENTS; latitude++) {
-            float latitude0 = -PI * 0.5F
-                    + PI * latitude / COMPATIBILITY_LATITUDE_SEGMENTS;
-            float latitude1 = -PI * 0.5F
-                    + PI * (latitude + 1) / COMPATIBILITY_LATITUDE_SEGMENTS;
-            float v0 = 1.0F - latitude / (float) COMPATIBILITY_LATITUDE_SEGMENTS;
-            float v1 = 1.0F
-                    - (latitude + 1) / (float) COMPATIBILITY_LATITUDE_SEGMENTS;
-            for (int longitude = 0;
-                 longitude < COMPATIBILITY_LONGITUDE_SEGMENTS; longitude++) {
-                float baseLongitude0 = -PI
-                        + TAU * longitude / COMPATIBILITY_LONGITUDE_SEGMENTS;
-                float baseLongitude1 = -PI
-                        + TAU * (longitude + 1) / COMPATIBILITY_LONGITUDE_SEGMENTS;
-                float longitude0 = baseLongitude0 - sampleRotation;
-                float longitude1 = baseLongitude1 - sampleRotation;
-                float u0 = longitude / (float) COMPATIBILITY_LONGITUDE_SEGMENTS;
-                float u1 = (longitude + 1)
-                        / (float) COMPATIBILITY_LONGITUDE_SEGMENTS;
-                addPanoramaVertex(buffer, matrix, radius, latitude0, longitude0,
-                        u0, v0, alpha);
-                addPanoramaVertex(buffer, matrix, radius, latitude0, longitude1,
-                        u1, v0, alpha);
-                addPanoramaVertex(buffer, matrix, radius, latitude1, longitude1,
-                        u1, v1, alpha);
-                addPanoramaVertex(buffer, matrix, radius, latitude1, longitude0,
-                        u0, v1, alpha);
-            }
+        Matrix4f rotated = new Matrix4f(matrix).rotateY(sampleRotation);
+        float[] mesh = CosmicSkyMeshes.PANORAMA;
+        for (int vertex = 0; vertex < mesh.length; vertex += 5) {
+            buffer.addVertex(rotated, mesh[vertex] * radius, mesh[vertex + 1] * radius, mesh[vertex + 2] * radius)
+                    .setUv(mesh[vertex + 3], mesh[vertex + 4])
+                    .setColor(1.0F, 1.0F, 1.0F, alpha);
         }
         BufferUploader.drawWithShader(buffer.buildOrThrow());
-    }
-
-    private static void addPanoramaVertex(
-            BufferBuilder buffer, Matrix4f matrix, float radius,
-            float latitude, float longitude, float u, float v, float alpha) {
-        float horizontal = (float) Math.cos(latitude);
-        float x = horizontal * (float) Math.cos(longitude);
-        float y = (float) Math.sin(latitude);
-        float z = horizontal * (float) Math.sin(longitude);
-        buffer.addVertex(matrix, x * radius, y * radius, z * radius)
-                .setUv(u, v)
-                .setColor(1.0F, 1.0F, 1.0F, alpha);
+        RenderSystem.disableCull();
     }
 
     private static void addSkyboxFace(BufferBuilder buffer, Matrix4f matrix, float radius,
@@ -232,7 +200,7 @@ public final class CosmicVoidSkyRenderer {
     private static void addSkyboxVertex(BufferBuilder buffer, Matrix4f matrix, float radius,
                                         float alpha, float sampleRotation, float trailSpan,
                                         float x, float y, float z) {
-        buffer.addVertex(matrix, x * radius, y * radius, z * radius)
+        VfxVertexWriter.vertex(buffer, matrix, x * radius, y * radius, z * radius)
                 // Constant per-face values carry rotation and motion-blur distance.
                 .setUv(sampleRotation, trailSpan)
                 // Keep projection direction fixed; the shader scrolls only longitude.
@@ -310,22 +278,16 @@ public final class CosmicVoidSkyRenderer {
     private static void addBillboard(BufferBuilder buffer, Matrix4f matrix,
                                      Vector3f center, Vector3f right, Vector3f up,
                                      float size, float red, float green, float blue, float alpha) {
-        Vector3f lowerLeft = new Vector3f(center).sub(new Vector3f(right).mul(size))
-                .sub(new Vector3f(up).mul(size));
-        Vector3f lowerRight = new Vector3f(center).add(new Vector3f(right).mul(size))
-                .sub(new Vector3f(up).mul(size));
-        Vector3f upperRight = new Vector3f(center).add(new Vector3f(right).mul(size))
-                .add(new Vector3f(up).mul(size));
-        Vector3f upperLeft = new Vector3f(center).sub(new Vector3f(right).mul(size))
-                .add(new Vector3f(up).mul(size));
-        buffer.addVertex(matrix, lowerLeft.x, lowerLeft.y, lowerLeft.z)
-                .setUv(0.0F, 1.0F).setColor(red, green, blue, alpha);
-        buffer.addVertex(matrix, lowerRight.x, lowerRight.y, lowerRight.z)
-                .setUv(1.0F, 1.0F).setColor(red, green, blue, alpha);
-        buffer.addVertex(matrix, upperRight.x, upperRight.y, upperRight.z)
-                .setUv(1.0F, 0.0F).setColor(red, green, blue, alpha);
-        buffer.addVertex(matrix, upperLeft.x, upperLeft.y, upperLeft.z)
-                .setUv(0.0F, 0.0F).setColor(red, green, blue, alpha);
+        float rx = right.x * size, ry = right.y * size, rz = right.z * size;
+        float ux = up.x * size, uy = up.y * size, uz = up.z * size;
+        VfxVertexWriter.vertex(buffer, matrix, center.x - rx - ux, center.y - ry - uy, center.z - rz - uz)
+                .setUv(0, 1).setColor(red, green, blue, alpha);
+        VfxVertexWriter.vertex(buffer, matrix, center.x + rx - ux, center.y + ry - uy, center.z + rz - uz)
+                .setUv(1, 1).setColor(red, green, blue, alpha);
+        VfxVertexWriter.vertex(buffer, matrix, center.x + rx + ux, center.y + ry + uy, center.z + rz + uz)
+                .setUv(1, 0).setColor(red, green, blue, alpha);
+        VfxVertexWriter.vertex(buffer, matrix, center.x - rx + ux, center.y - ry + uy, center.z - rz + uz)
+                .setUv(0, 0).setColor(red, green, blue, alpha);
     }
 
     private static void addTrailRibbon(
@@ -360,8 +322,8 @@ public final class CosmicVoidSkyRenderer {
                 Vector3f a = new Vector3f(center).fma(start, tangent).fma(curve0, direction);
                 Vector3f b = new Vector3f(center).fma(end, tangent).fma(curve1, direction);
                 float alpha = 0.075F + (current % 4) * 0.012F;
-                buffer.addVertex(matrix, a.x, a.y, a.z).setColor(0.45F, 0.58F, 0.82F, alpha);
-                buffer.addVertex(matrix, b.x, b.y, b.z).setColor(0.62F, 0.48F, 0.88F, 0.0F);
+                VfxVertexWriter.vertex(buffer, matrix, a.x, a.y, a.z).setColor(0.45F, 0.58F, 0.82F, alpha);
+                VfxVertexWriter.vertex(buffer, matrix, b.x, b.y, b.z).setColor(0.62F, 0.48F, 0.88F, 0.0F);
             }
         }
         BufferUploader.drawWithShader(buffer.buildOrThrow());

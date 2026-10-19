@@ -37,7 +37,7 @@ public class DebugWeaponEditorScreen extends AbstractContainerScreen<DebugWeapon
             int page = i;
             var label = Component.literal(i == 7 ? "[X] " : "").append(Component.translatable(
                     "screen.immortal_cultivation_mod.debug_tab_" + DebugStatEditorScreen.TAB_KEYS[i]));
-            button(10 + i * 37, 30, 36, 18, label, b -> {
+            button(10 + i * DebugStatEditorScreen.TAB_STEP, 30, DebugStatEditorScreen.TAB_STEP - 1, 18, label, b -> {
                 if (page != 7) send(3, page, 0);
             });
         }

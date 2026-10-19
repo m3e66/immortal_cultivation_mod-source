@@ -14,7 +14,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
@@ -58,28 +57,16 @@ public final class FlameTerrainDestruction {
                 ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER, SoundEvents.GENERIC_EXPLODE);
         var columns = new Columns(radius);
         var batch = new ArrayList<Candidate>(BATCH_SIZE);
-        var lining = new ArrayList<Candidate>();
         BlockPos origin = BlockPos.containing(center);
-        double radiusSquared = radius * radius;
+        long seed = FlameCraterShape.seed(shot.getUUID());
         while (columns.hasNext()) {
             BlockPos column = columns.next(origin);
-            double x = column.getX() + .5 - center.x, z = column.getZ() + .5 - center.z;
-            double remaining = radiusSquared - x * x - z * z;
-            if (remaining < 0 || !level.hasChunkAt(column) || !level.getWorldBorder().isWithinBounds(column)) continue;
-            double reach = Math.sqrt(remaining);
+            double reach = FlameCraterShape.reach(center, column, radius, seed);
+            if (!Double.isFinite(reach) || !level.hasChunkAt(column) || !level.getWorldBorder().isWithinBounds(column)) continue;
             int floor = Math.max(level.getMinBuildHeight(), (int) Math.ceil(center.y - reach - .5));
             int top = Math.min(level.getMaxBuildHeight() - 1, (int) Math.floor(center.y + reach - .5));
             // WORLD_SURFACE includes liquids, unlike ocean-floor heightmaps.
             top = Math.min(top, level.getHeight(Heightmap.Types.WORLD_SURFACE, column.getX(), column.getZ()) - 1);
-            // Keep the crater empty; only recolor its surviving solid floor, one block below the cut.
-            if (floor > level.getMinBuildHeight()) {
-                BlockPos ground = new BlockPos(column.getX(), floor - 1, column.getZ());
-                BlockState surface = level.getBlockState(ground);
-                if (!surface.isAir() && surface.getFluidState().isEmpty() && !surface.hasBlockEntity()
-                        && surface.getDestroySpeed(level, ground) >= 0) {
-                    lining.add(new Candidate(ground, surface));
-                }
-            }
             for (int y = top; y >= floor; y--) {
                 BlockPos pos = new BlockPos(column.getX(), y, column.getZ());
                 BlockState state = level.getBlockState(pos);
@@ -90,49 +77,6 @@ public final class FlameTerrainDestruction {
             }
         }
         eraseBatch(level, owner, explosion, batch);
-        for (int start = 0; start < lining.size(); start += BATCH_SIZE) {
-            transformFloor(level, owner, explosion, shot.kind(),
-                    lining.subList(start, Math.min(lining.size(), start + BATCH_SIZE)));
-        }
-    }
-
-    /** Stable mixed palettes avoid a flat sheet of identical blocks or valuable ore generation. */
-    static BlockState aftermath(FlameKind kind, BlockPos pos) {
-        int pattern = Math.floorMod(pos.getX() * 73428767 ^ pos.getZ() * 912931 ^ pos.getY() * 193, 16);
-        return (switch (kind) {
-            case CRIMSON -> pattern == 0 ? Blocks.LAVA : pattern < 10 ? Blocks.MAGMA_BLOCK : Blocks.BLACKSTONE;
-            case EARTH -> pattern < 2 ? Blocks.LAVA : pattern < 8 ? Blocks.MAGMA_BLOCK : Blocks.BASALT;
-            case WOOD -> pattern < 10 ? Blocks.MOSS_BLOCK : Blocks.ROOTED_DIRT;
-            case SOLAR -> pattern < 10 ? Blocks.CALCITE : Blocks.YELLOW_TERRACOTTA;
-            case NETHER -> pattern < 10 ? Blocks.SOUL_SOIL : Blocks.CRYING_OBSIDIAN;
-            case THUNDER -> pattern < 10 ? Blocks.OBSIDIAN : Blocks.TINTED_GLASS;
-            case DRAGON -> pattern < 2 ? Blocks.LAVA : pattern < 11 ? Blocks.MAGMA_BLOCK : Blocks.POLISHED_BASALT;
-            case HEAVENLY -> pattern < 5 ? Blocks.AMETHYST_BLOCK : Blocks.CALCITE;
-            default -> Blocks.BLACKSTONE;
-        }).defaultBlockState();
-    }
-
-    private static void transformFloor(ServerLevel level, ServerPlayer owner, Explosion explosion,
-            FlameKind kind, List<Candidate> batch) {
-        var affected = explosion.getToBlow();
-        affected.clear();
-        batch.forEach(candidate -> affected.add(candidate.pos));
-        NeoForge.EVENT_BUS.post(new ExplosionEvent.Detonate(level, explosion, new ArrayList<>()));
-        var permitted = new HashSet<>(affected);
-        for (var candidate : batch) {
-            if (!permitted.contains(candidate.pos) || !level.hasChunkAt(candidate.pos)
-                    || !level.getBlockState(candidate.pos.above()).isAir()
-                    || level.getBlockState(candidate.pos) != candidate.expected
-                    || !level.mayInteract(owner, candidate.pos)) continue;
-            BlockBreakingSettings.runWithSource(BlockBreakingSettings.Category.FLAME_VESSELS, owner, () -> {
-                // Use the same break-event and claim checks as the crater; a denied floor stays intact.
-                if (SpellDestruction.eraseImpactBlockNow(level, candidate.pos, owner)
-                        && level.getBlockState(candidate.pos).isAir()) {
-                    level.setBlock(candidate.pos, aftermath(kind, candidate.pos), 3);
-                }
-            });
-        }
-        affected.clear();
     }
 
     private static void eraseBatch(ServerLevel level, ServerPlayer owner, Explosion explosion, List<Candidate> batch) {

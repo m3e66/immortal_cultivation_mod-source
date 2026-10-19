@@ -1,0 +1,18 @@
+{
+  "name": "自由配药",
+  "icon": "immortal_cultivation_mod:qi_recovery_pill",
+  "category": "immortal_cultivation_mod:volume_7",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "丹方为纲，药性为变。炼丹之时，除丹方所需主药外，亦可酌情添入辅药，以求药力变化。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "然药材相生则利，相克则害。配伍得当，可改变丹力强弱、药效长短及丹性稳定；若阴阳相悖、药性冲突，则一炉灵草亦可能尽化灰烬。"
+    }
+  ]
+}

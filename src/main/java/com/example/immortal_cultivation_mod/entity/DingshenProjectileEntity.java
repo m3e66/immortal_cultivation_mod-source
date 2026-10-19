@@ -76,7 +76,7 @@ public class DingshenProjectileEntity extends ThrowableItemProjectile {
 
     @Override
     protected boolean canHitEntity(Entity entity) {
-        return NpcProfile.canNpcEffectHit(this, getOwner(), entity) && super.canHitEntity(entity);
+        return super.canHitEntity(entity) && NpcProfile.canNpcEffectHit(this, getOwner(), entity);
     }
 
     @Override

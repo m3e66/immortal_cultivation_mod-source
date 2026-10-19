@@ -1,0 +1,28 @@
+{
+  "name": "千年灵木心",
+  "icon": "immortal_cultivation_mod:qiannian_lingmu_heart",
+  "category": "immortal_cultivation_mod:volume_5",
+  "sortnum": 15,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "千年灵木心",
+      "text": "$(bold)生成尝试频率：$()1/24"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《百草录》记载",
+      "text": "千年灵木心，乃古木岁月精华凝聚之物。传闻灵木历经漫长岁月，吸纳四时地气，精华渐汇于木心。其质坚而不枯，灵韵深沉，非寻常新木可比。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《百草录》记载",
+      "text": "欲寻此物，当入古林深处，察参天巨木与悠久地脉之所在。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "寻木",
+      "text": "古老松林、古老云杉林、古老白桦林、暗林及丛林。"
+    }
+  ]
+}

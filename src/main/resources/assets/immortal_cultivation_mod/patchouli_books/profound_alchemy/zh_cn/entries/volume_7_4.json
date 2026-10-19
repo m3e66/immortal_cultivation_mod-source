@@ -1,0 +1,18 @@
+{
+  "name": "丹药相克",
+  "icon": "immortal_cultivation_mod:qi_recovery_pill",
+  "category": "immortal_cultivation_mod:volume_7",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "炼丹最忌药性紊乱。凡药材互不相容，或冲突之气过盛，药性难以凝聚；丹性不稳、浊毒积深者，亦不可强行结丹。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "若强求成丹，往往药液崩散，满炉化灰。纵使勉强成丹，残余丹毒亦可能侵害服丹之人。"
+    }
+  ]
+}

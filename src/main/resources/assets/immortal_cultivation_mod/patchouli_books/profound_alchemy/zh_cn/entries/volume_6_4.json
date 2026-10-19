@@ -1,0 +1,18 @@
+{
+  "name": "血气丹",
+  "icon": "immortal_cultivation_mod:blood_qi_pill",
+  "category": "immortal_cultivation_mod:volume_6",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "《丹经》记载",
+      "text": "血气丹可令气血凝于体表，化作一层护身血气。此气不直接补益肉身，而是代为抵挡伤害。多枚丹药之护持可相互累积，适合险境之前预作准备。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "丹效",
+      "text": "获得相当于最大气血百分之五的护盾，可叠加。"
+    }
+  ]
+}

@@ -35,6 +35,10 @@ public class ModAttachments {
         ATTACHMENTS.register(bus);
     }
 
+    public static final Supplier<AttachmentType<net.minecraft.nbt.CompoundTag>> PILL_TOXICITY = ATTACHMENTS.register(
+            "pill_toxicity", () -> AttachmentType.builder(() -> new net.minecraft.nbt.CompoundTag())
+                    .serialize(net.minecraft.nbt.CompoundTag.CODEC).build());
+
     public static CultivationData getData(net.minecraft.world.entity.player.Player player) {
         return player.getData(CULTIVATION_DATA);
     }
@@ -45,6 +49,9 @@ public class ModAttachments {
             return;
         }
         player.setData(CULTIVATION_DATA, data);
+        if(player instanceof ServerPlayer serverPlayer && serverPlayer.connection!=null
+                && (!previous.cultivationLevel().equals(data.cultivationLevel()) || previous.isMeditating()!=data.isMeditating()))
+            com.example.immortal_cultivation_mod.alchemy.PillToxicity.sync(serverPlayer,true);
         if (player instanceof ServerPlayer serverPlayer && !previous.cultivationLevel().equals(data.cultivationLevel())
                 && CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi()
                         > CultivationLevels.getLevelDef(previous.cultivationLevel()).maxQi()) {
@@ -53,11 +60,15 @@ public class ModAttachments {
         }
         if (player instanceof ServerPlayer serverPlayer
                 && !previous.bodyType().equals(data.bodyType())) {
+            BodyTypeEffects.bodyChanged(serverPlayer);
             OuterSystemManager.onBodyTypeChanged(serverPlayer);
         }
-        if (player instanceof ServerPlayer serverPlayer && data.qi() < previous.qi()) {
-            MethodQiParticleEffects.emit(
-                    serverPlayer, previous.activeCultivationMethod(), previous.qi() - data.qi());
+        if (player instanceof ServerPlayer serverPlayer) {
+            int qiSpent = Math.max(0, previous.qi() - data.qi());
+            int bloodSpent = CultivationMethods.isBloodDemon(previous.activeCultivationMethod())
+                    ? Math.max(0, previous.blood() - data.blood()) : 0;
+            if (qiSpent > 0 || bloodSpent > 0) MethodQiParticleEffects.emit(
+                    serverPlayer, previous.activeCultivationMethod(), (int)Math.min(Integer.MAX_VALUE, (long)qiSpent + bloodSpent));
         }
     }
 
@@ -91,6 +102,8 @@ public class ModAttachments {
     ) {
         public CultivationData {
             luck = com.example.immortal_cultivation_mod.fate.LuckRules.clamp(luck);
+            spiritRoots = SpiritRoots.migrateRootList(spiritRoots);
+            bodyType = BodyTypes.normalize(bodyType);
         }
         public static final Codec<CultivationData> CODEC = RecordCodecBuilder.create(instance ->
                 instance.group(
@@ -196,6 +209,8 @@ public class ModAttachments {
             return copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, spells, isMeditating,
                     skillPoints, maxHpBonus, maxQiBonus, maxEnergyBonus, physicalAttack, magicAttack, mentalAttack);
         }
+
+        public int maxQi() { return BodyTypeEffects.maxQi(this); }
 
         public CultivationData withBodyType(String bodyType) {
             return copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
@@ -343,7 +358,7 @@ public class ModAttachments {
                 case "max_hp" -> copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
                         skillPoints, value - levelDef.maxHp(), maxQiBonus, maxEnergyBonus, physicalAttack, magicAttack, mentalAttack);
                 case "max_qi" -> copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
-                        skillPoints, maxHpBonus, value - levelDef.maxQi(), maxEnergyBonus, physicalAttack, magicAttack, mentalAttack);
+                        skillPoints, maxHpBonus, BodyTypeEffects.baseQiForMaximum(bodyType, value) - levelDef.maxQi(), maxEnergyBonus, physicalAttack, magicAttack, mentalAttack);
                 case "max_energy" -> copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,
                         skillPoints, maxHpBonus, maxQiBonus, Math.max(0, value), physicalAttack, magicAttack, mentalAttack);
                 case "physical" -> copy(qi, cultivationLevel, luck, moral, bodyType, soul, thoughts, spiritRoots, spiritRootGrade, agePenalty, cultivationProgress, activeCultivationMethod, blood, knownSpells, isMeditating,

@@ -94,6 +94,7 @@ public class SoulEntity extends PathfinderMob {
     }
 
     public static double valueFor(LivingEntity entity) {
+        if (entity instanceof TrainingDummyEntity) return 0.0D;
         String realm;
         if (entity instanceof ServerPlayer player) {
             realm = ModAttachments.getData(player).cultivationLevel();

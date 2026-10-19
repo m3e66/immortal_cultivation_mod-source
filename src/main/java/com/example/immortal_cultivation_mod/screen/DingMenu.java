@@ -1,6 +1,9 @@
 package com.example.immortal_cultivation_mod.screen;
 
 import com.example.immortal_cultivation_mod.block.DingBlockEntity;
+import com.example.immortal_cultivation_mod.alchemy.AlchemyForgeRecipes;
+import com.example.immortal_cultivation_mod.attachment.CultivationMethods;
+import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.item.ForgingSystem;
 import com.example.immortal_cultivation_mod.item.ModItems;
 import net.minecraft.world.Container;
@@ -12,6 +15,7 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
 
 public class DingMenu extends AbstractContainerMenu {
 
@@ -166,6 +170,19 @@ public class DingMenu extends AbstractContainerMenu {
     public int lowTemp() { return data.get(5); }
     public int highTemp() { return data.get(6); }
     public int fireCost() { return data.get(7); }
+    public String craftProficiencyKey() {
+        ForgingSystem.ForgingRecipe recipe = ForgingSystem.recipe(container.getItem(DingBlockEntity.YUJIAN_SLOT));
+        return AlchemyForgeRecipes.proficiencyKey(recipe == null ? null : recipe.id());
+    }
+
+    public Component craftProficiencyLabel(ModAttachments.CultivationData stats) {
+        String proficiency = craftProficiencyKey();
+        String skill = proficiency.equals(com.example.immortal_cultivation_mod.item.FateAlchemyFormulaItem.PROFICIENCY)
+                ? "alchemy" : "forging";
+        return Component.translatable("screen.immortal_cultivation_mod.ding." + skill + "_proficiency",
+                CultivationMethods.methodProficiencyLevel(stats, proficiency),
+                stats == null ? 0 : stats.methodProficiency(proficiency));
+    }
     public int materialSlotCount() {
         int syncedCount = data.get(8);
         return syncedCount <= 0

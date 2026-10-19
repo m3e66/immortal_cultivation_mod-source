@@ -137,8 +137,7 @@ public final class SystemShop {
             "crimson_scale_flame_lizard_spawn_egg",
             "crimson_sky_flame_flood_dragon_spawn_egg",
             "blood_ape_demon_general_spawn_egg",
-            "zhuji_vault_guardian_spawn_egg",
-            "jindan_vault_guardian_spawn_egg",
+            "vault_guardian_spawn_egg",
             "azure_spirit_silkworm_spawn_egg",
             "kongming_beetle_spawn_egg",
             "thunderhorn_rock_badger_spawn_egg",
@@ -193,23 +192,10 @@ public final class SystemShop {
                 "ShopRefreshSeconds",
                 (int)Math.min(Integer.MAX_VALUE,
                         (refreshMillis + 999L) / 1000L));
-        result.put("ShopPurchases", shop.getCompound(PURCHASES).copy());
-        result.put("ShopUniqueBought",
-                shop.getList(UNIQUE_BOUGHT, Tag.TAG_STRING).copy());
         result.put("ShopRequests",
                 shop.getList(REQUESTS, Tag.TAG_COMPOUND).copy());
-        if (includeCatalog) {
-            ListTag encoded = new ListTag();
-            for (CatalogEntry entry : catalog()) {
-                CompoundTag item = new CompoundTag();
-                item.putString("Id", entry.id());
-                item.putInt("Price", entry.price());
-                item.putString("Rarity", entry.stockTier().id());
-                item.putString("Category", entry.category().id());
-                encoded.add(item);
-            }
-            result.put("ShopCatalog", encoded);
-        }
+        // Catalog and registry-sized purchase tables use bounded primitive packets.
+        // Normal updates contain only balance, refresh time and three requests.
     }
 
     public static void buy(ServerPlayer player, String itemId) {
@@ -437,6 +423,8 @@ public final class SystemShop {
         catalog();
         return catalogById;
     }
+
+    static CatalogEntry catalogEntry(String id) { return byId().get(id); }
 
     private static ListTag generateRequests(ServerPlayer player, long day) {
         List<CatalogEntry> pool = catalog().stream()

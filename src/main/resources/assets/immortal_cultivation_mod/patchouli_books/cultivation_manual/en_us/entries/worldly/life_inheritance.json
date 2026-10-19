@@ -1,0 +1,23 @@
+{
+  "name": "Inheritance of a Life",
+  "icon": "immortal_cultivation_mod:cultivation_manual",
+  "category": "immortal_cultivation_mod:worldly",
+  "sortnum": 35,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "The Past Life and the Present",
+      "text": "Cultivation, roots, spells, and possessions within a simulation belong to that person. A cultivation inheritance uses that life's earned cultivation and reward percentage; it is not a percentage of your present character's progress."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Only What Was Earned",
+      "text": "A spell inheritance must be genuinely learned by that life and satisfy its root and realm requirements. A rootless mortal cannot pass down an invented spell. Item inheritances come from the simulated inventory, not possessions the person never had."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Choose an Inheritance",
+      "text": "After natural death or Manual Settlement, inspect the eligible inheritances, select one, and claim it. Each life can be claimed once. A life without an eligible inheritance may finish without one. Manual Settlement ends that life permanently."
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "开发注记",
+  "icon": "minecraft:bedrock",
+  "category": "immortal_cultivation_mod:reference",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "开发注记",
+      "text": "当前灵石矿脉中心可能选在世界最低基岩层以下，导致部分生成尝试落空。因此实际灵脉数量可能低于表面设定的 1/4 区块尝试频率。灵脉代码中的高度选择也会覆盖配置文件中 Y 80–120 的设置。"
+    }
+  ]
+}

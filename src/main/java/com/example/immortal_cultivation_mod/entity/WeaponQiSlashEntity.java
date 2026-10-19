@@ -36,6 +36,7 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
 
     private final Set<UUID> hitEntities = new HashSet<>();
     private final Set<Long> checkedBlocks = new HashSet<>();
+    private ItemStack bindingWeapon = ItemStack.EMPTY;
     private UUID ownerUuid;
     private UUID restrictedTargetUuid;
     private Vec3 direction = new Vec3(0.0D, 0.0D, 1.0D);
@@ -62,12 +63,6 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
         super(type, level);
         setNoGravity(true);
         noPhysics = true;
-    }
-
-    /** Grow width with the released damage, while retaining each weapon's base silhouette and size limit. */
-    public static double damageScaledRadius(double baseRadius, float damage, double maximum) {
-        double strength = Float.isNaN(damage) ? 0 : Math.max(0, damage);
-        return Math.min(maximum, Math.max(.2, baseRadius) * Math.sqrt(1 + strength / 10));
     }
 
     /** Lifetime terrain capacity; actual work still shares SpellDestruction's global tick budget. */
@@ -144,10 +139,14 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
         return release(owner, slashStage, heavyCone, heavyCone);
     }
 
+    @Override public ItemStack getWeaponItem() { return bindingWeapon; }
+
     public boolean allowsTerrainBreaking() { return blockBreaking; }
 
     public static boolean release(ServerPlayer owner, int slashStage, boolean heavyCone, boolean heavyWeaponAttack) {
         ItemStack weapon = owner.getMainHandItem();
+        if (!com.example.immortal_cultivation_mod.item.WeaponBinding.checkUse(weapon, owner)) return false;
+        com.example.immortal_cultivation_mod.item.WeaponBinding.prepare(weapon);
         boolean fistWeapon = QiInfusedWeapon.isFistWeapon(weapon);
         if (!CombatStateManager.isInCombat(owner)
                 || !QiInfusedWeapon.outwardQiReleaseEnabled(owner)
@@ -169,6 +168,8 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
         float injectedQiDamage =
                 QiInfusedWeapon.injectedQiDamage(weapon);
         double baseDamage = Math.max(1.0D, QiInfusedWeapon.baseAttackDamage(weapon));
+        com.example.immortal_cultivation_mod.item.WeaponBinding.prepare(owner.getMainHandItem());
+        slash.bindingWeapon = owner.getMainHandItem().copy();
         slash.ownerUuid = owner.getUUID();
         slash.direction = safeDirection(owner.getLookAngle());
         slash.damage = (float) Math.min(
@@ -178,34 +179,25 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
         slash.expandingCone = fistWeapon;
         slash.heavyAttack = fistWeapon && heavyCone;
         if (fistWeapon) {
-            double fourthRootPower = Math.sqrt(Math.sqrt(Math.max(0.0D, qiPower)));
             if (heavyCone) {
-                slash.radius = Math.min(12.0D, 3.0D + fourthRootPower * 0.80D);
                 slash.maxDistance = Math.min(
                         36.0D, 7.0D + Math.sqrt(qiPower) * 0.90D);
             } else {
-                slash.radius = Math.min(7.0D, 1.5D + fourthRootPower * 0.50D);
                 slash.maxDistance = Math.min(
                         24.0D, 4.0D + Math.sqrt(qiPower) * 0.60D);
             }
         } else if (slash.cone) {
-            slash.radius = Math.min(
-                    32.0D, 0.35D + Math.pow(qiPower, 0.65D) * 0.22D);
             slash.maxDistance = Math.min(
                     128.0D, 4.0D + Math.sqrt(qiPower) * 1.4D);
         } else {
-            slash.radius = Math.min(
-                    32.0D, 2.0D + Math.sqrt(qiPower) * 0.65D);
             slash.maxDistance = Math.min(
                     128.0D, 40.0D + Math.sqrt(qiPower) * 1.2D);
         }
-        slash.radius = damageScaledRadius(slash.radius, slash.damage,
-                fistWeapon ? (heavyCone ? 12 : 7) : ExternalQiVfxShape.MAX_RADIUS);
         slash.remainingBlocks = damageScaledBlockBudget(slash.damage);
         slash.slashStage = Math.floorMod(slashStage, 3);
         slash.blockBreaking = heavyWeaponAttack && QiInfusedWeapon.outwardQiBlockBreakingEnabled(owner);
-        slash.radius = Math.clamp(slash.radius * com.example.immortal_cultivation_mod.combat.ExternalQiSize.scale(owner),
-                .2, ExternalQiVfxShape.MAX_RADIUS);
+        slash.radius = com.example.immortal_cultivation_mod.combat.ExternalQiSize.radius(weapon,
+                com.example.immortal_cultivation_mod.combat.ExternalQiSize.scale(owner), slash.cone, heavyCone, false);
         double originalRadius = slash.radius;
         slash.radius = ExternalQiSpaceFit.fit(owner, slash.direction, slash.slashStage, slash.radius, slash.cone);
         boolean fittedToSpace = slash.radius < originalRadius;
@@ -242,19 +234,21 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
             float damage,
             float qiDamage,
             double range) {
+        if (!com.example.immortal_cultivation_mod.item.WeaponBinding.checkUse(owner.getMainHandItem(), owner)) return false;
         WeaponQiSlashEntity slash = ModEntities.WEAPON_QI_SLASH.get()
                 .create(owner.serverLevel());
         if (slash == null) {
             return false;
         }
 
+        com.example.immortal_cultivation_mod.item.WeaponBinding.prepare(owner.getMainHandItem());
+        slash.bindingWeapon = owner.getMainHandItem().copy();
         slash.ownerUuid = owner.getUUID();
         slash.direction = safeDirection(owner.getLookAngle());
         slash.damage = Math.max(
                 1.0F, Math.min(MAX_DAMAGE, damage));
-        slash.radius = damageScaledRadius(0.9D, slash.damage, ExternalQiVfxShape.MAX_RADIUS);
-        slash.radius = Math.clamp(slash.radius * com.example.immortal_cultivation_mod.combat.ExternalQiSize.scale(owner),
-                .2, ExternalQiVfxShape.MAX_RADIUS);
+        slash.radius = com.example.immortal_cultivation_mod.combat.ExternalQiSize.radius(owner.getMainHandItem(),
+                com.example.immortal_cultivation_mod.combat.ExternalQiSize.scale(owner), false, false, true);
         slash.maxDistance = Math.max(1.0D, range);
         slash.remainingBlocks = damageScaledBlockBudget(slash.damage);
         slash.slashStage = Math.floorMod(owner.tickCount, 3);
@@ -284,11 +278,12 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
             LivingEntity target,
             double range,
             float damage,
-            double radius,
+            double ignoredLegacyRadius,
             String element,
             int slashStage,
             boolean heavyCone) {
         if (!(owner.level() instanceof ServerLevel serverLevel)
+                || !com.example.immortal_cultivation_mod.item.WeaponBinding.canUse(owner.getMainHandItem(), owner)
                 || target == null
                 || !isEnemy(owner, target)) {
             return false;
@@ -307,11 +302,15 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
         Vec3 predictedTargetEye = targetEye.add(
                 target.getDeltaMovement().scale(predictionTicks));
 
+        com.example.immortal_cultivation_mod.item.WeaponBinding.prepare(owner.getMainHandItem());
+        slash.bindingWeapon = owner.getMainHandItem().copy();
         slash.ownerUuid = owner.getUUID();
         slash.restrictedTargetUuid = heavyCone ? null : target.getUUID();
         slash.direction = safeDirection(predictedTargetEye.subtract(ownerEye));
         slash.damage = Math.max(1.0F, Math.min(MAX_DAMAGE, damage));
-        slash.radius = damageScaledRadius(radius, slash.damage, ExternalQiVfxShape.MAX_RADIUS);
+        // NPCs use the same weapon-level size as players; caster damage does not enlarge it.
+        slash.radius = com.example.immortal_cultivation_mod.combat.ExternalQiSize.radius(owner.getMainHandItem(),
+                1, QiInfusedWeapon.isFistWeapon(owner.getMainHandItem()) || heavyCone, heavyCone, false);
         slash.maxDistance = Math.max(1.0D, Math.min(128.0D, range));
         slash.remainingBlocks = damageScaledBlockBudget(slash.damage);
         slash.slashStage = Math.floorMod(slashStage, 3);
@@ -358,7 +357,7 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
         LivingEntity owner = resolvedOwner instanceof LivingEntity living
                 ? living
                 : null;
-        if (owner == null || !owner.isAlive() || tickCount > MAX_LIFETIME_TICKS
+        if (owner == null || !owner.isAlive() || !com.example.immortal_cultivation_mod.item.WeaponBinding.canUse(bindingWeapon, owner) || tickCount > MAX_LIFETIME_TICKS
                 || distanceTraveled >= maxDistance) {
             discard();
             return;
@@ -418,7 +417,7 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
             if (random.nextFloat() < 0.05F) {
                 if (owner instanceof ServerPlayer playerOwner) {
                     WhipItem.createQiContactPop(
-                            playerOwner, whipBlockHit.getLocation());
+                            playerOwner, whipBlockHit.getLocation(), bindingWeapon);
                 }
             }
             discard();
@@ -573,14 +572,14 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
                         target,
                         damage,
                         whipQiDamage,
-                        !whipHitRegistered);
+                        !whipHitRegistered, bindingWeapon);
                 if (hit) {
                     whipHitRegistered = true;
                 }
                 if (random.nextFloat() < 0.05F) {
                     WhipItem.createQiContactPop(
                             playerOwner,
-                            target.getBoundingBox().getCenter());
+                            target.getBoundingBox().getCenter(), bindingWeapon);
                 }
                 continue;
             }
@@ -814,11 +813,13 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
     }
 
     private static String normalizeElement(String element) {
-        return element == null || element.isBlank() ? "any" : element.trim();
+        return element == null || element.isBlank() ? "any"
+                : com.example.immortal_cultivation_mod.attachment.SpiritRoots.normalizeElementSpec(element);
     }
 
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
+        bindingWeapon = ItemStack.parseOptional(registryAccess(), tag.getCompound("BindingWeapon"));
         if (tag.hasUUID("Owner")) {
             ownerUuid = tag.getUUID("Owner");
         }
@@ -887,6 +888,7 @@ public class WeaponQiSlashEntity extends Entity implements ForcefieldInterceptab
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
+        if (!bindingWeapon.isEmpty()) tag.put("BindingWeapon", bindingWeapon.saveOptional(registryAccess()));
         if (ownerUuid != null) {
             tag.putUUID("Owner", ownerUuid);
         }

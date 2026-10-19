@@ -4,7 +4,6 @@ import com.example.immortal_cultivation_mod.ImmortalCultivationMod;
 import com.example.immortal_cultivation_mod.config.BlockBreakingSettings;
 import com.example.immortal_cultivation_mod.flame.FlameKind;
 import com.example.immortal_cultivation_mod.flame.FlameShotEntity;
-import com.example.immortal_cultivation_mod.pagoda.PagodaWorlds;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -74,12 +73,11 @@ public record FlameImpactPayload(ResourceLocation dimension, UUID impactId, Stri
                 || !level.hasChunkAt(block.getBlockPos()) || level.isOutsideBuildHeight(block.getBlockPos()))
             return Optional.empty();
         boolean terrainDamaged = owner.getAbilities().mayBuild
-                && !PagodaWorlds.isInterior(level.dimension())
                 && BlockBreakingSettings.enabled(owner, BlockBreakingSettings.Category.FLAME_VESSELS);
         float radius = terrainDamaged ? shot.destructionRadius() : shot.blastRadius();
         if (!Float.isFinite(radius) || radius <= 0) return Optional.empty();
         UUID identity = shot.getUUID();
-        long seed = identity.getMostSignificantBits() ^ Long.rotateLeft(identity.getLeastSignificantBits(), 17);
+        long seed = com.example.immortal_cultivation_mod.flame.FlameCraterShape.seed(identity);
         return Optional.of(new FlameImpactPayload(level.dimension().location(), identity, shot.kind().id(), center,
                 radius, shot.charge(), seed, Block.getId(level.getBlockState(block.getBlockPos())), terrainDamaged));
     }

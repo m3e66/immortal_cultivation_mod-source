@@ -5,6 +5,11 @@ import com.example.immortal_cultivation_mod.attachment.CultivationLevels;
 import com.example.immortal_cultivation_mod.attachment.ModAttachments;
 import com.example.immortal_cultivation_mod.effect.ModEffects;
 import com.example.immortal_cultivation_mod.entity.CultivationNpc;
+import com.example.immortal_cultivation_mod.entity.BeastRealms;
+import com.example.immortal_cultivation_mod.entity.EscapedYuanyingCoreEntity;
+import com.example.immortal_cultivation_mod.entity.RealmBeast;
+import com.example.immortal_cultivation_mod.entity.XuanjinZhengEntity;
+import com.example.immortal_cultivation_mod.companion.XuanjinRules;
 import com.example.immortal_cultivation_mod.event.ServerEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -83,8 +88,8 @@ public final class Weiya {
             return;
         }
 
-        if (!ServerEvents.spendSustainedQiOrBlood(
-                player, data, qiCostPerSecond(data))) {
+        if (!ServerEvents.spendSustainedSpellQiOrBlood(
+                player, data, qiCostPerSecond(data), ModSpells.WEIYA)) {
             stop(player);
             player.sendSystemMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".not_enough_qi"));
             return;
@@ -191,6 +196,16 @@ public final class Weiya {
         if (target instanceof CultivationNpc npc) {
             return npc.npcRealm();
         }
+        // Species IDs and health do not describe a beast's saved realm variant.
+        if (target instanceof RealmBeast beast) {
+            return beast.beastCultivationLevel();
+        }
+        if (target instanceof XuanjinZhengEntity beast) {
+            return CultivationLevels.allLevels().get(XuanjinRules.stage(beast.seal()).realmStage());
+        }
+        if (target instanceof EscapedYuanyingCoreEntity core) {
+            return BeastRealms.level(core.coreRealm());
+        }
 
         return CultivationLevels.REALM_MORTAL;
     }
@@ -236,7 +251,7 @@ public final class Weiya {
     }
 
     public static int qiCostPerSecond(ModAttachments.CultivationData data) {
-        long maxQi = Math.max(1L, (long) CultivationLevels.getLevelDef(data.cultivationLevel()).maxQi() + data.maxQiBonus());
+        long maxQi = Math.max(1L, (long) data.maxQi());
         return (int) Math.min(Integer.MAX_VALUE, Math.max(1L, (long) Math.ceil(maxQi * 0.02D)));
     }
 

@@ -38,7 +38,7 @@ public final class TianyunFenchengMeteorRenderer extends EntityRenderer<TianyunF
 
    private static void renderMeteor(TianyunFenchengMeteorEntity entity, float age, PoseStack poseStack, MultiBufferSource buffer) {
       float formation = Mth.clamp((age + 1.0F) / 10.0F, 0.18F, 1.0F);
-      float radius = entity.meteorRadius() * formation * .45F;
+      float radius = entity.meteorRadius() * formation * .45F * com.example.immortal_cultivation_mod.client.SpellProjectileVisuals.SCALE;
       float pulse = 0.93F + Mth.sin(age * 0.82F) * 0.07F;
       poseStack.pushPose();
       poseStack.mulPose(Axis.YP.rotationDegrees(age * 4.8F));

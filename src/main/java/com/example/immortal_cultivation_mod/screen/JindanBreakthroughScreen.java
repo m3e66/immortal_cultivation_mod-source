@@ -32,16 +32,17 @@ public class JindanBreakthroughScreen extends Screen {
     private static final int BOARD_CENTER_X = 215;
     private static final int BOARD_CENTER_Y = 169;
     private static final float HEX_RADIUS = 13.0F;
-    private static final int PRESSURE_INTERVAL_TICKS = 24;
+    // Half the pressure buildup rate gives twice as long to repair the formation.
+    private static final int PRESSURE_INTERVAL_TICKS = 48;
     private static final int RESULT_DISPLAY_TICKS = 80;
 
     private static final int CHARCOAL = 0xE6191714;
-    private static final int CHARCOAL_SOFT = 0xC9211D18;
+    private static final int CHARCOAL_SOFT = 0xFF211D18;
     private static final int GOLD_DARK = 0xFF80642D;
     private static final int GOLD = 0xFFE0B84F;
     private static final int GOLD_BRIGHT = 0xFFFFE29A;
     private static final int IVORY = 0xFFFFF3D1;
-    private static final int MUTED = 0xFFBAAD90;
+    private static final int MUTED = 0xFFD8CFBA;
     private static final int LEAK_RED = 0xFF8E3029;
     private static final int LEAK_GLOW = 0x708E3029;
 
@@ -61,6 +62,11 @@ public class JindanBreakthroughScreen extends Screen {
     private int hoveredTile = -1;
     private FormationButton resetButton;
     private FormationButton debugSkipButton;
+    private FormationButton previousRulesButton;
+    private FormationButton nextRulesButton;
+    private static final int RULES_VISIBLE_LINES = 15;
+    private List<FormattedCharSequence> ruleLines = List.of();
+    private int rulesPage;
 
     public JindanBreakthroughScreen(boolean assisted) {
         super(Component.translatable("screen." + ImmortalCultivationMod.MODID + ".jindan_breakthrough"));
@@ -79,6 +85,19 @@ public class JindanBreakthroughScreen extends Screen {
 
         int x = left();
         int y = top();
+        List<FormattedCharSequence> lines = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            if (i > 1) lines.add(Component.empty().getVisualOrderText());
+            lines.addAll(font.split(Component.translatable(KEY_PREFIX + "rule." + i), 78));
+        }
+        ruleLines = List.copyOf(lines);
+        rulesPage = Mth.clamp(rulesPage, 0, rulesPageCount() - 1);
+        previousRulesButton = addRenderableWidget(new FormationButton(x + 29, y + 261, 18, 14,
+                Component.literal("<"), () -> changeRulesPage(-1)));
+        nextRulesButton = addRenderableWidget(new FormationButton(x + 89, y + 261, 18, 14,
+                Component.literal(">"), () -> changeRulesPage(1)));
+        previousRulesButton.setTooltip(net.minecraft.client.gui.components.Tooltip.create(Component.translatable(KEY_PREFIX + "previous_rules")));
+        nextRulesButton.setTooltip(net.minecraft.client.gui.components.Tooltip.create(Component.translatable(KEY_PREFIX + "next_rules")));
         boolean showDebugSkip = ClientData.debugEyeEnabled();
         resetButton = addRenderableWidget(new FormationButton(
                 x + 323, y + 237, 82, 18,
@@ -89,6 +108,25 @@ public class JindanBreakthroughScreen extends Screen {
                     x + 323, y + 260, 82, 18,
                     Component.translatable(KEY_PREFIX + "debug_skip"), this::debugSkipPuzzle));
         }
+        refreshButtons();
+    }
+
+    private int rulesPageCount() {
+        return Math.max(1, (ruleLines.size() + RULES_VISIBLE_LINES - 1) / RULES_VISIBLE_LINES);
+    }
+
+    private void changeRulesPage(int direction) {
+        rulesPage = Mth.clamp(rulesPage + direction, 0, rulesPageCount() - 1);
+        refreshButtons();
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontal, double vertical) {
+        if (mouseX >= left() + 22 && mouseX < left() + 114 && mouseY >= top() + 75 && mouseY < top() + 280) {
+            changeRulesPage(-(int)Math.signum(vertical));
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, horizontal, vertical);
     }
 
     private void buildPuzzle() {
@@ -129,6 +167,8 @@ public class JindanBreakthroughScreen extends Screen {
         if (debugSkipButton != null) {
             debugSkipButton.active = active;
         }
+        previousRulesButton.active = rulesPage > 0;
+        nextRulesButton.active = rulesPage + 1 < rulesPageCount();
     }
 
     @Override
@@ -194,8 +234,9 @@ public class JindanBreakthroughScreen extends Screen {
     }
 
     private float qualityScale() {
-        float pressurePenalty = pressure / 250.0F;
-        float rotationPenalty = Math.max(0, rotationCount - 30) / 500.0F;
+        // Allow an initial learning period, then apply gentler quality penalties.
+        float pressurePenalty = Math.max(0.0F, pressure - 5.0F) / 500.0F;
+        float rotationPenalty = Math.max(0, rotationCount - 45) / 1000.0F;
         return 1.0F + Mth.clamp(pressurePenalty + rotationPenalty, 0.0F, 0.75F);
     }
 
@@ -261,20 +302,18 @@ public class JindanBreakthroughScreen extends Screen {
         fillPanel(graphics, x + 22, y + 75, 92, 205);
         fillPanel(graphics, x + 316, y + 75, 92, 205);
 
-        drawCenteredShadow(graphics, Component.translatable(KEY_PREFIX + "rules_title"),
-                x + 68, y + 84, GOLD_BRIGHT);
-        int ruleY = y + 102;
-        for (int i = 1; i <= 5; i++) {
-            Component rule = Component.translatable(KEY_PREFIX + "rule." + i);
-            for (FormattedCharSequence line : font.split(rule, 78)) {
-                graphics.drawString(font, line, x + 29, ruleY, MUTED, true);
-                ruleY += 10;
-            }
-            ruleY += 3;
-        }
+        drawCenteredFitted(graphics, Component.translatable(KEY_PREFIX + "rules_title"),
+                x + 68, y + 84, 78, GOLD_BRIGHT);
+        graphics.enableScissor(x + 29, y + 102, x + 107, y + 252);
+        int firstRuleLine = rulesPage * RULES_VISIBLE_LINES;
+        for (int row = 0; row < RULES_VISIBLE_LINES && firstRuleLine + row < ruleLines.size(); row++)
+            graphics.drawString(font, ruleLines.get(firstRuleLine + row), x + 29, y + 102 + row * 10, MUTED, true);
+        graphics.disableScissor();
+        drawCenteredFitted(graphics, Component.literal((rulesPage + 1) + "/" + rulesPageCount()),
+                x + 68, y + 264, 36, MUTED);
 
-        drawCenteredShadow(graphics, Component.translatable(KEY_PREFIX + "formation_status"),
-                x + 362, y + 84, GOLD_BRIGHT);
+        drawCenteredFitted(graphics, Component.translatable(KEY_PREFIX + "formation_status"),
+                x + 362, y + 84, 76, GOLD_BRIGHT);
         drawMeter(graphics, x + 326, y + 108, 72, 8, puzzle.integrity() / 100.0F,
                 0xFFB98931, Component.translatable(KEY_PREFIX + "integrity"));
         drawMeter(graphics, x + 326, y + 145, 72, 8, pressure / 100.0F,
@@ -287,11 +326,13 @@ public class JindanBreakthroughScreen extends Screen {
             case FAILURE -> "status.failure";
         });
         int statusY = y + 183;
+        graphics.enableScissor(x + 326, y + 183, x + 398, y + 229);
         for (FormattedCharSequence line : font.split(status, 72)) {
             graphics.drawString(font, line, x + 326, statusY,
                     state == FormationState.FAILURE ? 0xFFFF9586 : IVORY, true);
             statusY += 10;
         }
+        graphics.disableScissor();
     }
 
     private void drawBoardPanel(GuiGraphics graphics, int x, int y) {
@@ -356,7 +397,7 @@ public class JindanBreakthroughScreen extends Screen {
 
     private void drawMeter(GuiGraphics graphics, int x, int y, int width, int height,
                            float progress, int fillColor, Component label) {
-        graphics.drawString(font, label, x, y - 12, MUTED, true);
+        drawCenteredFitted(graphics, label, x + width / 2, y - 12, width, MUTED);
         graphics.fill(x - 1, y - 1, x + width + 1, y + height + 1, GOLD_DARK);
         graphics.fill(x, y, x + width, y + height, 0xFF191612);
         graphics.fill(x, y, x + Math.round(width * Mth.clamp(progress, 0.0F, 1.0F)),
@@ -366,10 +407,10 @@ public class JindanBreakthroughScreen extends Screen {
     }
 
     private void drawSuccessOverlay(GuiGraphics graphics, int x, int y, float partialTick) {
-        int panelX = x + 128;
-        int panelY = y + 105;
-        int panelW = 174;
-        int panelH = 128;
+        int panelX = x + 121;
+        int panelY = y + 88;
+        int panelW = 188;
+        int panelH = 174;
         graphics.fill(panelX, panelY, panelX + panelW, panelY + panelH, 0xF21B160D);
         graphics.renderOutline(panelX, panelY, panelW, panelH, GOLD_BRIGHT);
         graphics.renderOutline(panelX + 3, panelY + 3, panelW - 6, panelH - 6, GOLD_DARK);
@@ -379,14 +420,15 @@ public class JindanBreakthroughScreen extends Screen {
         drawCircleFill(graphics, x + BOARD_CENTER_X, panelY + 35, pulse, 0xFFFFD568);
         drawCircleFill(graphics, x + BOARD_CENTER_X - 4, panelY + 30, 3.4F, 0xFFFFF5C7);
 
-        drawCenteredShadow(graphics, Component.translatable(KEY_PREFIX + "success_title"),
-                x + BOARD_CENTER_X, panelY + 58, GOLD_BRIGHT);
-        drawCenteredShadow(graphics, Component.translatable(KEY_PREFIX + "success_line_1"),
-                x + BOARD_CENTER_X, panelY + 75, IVORY);
-        drawCenteredShadow(graphics, Component.translatable(KEY_PREFIX + "success_line_2"),
-                x + BOARD_CENTER_X, panelY + 87, IVORY);
-        drawCenteredShadow(graphics, Component.translatable(KEY_PREFIX + "success_footer"),
-                x + BOARD_CENTER_X, panelY + 107, GOLD_BRIGHT);
+        drawCenteredFitted(graphics, Component.translatable(KEY_PREFIX + "success_title"),
+                x + BOARD_CENTER_X, panelY + 58, panelW - 16, GOLD_BRIGHT);
+        int textY = panelY + 76;
+        textY += drawCenteredWrapped(graphics, Component.translatable(KEY_PREFIX + "success_line_1"),
+                x + BOARD_CENTER_X, textY, panelW - 16, IVORY) + 4;
+        drawCenteredWrapped(graphics, Component.translatable(KEY_PREFIX + "success_line_2"),
+                x + BOARD_CENTER_X, textY, panelW - 16, IVORY);
+        drawCenteredWrapped(graphics, Component.translatable(KEY_PREFIX + "success_footer"),
+                x + BOARD_CENTER_X, panelY + panelH - 28, panelW - 16, GOLD_BRIGHT);
     }
 
     private void drawFailureOverlay(GuiGraphics graphics, int x, int y) {
@@ -397,8 +439,8 @@ public class JindanBreakthroughScreen extends Screen {
         graphics.fill(panelX, panelY, panelX + panelW, panelY + panelH, 0xF2261210);
         graphics.renderOutline(panelX, panelY, panelW, panelH, LEAK_RED);
         graphics.renderOutline(panelX + 3, panelY + 3, panelW - 6, panelH - 6, 0xFF5E2B26);
-        drawCenteredShadow(graphics, Component.translatable(KEY_PREFIX + "failure_title"),
-                x + BOARD_CENTER_X, panelY + 15, 0xFFFF9586);
+        drawCenteredFitted(graphics, Component.translatable(KEY_PREFIX + "failure_title"),
+                x + BOARD_CENTER_X, panelY + 15, panelW - 16, 0xFFFF9586);
         int lineY = panelY + 34;
         for (FormattedCharSequence line : font.split(
                 Component.translatable(KEY_PREFIX + "failure_body"), panelW - 18)) {
@@ -520,6 +562,22 @@ public class JindanBreakthroughScreen extends Screen {
 
     private void drawCenteredShadow(GuiGraphics graphics, Component text, int centerX, int y, int color) {
         graphics.drawString(font, text, centerX - font.width(text) / 2, y, color, true);
+    }
+
+    private void drawCenteredFitted(GuiGraphics graphics, Component text, int centerX, int y, int width, int color) {
+        float scale = Math.min(1.0F, width / (float)Math.max(1, font.width(text)));
+        graphics.pose().pushPose();
+        graphics.pose().translate(centerX, y, 0);
+        graphics.pose().scale(scale, scale, 1);
+        graphics.drawString(font, text, -font.width(text) / 2, 0, color, true);
+        graphics.pose().popPose();
+    }
+
+    private int drawCenteredWrapped(GuiGraphics graphics, Component text, int centerX, int y, int width, int color) {
+        var lines = font.split(text, width);
+        for (int row = 0; row < lines.size(); row++)
+            graphics.drawString(font, lines.get(row), centerX - font.width(lines.get(row)) / 2, y + row * 11, color, true);
+        return lines.size() * 11;
     }
 
     private static void drawHexFill(GuiGraphics graphics, float centerX, float centerY,

@@ -66,7 +66,8 @@ public final class JindanFlightEffects {
             selectedSpeed = Mth.clamp(
                     speed,
                     JindanCreativeFlight.minFlyingSpeed(),
-                    JindanCreativeFlight.maxFlyingSpeed());
+                    JindanCreativeFlight.maxFlyingSpeed()
+                            * com.example.immortal_cultivation_mod.entity.FlyingSwordEntity.FLIGHT_SPEED_MULTIPLIER);
         }
         if (changedLayers > 0) {
             speedBurstLayers = Mth.clamp(changedLayers, 1, 8);
@@ -292,7 +293,8 @@ public final class JindanFlightEffects {
     /** Eased local pose weight for real Golden Core fast flight, not vanilla Elytra. */
     public static float fastFlightPoseProgress(Player player, float partialTick) {
         Minecraft minecraft = Minecraft.getInstance();
-        if (player == null || player != minecraft.player || player.isFallFlying()) {
+        if (player == null || player != minecraft.player || player.isFallFlying()
+                || com.example.immortal_cultivation_mod.entity.FlyingSwordEntity.flightSword(player) != null) {
             return 0.0F;
         }
         float interpolated = Mth.lerp(
@@ -308,7 +310,8 @@ public final class JindanFlightEffects {
     }
 
     private static void updateFastFlightPoseBlend(Player player) {
-        boolean entering = fastFlightMode && !player.isFallFlying();
+        boolean entering = fastFlightMode && !player.isFallFlying()
+                && com.example.immortal_cultivation_mod.entity.FlyingSwordEntity.flightSword(player) == null;
         if (entering) {
             fastFlightPoseBlend = Math.min(
                     1.0F,

@@ -20,8 +20,7 @@ public final class WeaponUseAnimations {
         HOOK(-28, "weapon_skill_hook", false),
         BANNER(-29, "weapon_skill_banner", true),
         FUCHEN(-30, "weapon_skill_fuchen", true),
-        KNIFE(-31, "weapon_skill_knife", false),
-        PAGODA(-32, "weapon_skill_pagoda", true);
+        KNIFE(-31, "weapon_skill_knife", false);
 
         public final int packetId;
         public final String clip;
