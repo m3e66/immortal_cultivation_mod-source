@@ -42,13 +42,25 @@ public final class ThoughtInputGuard {
             return new Movement(input.leftImpulse,input.forwardImpulse,input.up,input.down,input.left,input.right,input.jumping,input.shiftKeyDown);
         }
         public boolean restricted(Input input) {
-            return left!=0 && (Math.abs(input.leftImpulse)<Math.abs(left)*.5 || input.leftImpulse*left<0)
-                    || forward!=0 && (Math.abs(input.forwardImpulse)<Math.abs(forward)*.5 || input.forwardImpulse*forward<0)
+            return axisRestricted(left, input.leftImpulse)
+                    || axisRestricted(forward, input.forwardImpulse)
                     || jump&&!input.jumping || shift&&!input.shiftKeyDown;
         }
+        private static boolean axisRestricted(float before, float after) {
+            return before != 0 && (Math.abs(after) < Math.abs(before) * .5 || after * before < 0);
+        }
         public void restore(Input input) {
-            input.leftImpulse=left;input.forwardImpulse=forward;input.up=up;input.down=down;
-            input.left=leftKey;input.right=rightKey;input.jumping=jump;input.shiftKeyDown=shift;
+            // Physical keyboard snapshots do not contain touch/controller movement added
+            // later in the input pipeline. Repair only the suppressed components; a
+            // blocked jump must never replace a working joystick axis with keyboard zero.
+            if (axisRestricted(left, input.leftImpulse)) {
+                input.leftImpulse=left;input.left=leftKey;input.right=rightKey;
+            }
+            if (axisRestricted(forward, input.forwardImpulse)) {
+                input.forwardImpulse=forward;input.up=up;input.down=down;
+            }
+            if (jump) input.jumping=true;
+            if (shift) input.shiftKeyDown=true;
         }
     }
     private ThoughtInputGuard() {}

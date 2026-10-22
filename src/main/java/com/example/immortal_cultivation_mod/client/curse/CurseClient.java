@@ -38,9 +38,9 @@ import software.bernie.geckolib.renderer.GeoEntityRenderer;
 public final class CurseClient {
     public static final ResourceLocation RUNE_ATLAS=ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID,"textures/particle/annihilation_runes/fuwen_atlas.png");
     private static final RenderType INK=RenderType.entityTranslucent(RUNE_ATLAS);
-    private static final int MAX_RUNES=720;
+    private static final int MAX_RUNES=1080;
     private static final int OUTBREAK_RUNES=480;
-    private static final double SPACING_X=.10,SPACING_Y=.12;
+    private static final double SPACING_X=.08,SPACING_Y=.10;
     // Opaque bounds in each 64px Aseprite frame, generated with the five sprites.
     private static final int[][] RUNE_BOUNDS={{20,2,49,64},{5,2,62,63},{15,3,51,63},{13,2,54,60},{14,3,51,62}};
     private record Snapshot(int id,float previous,float target,long changed) {

@@ -77,8 +77,22 @@ import java.util.UUID;
 
 public class ModClientEvents {
     @SubscribeEvent
-    public static void clearShieldDisplay(net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut event) {
-        ClientData.updateShield(0,0);
+    public static void onClientLogout(net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut event) {
+        resetSession();
+    }
+
+    public static void onClientLogin(net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingIn event) {
+        resetSession();
+    }
+
+    private static void resetSession() {
+        ClientData.resetSession();
+        resetPreparedCharge(false);
+        preparedCastInterrupted = false;
+        wasSpellKeyDown = false;
+        wasSwordRideKeyDown = false;
+        wasQiBlastDown = false;
+        ModHotkeyGuard.reset();
     }
     private static boolean wasSwordRideKeyDown;
     private static boolean wasQiBlastDown;
@@ -135,6 +149,8 @@ public class ModClientEvents {
         OverworldCosmicSkyRenderer.register();
         JindanFlightEffects.register();
         NeoForge.EVENT_BUS.addListener(ModClientEvents::onClientTickPre);
+        NeoForge.EVENT_BUS.addListener(ModClientEvents::onClientLogin);
+        NeoForge.EVENT_BUS.addListener(ModClientEvents::onClientLogout);
         NeoForge.EVENT_BUS.addListener(ModClientEvents::onClientTick);
         NeoForge.EVENT_BUS.addListener(ModClientEvents::onMouseScrolling);
         NeoForge.EVENT_BUS.addListener(ModClientEvents::onRenderBlockScreenEffect);
@@ -343,6 +359,7 @@ public class ModClientEvents {
                 || mc.screen instanceof com.example.immortal_cultivation_mod.hair.client.HairScreen hairScreen && hairScreen.isEditingText();
 
         if (typing) {
+            while (ModKeyMappings.CAST_PREPARED_SPELL.get().consumeClick()) { }
             wasSwordRideKeyDown = ModKeyMappings.RIDE_FLYING_SWORD.get().isDown();
             wasQiBlastDown = ModKeyMappings.BLAST_QI.get().isDown();
             if(mc.screen instanceof com.example.immortal_cultivation_mod.hair.client.HairScreen)
@@ -717,6 +734,10 @@ public class ModClientEvents {
 
     private static void tickPreparedSpellCharge(Minecraft mc) {
         var preparedCastKey = ModKeyMappings.CAST_PREPARED_SPELL.get();
+        boolean preparedCastClicked = false;
+        while (preparedCastKey.consumeClick()) {
+            preparedCastClicked = true;
+        }
         boolean preparedCastDown = ModHotkeyGuard.allow(preparedCastKey)
                 && InputConstants.isKeyDown(mc.getWindow().getWindow(), preparedCastKey.getKey().getValue());
         String preparedSpell = ClientData.preparedSpellId();
@@ -732,7 +753,7 @@ public class ModClientEvents {
                 : PREPARED_CHARGE_TICKS;
         if (ModSpells.ZIBAO.equals(ModSpells.normalizeId(preparedSpell))) {
             // One confirmation per physical rising edge. Holding R never repeats it.
-            if (preparedCastDown && !wasPreparedCastKeyDown && canUse && mc.isWindowActive()) {
+            if ((preparedCastDown || preparedCastClicked) && !wasPreparedCastKeyDown && canUse && mc.isWindowActive()) {
                 PacketDistributor.sendToServer(new ModPayloads.ServerboundSpellPreparationPayload(preparedSpell, true));
                 PacketDistributor.sendToServer(new ModPayloads.ServerboundCastSpellPayload(preparedSpell, 1.0F, false));
                 preparedStateSent = true;
@@ -751,6 +772,19 @@ public class ModClientEvents {
             wasPreparedCastKeyDown = preparedCastDown;
             if (!preparedCastDown) {
                 preparedCastInterrupted = false;
+            }
+            return;
+        }
+        // GLFW may receive both press and release between client ticks. Preserve that
+        // queued tap as an uncharged cast, without replaying repeats from a held key.
+        if (preparedCastClicked && !preparedCastDown && !wasPreparedCastKeyDown && canUse) {
+            resetPreparedCharge(true);
+            if (canAffordPreparedCharge(preparedSpell, 1.0F)) {
+                PacketDistributor.sendToServer(
+                        new ModPayloads.ServerboundSpellPreparationPayload(preparedSpell, true));
+                PacketDistributor.sendToServer(
+                        new ModPayloads.ServerboundCastSpellPayload(
+                                preparedSpell, 1.0F, mc.options.keyShift.isDown()));
             }
             return;
         }

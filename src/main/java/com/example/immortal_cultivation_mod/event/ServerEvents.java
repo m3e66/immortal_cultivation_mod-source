@@ -160,6 +160,11 @@ public class ServerEvents {
     }
 
     @SubscribeEvent
+    public static void onServerStopped(net.neoforged.neoforge.event.server.ServerStoppedEvent event) {
+        ModPayloads.ModPayloadsHandler.clearServerSpellState(event.getServer());
+    }
+
+    @SubscribeEvent
     public static void onItemCrafted(PlayerEvent.ItemCraftedEvent event) {
         if (event.getEntity().level().isClientSide) return;
         ItemStack output = event.getCrafting();
@@ -1153,6 +1158,7 @@ public class ServerEvents {
             com.example.immortal_cultivation_mod.item.IdentityItems.ensurePlayerIdentity(sp);
             JindanCreativeFlight.resetControlSync(sp);
             syncPlayerData(sp);
+            ModPayloads.ModPayloadsHandler.syncSpellCooldowns(sp);
             ModPayloads.syncDebugEyeState(sp);
             syncRestrictionHints(sp);
             CombatStateManager.sync(sp, true);

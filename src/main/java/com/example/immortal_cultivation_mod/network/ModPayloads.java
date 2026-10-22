@@ -1378,8 +1378,22 @@ public class ModPayloads {
                 "formation",
                 "divination",
                 "ghost_control");
-        private static final Map<UUID, Map<String, Long>> SPELL_COOLDOWNS = new HashMap<>();
-        private static final Map<UUID, Map<String, Long>> MESSAGE_COOLDOWNS = new HashMap<>();
+        // Integrated servers share this JVM. A player's UUID is identical in every
+        // save, but each server has its own game-time clock and spell state.
+        private static final Map<net.minecraft.server.MinecraftServer, ServerSpellState> SERVER_SPELL_STATES =
+                java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
+        private record ServerSpellState(
+                Map<UUID, Map<String, Long>> cooldowns,
+                Map<UUID, Map<String, Long>> messages) { }
+
+        private static ServerSpellState serverSpellState(ServerPlayer player) {
+            return SERVER_SPELL_STATES.computeIfAbsent(player.server,
+                    ignored -> new ServerSpellState(new HashMap<>(), new HashMap<>()));
+        }
+
+        public static void clearServerSpellState(net.minecraft.server.MinecraftServer server) {
+            SERVER_SPELL_STATES.remove(server);
+        }
         private static final Map<UUID, PendingLearning> PENDING_LEARNING = new HashMap<>();
         private static final int BASE_LEARNING_POINTS = 5_000;
         private static final long LEARNING_SESSION_TICKS = 20L * 60L * 15L;
@@ -2560,11 +2574,12 @@ public class ModPayloads {
                     if (!ModSpells.ZIBAO.equals(spellId)) {
                         com.example.immortal_cultivation_mod.spell.SelfExplosionConfirmation.cancel(sp);
                     }
-                    if (!CombatStateManager.finishSpellPreparation(
-                            sp, spellId, payload.chargeScale())) {
+                    float chargeScale = CombatStateManager.consumeSpellCharge(
+                            sp, spellId, payload.chargeScale());
+                    if (chargeScale < 1.0F) {
                         return;
                     }
-                    castValidatedSpell(sp, spellId, payload.chargeScale(), payload.selfCast());
+                    castValidatedSpell(sp, spellId, chargeScale, payload.selfCast());
                 }
             });
         }
@@ -2824,7 +2839,8 @@ public class ModPayloads {
 
         private static void sendThrottledSystemMessage(ServerPlayer player, String key, Component message) {
             long gameTime = player.serverLevel().getGameTime();
-            Map<String, Long> playerCooldowns = MESSAGE_COOLDOWNS.computeIfAbsent(player.getUUID(), ignored -> new HashMap<>());
+            Map<String, Long> playerCooldowns = serverSpellState(player).messages()
+                    .computeIfAbsent(player.getUUID(), ignored -> new HashMap<>());
             long nextAllowed = playerCooldowns.getOrDefault(key, 0L);
             if (gameTime < nextAllowed) {
                 return;
@@ -2877,7 +2893,7 @@ public class ModPayloads {
             if (ticks <= 0) {
                 return false;
             }
-            Map<String, Long> cooldowns = SPELL_COOLDOWNS.get(player.getUUID());
+            Map<String, Long> cooldowns = serverSpellState(player).cooldowns().get(player.getUUID());
             if (cooldowns == null) {
                 return false;
             }
@@ -2886,7 +2902,7 @@ public class ModPayloads {
             if (until == null || until <= now) {
                 cooldowns.remove(spellId);
                 if (cooldowns.isEmpty()) {
-                    SPELL_COOLDOWNS.remove(player.getUUID());
+                    serverSpellState(player).cooldowns().remove(player.getUUID());
                 }
                 return false;
             }
@@ -2896,14 +2912,19 @@ public class ModPayloads {
         public static Map<String, Long> debugSpellCooldowns(ServerPlayer player) {
             var result = new java.util.TreeMap<String, Long>();
             long now = player.level().getGameTime();
-            SPELL_COOLDOWNS.getOrDefault(player.getUUID(), Map.of()).forEach((id, until) -> {
+            serverSpellState(player).cooldowns().getOrDefault(player.getUUID(), Map.of()).forEach((id, until) -> {
                 if (until > now) result.put(id, until - now);
             });
             return result;
         }
 
+        public static void syncSpellCooldowns(ServerPlayer player) {
+            debugSpellCooldowns(player).forEach((id, remaining) -> PacketDistributor.sendToPlayer(
+                    player, new ClientboundSpellCooldownPayload(id, (int)Math.min(Integer.MAX_VALUE, remaining))));
+        }
+
         public static void reduceAttackCooldowns(ServerPlayer player, int ticks) {
-            var cooldowns = SPELL_COOLDOWNS.get(player.getUUID());
+            var cooldowns = serverSpellState(player).cooldowns().get(player.getUUID());
             if (cooldowns == null) return;
             long now = player.level().getGameTime();
             cooldowns.replaceAll((id, until) -> {
@@ -2922,7 +2943,7 @@ public class ModPayloads {
             if (ticks <= 0) {
                 return;
             }
-            SPELL_COOLDOWNS
+            serverSpellState(player).cooldowns()
                     .computeIfAbsent(player.getUUID(), ignored -> new HashMap<>())
                     .put(spellId, player.level().getGameTime() + ticks);
             net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player, new ClientboundSpellCooldownPayload(spellId, ticks));

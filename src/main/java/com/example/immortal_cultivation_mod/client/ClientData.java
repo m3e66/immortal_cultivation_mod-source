@@ -73,6 +73,35 @@ public class ClientData {
     private static boolean outerSystemEquipped = false;
     private static boolean livingCorpse = false;
 
+    /** Clear transient server data without deleting this world's saved wheel preferences. */
+    public static void resetSession() {
+        cultivationData = ModAttachments.CultivationData.createDefault();
+        playerIdentity = "wandering_cultivator";
+        jindanQuality = "liedan";
+        MEDITATING_PLAYERS.clear();
+        CASTING_PLAYERS.clear();
+        SPELL_COOLDOWNS.clear();
+        synchronized (SELECTED_WHEEL_SPELLS) {
+            SELECTED_WHEEL_SPELLS.clear();
+            wheelSelectionLoaded = false;
+            wheelSelectionFileExists = false;
+            wheelSelectionStorageKey = "";
+            wheelAvailabilityStorageKey = "";
+            availableWheelSpells = Set.of();
+        }
+        preparedSpellId = "";
+        preparedSpellStorageKey = "";
+        resetPreparedCharge();
+        resetSwordCaseCharge();
+        updateShield(0, 0);
+        updateCombatState(false, 0, 0, 0, false);
+        updateOuterSystem("", false);
+        setLivingCorpse(false);
+        setDebugEyeEnabled(false);
+        setRestrictionHints(0);
+        jindanFlightControlActive = false;
+    }
+
     public static boolean livingCorpse() {
         return livingCorpse;
     }
@@ -227,7 +256,9 @@ public class ClientData {
 
     public static String preparedSpellId() {
         ensurePreparedSpellLoaded();
-        if (preparedSpellId == null || preparedSpellId.isBlank() || !isValidWheelId(preparedSpellId)) {
+        if (preparedSpellId == null || preparedSpellId.isBlank() || !isValidWheelId(preparedSpellId)
+                || !cultivationData.knownSpells().stream().map(ModSpells::normalizeId).anyMatch(preparedSpellId::equals)
+                && !isInnateSpellKnown(preparedSpellId)) {
             return "";
         }
         return preparedSpellId;
@@ -601,6 +632,12 @@ public class ClientData {
                 }
             }
             if (changed) saveWheelSelection();
+            ensurePreparedSpellLoaded();
+            if (!preparedSpellId.isEmpty() && !availableWheelSpells.contains(preparedSpellId)) {
+                preparedSpellId = "";
+                resetPreparedCharge();
+                savePreparedSpell();
+            }
         }
     }
 

@@ -355,24 +355,36 @@ public final class CombatStateManager {
             ServerPlayer player,
             String spellId,
             float requestedChargeScale) {
+        float charge = consumeSpellCharge(player, spellId, requestedChargeScale);
+        return charge >= 1.0F && requestedChargeScale <= charge + 0.001F;
+    }
+
+    /** Returns server-earned charge, or zero when this cast has no valid preparation. */
+    public static float consumeSpellCharge(
+            ServerPlayer player,
+            String spellId,
+            float requestedChargeScale) {
         String normalized = normalizeSpellId(spellId);
         SpellPreparation preparation = SPELL_PREPARATIONS.remove(player.getUUID());
-        if (normalized.isEmpty() || !ModSpells.requiresPreparation(normalized)) {
-            return Float.isFinite(requestedChargeScale) && requestedChargeScale <= 1.001F;
+        if (normalized.isEmpty() || !Float.isFinite(requestedChargeScale) || requestedChargeScale < 1.0F) {
+            return 0.0F;
+        }
+        if (!ModSpells.requiresPreparation(normalized)) {
+            return requestedChargeScale <= 1.001F ? 1.0F : 0.0F;
         }
         if (preparation == null
                 || !preparation.spellId().equals(normalized)
-                || isSpellPreparationBlocked(player)
-                || !Float.isFinite(requestedChargeScale)
-                || requestedChargeScale < 1.0F) {
-            return false;
+                || isSpellPreparationBlocked(player)) {
+            return 0.0F;
         }
         long elapsed = Math.max(0L,
                 player.serverLevel().getGameTime() - preparation.startedAt());
         long effectiveElapsed = Math.max(0L, (long) Math.floor(
                 elapsed * UndeadAbilitySystem.spellChargeSpeedMultiplier(player)));
         float maximumCharge = 1.0F + Math.min(40L, effectiveElapsed + 2L) / 40.0F;
-        return requestedChargeScale <= maximumCharge + 0.001F;
+        // Client input and server ticks can drift under network/mod load. A valid
+        // release still casts, but can never earn more charge than the server saw.
+        return Math.min(requestedChargeScale, maximumCharge);
     }
 
     public static void interruptSpellPreparation(ServerPlayer player) {

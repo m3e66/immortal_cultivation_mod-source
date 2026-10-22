@@ -28,19 +28,27 @@
           "text_key": "life.loot.start.title",
           "parts": [
             {
-              "text_key": "life.loot.start.0",
+              "text_key": "life.full_rewrite.life_story_courier_cache.start.0",
               "requires": ""
             },
             {
-              "text_key": "life.loot.start.1",
+              "text_key": "life.full_rewrite.life_story_courier_cache.start.1",
               "requires": ""
             },
             {
-              "text_key": "life.loot.start.2",
+              "text_key": "life.full_rewrite.life_story_courier_cache.start.2",
               "requires": ""
             },
             {
-              "text_key": "life.loot.start.3",
+              "text_key": "life.full_rewrite.life_story_courier_cache.start.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.full_rewrite.life_story_courier_cache.start.4",
+              "requires": ""
+            },
+            {
+              "text_key": "life.full_rewrite.life_story_courier_cache.start.5",
               "requires": ""
             }
           ],
@@ -72,19 +80,23 @@
           "text_key": "life.loot.cache.title",
           "parts": [
             {
-              "text_key": "life.loot.cache.0",
+              "text_key": "life.full_rewrite.life_story_courier_cache.cache.0",
               "requires": ""
             },
             {
-              "text_key": "life.loot.cache.1",
+              "text_key": "life.full_rewrite.life_story_courier_cache.cache.1",
               "requires": ""
             },
             {
-              "text_key": "life.loot.cache.2",
+              "text_key": "life.full_rewrite.life_story_courier_cache.cache.2",
               "requires": ""
             },
             {
-              "text_key": "life.loot.cache.3",
+              "text_key": "life.full_rewrite.life_story_courier_cache.cache.3",
+              "requires": ""
+            },
+            {
+              "text_key": "life.full_rewrite.life_story_courier_cache.cache.4",
               "requires": ""
             }
           ],
@@ -114,11 +126,11 @@
           "text_key": "life.loot.E_pill.title",
           "parts": [
             {
-              "text_key": "life.loot.E_pill.0",
+              "text_key": "life.full_rewrite.life_story_courier_cache.E_pill.0",
               "requires": ""
             },
             {
-              "text_key": "life.loot.E_pill.1",
+              "text_key": "life.full_rewrite.life_story_courier_cache.E_pill.1",
               "requires": ""
             }
           ],
@@ -141,11 +153,11 @@
           "text_key": "life.loot.E_spell.title",
           "parts": [
             {
-              "text_key": "life.loot.E_spell.0",
+              "text_key": "life.full_rewrite.life_story_courier_cache.E_spell.0",
               "requires": ""
             },
             {
-              "text_key": "life.loot.E_spell.1",
+              "text_key": "life.full_rewrite.life_story_courier_cache.E_spell.1",
               "requires": ""
             }
           ],
@@ -168,11 +180,11 @@
           "text_key": "life.loot.E_method.title",
           "parts": [
             {
-              "text_key": "life.loot.E_method.0",
+              "text_key": "life.full_rewrite.life_story_courier_cache.E_method.0",
               "requires": ""
             },
             {
-              "text_key": "life.loot.E_method.1",
+              "text_key": "life.full_rewrite.life_story_courier_cache.E_method.1",
               "requires": ""
             }
           ],
@@ -195,7 +207,7 @@
           "text_key": "life.loot.E4.title",
           "parts": [
             {
-              "text_key": "life.loot.E4.0",
+              "text_key": "life.full_rewrite.life_story_courier_cache.E4.0",
               "requires": ""
             }
           ],

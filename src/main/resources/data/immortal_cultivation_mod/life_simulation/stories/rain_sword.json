@@ -20,107 +20,39 @@
           "text_key": "life.replacement.rain_sword.S01.title",
           "parts": [
             {
-              "text_key": "life.replacement.rain_sword.S01.zh_cn.1",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S01.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S01.zh_cn.3",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S01.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S01.zh_cn.5",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S01.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S01.zh_cn.7",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S01.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S01.zh_cn.9",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S01.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S01.zh_cn.11",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S01.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S01.zh_cn.13",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S01.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S01.zh_cn.15",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S01.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S01.zh_cn.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S01.zh_cn.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S01.zh_cn.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S01.zh_cn.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S01.zh_cn.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S01.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S01.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S01.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S01.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S01.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S01.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S01.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S01.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S01.en_us.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S01.en_us.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S01.en_us.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S01.en_us.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S01.en_us.25",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S01.8",
               "requires": ""
             }
           ],
@@ -158,131 +90,39 @@
           "text_key": "life.replacement.rain_sword.S02.title",
           "parts": [
             {
-              "text_key": "life.replacement.rain_sword.S02.zh_cn.1",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S02.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S02.zh_cn.3",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S02.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S02.zh_cn.5",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S02.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S02.zh_cn.7",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S02.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S02.zh_cn.9",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S02.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S02.zh_cn.11",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S02.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S02.zh_cn.13",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S02.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S02.zh_cn.15",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S02.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S02.zh_cn.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.zh_cn.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.zh_cn.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.zh_cn.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.zh_cn.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.zh_cn.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.zh_cn.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.zh_cn.31",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.en_us.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.en_us.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.en_us.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.en_us.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.en_us.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.en_us.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.en_us.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S02.en_us.31",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S02.8",
               "requires": ""
             }
           ],
@@ -336,139 +176,43 @@
           "text_key": "life.replacement.rain_sword.S03.title",
           "parts": [
             {
-              "text_key": "life.replacement.rain_sword.S03.zh_cn.1",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S03.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S03.zh_cn.3",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S03.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S03.zh_cn.5",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S03.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S03.zh_cn.7",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S03.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S03.zh_cn.9",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S03.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S03.zh_cn.11",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S03.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S03.zh_cn.13",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S03.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S03.zh_cn.15",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S03.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S03.zh_cn.17",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S03.8",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S03.zh_cn.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.zh_cn.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.zh_cn.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.zh_cn.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.zh_cn.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.zh_cn.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.zh_cn.31",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.zh_cn.33",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.en_us.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.en_us.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.en_us.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.en_us.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.en_us.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.en_us.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.en_us.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.en_us.31",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S03.en_us.33",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S03.9",
               "requires": ""
             }
           ],
@@ -509,135 +253,39 @@
           "text_key": "life.replacement.rain_sword.S04.title",
           "parts": [
             {
-              "text_key": "life.replacement.rain_sword.S04.check_success",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S04.0",
               "requires": "timely_read"
             },
             {
-              "text_key": "life.replacement.rain_sword.S04.zh_cn.1",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S04.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S04.zh_cn.3",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S04.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S04.zh_cn.5",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S04.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S04.zh_cn.7",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S04.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S04.zh_cn.9",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S04.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S04.zh_cn.11",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S04.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S04.zh_cn.13",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S04.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S04.zh_cn.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.zh_cn.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.zh_cn.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.zh_cn.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.zh_cn.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.zh_cn.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.zh_cn.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.zh_cn.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.zh_cn.31",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.en_us.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.en_us.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.en_us.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.en_us.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.en_us.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.en_us.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.en_us.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S04.en_us.31",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S04.8",
               "requires": ""
             }
           ],
@@ -672,127 +320,43 @@
           "text_key": "life.replacement.rain_sword.S05.title",
           "parts": [
             {
-              "text_key": "life.replacement.rain_sword.S05.check_failure",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S05.0",
               "requires": "reading_failed"
             },
             {
-              "text_key": "life.replacement.rain_sword.S05.zh_cn.1",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S05.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S05.zh_cn.3",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S05.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S05.zh_cn.5",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S05.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S05.zh_cn.7",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S05.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S05.zh_cn.9",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S05.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S05.zh_cn.11",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S05.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S05.zh_cn.13",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S05.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S05.zh_cn.15",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S05.8",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S05.zh_cn.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.zh_cn.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.zh_cn.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.zh_cn.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.zh_cn.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.zh_cn.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.zh_cn.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.en_us.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.en_us.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.en_us.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.en_us.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.en_us.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.en_us.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S05.en_us.29",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S05.9",
               "requires": ""
             }
           ],
@@ -823,171 +387,43 @@
           "text_key": "life.replacement.rain_sword.S06.title",
           "parts": [
             {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.1",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S06.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.3",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S06.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.5",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S06.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.7",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S06.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.9",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S06.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.11",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S06.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.13",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S06.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.15",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S06.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.17",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S06.8",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.31",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.33",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.35",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.37",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.39",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.zh_cn.41",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.31",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.33",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.35",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.37",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.39",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S06.en_us.41",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S06.9",
               "requires": ""
             }
           ],
@@ -1025,115 +461,35 @@
           "text_key": "life.replacement.rain_sword.S07.title",
           "parts": [
             {
-              "text_key": "life.replacement.rain_sword.S07.zh_cn.1",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S07.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S07.zh_cn.3",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S07.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S07.zh_cn.5",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S07.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S07.zh_cn.7",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S07.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S07.zh_cn.9",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S07.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S07.zh_cn.11",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S07.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S07.zh_cn.13",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S07.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S07.zh_cn.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.zh_cn.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.zh_cn.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.zh_cn.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.zh_cn.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.zh_cn.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.zh_cn.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.en_us.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.en_us.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.en_us.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.en_us.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.en_us.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S07.en_us.27",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S07.7",
               "requires": ""
             }
           ],
@@ -1167,163 +523,43 @@
           "text_key": "life.replacement.rain_sword.S08.title",
           "parts": [
             {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.1",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S08.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.3",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S08.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.5",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S08.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.7",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S08.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.9",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S08.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.11",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S08.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.13",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S08.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.15",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S08.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.17",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S08.8",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.31",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.33",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.35",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.37",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.zh_cn.39",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.31",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.33",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.35",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.37",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S08.en_us.39",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S08.9",
               "requires": ""
             }
           ],
@@ -1369,136 +605,40 @@
           "text_key": "life.replacement.rain_sword.S09.title",
           "parts": [
             {
-              "text_key": "life.replacement.rain_sword.S09.zh_cn.1",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S09.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S09.zh_cn.3",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S09.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S09.zh_cn.5",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S09.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S09.zh_cn.7",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S09.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S09.zh_cn.9",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S09.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S09.zh_cn.11",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S09.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S09.zh_cn.13",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S09.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S09.zh_cn.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.zh_cn.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.zh_cn.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.zh_cn.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.zh_cn.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.zh_cn.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.zh_cn.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.zh_cn.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.zh_cn.31",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.en_us.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.en_us.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.en_us.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.en_us.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.en_us.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.en_us.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.en_us.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.en_us.31",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S09.ownership",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S09.7",
               "requires": "asked_ownership"
+            },
+            {
+              "text_key": "life.full_rewrite.life_event_rain_sword.S09.8",
+              "requires": ""
             }
           ],
           "choices": [
@@ -1532,99 +672,31 @@
           "text_key": "life.replacement.rain_sword.S10.title",
           "parts": [
             {
-              "text_key": "life.replacement.rain_sword.S10.zh_cn.1",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S10.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S10.zh_cn.3",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S10.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S10.zh_cn.5",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S10.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S10.zh_cn.7",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S10.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S10.zh_cn.9",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S10.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S10.zh_cn.11",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S10.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S10.zh_cn.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S10.zh_cn.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S10.zh_cn.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S10.zh_cn.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S10.zh_cn.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S10.zh_cn.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S10.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S10.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S10.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S10.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S10.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S10.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S10.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S10.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S10.en_us.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S10.en_us.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S10.en_us.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S10.en_us.23",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S10.6",
               "requires": ""
             }
           ],
@@ -1721,115 +793,35 @@
           "text_key": "life.replacement.rain_sword.S11.title",
           "parts": [
             {
-              "text_key": "life.replacement.rain_sword.S11.zh_cn.1",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S11.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S11.zh_cn.3",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S11.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S11.zh_cn.5",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S11.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S11.zh_cn.7",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S11.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S11.zh_cn.9",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S11.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S11.zh_cn.11",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S11.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S11.zh_cn.13",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S11.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S11.zh_cn.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.zh_cn.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.zh_cn.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.zh_cn.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.zh_cn.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.zh_cn.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.zh_cn.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.en_us.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.en_us.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.en_us.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.en_us.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.en_us.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S11.en_us.27",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S11.7",
               "requires": ""
             }
           ],
@@ -1870,147 +862,39 @@
           "text_key": "life.replacement.rain_sword.S12.title",
           "parts": [
             {
-              "text_key": "life.replacement.rain_sword.S12.zh_cn.1",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S12.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S12.zh_cn.3",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S12.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S12.zh_cn.5",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S12.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S12.zh_cn.7",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S12.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S12.zh_cn.9",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S12.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S12.zh_cn.11",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S12.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S12.zh_cn.13",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S12.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S12.zh_cn.15",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S12.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S12.zh_cn.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.zh_cn.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.zh_cn.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.zh_cn.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.zh_cn.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.zh_cn.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.zh_cn.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.zh_cn.31",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.zh_cn.33",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.zh_cn.35",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.en_us.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.en_us.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.en_us.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.en_us.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.en_us.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.en_us.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.en_us.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.en_us.31",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.en_us.33",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S12.en_us.35",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S12.8",
               "requires": ""
             }
           ],
@@ -2060,115 +944,35 @@
           "text_key": "life.replacement.rain_sword.S13.title",
           "parts": [
             {
-              "text_key": "life.replacement.rain_sword.S13.zh_cn.1",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S13.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S13.zh_cn.3",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S13.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S13.zh_cn.5",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S13.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S13.zh_cn.7",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S13.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S13.zh_cn.9",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S13.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S13.zh_cn.11",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S13.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S13.zh_cn.13",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S13.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S13.zh_cn.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.zh_cn.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.zh_cn.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.zh_cn.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.zh_cn.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.zh_cn.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.zh_cn.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.en_us.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.en_us.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.en_us.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.en_us.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.en_us.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S13.en_us.27",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S13.7",
               "requires": ""
             }
           ],
@@ -2203,111 +1007,35 @@
           "text_key": "life.replacement.rain_sword.S14.title",
           "parts": [
             {
-              "text_key": "life.replacement.rain_sword.S14.promise",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S14.0",
               "requires": "crossing_promise"
             },
             {
-              "text_key": "life.replacement.rain_sword.S14.zh_cn.1",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S14.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S14.zh_cn.3",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S14.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S14.zh_cn.5",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S14.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S14.zh_cn.7",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S14.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S14.zh_cn.9",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S14.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S14.zh_cn.11",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S14.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S14.zh_cn.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S14.zh_cn.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S14.zh_cn.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S14.zh_cn.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S14.zh_cn.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S14.zh_cn.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S14.zh_cn.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S14.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S14.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S14.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S14.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S14.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S14.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S14.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S14.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S14.en_us.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S14.en_us.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S14.en_us.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S14.en_us.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S14.en_us.25",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S14.7",
               "requires": ""
             }
           ],
@@ -2348,123 +1076,35 @@
           "text_key": "life.replacement.rain_sword.S15.title",
           "parts": [
             {
-              "text_key": "life.replacement.rain_sword.S15.zh_cn.1",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S15.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S15.zh_cn.3",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S15.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S15.zh_cn.5",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S15.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S15.zh_cn.7",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S15.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S15.zh_cn.9",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S15.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S15.zh_cn.11",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S15.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S15.zh_cn.13",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S15.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.S15.zh_cn.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.zh_cn.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.zh_cn.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.zh_cn.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.zh_cn.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.zh_cn.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.zh_cn.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.zh_cn.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.en_us.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.en_us.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.en_us.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.en_us.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.en_us.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.en_us.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.S15.en_us.29",
+              "text_key": "life.full_rewrite.life_event_rain_sword.S15.7",
               "requires": ""
             }
           ],
@@ -2505,155 +1145,39 @@
           "text_key": "life.replacement.rain_sword.E1.title",
           "parts": [
             {
-              "text_key": "life.replacement.rain_sword.E1.zh_cn.1",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E1.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.E1.zh_cn.3",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E1.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.E1.zh_cn.5",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E1.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.E1.zh_cn.7",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E1.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.E1.zh_cn.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.zh_cn.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.zh_cn.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.zh_cn.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.zh_cn.19",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E1.4",
               "requires": "ferry_dismantled"
             },
             {
-              "text_key": "life.replacement.rain_sword.E1.zh_cn.21",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E1.5",
               "requires": "ferry_dismantled"
             },
             {
-              "text_key": "life.replacement.rain_sword.E1.zh_cn.23",
-              "requires": "ferry_dismantled"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.zh_cn.25",
-              "requires": "ferry_dismantled"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.zh_cn.27",
-              "requires": "ferry_dismantled"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.zh_cn.31",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E1.6",
               "requires": "own_boat"
             },
             {
-              "text_key": "life.replacement.rain_sword.E1.zh_cn.33",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E1.7",
               "requires": "own_boat"
             },
             {
-              "text_key": "life.replacement.rain_sword.E1.zh_cn.35",
-              "requires": "own_boat"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.zh_cn.37",
-              "requires": "own_boat"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.zh_cn.39",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.zh_cn.41",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.en_us.19",
-              "requires": "ferry_dismantled"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.en_us.21",
-              "requires": "ferry_dismantled"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.en_us.23",
-              "requires": "ferry_dismantled"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.en_us.25",
-              "requires": "ferry_dismantled"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.en_us.27",
-              "requires": "ferry_dismantled"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.en_us.31",
-              "requires": "own_boat"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.en_us.33",
-              "requires": "own_boat"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.en_us.35",
-              "requires": "own_boat"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.en_us.37",
-              "requires": "own_boat"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.en_us.39",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E1.en_us.41",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E1.8",
               "requires": ""
             }
           ],
@@ -2680,155 +1204,39 @@
           "text_key": "life.replacement.rain_sword.E2.title",
           "parts": [
             {
-              "text_key": "life.replacement.rain_sword.E2.zh_cn.1",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E2.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.E2.zh_cn.3",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E2.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.E2.zh_cn.5",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E2.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.E2.zh_cn.7",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E2.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.E2.zh_cn.9",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E2.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.E2.zh_cn.11",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E2.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.E2.zh_cn.13",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E2.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.E2.zh_cn.15",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E2.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.E2.zh_cn.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.zh_cn.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.zh_cn.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.zh_cn.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.zh_cn.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.zh_cn.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.zh_cn.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.zh_cn.31",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.zh_cn.33",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.zh_cn.35",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.zh_cn.37",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.en_us.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.en_us.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.en_us.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.en_us.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.en_us.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.en_us.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.en_us.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.en_us.31",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.en_us.33",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.en_us.35",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E2.en_us.37",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E2.8",
               "requires": ""
             }
           ],
@@ -2852,147 +1260,35 @@
           "text_key": "life.replacement.rain_sword.E3.title",
           "parts": [
             {
-              "text_key": "life.replacement.rain_sword.E3.zh_cn.1",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E3.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.E3.zh_cn.3",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E3.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.E3.zh_cn.5",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E3.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.E3.zh_cn.7",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E3.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.E3.zh_cn.9",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E3.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.E3.zh_cn.11",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E3.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.E3.zh_cn.13",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E3.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.rain_sword.E3.zh_cn.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.zh_cn.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.zh_cn.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.zh_cn.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.zh_cn.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.zh_cn.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.zh_cn.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.zh_cn.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.zh_cn.31",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.zh_cn.33",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.zh_cn.35",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.en_us.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.en_us.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.en_us.21",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.en_us.23",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.en_us.25",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.en_us.27",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.en_us.29",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.en_us.31",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.en_us.33",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E3.en_us.35",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E3.7",
               "requires": ""
             }
           ],
@@ -3017,151 +1313,39 @@
           "text_key": "life.replacement.rain_sword.E4.title",
           "parts": [
             {
-              "text_key": "life.replacement.rain_sword.E4.zh_cn.1",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E4.0",
               "requires": "cast_alive:ferryman"
             },
             {
-              "text_key": "life.replacement.rain_sword.E4.zh_cn.3",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E4.1",
               "requires": "cast_alive:ferryman"
             },
             {
-              "text_key": "life.replacement.rain_sword.E4.zh_cn.5",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E4.2",
               "requires": "cast_alive:ferryman"
             },
             {
-              "text_key": "life.replacement.rain_sword.E4.zh_cn.7",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E4.3",
               "requires": "cast_alive:ferryman"
             },
             {
-              "text_key": "life.replacement.rain_sword.E4.zh_cn.9",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E4.4",
               "requires": "cast_alive:ferryman"
             },
             {
-              "text_key": "life.replacement.rain_sword.E4.zh_cn.11",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E4.5",
               "requires": "cast_alive:ferryman"
             },
             {
-              "text_key": "life.replacement.rain_sword.E4.zh_cn.13",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E4.6",
               "requires": "cast_alive:ferryman"
             },
             {
-              "text_key": "life.replacement.rain_sword.E4.zh_cn.15",
-              "requires": "cast_alive:ferryman"
+              "text_key": "life.full_rewrite.life_event_rain_sword.E4.7",
+              "requires": "!cast_alive:ferryman"
             },
             {
-              "text_key": "life.replacement.rain_sword.E4.zh_cn.17",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.zh_cn.19",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.zh_cn.21",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.zh_cn.23",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.zh_cn.25",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.zh_cn.27",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.zh_cn.29",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.zh_cn.31",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.zh_cn.33",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.zh_cn.35",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.en_us.1",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.en_us.3",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.en_us.5",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.en_us.7",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.en_us.9",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.en_us.11",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.en_us.13",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.en_us.15",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.en_us.17",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.en_us.19",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.en_us.21",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.en_us.23",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.en_us.25",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.en_us.27",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.en_us.29",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.en_us.31",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.en_us.33",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.en_us.35",
-              "requires": "cast_alive:ferryman"
-            },
-            {
-              "text_key": "life.replacement.rain_sword.E4.legacy",
+              "text_key": "life.full_rewrite.life_event_rain_sword.E4.8",
               "requires": "!cast_alive:ferryman"
             }
           ],

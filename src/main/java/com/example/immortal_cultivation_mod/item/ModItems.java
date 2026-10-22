@@ -753,52 +753,52 @@ public class ModItems {
     public static final DeferredItem<Item> MORTAL_BEAST_MEAT = registerItem("mortal_beast_meat",
             () -> new Item(new Item.Properties().stacksTo(64).food(
                     new FoodProperties.Builder().nutrition(6)
-                            .saturationModifier(0.55F).build())));
+                            .saturationModifier(0.55F).alwaysEdible().build())));
 
     public static final DeferredItem<Item> LIANQI_BEAST_MEAT = registerItem("lianqi_beast_meat",
             () -> new Item(new Item.Properties().stacksTo(64).food(
                     new FoodProperties.Builder().nutrition(6)
-                            .saturationModifier(0.55F).build())));
+                            .saturationModifier(0.55F).alwaysEdible().build())));
 
     public static final DeferredItem<Item> ZHUJI_BEAST_MEAT = registerItem("zhuji_beast_meat",
             () -> new Item(new Item.Properties().stacksTo(64).food(
                     new FoodProperties.Builder().nutrition(6)
-                            .saturationModifier(0.55F).build())));
+                            .saturationModifier(0.55F).alwaysEdible().build())));
 
     public static final DeferredItem<Item> JINDAN_BEAST_MEAT = registerItem("jindan_beast_meat",
             () -> new Item(new Item.Properties().stacksTo(64).food(
                     new FoodProperties.Builder().nutrition(6)
-                            .saturationModifier(0.55F).build())));
+                            .saturationModifier(0.55F).alwaysEdible().build())));
 
     public static final DeferredItem<Item> YUANYING_BEAST_MEAT = registerItem("yuanying_beast_meat",
             () -> new Item(new Item.Properties().stacksTo(64).food(
                     new FoodProperties.Builder().nutrition(6)
-                            .saturationModifier(0.55F).build())));
+                            .saturationModifier(0.55F).alwaysEdible().build())));
 
     public static final DeferredItem<Item> HUASHEN_BEAST_MEAT = registerItem("huashen_beast_meat",
             () -> new Item(new Item.Properties().stacksTo(64).food(
                     new FoodProperties.Builder().nutrition(6)
-                            .saturationModifier(0.55F).build())));
+                            .saturationModifier(0.55F).alwaysEdible().build())));
 
     public static final DeferredItem<Item> LIANXU_BEAST_MEAT = registerItem("lianxu_beast_meat",
             () -> new Item(new Item.Properties().stacksTo(64).food(
                     new FoodProperties.Builder().nutrition(6)
-                            .saturationModifier(0.55F).build())));
+                            .saturationModifier(0.55F).alwaysEdible().build())));
 
     public static final DeferredItem<Item> HETI_BEAST_MEAT = registerItem("heti_beast_meat",
             () -> new Item(new Item.Properties().stacksTo(64).food(
                     new FoodProperties.Builder().nutrition(6)
-                            .saturationModifier(0.55F).build())));
+                            .saturationModifier(0.55F).alwaysEdible().build())));
 
     public static final DeferredItem<Item> DACHENG_BEAST_MEAT = registerItem("dacheng_beast_meat",
             () -> new Item(new Item.Properties().stacksTo(64).food(
                     new FoodProperties.Builder().nutrition(6)
-                            .saturationModifier(0.55F).build())));
+                            .saturationModifier(0.55F).alwaysEdible().build())));
 
     public static final DeferredItem<Item> DUJIE_BEAST_MEAT = registerItem("dujie_beast_meat",
             () -> new Item(new Item.Properties().stacksTo(64).food(
                     new FoodProperties.Builder().nutrition(6)
-                            .saturationModifier(0.55F).build())));
+                            .saturationModifier(0.55F).alwaysEdible().build())));
 
     public static final DeferredItem<Item> COLD_MARROW = registerItem("cold_marrow",
             () -> new BeastMaterialItem(new Item.Properties().stacksTo(16).rarity(Rarity.RARE), 2));

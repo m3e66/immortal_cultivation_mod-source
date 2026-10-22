@@ -77,19 +77,26 @@ abstract class AbstractNpcScreen extends Screen implements NpcDataScreen {
     }
 
     protected final int panelWidth() {
-        return Math.min(PANEL_WIDTH, Math.max(208, width - 16));
+        return PANEL_WIDTH;
     }
 
     protected final int panelHeight() {
-        return Math.min(PANEL_HEIGHT, Math.max(280, height - 16));
+        return PANEL_HEIGHT;
+    }
+
+    // Keep the complete layout (including option pages) intact on small GUI viewports.
+    // Input must use this same transform; shrinking only the background clips controls.
+    private float panelScale() {
+        return Math.min(1.0F, Math.min(Math.max(1, width - 16) / (float) PANEL_WIDTH,
+                Math.max(1, height - 16) / (float) PANEL_HEIGHT));
     }
 
     protected final int panelX() {
-        return width - panelWidth() - 8;
+        return (int) ((width - 8) / panelScale()) - panelWidth();
     }
 
     protected final int panelY() {
-        return (height - panelHeight()) / 2;
+        return (int) ((height / panelScale() - panelHeight()) / 2);
     }
 
     protected final int contentX() {
@@ -110,11 +117,46 @@ abstract class AbstractNpcScreen extends Screen implements NpcDataScreen {
 
     @Override
     public final void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        renderPanel(graphics);
-        renderContent(graphics, mouseX, mouseY, partialTick);
-        super.render(graphics, mouseX, mouseY, partialTick);
-        renderForeground(graphics, mouseX, mouseY, partialTick);
-        renderStatus(graphics);
+        float scale = panelScale();
+        int localMouseX = (int) Math.floor(mouseX / scale);
+        int localMouseY = (int) Math.floor(mouseY / scale);
+        graphics.pose().pushPose();
+        graphics.pose().scale(scale, scale, 1.0F);
+        try {
+            renderPanel(graphics);
+            renderContent(graphics, localMouseX, localMouseY, partialTick);
+            super.render(graphics, localMouseX, localMouseY, partialTick);
+            renderForeground(graphics, localMouseX, localMouseY, partialTick);
+            renderStatus(graphics);
+        } finally {
+            graphics.pose().popPose();
+        }
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return super.mouseClicked(mouseX / panelScale(), mouseY / panelScale(), button);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        return super.mouseReleased(mouseX / panelScale(), mouseY / panelScale(), button);
+    }
+
+    @Override
+    public void mouseMoved(double mouseX, double mouseY) {
+        super.mouseMoved(mouseX / panelScale(), mouseY / panelScale());
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        float scale = panelScale();
+        return super.mouseDragged(mouseX / scale, mouseY / scale, button, dragX / scale, dragY / scale);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        return super.mouseScrolled(mouseX / panelScale(), mouseY / panelScale(), scrollX, scrollY);
     }
 
     private void renderPanel(GuiGraphics graphics) {

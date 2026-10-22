@@ -16,99 +16,43 @@
           "text_key": "life.replacement.third_bell.S01.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.S01.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.S01.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S01.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.S01.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S01.zh_cn.2",
+              "text_key": "life.full_rewrite.life_story_third_bell.S01.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S01.zh_cn.3",
+              "text_key": "life.full_rewrite.life_story_third_bell.S01.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S01.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.S01.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S01.zh_cn.5",
+              "text_key": "life.full_rewrite.life_story_third_bell.S01.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S01.zh_cn.6",
+              "text_key": "life.full_rewrite.life_story_third_bell.S01.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S01.zh_cn.7",
+              "text_key": "life.full_rewrite.life_story_third_bell.S01.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S01.zh_cn.8",
+              "text_key": "life.full_rewrite.life_story_third_bell.S01.8",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S01.zh_cn.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S01.zh_cn.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S01.zh_cn.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S01.en_us.0",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S01.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S01.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S01.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S01.en_us.4",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S01.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S01.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S01.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S01.en_us.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S01.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S01.en_us.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S01.en_us.11",
+              "text_key": "life.full_rewrite.life_story_third_bell.S01.9",
               "requires": ""
             }
           ],
@@ -143,91 +87,43 @@
           "text_key": "life.replacement.third_bell.S02.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.S02.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.S02.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S02.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.S02.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S02.zh_cn.2",
+              "text_key": "life.full_rewrite.life_story_third_bell.S02.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S02.zh_cn.3",
+              "text_key": "life.full_rewrite.life_story_third_bell.S02.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S02.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.S02.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S02.zh_cn.5",
+              "text_key": "life.full_rewrite.life_story_third_bell.S02.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S02.zh_cn.6",
+              "text_key": "life.full_rewrite.life_story_third_bell.S02.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S02.zh_cn.7",
+              "text_key": "life.full_rewrite.life_story_third_bell.S02.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S02.zh_cn.8",
+              "text_key": "life.full_rewrite.life_story_third_bell.S02.8",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S02.zh_cn.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S02.zh_cn.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S02.en_us.0",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S02.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S02.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S02.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S02.en_us.4",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S02.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S02.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S02.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S02.en_us.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S02.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S02.en_us.10",
+              "text_key": "life.full_rewrite.life_story_third_bell.S02.9",
               "requires": ""
             }
           ],
@@ -277,131 +173,43 @@
           "text_key": "life.replacement.third_bell.S03.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.S03.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.S03.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S03.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.S03.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S03.zh_cn.2",
+              "text_key": "life.full_rewrite.life_story_third_bell.S03.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S03.zh_cn.3",
+              "text_key": "life.full_rewrite.life_story_third_bell.S03.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S03.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.S03.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S03.zh_cn.5",
+              "text_key": "life.full_rewrite.life_story_third_bell.S03.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S03.zh_cn.6",
+              "text_key": "life.full_rewrite.life_story_third_bell.S03.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S03.zh_cn.7",
+              "text_key": "life.full_rewrite.life_story_third_bell.S03.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S03.zh_cn.8",
+              "text_key": "life.full_rewrite.life_story_third_bell.S03.8",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S03.zh_cn.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.zh_cn.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.zh_cn.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.zh_cn.12",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.zh_cn.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.zh_cn.14",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.zh_cn.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.en_us.0",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.en_us.4",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.en_us.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.en_us.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.en_us.12",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.en_us.14",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S03.en_us.15",
+              "text_key": "life.full_rewrite.life_story_third_bell.S03.9",
               "requires": ""
             }
           ],
@@ -437,91 +245,43 @@
           "text_key": "life.replacement.third_bell.S04.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.S04.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.S04.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S04.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.S04.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S04.zh_cn.2",
+              "text_key": "life.full_rewrite.life_story_third_bell.S04.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S04.zh_cn.3",
+              "text_key": "life.full_rewrite.life_story_third_bell.S04.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S04.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.S04.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S04.zh_cn.5",
+              "text_key": "life.full_rewrite.life_story_third_bell.S04.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S04.zh_cn.6",
+              "text_key": "life.full_rewrite.life_story_third_bell.S04.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S04.zh_cn.7",
+              "text_key": "life.full_rewrite.life_story_third_bell.S04.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S04.zh_cn.8",
+              "text_key": "life.full_rewrite.life_story_third_bell.S04.8",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S04.zh_cn.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S04.zh_cn.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S04.en_us.0",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S04.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S04.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S04.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S04.en_us.4",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S04.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S04.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S04.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S04.en_us.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S04.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S04.en_us.10",
+              "text_key": "life.full_rewrite.life_story_third_bell.S04.9",
               "requires": ""
             }
           ],
@@ -568,115 +328,47 @@
           "text_key": "life.replacement.third_bell.S05.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.S05.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.S05.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S05.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.S05.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S05.zh_cn.2",
+              "text_key": "life.full_rewrite.life_story_third_bell.S05.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S05.zh_cn.3",
+              "text_key": "life.full_rewrite.life_story_third_bell.S05.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S05.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.S05.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S05.zh_cn.5",
+              "text_key": "life.full_rewrite.life_story_third_bell.S05.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S05.zh_cn.6",
+              "text_key": "life.full_rewrite.life_story_third_bell.S05.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S05.zh_cn.7",
+              "text_key": "life.full_rewrite.life_story_third_bell.S05.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S05.zh_cn.8",
+              "text_key": "life.full_rewrite.life_story_third_bell.S05.8",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S05.zh_cn.9",
+              "text_key": "life.full_rewrite.life_story_third_bell.S05.9",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S05.zh_cn.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S05.zh_cn.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S05.zh_cn.12",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S05.zh_cn.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S05.en_us.0",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S05.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S05.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S05.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S05.en_us.4",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S05.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S05.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S05.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S05.en_us.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S05.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S05.en_us.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S05.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S05.en_us.12",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S05.en_us.13",
+              "text_key": "life.full_rewrite.life_story_third_bell.S05.10",
               "requires": ""
             }
           ],
@@ -707,123 +399,47 @@
           "text_key": "life.replacement.third_bell.S06.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.S06.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.S06.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S06.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.S06.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S06.zh_cn.2",
+              "text_key": "life.full_rewrite.life_story_third_bell.S06.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S06.zh_cn.3",
+              "text_key": "life.full_rewrite.life_story_third_bell.S06.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S06.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.S06.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S06.zh_cn.5",
+              "text_key": "life.full_rewrite.life_story_third_bell.S06.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S06.zh_cn.6",
+              "text_key": "life.full_rewrite.life_story_third_bell.S06.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S06.zh_cn.7",
+              "text_key": "life.full_rewrite.life_story_third_bell.S06.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S06.zh_cn.8",
+              "text_key": "life.full_rewrite.life_story_third_bell.S06.8",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S06.zh_cn.9",
+              "text_key": "life.full_rewrite.life_story_third_bell.S06.9",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S06.zh_cn.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S06.zh_cn.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S06.zh_cn.12",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S06.zh_cn.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S06.zh_cn.14",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S06.en_us.0",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S06.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S06.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S06.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S06.en_us.4",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S06.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S06.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S06.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S06.en_us.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S06.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S06.en_us.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S06.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S06.en_us.12",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S06.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S06.en_us.14",
+              "text_key": "life.full_rewrite.life_story_third_bell.S06.10",
               "requires": ""
             }
           ],
@@ -862,179 +478,51 @@
           "text_key": "life.replacement.third_bell.S07.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.S07.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.S07.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.2",
+              "text_key": "life.full_rewrite.life_story_third_bell.S07.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.3",
+              "text_key": "life.full_rewrite.life_story_third_bell.S07.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.S07.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.5",
+              "text_key": "life.full_rewrite.life_story_third_bell.S07.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.6",
+              "text_key": "life.full_rewrite.life_story_third_bell.S07.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.7",
+              "text_key": "life.full_rewrite.life_story_third_bell.S07.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.8",
+              "text_key": "life.full_rewrite.life_story_third_bell.S07.8",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.9",
+              "text_key": "life.full_rewrite.life_story_third_bell.S07.9",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.12",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.14",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.16",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.18",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.20",
+              "text_key": "life.full_rewrite.life_story_third_bell.S07.10",
               "requires": "protection"
             },
             {
-              "text_key": "life.replacement.third_bell.S07.zh_cn.21",
-              "requires": "delayed"
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.0",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.4",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.12",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.14",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.16",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.18",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.20",
-              "requires": "protection"
-            },
-            {
-              "text_key": "life.replacement.third_bell.S07.en_us.21",
+              "text_key": "life.full_rewrite.life_story_third_bell.S07.11",
               "requires": "delayed"
             }
           ],
@@ -1069,115 +557,43 @@
           "text_key": "life.replacement.third_bell.S08.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.S08.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.S08.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S08.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.S08.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S08.zh_cn.2",
+              "text_key": "life.full_rewrite.life_story_third_bell.S08.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S08.zh_cn.3",
+              "text_key": "life.full_rewrite.life_story_third_bell.S08.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S08.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.S08.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S08.zh_cn.5",
+              "text_key": "life.full_rewrite.life_story_third_bell.S08.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S08.zh_cn.6",
+              "text_key": "life.full_rewrite.life_story_third_bell.S08.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S08.zh_cn.7",
+              "text_key": "life.full_rewrite.life_story_third_bell.S08.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S08.zh_cn.8",
+              "text_key": "life.full_rewrite.life_story_third_bell.S08.8",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S08.zh_cn.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S08.zh_cn.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S08.zh_cn.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S08.zh_cn.12",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S08.zh_cn.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S08.en_us.0",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S08.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S08.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S08.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S08.en_us.4",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S08.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S08.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S08.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S08.en_us.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S08.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S08.en_us.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S08.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S08.en_us.12",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S08.en_us.13",
+              "text_key": "life.full_rewrite.life_story_third_bell.S08.9",
               "requires": ""
             }
           ],
@@ -1220,107 +636,43 @@
           "text_key": "life.replacement.third_bell.S09.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.S09.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.S09.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S09.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.S09.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S09.zh_cn.2",
+              "text_key": "life.full_rewrite.life_story_third_bell.S09.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S09.zh_cn.3",
+              "text_key": "life.full_rewrite.life_story_third_bell.S09.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S09.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.S09.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S09.zh_cn.5",
+              "text_key": "life.full_rewrite.life_story_third_bell.S09.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S09.zh_cn.6",
+              "text_key": "life.full_rewrite.life_story_third_bell.S09.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S09.zh_cn.7",
+              "text_key": "life.full_rewrite.life_story_third_bell.S09.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S09.zh_cn.8",
+              "text_key": "life.full_rewrite.life_story_third_bell.S09.8",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S09.zh_cn.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S09.zh_cn.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S09.zh_cn.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S09.zh_cn.12",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S09.en_us.0",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S09.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S09.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S09.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S09.en_us.4",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S09.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S09.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S09.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S09.en_us.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S09.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S09.en_us.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S09.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S09.en_us.12",
+              "text_key": "life.full_rewrite.life_story_third_bell.S09.9",
               "requires": ""
             }
           ],
@@ -1372,67 +724,35 @@
           "text_key": "life.replacement.third_bell.S10.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.S10.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.S10.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S10.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.S10.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S10.zh_cn.2",
+              "text_key": "life.full_rewrite.life_story_third_bell.S10.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S10.zh_cn.3",
+              "text_key": "life.full_rewrite.life_story_third_bell.S10.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S10.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.S10.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S10.zh_cn.5",
+              "text_key": "life.full_rewrite.life_story_third_bell.S10.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S10.zh_cn.6",
+              "text_key": "life.full_rewrite.life_story_third_bell.S10.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S10.zh_cn.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S10.en_us.0",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S10.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S10.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S10.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S10.en_us.4",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S10.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S10.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S10.en_us.7",
+              "text_key": "life.full_rewrite.life_story_third_bell.S10.7",
               "requires": ""
             }
           ],
@@ -1491,107 +811,47 @@
           "text_key": "life.replacement.third_bell.S11.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.S11.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.S11.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S11.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.S11.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S11.zh_cn.2",
+              "text_key": "life.full_rewrite.life_story_third_bell.S11.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S11.zh_cn.3",
+              "text_key": "life.full_rewrite.life_story_third_bell.S11.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S11.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.S11.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S11.zh_cn.5",
+              "text_key": "life.full_rewrite.life_story_third_bell.S11.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S11.zh_cn.6",
+              "text_key": "life.full_rewrite.life_story_third_bell.S11.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S11.zh_cn.7",
+              "text_key": "life.full_rewrite.life_story_third_bell.S11.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S11.zh_cn.8",
+              "text_key": "life.full_rewrite.life_story_third_bell.S11.8",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S11.zh_cn.9",
+              "text_key": "life.full_rewrite.life_story_third_bell.S11.9",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S11.zh_cn.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S11.zh_cn.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S11.zh_cn.12",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S11.en_us.0",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S11.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S11.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S11.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S11.en_us.4",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S11.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S11.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S11.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S11.en_us.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S11.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S11.en_us.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S11.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S11.en_us.12",
+              "text_key": "life.full_rewrite.life_story_third_bell.S11.10",
               "requires": ""
             }
           ],
@@ -1620,179 +880,55 @@
           "text_key": "life.replacement.third_bell.S12.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.S12.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.S12.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.2",
+              "text_key": "life.full_rewrite.life_story_third_bell.S12.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.3",
+              "text_key": "life.full_rewrite.life_story_third_bell.S12.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.S12.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.5",
+              "text_key": "life.full_rewrite.life_story_third_bell.S12.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.6",
+              "text_key": "life.full_rewrite.life_story_third_bell.S12.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.7",
+              "text_key": "life.full_rewrite.life_story_third_bell.S12.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.8",
+              "text_key": "life.full_rewrite.life_story_third_bell.S12.8",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.9",
+              "text_key": "life.full_rewrite.life_story_third_bell.S12.9",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.10",
+              "text_key": "life.full_rewrite.life_story_third_bell.S12.10",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.12",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.14",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.16",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.18",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.20",
+              "text_key": "life.full_rewrite.life_story_third_bell.S12.11",
               "requires": "protection_broken"
             },
             {
-              "text_key": "life.replacement.third_bell.S12.zh_cn.21",
-              "requires": "!signed"
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.0",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.4",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.12",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.14",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.16",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.17",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.18",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.19",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.20",
-              "requires": "protection_broken"
-            },
-            {
-              "text_key": "life.replacement.third_bell.S12.en_us.21",
+              "text_key": "life.full_rewrite.life_story_third_bell.S12.12",
               "requires": "!signed"
             }
           ],
@@ -1835,83 +971,43 @@
           "text_key": "life.replacement.third_bell.S13.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.S13.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.S13.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S13.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.S13.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S13.zh_cn.2",
+              "text_key": "life.full_rewrite.life_story_third_bell.S13.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S13.zh_cn.3",
+              "text_key": "life.full_rewrite.life_story_third_bell.S13.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S13.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.S13.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S13.zh_cn.5",
+              "text_key": "life.full_rewrite.life_story_third_bell.S13.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S13.zh_cn.6",
+              "text_key": "life.full_rewrite.life_story_third_bell.S13.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S13.zh_cn.7",
+              "text_key": "life.full_rewrite.life_story_third_bell.S13.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S13.zh_cn.8",
+              "text_key": "life.full_rewrite.life_story_third_bell.S13.8",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S13.zh_cn.9",
-              "requires": "secrecy"
-            },
-            {
-              "text_key": "life.replacement.third_bell.S13.en_us.0",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S13.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S13.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S13.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S13.en_us.4",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S13.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S13.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S13.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S13.en_us.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S13.en_us.9",
+              "text_key": "life.full_rewrite.life_story_third_bell.S13.9",
               "requires": "secrecy"
             }
           ],
@@ -1952,131 +1048,43 @@
           "text_key": "life.replacement.third_bell.S14.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.S14.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.S14.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S14.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.S14.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S14.zh_cn.2",
+              "text_key": "life.full_rewrite.life_story_third_bell.S14.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S14.zh_cn.3",
+              "text_key": "life.full_rewrite.life_story_third_bell.S14.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S14.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.S14.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S14.zh_cn.5",
+              "text_key": "life.full_rewrite.life_story_third_bell.S14.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S14.zh_cn.6",
+              "text_key": "life.full_rewrite.life_story_third_bell.S14.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S14.zh_cn.7",
+              "text_key": "life.full_rewrite.life_story_third_bell.S14.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S14.zh_cn.8",
+              "text_key": "life.full_rewrite.life_story_third_bell.S14.8",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S14.zh_cn.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.zh_cn.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.zh_cn.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.zh_cn.12",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.zh_cn.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.zh_cn.14",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.zh_cn.15",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.en_us.0",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.en_us.4",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.en_us.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.en_us.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.en_us.12",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.en_us.13",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.en_us.14",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S14.en_us.15",
+              "text_key": "life.full_rewrite.life_story_third_bell.S14.9",
               "requires": ""
             }
           ],
@@ -2113,107 +1121,39 @@
           "text_key": "life.replacement.third_bell.S15.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.S15.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.S15.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S15.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.S15.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S15.zh_cn.2",
+              "text_key": "life.full_rewrite.life_story_third_bell.S15.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S15.zh_cn.3",
+              "text_key": "life.full_rewrite.life_story_third_bell.S15.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S15.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.S15.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S15.zh_cn.5",
+              "text_key": "life.full_rewrite.life_story_third_bell.S15.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S15.zh_cn.6",
+              "text_key": "life.full_rewrite.life_story_third_bell.S15.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S15.zh_cn.7",
+              "text_key": "life.full_rewrite.life_story_third_bell.S15.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S15.zh_cn.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S15.zh_cn.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S15.zh_cn.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S15.zh_cn.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S15.zh_cn.12",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S15.en_us.0",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S15.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S15.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S15.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S15.en_us.4",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S15.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S15.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S15.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S15.en_us.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S15.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S15.en_us.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S15.en_us.11",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S15.en_us.12",
+              "text_key": "life.full_rewrite.life_story_third_bell.S15.8",
               "requires": ""
             }
           ],
@@ -2243,83 +1183,43 @@
           "text_key": "life.replacement.third_bell.S16.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.S16.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.S16.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S16.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.S16.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S16.zh_cn.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S16.zh_cn.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S16.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.S16.2",
               "requires": "custody"
             },
             {
-              "text_key": "life.replacement.third_bell.S16.zh_cn.5",
+              "text_key": "life.full_rewrite.life_story_third_bell.S16.3",
               "requires": "!custody"
             },
             {
-              "text_key": "life.replacement.third_bell.S16.zh_cn.6",
+              "text_key": "life.full_rewrite.life_story_third_bell.S16.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S16.zh_cn.7",
+              "text_key": "life.full_rewrite.life_story_third_bell.S16.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S16.zh_cn.8",
+              "text_key": "life.full_rewrite.life_story_third_bell.S16.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S16.zh_cn.9",
+              "text_key": "life.full_rewrite.life_story_third_bell.S16.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S16.en_us.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.S16.8",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.S16.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S16.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S16.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S16.en_us.4",
-              "requires": "custody"
-            },
-            {
-              "text_key": "life.replacement.third_bell.S16.en_us.5",
-              "requires": "!custody"
-            },
-            {
-              "text_key": "life.replacement.third_bell.S16.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S16.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S16.en_us.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.S16.en_us.9",
+              "text_key": "life.full_rewrite.life_story_third_bell.S16.9",
               "requires": ""
             }
           ],
@@ -2360,99 +1260,39 @@
           "text_key": "life.replacement.third_bell.E1.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.E1.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.E1.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E1.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.E1.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E1.zh_cn.2",
+              "text_key": "life.full_rewrite.life_story_third_bell.E1.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E1.zh_cn.3",
+              "text_key": "life.full_rewrite.life_story_third_bell.E1.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E1.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.E1.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E1.zh_cn.5",
+              "text_key": "life.full_rewrite.life_story_third_bell.E1.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E1.zh_cn.6",
+              "text_key": "life.full_rewrite.life_story_third_bell.E1.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E1.zh_cn.7",
+              "text_key": "life.full_rewrite.life_story_third_bell.E1.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E1.zh_cn.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E1.zh_cn.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E1.zh_cn.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E1.zh_cn.11",
-              "requires": "secrecy_broken"
-            },
-            {
-              "text_key": "life.replacement.third_bell.E1.en_us.0",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E1.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E1.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E1.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E1.en_us.4",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E1.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E1.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E1.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E1.en_us.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E1.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E1.en_us.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E1.en_us.11",
+              "text_key": "life.full_rewrite.life_story_third_bell.E1.8",
               "requires": "secrecy_broken"
             }
           ],
@@ -2481,91 +1321,39 @@
           "text_key": "life.replacement.third_bell.E2.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.E2.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.E2.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E2.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.E2.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E2.zh_cn.2",
+              "text_key": "life.full_rewrite.life_story_third_bell.E2.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E2.zh_cn.3",
+              "text_key": "life.full_rewrite.life_story_third_bell.E2.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E2.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.E2.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E2.zh_cn.5",
+              "text_key": "life.full_rewrite.life_story_third_bell.E2.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E2.zh_cn.6",
+              "text_key": "life.full_rewrite.life_story_third_bell.E2.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E2.zh_cn.7",
+              "text_key": "life.full_rewrite.life_story_third_bell.E2.7",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E2.zh_cn.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E2.zh_cn.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E2.zh_cn.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E2.en_us.0",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E2.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E2.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E2.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E2.en_us.4",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E2.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E2.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E2.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E2.en_us.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E2.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E2.en_us.10",
+              "text_key": "life.full_rewrite.life_story_third_bell.E2.8",
               "requires": ""
             }
           ],
@@ -2593,91 +1381,35 @@
           "text_key": "life.replacement.third_bell.E3.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.E3.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.E3.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E3.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.E3.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E3.zh_cn.2",
+              "text_key": "life.full_rewrite.life_story_third_bell.E3.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E3.zh_cn.3",
+              "text_key": "life.full_rewrite.life_story_third_bell.E3.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E3.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.E3.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E3.zh_cn.5",
+              "text_key": "life.full_rewrite.life_story_third_bell.E3.5",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E3.zh_cn.6",
+              "text_key": "life.full_rewrite.life_story_third_bell.E3.6",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E3.zh_cn.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E3.zh_cn.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E3.zh_cn.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E3.zh_cn.10",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E3.en_us.0",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E3.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E3.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E3.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E3.en_us.4",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E3.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E3.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E3.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E3.en_us.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E3.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E3.en_us.10",
+              "text_key": "life.full_rewrite.life_story_third_bell.E3.7",
               "requires": ""
             }
           ],
@@ -2704,100 +1436,36 @@
           "text_key": "life.replacement.third_bell.E4.title",
           "parts": [
             {
-              "text_key": "life.replacement.third_bell.E4.zh_cn.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.E4.0",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E4.zh_cn.1",
+              "text_key": "life.full_rewrite.life_story_third_bell.E4.1",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E4.zh_cn.2",
+              "text_key": "life.full_rewrite.life_story_third_bell.E4.2",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E4.zh_cn.3",
+              "text_key": "life.full_rewrite.life_story_third_bell.E4.3",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E4.zh_cn.4",
+              "text_key": "life.full_rewrite.life_story_third_bell.E4.4",
               "requires": ""
             },
             {
-              "text_key": "life.replacement.third_bell.E4.zh_cn.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E4.zh_cn.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E4.zh_cn.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E4.zh_cn.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E4.zh_cn.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E4.zh_cn.10",
+              "text_key": "life.full_rewrite.life_story_third_bell.E4.5",
               "requires": "stayed"
             },
             {
-              "text_key": "life.replacement.third_bell.E4.zh_cn.11",
+              "text_key": "life.full_rewrite.life_story_third_bell.E4.6",
               "requires": "petitioned"
             },
             {
-              "text_key": "life.replacement.third_bell.E4.en_us.0",
+              "text_key": "life.full_rewrite.life_story_third_bell.E4.7",
               "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E4.en_us.1",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E4.en_us.2",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E4.en_us.3",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E4.en_us.4",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E4.en_us.5",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E4.en_us.6",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E4.en_us.7",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E4.en_us.8",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E4.en_us.9",
-              "requires": ""
-            },
-            {
-              "text_key": "life.replacement.third_bell.E4.en_us.10",
-              "requires": "stayed"
-            },
-            {
-              "text_key": "life.replacement.third_bell.E4.en_us.11",
-              "requires": "petitioned"
             }
           ],
           "choices": [
