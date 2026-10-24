@@ -62,6 +62,9 @@ public final class DaoGuidanceObservations {
         items.addAll(player.getInventory().offhand);
         for (ItemStack stack : items) {
             if (stack.isEmpty()) continue;
+            if(stack.getItem() instanceof com.example.immortal_cultivation_mod.farming.SpiritSeedItem
+                    ||stack.is(com.example.immortal_cultivation_mod.farming.SpiritFarming.FARMLAND_ITEM.get()))
+                DaoGuidanceSystem.discover(player,"spirit_farming");
             if (stack.getItem() instanceof FlameVesselItem) {
                 record(player, "vessel_obtained");
                 if (FlameVesselItem.flame(stack) != null) {

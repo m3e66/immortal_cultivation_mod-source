@@ -4,6 +4,7 @@
   "package": "com.example.immortal_cultivation_mod.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "SpellProjectileCollisionMixin",
     "ColdTidePlayerActionsMixin",
     "ColdTidePlayerPayloadMixin",
     "SpiritWoodBiomeSourceMixin",

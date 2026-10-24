@@ -266,11 +266,23 @@ public final class CultivatorSpellExecution {
     }
 
     public static boolean applyRegeneration(LivingEntity caster) {
-        if (caster.getHealth() >= caster.getMaxHealth()) {
+        return applyRegeneration(caster, ModSpells.REGENERATION);
+    }
+
+    public static boolean canApplyRegeneration(LivingEntity caster) {
+        return caster.isAlive() && caster.getHealth() < caster.getMaxHealth()
+                && !caster.hasEffect(ModEffects.SPRING_RECOVERY) && !caster.hasEffect(MobEffects.HEAL);
+    }
+
+    public static boolean applyRegeneration(LivingEntity caster, String spellId) {
+        if (!canApplyRegeneration(caster)) {
             return false;
         }
-        caster.addEffect(new MobEffectInstance(MobEffects.HEAL, 20, 0));
-        return true;
+        if (!ModSpells.REGENERATION.equals(ModSpells.normalizeId(spellId))
+                && !HealingTechniques.isTechnique(spellId)) return false;
+        return caster.addEffect(new MobEffectInstance(ModEffects.SPRING_RECOVERY, 20,
+                com.example.immortal_cultivation_mod.attachment.CultivationLevels
+                        .getStageIndex(ModSpells.realmLevel(spellId))));
     }
 
     public static boolean applyQiGathering(LivingEntity caster) {

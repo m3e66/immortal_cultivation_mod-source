@@ -403,8 +403,6 @@ public final class PhantomVeilFoxEntity extends RealmBeastMonster implements Geo
             long until = level.getGameTime() + 120L;
             target.getPersistentData().putLong("PhantomVeilBewilderedUntil", until);
             target.getPersistentData().putLong("PhantomVeilLockOnDisruptedUntil", until);
-            target.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 120, 0,
-                    false, true, true));
             target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 120, 0,
                     false, true, true));
             burst(level, ParticleTypes.WITCH,
@@ -467,8 +465,6 @@ public final class PhantomVeilFoxEntity extends RealmBeastMonster implements Geo
                 target.hurt(damageSources().indirectMagic(this, this), techniqueDamage(90.0F));
                 target.addEffect(new MobEffectInstance(
                         MobEffects.MOVEMENT_SLOWDOWN, 35, 0, false, true, true));
-                target.addEffect(new MobEffectInstance(
-                        MobEffects.DARKNESS, 35, 0, false, false, true));
                 target.getPersistentData().putLong(
                         "PhantomVeilLockOnDisruptedUntil", level.getGameTime() + 35L);
             }
@@ -510,8 +506,6 @@ public final class PhantomVeilFoxEntity extends RealmBeastMonster implements Geo
             BeastMoveBlockBreaker.breakSphere(level, this, target.position(), 2.8, 1.8, 48, 8);
         target.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 80, 0,
                 false, true, true));
-        target.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 80, 0,
-                false, false, true));
         target.getPersistentData().putLong(
                 "PhantomVeilSenseShockUntil", level.getGameTime() + 80L);
         crescentParticles(level,
@@ -534,8 +528,6 @@ public final class PhantomVeilFoxEntity extends RealmBeastMonster implements Geo
         long until = level.getGameTime() + 140L;
         target.getPersistentData().putLong("PhantomVeilWrongDistanceUntil", until);
         target.getPersistentData().putLong("PhantomVeilLockOnDisruptedUntil", until);
-        target.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 140, 0,
-                false, true, true));
         Vec3 center = target.position().add(0.0D, target.getBbHeight() * 0.7D, 0.0D);
         for (int i = 0; i < 24; i++) {
             double angle = Math.PI * 2.0D * i / 24.0D;

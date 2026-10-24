@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "age=0": {
+      "model": "immortal_cultivation_mod:block/farming/chiyan_flower_0"
+    },
+    "age=1": {
+      "model": "immortal_cultivation_mod:block/farming/chiyan_flower_1"
+    },
+    "age=2": {
+      "model": "immortal_cultivation_mod:block/farming/chiyan_flower_2"
+    },
+    "age=3": {
+      "model": "immortal_cultivation_mod:block/farming/chiyan_flower_3"
+    },
+    "age=4": {
+      "model": "immortal_cultivation_mod:block/farming/chiyan_flower_4"
+    }
+  }
+}

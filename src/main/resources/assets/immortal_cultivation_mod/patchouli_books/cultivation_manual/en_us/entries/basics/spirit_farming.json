@@ -1,0 +1,38 @@
+{
+  "name": "Spirit Plant Farming",
+  "icon": "immortal_cultivation_mod:qingling_grass_seeds",
+  "category": "immortal_cultivation_mod:basics",
+  "sortnum": 15,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Spirit Plant Farming",
+      "text": "Harvest mature wild herbs for ingredients and a chance of seeds. All eight species grow on ordinary farmland or spirit farmland, including vines, lotus and moss.$(br2)Crops have five visible stages. Breaking immature crops returns only their planted seed."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Spirit Farmland",
+      "text": "Surround one dirt block with eight basic spirit stones at a crafting table to obtain one spirit farmland. Collecting a spirit stone unlocks the recipe. You can also right-click ordinary farmland while holding at least eight basic spirit stones; each conversion consumes eight.$(br2)Spirit farmland supplies 25 additional local Qi to its rooted crop and never dries out. Planted spiritual crops also keep ordinary dry farmland usable. Trampling or placing solid blocks above can still turn farmland into dirt."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "One Source of Growth",
+      "text": "Existing spirit veins each contribute 25 ambient Qi within the same 48-block range used by spiritual sense. Each vein is counted once; adjacent spirit farmland does not stack.$(br2)Qi below 10: 50% speed; 10–24: 75%; 25–49: normal; 50–74: 150%; 75+: 200%. Server configuration can change these thresholds and farmland Qi."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Growing Days",
+      "text": "At normal Qi: Clear Spirit Grass 3–4 days; Crimson Flame Flower and Dew-Congealing Zhi 5–7; Purple Cloud Vine 6–9; Profound Ice Lotus 8–12; Soul-Devouring Grass 7–10; Bone-Corroding Moss 5–8; Illusory Dawn Silk 10–14.$(br2)One day is 24,000 ticks. These are expected durations at randomTickSpeed 3; natural variation applies. Unloaded crops pause and resume from saved progress."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Harvest and Regrow",
+      "text": "Right-click mature crops to gather herbs and leave roots to regrow. Common herbs yield 1–3, uncommon 1–2, rare 1 with a 10% chance of another. Fortune may add at most one extra herb. Qi changes speed, never yield.$(br2)Extra seed chances: common 65%, uncommon 35%, rare 12%. Breaking a crop also returns its original seed. Existing alchemy ingredients and formulas remain valid."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "A Simple Garden",
+      "text": "No personal Qi, watering, fertilizer, sunlight, temperature, support structures or realm requirements. Grass is common; flame flower, dew zhi, purple vine and moss are uncommon; ice lotus, soul grass and dawn silk are rare.$(br2)Placing harvested herb items only returns the original herb when harvested again. Expand gardens with seeds, not placed ingredients."
+    }
+  ]
+}

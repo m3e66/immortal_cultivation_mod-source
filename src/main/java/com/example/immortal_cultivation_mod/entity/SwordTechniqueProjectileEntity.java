@@ -475,21 +475,22 @@ public final class SwordTechniqueProjectileEntity extends ThrowableItemProjectil
         if (blockHit.getType() == HitResult.Type.BLOCK) {
             end = blockHit.getLocation();
         }
-        AABB path = new AABB(extendedStart, end).inflate(0.14D);
+        double contactMargin = com.example.immortal_cultivation_mod.spell.SpellProjectileCollision.margin(this, 0.16F);
+        AABB path = new AABB(extendedStart, end).inflate(contactMargin);
         Vec3 finalEnd = end;
         List<LivingEntity> targets = level().getEntitiesOfClass(
                         LivingEntity.class, path, this::canHitEntity)
                 .stream()
-                .filter(target -> target.getBoundingBox().inflate(0.16D)
+                .filter(target -> target.getBoundingBox().inflate(contactMargin)
                         .clip(extendedStart, finalEnd).isPresent())
-                .sorted(Comparator.comparingDouble(target -> target.getBoundingBox().inflate(0.16D)
+                .sorted(Comparator.comparingDouble(target -> target.getBoundingBox().inflate(contactMargin)
                         .clip(extendedStart, finalEnd).orElse(finalEnd).distanceToSqr(extendedStart)))
                 .toList();
         for (LivingEntity target : targets) {
             if (!isAlive() || hitTargets.size() >= 2) {
                 break;
             }
-            Vec3 hit = target.getBoundingBox().inflate(0.16D)
+            Vec3 hit = target.getBoundingBox().inflate(contactMargin)
                     .clip(extendedStart, finalEnd).orElse(target.getBoundingBox().getCenter());
             onHitEntity(new EntityHitResult(target, hit));
         }

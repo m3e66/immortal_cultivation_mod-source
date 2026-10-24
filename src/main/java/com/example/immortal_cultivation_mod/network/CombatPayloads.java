@@ -23,6 +23,9 @@ public final class CombatPayloads {
     public static final int ATTACK_NORMAL = 1;
     public static final int ATTACK_HEAVY = 2;
     public static final int ATTACK_CANCEL = 3;
+    public static final int ATTACK_BACKSTEP = 4;
+    public static final int BACKSTEP_ANIMATION = -40;
+    public static final int CANCEL_STRIKE_ANIMATION = -41;
     public static final int SPEAR_HEAVY_THRUST_ANIMATION = -1;
     public static final int BLOCK_ANIMATION_START = -2;
     public static final int BLOCK_ANIMATION_STOP = -3;
@@ -287,6 +290,7 @@ public final class CombatPayloads {
                     case ATTACK_HEAVY -> CombatStateManager.performHeavyAttack(
                             player, payload.entityId(), payload.packedBlockPos());
                     case ATTACK_CANCEL -> CombatStateManager.cancelHeavyCharge(player);
+                    case ATTACK_BACKSTEP -> com.example.immortal_cultivation_mod.combat.CombatFootwork.backstep(player);
                     default -> {
                     }
                 }

@@ -56,6 +56,9 @@ public final class CombatStateManager {
     private static final Map<UUID, SyncState> LAST_SYNC = new ConcurrentHashMap<>();
     private static final Map<UUID, ComboState> COMBO_STATES = new ConcurrentHashMap<>();
     private static final Set<UUID> BLOCKING_PLAYERS = ConcurrentHashMap.newKeySet();
+    private record Strike(int targetId, boolean heavy, long impactAt, ItemStack weapon, int slashIndex, boolean heavyCone) {}
+    private static final Map<UUID, Strike> STRIKES = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> RECOVERY = new ConcurrentHashMap<>();
     private static final ThreadLocal<UUID> HEAVY_ATTACKER = new ThreadLocal<>();
 
     private CombatStateManager() {
@@ -150,6 +153,7 @@ public final class CombatStateManager {
     }
 
     public static void tick(ServerPlayer player) {
+        tickStrike(player);
         WhipItem.tickCombo(player);
         if (SPELL_PREPARATIONS.containsKey(player.getUUID())
                 && isSpellPreparationBlocked(player)) {
@@ -461,6 +465,7 @@ public final class CombatStateManager {
         }
         cancelHeavyCharge(player);
         if (nextBlocking) {
+            cancelStrike(player);
             interruptSpellPreparation(player);
         }
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(
@@ -524,7 +529,7 @@ public final class CombatStateManager {
             player.swing(InteractionHand.MAIN_HAND, true);
             return;
         }
-        attackEntity(player, entityId, false);
+        queueStrike(player, entityId, false);
         broadcastSwordCombo(player);
     }
 
@@ -557,7 +562,7 @@ public final class CombatStateManager {
                     new CombatPayloads.ClientboundSwordComboAnimationPayload(
                             player.getUUID(), slashIndex));
             player.swing(InteractionHand.MAIN_HAND, true);
-            WeaponQiSlashEntity.release(player, slashIndex, heavyCone, heavyWeaponAttack);
+            releaseOrQueueQi(player, slashIndex, heavyCone, heavyWeaponAttack);
             return;
         }
         if (player.getMainHandItem().getItem() instanceof FuchenItem) {
@@ -566,7 +571,13 @@ public final class CombatStateManager {
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(
                 player, new CombatPayloads.ClientboundSwordComboAnimationPayload(
                         player.getUUID(), slashIndex));
-        WeaponQiSlashEntity.release(player, slashIndex, heavyCone, heavyWeaponAttack);
+        releaseOrQueueQi(player, slashIndex, heavyCone, heavyWeaponAttack);
+    }
+
+    private static void releaseOrQueueQi(ServerPlayer player,int slash,boolean cone,boolean heavy) {
+        Strike pending=STRIKES.get(player.getUUID());
+        if(pending==null)WeaponQiSlashEntity.release(player,slash,cone,heavy);
+        else STRIKES.put(player.getUUID(),new Strike(pending.targetId(),pending.heavy(),pending.impactAt(),pending.weapon(),slash,cone));
     }
 
     public static void performHeavyAttack(ServerPlayer player, int entityId, long packedBlockPos) {
@@ -607,7 +618,7 @@ public final class CombatStateManager {
             return;
         }
 
-        attackEntity(player, entityId, true);
+        queueStrike(player, entityId, true);
         if (QiInfusedWeapon.isFistWeapon(player.getMainHandItem())) {
             broadcastSwordCombo(player, true);
         } else if (QiInfusedWeapon.isSpear(player.getMainHandItem())) {
@@ -654,16 +665,45 @@ public final class CombatStateManager {
     }
 
     private static boolean canPerformWeaponAttack(ServerPlayer player) {
-        return com.example.immortal_cultivation_mod.item.WeaponBinding.checkUse(player.getMainHandItem(), player)
+        return !isSpellcastingBlocked(player)
+                && !STRIKES.containsKey(player.getUUID())
+                && player.level().getGameTime() >= RECOVERY.getOrDefault(player.getUUID(), 0L)
+                && com.example.immortal_cultivation_mod.item.WeaponBinding.checkUse(player.getMainHandItem(), player)
                 && (canMaintainBlock(player) || XiujianItem.canFire(player))
                 && !BLOCKING_PLAYERS.contains(player.getUUID());
     }
 
     private static boolean canMaintainBlock(ServerPlayer player) {
         return isInCombat(player)
-                && !isPostureBroken(player)
+                && !isSpellcastingBlocked(player)
                 && isCombatWeapon(player.getMainHandItem())
                 && com.example.immortal_cultivation_mod.item.WeaponBinding.canUse(player.getMainHandItem(), player);
+    }
+
+    private static void queueStrike(ServerPlayer player, int target, boolean heavy) {
+        long now=player.level().getGameTime();
+        STRIKES.put(player.getUUID(), new Strike(target,heavy,now+2,player.getMainHandItem().copy(),-1,false));
+        RECOVERY.put(player.getUUID(),now+(heavy?14:8));
+    }
+
+    public static void cancelStrike(ServerPlayer player) {
+        if (STRIKES.remove(player.getUUID()) != null)
+            PacketDistributor.sendToPlayersTrackingEntityAndSelf(player,
+                new CombatPayloads.ClientboundSwordComboAnimationPayload(player.getUUID(),CombatPayloads.CANCEL_STRIKE_ANIMATION));
+        CombatExchange.reset(player);
+    }
+
+    private static void tickStrike(ServerPlayer player) {
+        Strike strike=STRIKES.get(player.getUUID());
+        if(strike==null)return;
+        if (!canMaintainBlock(player) || BLOCKING_PLAYERS.contains(player.getUUID())
+                || !ItemStack.isSameItemSameComponents(strike.weapon(),player.getMainHandItem())) {
+            cancelStrike(player); return;
+        }
+        if(player.level().getGameTime()<strike.impactAt())return;
+        STRIKES.remove(player.getUUID());
+        if(!attackEntity(player,strike.targetId(),strike.heavy()))CombatExchange.reset(player);
+        if(strike.slashIndex()>=0) WeaponQiSlashEntity.release(player,strike.slashIndex(),strike.heavyCone(),strike.heavy());
     }
 
     private static boolean attackEntity(ServerPlayer player, int entityId, boolean heavy) {
@@ -687,12 +727,13 @@ public final class CombatStateManager {
         if (heavy) {
             HEAVY_ATTACKER.set(player.getUUID());
         }
+        float before = target instanceof LivingEntity living ? living.getHealth() : 0;
         try {
             player.attack(target);
         } finally {
             HEAVY_ATTACKER.remove();
         }
-        return true;
+        return target instanceof LivingEntity living && living.getHealth() < before;
     }
 
     private static double distanceToBoundsSqr(Vec3 point, AABB bounds) {
@@ -729,6 +770,8 @@ public final class CombatStateManager {
     }
 
     private static void clear(ServerPlayer player, boolean clearSpellPreparation) {
+        cancelStrike(player);
+        RECOVERY.remove(player.getUUID());
         player.getPersistentData().remove(COMBAT_UNTIL_TAG);
         player.getPersistentData().remove(MANUAL_COMBAT_TAG);
         player.getPersistentData().remove(POSTURE_BROKEN_UNTIL_TAG);
@@ -745,6 +788,8 @@ public final class CombatStateManager {
     }
 
     public static void onLogout(ServerPlayer player) {
+        cancelStrike(player);
+        RECOVERY.remove(player.getUUID());
         com.example.immortal_cultivation_mod.spell.SelfExplosionConfirmation.cancel(player);
         RECENT_HITS.remove(player.getUUID());
         HEAVY_CHARGE_STARTS.remove(player.getUUID());

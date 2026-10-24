@@ -1,0 +1,23 @@
+{
+  "name": "Silver Mist Wolf",
+  "icon": "immortal_cultivation_mod:silver_mist_wolf_spawn_egg",
+  "category": "immortal_cultivation_mod:volume_1",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Silver Mist Wolf — Mortal",
+      "text": "A silver-grey wolf with gold eyes. It remains mortal: 20 health and 4 base bite damage.$(br2)Found in existing wolf habitats, normally in groups of five. Terrain and normal spawning checks can leave a smaller group."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Pack Tactics",
+      "text": "Small packs commit one attacker; five or more healthy wolves commit two. Others hold flanks and escape lanes. Attack turns rotate every three seconds, and interception predicts a short lead from observed movement.$(br2)Packmates at 35% health or lower retreat while healthy wolves take over. A lone wolf can still defend itself. Higher realm and then maximum health decide leadership; howls recruit nearby idle wild adults."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Pounces and Counterplay",
+      "text": "Pounces against one target launch at least 0.8 seconds apart. Only physical contact deals damage and brief slowing. Walls and ravines block leaps; obstructed flanks try a neighboring lane rather than all rushing the target.$(br2)Hidden prey is searched for at its last observed position. Four seconds without sight ends pursuit. These tactics apply to all wild adult wolves; pets and pups are excluded. Silver Mist Wolves accept bones and breed Silver Mist pups."
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "SSS",
+    "SDS",
+    "SSS"
+  ],
+  "key": {
+    "D": {
+      "item": "minecraft:dirt"
+    },
+    "S": {
+      "item": "immortal_cultivation_mod:spirit_stone"
+    }
+  },
+  "result": {
+    "id": "immortal_cultivation_mod:spirit_farmland",
+    "count": 1
+  }
+}

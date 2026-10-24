@@ -82,6 +82,10 @@ public final class BeastSpawnRules {
     }
 
     public static void register(RegisterSpawnPlacementsEvent event) {
+        event.register(ModEntities.SILVER_MIST_WOLF.get(), SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                (type, level, reason, pos, random) -> net.minecraft.world.entity.animal.Wolf.checkWolfSpawnRules(
+                        EntityType.WOLF, level, reason, pos, random), RegisterSpawnPlacementsEvent.Operation.REPLACE);
         register(event, ModEntities.CRIMSON_SCALE_FLAME_LIZARD.get(), BeastSpawnRules::checkLizard);
         register(event, ModEntities.CRIMSON_SKY_FLAME_FLOOD_DRAGON.get(), CrimsonSkyFlameFloodDragonEntity::checkDragonSpawnRules);
         register(event, ModEntities.BLOOD_APE_DEMON_GENERAL.get(), BeastSpawnRules::checkBloodApe);

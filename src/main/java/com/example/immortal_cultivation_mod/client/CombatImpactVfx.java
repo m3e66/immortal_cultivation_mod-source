@@ -17,10 +17,12 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.ParticleStatus;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
@@ -39,10 +41,12 @@ public final class CombatImpactVfx {
     private static final int MAX_IMPACTS = 48;
     private static final int MAX_QUADS = 12000;
     private static final List<Impact> IMPACTS = new ArrayList<>();
+    private static final List<Particle> SMOKE = new ArrayList<>();
     private static ClientLevel world;
     private static int renderedQuads;
     private static long admittedTick = Long.MIN_VALUE;
     private static int admittedCount;
+    private static int smokeThisTick;
     static final RenderType MATTER = RenderType.create("cultivation_impact_matter",
             DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 65536, false, true,
             RenderType.CompositeState.builder()
@@ -135,6 +139,8 @@ public final class CombatImpactVfx {
     private static boolean useLevel(ClientLevel level) {
         if (world != level) {
             IMPACTS.clear();
+            SMOKE.forEach(Particle::remove);
+            SMOKE.clear();
             world = level;
             admittedTick = Long.MIN_VALUE;
             admittedCount = 0;
@@ -150,7 +156,7 @@ public final class CombatImpactVfx {
                 || !Float.isFinite(packet.intensity()) || mc.player == null
                 || packet.position().distanceToSqr(mc.player.position()) > 80 * 80) return;
         long now = world.getGameTime();
-        if (admittedTick != now) { admittedTick = now; admittedCount = 0; }
+        if (admittedTick != now) { admittedTick = now; admittedCount = 0; smokeThisTick = 0; }
         int quality = quality();
         if (admittedCount >= (quality == 0 ? 3 : quality == 1 ? 6 : 10)) return;
         // Duplicate/overlapping packets must not turn a single contact into repeated bright flashes.
@@ -160,8 +166,41 @@ public final class CombatImpactVfx {
                     && old.data.position().distanceToSqr(packet.position()) < .25) return;
         }
         if (IMPACTS.size() >= MAX_IMPACTS) IMPACTS.removeFirst();
-        IMPACTS.add(new Impact(packet, now, quality));
+        Impact impact = new Impact(packet, now, quality);
+        IMPACTS.add(impact);
+        if (packet.kind() == Kind.HIT) spawnCombatSmoke(impact, quality);
         admittedCount++;
+    }
+
+    private static void spawnCombatSmoke(Impact impact, int quality) {
+        SMOKE.removeIf(particle -> !particle.isAlive());
+        float strength = Mth.clamp(impact.data.intensity(), 0, 1);
+        boolean heavy = com.example.immortal_cultivation_mod.combat.CombatFeedbackProfile.heavy(strength);
+        double plumeScale = heavy ? 1.25 : 1;
+        int liveLimit = quality == 0 ? 24 : quality == 1 ? 64 : 128;
+        int tickLimit = quality == 0 ? 4 : quality == 1 ? 12 : 24;
+        int count = quality == 0 ? 2 : (int) ((5 + strength * 11) * (quality == 1 ? .6F : 1));
+        count = Math.min(count, Math.min(liveLimit - SMOKE.size(), tickLimit - smokeThisTick));
+        Vec3 origin = impact.floor == null ? impact.data.position() : impact.floor.add(0, .15, 0);
+        Vec3 push = impact.data.direction().multiply(.025, 0, .025);
+        for (int i = 0; i < count; i++) {
+            // Offset lobes form a rising column instead of one opaque cloud over the target.
+            double angle = impact.random(700 + i) * Math.PI * 2;
+            double radius = (.15 + impact.random(740 + i) * .35) * (.6 + strength) * plumeScale;
+            double dx = Math.cos(angle), dz = Math.sin(angle);
+            Particle particle = Minecraft.getInstance().particleEngine.createParticle(
+                    ParticleTypes.CAMPFIRE_COSY_SMOKE,
+                    origin.x + dx * radius, origin.y + impact.random(780 + i) * (.35 + strength * 2.3) * plumeScale,
+                    origin.z + dz * radius, push.x + dx * .012,
+                    .025 + strength * .035 + impact.random(820 + i) * .015, push.z + dz * .012);
+            if (particle == null) continue;
+            float gray = (float) (.55 + impact.random(860 + i) * .18);
+            particle.setColor(gray, gray, gray);
+            particle.scale((float) ((1 + strength * 1.2 + impact.random(900 + i) * .4) * (heavy ? 1.5 : 1)));
+            particle.setLifetime(70 + (int) (strength * 20 + impact.random(940 + i) * 10) + (heavy ? 30 : 0));
+            SMOKE.add(particle);
+            smokeThisTick++;
+        }
     }
 
     @SubscribeEvent
@@ -170,6 +209,7 @@ public final class CombatImpactVfx {
         if (!useLevel(mc.level) || mc.isPaused()) return;
         long now = world.getGameTime();
         IMPACTS.removeIf(impact -> now - impact.born >= impact.lifetime());
+        SMOKE.removeIf(particle -> !particle.isAlive());
     }
 
     public static int activeCount() { return IMPACTS.size(); }

@@ -32,7 +32,7 @@
     {
       "type": "patchouli:text",
       "title": "Domains and Rivals",
-      "text": "They use their active method, not every art at once. NPC release lasts up to ten seconds, followed by ten seconds of recovery; losing the target or Qi ends it early. Read Qi Domains for each art."
+      "text": "NPCs wait five seconds after entering combat before considering Blast Qi. They protect at least 40% maximum Qi, or the cost of their most expensive affordable learned spell, whichever is greater. Only surplus Qi may fund up to ten seconds of release. If spellcasting reaches the reserve, release stops before further upkeep. Losing the target ends it too. Recovery lasts ten seconds; training dummy controls remain manual."
     },
     {
       "type": "patchouli:text",

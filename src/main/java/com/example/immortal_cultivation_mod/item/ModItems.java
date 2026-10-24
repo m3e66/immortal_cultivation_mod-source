@@ -352,6 +352,11 @@ public class ModItems {
                                     .FROSTSPINE_CAVE_BEAR.get(),
                             0x1C2631, 0x8FDFFF, new Item.Properties()));
 
+    public static final DeferredItem<Item> SILVER_MIST_WOLF_SPAWN_EGG = registerItem("silver_mist_wolf_spawn_egg",
+            () -> new net.minecraft.world.item.SpawnEggItem(
+                    com.example.immortal_cultivation_mod.entity.ModEntities.SILVER_MIST_WOLF.get(),
+                    0x707A83, 0xDDDCC7, new Item.Properties()));
+
     public static final DeferredItem<Item> GREEN_PATTERNED_SPIRIT_DEVOURING_RAT_SPAWN_EGG =
             registerItem("green_patterned_spirit_devouring_rat_spawn_egg",
                     () -> new BeastSpawnEggItem(com.example.immortal_cultivation_mod.entity.ModEntities

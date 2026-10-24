@@ -123,11 +123,11 @@ public final class BlockBreakingGameTests {
             h.getLevel().setBlock(bedrock, Blocks.BEDROCK.defaultBlockState(), Block.UPDATE_CLIENTS);
             h.getLevel().setBlock(chest, Blocks.CHEST.defaultBlockState(), Block.UPDATE_CLIENTS);
             h.assertTrue(!impact(h, user.player, bedrock, Category.SPECIAL_ITEMS)
-                            && !impact(h, user.player, chest, Category.SPECIAL_ITEMS),
-                    "Enabling an effect cannot bypass unbreakable blocks or inventory-block protection");
+                            && impact(h, user.player, chest, Category.SPECIAL_ITEMS),
+                    "Enabled effects destroy containers but cannot bypass unbreakable blocks");
             h.assertTrue(h.getLevel().getBlockState(bedrock).is(Blocks.BEDROCK)
-                            && h.getLevel().getBlockState(chest).is(Blocks.CHEST),
-                    "Protected blocks remain intact");
+                            && h.getLevel().getBlockState(chest).isAir(),
+                    "Bedrock remains intact while the container breaks");
         }
         h.succeed();
     }

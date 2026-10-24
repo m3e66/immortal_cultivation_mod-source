@@ -73,7 +73,14 @@ public final class DaoGuidanceUpdates {
                     new DaoGuidanceContent.Objective("step_4", "read:settings_controls:step_4", 1),
                     new DaoGuidanceContent.Objective("step_5", "read:settings_controls:step_5", 1),
                     new DaoGuidanceContent.Objective("step_6", "read:settings_controls:step_6", 1),
-                    new DaoGuidanceContent.Objective("step_7", "read:settings_controls:step_7", 1))));
+                    new DaoGuidanceContent.Objective("step_7", "read:settings_controls:step_7", 1))),
+            new DaoGuidanceContent.Chapter("spirit_farming",true,List.of(
+                    new DaoGuidanceContent.Objective("step_1","read:spirit_farming:step_1",1),
+                    new DaoGuidanceContent.Objective("step_2","read:spirit_farming:step_2",1),
+                    new DaoGuidanceContent.Objective("step_3","read:spirit_farming:step_3",1),
+                    new DaoGuidanceContent.Objective("step_4","read:spirit_farming:step_4",1),
+                    new DaoGuidanceContent.Objective("step_5","read:spirit_farming:step_5",1),
+                    new DaoGuidanceContent.Objective("step_6","read:spirit_farming:step_6",1))));
     public static List<DaoGuidanceContent.Chapter> chapters() { return CHAPTERS; }
 
     /** Discovery explains a feature; only an explicit acknowledgement completes a reading. */

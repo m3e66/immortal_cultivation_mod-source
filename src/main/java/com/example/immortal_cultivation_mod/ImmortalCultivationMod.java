@@ -103,6 +103,8 @@ public class ImmortalCultivationMod {
 
         com.example.immortal_cultivation_mod.hair.HairContent.init();
         com.example.immortal_cultivation_mod.alchemy.AlchemyContent.init();
+        com.example.immortal_cultivation_mod.farming.SpiritFarming.init();
+        com.example.immortal_cultivation_mod.entity.WolfPackBiomeModifier.register(modEventBus);
 
         ModBlocks.BLOCKS.register(
                 modEventBus

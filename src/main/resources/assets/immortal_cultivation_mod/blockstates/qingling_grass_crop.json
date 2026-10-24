@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "age=0": {
+      "model": "immortal_cultivation_mod:block/farming/qingling_grass_0"
+    },
+    "age=1": {
+      "model": "immortal_cultivation_mod:block/farming/qingling_grass_1"
+    },
+    "age=2": {
+      "model": "immortal_cultivation_mod:block/farming/qingling_grass_2"
+    },
+    "age=3": {
+      "model": "immortal_cultivation_mod:block/farming/qingling_grass_3"
+    },
+    "age=4": {
+      "model": "immortal_cultivation_mod:block/farming/qingling_grass_4"
+    }
+  }
+}

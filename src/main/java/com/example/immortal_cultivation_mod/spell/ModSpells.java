@@ -211,6 +211,8 @@ public class ModSpells {
             SUIGUI_XINGYUN,
             SUOKONG_SHU);
 
+    // Keep authored spell realms even when learning requirements are relaxed.
+    private static final Map<String, String> SPELL_REALM_LEVELS = new LinkedHashMap<>();
     private static final Map<String, SpellDef> SPELLS = createSpells();
     private static final Map<String, Integer> NPC_LEARNING_TRUST = Map.ofEntries(
             Map.entry(QI_GATHERING, 5),
@@ -898,6 +900,7 @@ public class ModSpells {
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_MID, 35, "none", "earth");
         putTechnique(spells, BIHUO_JUE,
                 CultivationLevels.REALM_LIANQI + CultivationLevels.STAGE_LATE, 60, "none", "earth");
+        spells.forEach((id, spell) -> SPELL_REALM_LEVELS.put(id, spell.requiredLevel()));
         removeRealmRequirements(spells);
         return Map.copyOf(spells);
     }
@@ -939,6 +942,10 @@ public class ModSpells {
 
     public static List<SpellDef> all() {
         return List.copyOf(SPELLS.values());
+    }
+
+    public static String realmLevel(String spellId) {
+        return SPELL_REALM_LEVELS.getOrDefault(normalizeId(spellId), "");
     }
 
     public static SpellDef get(String id) {

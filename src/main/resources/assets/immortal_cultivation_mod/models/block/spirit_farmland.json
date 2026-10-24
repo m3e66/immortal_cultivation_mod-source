@@ -1,0 +1,145 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "dirt": "minecraft:block/dirt",
+    "top": "minecraft:block/farmland_moist",
+    "jade": "minecraft:block/prismarine",
+    "particle": "minecraft:block/dirt"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        15,
+        16
+      ],
+      "faces": {
+        "up": {
+          "texture": "#top",
+          "cullface": "up"
+        },
+        "down": {
+          "texture": "#dirt",
+          "cullface": "down"
+        },
+        "north": {
+          "texture": "#dirt",
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#dirt",
+          "cullface": "south"
+        },
+        "east": {
+          "texture": "#dirt",
+          "cullface": "east"
+        },
+        "west": {
+          "texture": "#dirt",
+          "cullface": "west"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        15.01,
+        3
+      ],
+      "to": [
+        5,
+        15.04,
+        4
+      ],
+      "shade": false,
+      "faces": {
+        "up": {
+          "texture": "#jade",
+          "uv": [
+            0,
+            0,
+            2,
+            1
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        11,
+        15.01,
+        6
+      ],
+      "to": [
+        13,
+        15.04,
+        7
+      ],
+      "shade": false,
+      "faces": {
+        "up": {
+          "texture": "#jade",
+          "uv": [
+            0,
+            0,
+            2,
+            1
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        15.01,
+        12
+      ],
+      "to": [
+        7,
+        15.04,
+        13
+      ],
+      "shade": false,
+      "faces": {
+        "up": {
+          "texture": "#jade",
+          "uv": [
+            0,
+            0,
+            2,
+            1
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        12,
+        15.01,
+        13
+      ],
+      "to": [
+        14,
+        15.04,
+        14
+      ],
+      "shade": false,
+      "faces": {
+        "up": {
+          "texture": "#jade",
+          "uv": [
+            0,
+            0,
+            2,
+            1
+          ]
+        }
+      }
+    }
+  ]
+}

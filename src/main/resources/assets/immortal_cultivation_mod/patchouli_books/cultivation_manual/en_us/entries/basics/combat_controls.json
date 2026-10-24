@@ -8,6 +8,11 @@
       "type": "patchouli:text",
       "title": "Attacks and Charging",
       "text": "Enter combat mode with its keybind (default Y). Tap attack for a normal hit; hold to charge. Holding attack and use together guards with supported weapons.$(br2)The circular crosshair meter shows the current charge. Golden Core cultivators may use Blast Qi (default G); see Qi Release and Fist Force."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Footwork and combinations",
+      "text": "During combat, hold Backward and press Jump to backstep. The route needs solid ground; walls, ledges, immobilization and freezing prevent the step. Repeated steps require longer recovery, with at most three in a short burst.$(br2)Opening light hits push slightly; follow-up hits on the same foe keep them close. Heavy strikes create separation. Guarding or being disabled during startup cancels the pending strike and its outward Qi release."
     }
   ]
 }

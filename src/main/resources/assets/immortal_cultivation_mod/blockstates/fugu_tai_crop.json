@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "age=0": {
+      "model": "immortal_cultivation_mod:block/farming/fugu_tai_0"
+    },
+    "age=1": {
+      "model": "immortal_cultivation_mod:block/farming/fugu_tai_1"
+    },
+    "age=2": {
+      "model": "immortal_cultivation_mod:block/farming/fugu_tai_2"
+    },
+    "age=3": {
+      "model": "immortal_cultivation_mod:block/farming/fugu_tai_3"
+    },
+    "age=4": {
+      "model": "immortal_cultivation_mod:block/farming/fugu_tai_4"
+    }
+  }
+}

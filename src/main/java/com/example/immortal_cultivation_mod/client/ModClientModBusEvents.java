@@ -153,7 +153,7 @@ public class ModClientModBusEvents {
         event.registerEntityRenderer(ModEntities.BLOOD_DROP.get(), ItemEntityRenderer::new);
         event.registerEntityRenderer(ModEntities.ASTEROID.get(), AsteroidRenderer::new);
 
-        event.registerEntityRenderer(ModEntities.FIREBALL_PROJECTILE.get(), ScaledFireballRenderer::new);
+        event.registerEntityRenderer(ModEntities.FIREBALL_PROJECTILE.get(), EmptyEntityRenderer::new);
         event.registerEntityRenderer(ModEntities.FIREBALL_TALISMAN_PROJECTILE.get(),
                 FireballTalismanProjectileRenderer::new);
         event.registerEntityRenderer(ModEntities.TALISMAN_ACTIVATION.get(),
@@ -173,11 +173,11 @@ public class ModClientModBusEvents {
                 BeastProjectileRenderer::new);
         event.registerEntityRenderer(ModEntities.SPIRIT_SILK_PROJECTILE.get(), BeastProjectileRenderer::new);
         event.registerEntityRenderer(ModEntities.IGNITE_FLARE_PROJECTILE.get(), EmptyEntityRenderer::new);
-        event.registerEntityRenderer(ModEntities.LIGHT_BEAM_PROJECTILE.get(), net.minecraft.client.renderer.entity.NoopRenderer::new);
-        event.registerEntityRenderer(ModEntities.LINGZHI_BULLET_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, 0.32F * SpellProjectileVisuals.SCALE, true));
+        event.registerEntityRenderer(ModEntities.LIGHT_BEAM_PROJECTILE.get(), EmptyEntityRenderer::new);
+        event.registerEntityRenderer(ModEntities.LINGZHI_BULLET_PROJECTILE.get(), EmptyEntityRenderer::new);
         event.registerEntityRenderer(ModEntities.JINMANG_CHUANSHA_PROJECTILE.get(), EmptyEntityRenderer::new);
         event.registerEntityRenderer(ModEntities.ELEMENTAL_TECHNIQUE_PROJECTILE.get(),
-                ElementalTechniqueProjectileRenderer::new);
+                EmptyEntityRenderer::new);
         event.registerEntityRenderer(ModEntities.SPELL_TRIGGER_PROJECTILE.get(),
                 SpellTriggerProjectileRenderer::new);
         event.registerEntityRenderer(ModEntities.SOLAR_TECHNIQUE_MODEL.get(),
@@ -193,17 +193,17 @@ public class ModClientModBusEvents {
         event.registerEntityRenderer(ModEntities.YAOGUANG_FLASH.get(), YaoguangFlashRenderer::new);
         event.registerEntityRenderer(ModEntities.WANTENG_VINE.get(), WantengVineRenderer::new);
         event.registerEntityRenderer(ModEntities.SHANBENG_SEAL.get(), ShanbengSealRenderer::new);
-        event.registerEntityRenderer(ModEntities.WIND_BLADE_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, 0.32F * SpellProjectileVisuals.SCALE, true));
-        event.registerEntityRenderer(ModEntities.SMOKE_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, SpellProjectileVisuals.SCALE, false));
-        event.registerEntityRenderer(ModEntities.SLIDING_WATER_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, SpellProjectileVisuals.SCALE, false));
-        event.registerEntityRenderer(ModEntities.ABSORB_CULTIVATION_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, SpellProjectileVisuals.SCALE, false));
-        event.registerEntityRenderer(ModEntities.DINGSHEN_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, 0.32F * SpellProjectileVisuals.SCALE, true));
-        event.registerEntityRenderer(ModEntities.KONGSHI_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, SpellProjectileVisuals.SCALE, false));
-        event.registerEntityRenderer(ModEntities.LIGHTNING_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, 0.32F * SpellProjectileVisuals.SCALE, true));
-        event.registerEntityRenderer(ModEntities.FROST_CRY_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, SpellProjectileVisuals.SCALE, false));
-        event.registerEntityRenderer(ModEntities.LIUGUANG_JIANYING_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, SpellProjectileVisuals.SCALE, false));
-        event.registerEntityRenderer(ModEntities.DUANLIU_KONGDUN_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, 0.32F * SpellProjectileVisuals.SCALE, true));
-        event.registerEntityRenderer(ModEntities.YIHEN_CI_PROJECTILE.get(), context -> new ThrownItemRenderer<>(context, 0.32F * SpellProjectileVisuals.SCALE, true));
+        event.registerEntityRenderer(ModEntities.WIND_BLADE_PROJECTILE.get(), EmptyEntityRenderer::new);
+        event.registerEntityRenderer(ModEntities.SMOKE_PROJECTILE.get(), EmptyEntityRenderer::new);
+        event.registerEntityRenderer(ModEntities.SLIDING_WATER_PROJECTILE.get(), EmptyEntityRenderer::new);
+        event.registerEntityRenderer(ModEntities.ABSORB_CULTIVATION_PROJECTILE.get(), EmptyEntityRenderer::new);
+        event.registerEntityRenderer(ModEntities.DINGSHEN_PROJECTILE.get(), EmptyEntityRenderer::new);
+        event.registerEntityRenderer(ModEntities.KONGSHI_PROJECTILE.get(), EmptyEntityRenderer::new);
+        event.registerEntityRenderer(ModEntities.LIGHTNING_PROJECTILE.get(), EmptyEntityRenderer::new);
+        event.registerEntityRenderer(ModEntities.FROST_CRY_PROJECTILE.get(), EmptyEntityRenderer::new);
+        event.registerEntityRenderer(ModEntities.LIUGUANG_JIANYING_PROJECTILE.get(), EmptyEntityRenderer::new);
+        event.registerEntityRenderer(ModEntities.DUANLIU_KONGDUN_PROJECTILE.get(), EmptyEntityRenderer::new);
+        event.registerEntityRenderer(ModEntities.YIHEN_CI_PROJECTILE.get(), EmptyEntityRenderer::new);
         event.registerEntityRenderer(ModEntities.SUOKONG_PROJECTILE.get(), EmptyEntityRenderer::new);
         event.registerEntityRenderer(ModEntities.XINLIAO_FIREBALL.get(), EmptyEntityRenderer::new);
         event.registerEntityRenderer(ModEntities.STARFALL_PROJECTILE.get(), EmptyEntityRenderer::new);
@@ -212,7 +212,7 @@ public class ModClientModBusEvents {
         event.registerEntityRenderer(ModEntities.PETAL_TECHNIQUE.get(),
                 PetalTechniqueRenderer::new);
         event.registerEntityRenderer(ModEntities.SWORD_TECHNIQUE_PROJECTILE.get(),
-                SwordTechniqueProjectileRenderer::new);
+                EmptyEntityRenderer::new);
         event.registerEntityRenderer(ModEntities.SWORD_TECHNIQUE_MARK.get(),
                 SwordTechniqueMarkRenderer::new);
         event.registerEntityRenderer(ModEntities.FLYING_SWORD.get(), FlyingSwordRenderer::new);
@@ -254,6 +254,8 @@ public class ModClientModBusEvents {
                 ThunderhornRockBadgerRenderer::new);
         event.registerEntityRenderer(ModEntities.FROSTSPINE_CAVE_BEAR.get(),
                 FrostspineCaveBearRenderer::new);
+        event.registerEntityRenderer(ModEntities.SILVER_MIST_WOLF.get(),
+                com.example.immortal_cultivation_mod.client.renderer.SilverMistWolfRenderer::new);
         event.registerEntityRenderer(ModEntities.GREEN_PATTERNED_SPIRIT_DEVOURING_RAT.get(),
                 CultivationBestiaryBeastRenderer::new);
         event.registerEntityRenderer(ModEntities.RED_BACKED_IRON_SCALE_SCORPION.get(),

@@ -171,6 +171,10 @@ public final class SwordComboAnimations {
 
     private static void play(AbstractClientPlayer player, int slashIndex) {
         ModifierLayer<IAnimation> layer = getOrCreateLayer(player);
+        if (slashIndex == CombatPayloads.CANCEL_STRIKE_ANIMATION) {
+            layer.setAnimation(null);
+            return;
+        }
         var weaponUse = com.example.immortal_cultivation_mod.network.WeaponUseAnimations.fromPacket(slashIndex);
         if (weaponUse != null) {
             WeaponSkillAnimations.play(player, weaponUse);
@@ -200,7 +204,9 @@ public final class SwordComboAnimations {
             setFirstPersonBlockMode(player, true);
         }
         ResourceLocation animationId;
-        if (slashIndex == CombatPayloads.SPEAR_HEAVY_THRUST_ANIMATION) {
+        if (slashIndex == CombatPayloads.BACKSTEP_ANIMATION) {
+            animationId = ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "combat_backstep");
+        } else if (slashIndex == CombatPayloads.SPEAR_HEAVY_THRUST_ANIMATION) {
             animationId = SPEAR_HEAVY_THRUST_ID;
         } else if (slashIndex == CombatPayloads.FUCHEN_HEAVY_SPIN_ANIMATION) {
             animationId = FUCHEN_HEAVY_SPIN_ID;

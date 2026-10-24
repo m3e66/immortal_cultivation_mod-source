@@ -214,7 +214,7 @@ public final class QiBlastAttackGameTests {
             try {
                 npc.setPos(a.owner.player.position());npc.setNoAi(true);npc.setItemSlot(EquipmentSlot.MAINHAND,ItemStack.EMPTY);
                 com.example.immortal_cultivation_mod.entity.NpcProfile.ensure(npc,npc.npcArchetype());npc.setTarget(a.target.player);npc.tickCount=20;
-                QiDomainSystem.npcTick(new EntityTickEvent.Post(npc));
+                npc.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new EntityTickEvent.Post(npc));
                 h.assertTrue(QiDomainSystem.blasting(npc),"NPC uses real release state");
                 BlockPos wall=a.wall(3,Blocks.STONE.defaultBlockState());rule.set(false,h.getLevel().getServer());
                 a.target.player.invulnerableTime=0;a.target.player.setDeltaMovement(Vec3.ZERO);
@@ -393,7 +393,7 @@ public final class QiBlastAttackGameTests {
                 profile.putString("Realm",CORE);profile.putInt("Qi",100000);profile.putInt("MaxQi",100000);
                 npc.setItemSlot(EquipmentSlot.MAINHAND,ItemStack.EMPTY);npc.setTarget(a.target.player);npc.tickCount=20;
                 com.example.immortal_cultivation_mod.entity.NpcProfile.recordPlayerAttack(npc,a.target.player);
-                npc.setHealth(npc.getMaxHealth());QiDomainSystem.npcTick(new EntityTickEvent.Post(npc));
+                npc.setHealth(npc.getMaxHealth());npc.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new EntityTickEvent.Post(npc));
                 h.assertTrue(QiDomainSystem.blasting(npc),"NPC activates actual Blast Qi");
                 a.target.player.setPos(npc.position().add(0,0,2));a.target.player.setDeltaMovement(Vec3.ZERO);a.target.player.invulnerableTime=0;
                 float before=a.target.player.getHealth();BlockPos wall=a.wall(3,Blocks.STONE.defaultBlockState());
@@ -413,7 +413,7 @@ public final class QiBlastAttackGameTests {
             try {
                 npc.setPos(a.owner.player.position());npc.setNoAi(true);npc.setItemSlot(EquipmentSlot.MAINHAND,ItemStack.EMPTY);
                 com.example.immortal_cultivation_mod.entity.NpcProfile.ensure(npc,npc.npcArchetype());npc.setTarget(a.target.player);npc.tickCount=20;
-                QiDomainSystem.npcTick(new EntityTickEvent.Post(npc));
+                npc.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new EntityTickEvent.Post(npc));
                 BlockPos wall=a.wall(3,Blocks.STONE.defaultBlockState());
                 NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.HIGHEST,change);
                 a.target.player.invulnerableTime=0;a.target.player.setDeltaMovement(Vec3.ZERO);

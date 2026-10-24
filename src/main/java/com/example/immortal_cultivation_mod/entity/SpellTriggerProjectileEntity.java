@@ -31,7 +31,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.HashSet;
 import java.util.Set;
 
-/** Invisible real projectile that activates an existing spell at its impact point. */
+/** Visible custom projectile that activates an existing spell at its impact point. */
 public final class SpellTriggerProjectileEntity extends ThrowableItemProjectile
         implements ForcefieldInterceptable {
     /** Safety cleanup only; spell reach is determined by projectile collision, not distance. */

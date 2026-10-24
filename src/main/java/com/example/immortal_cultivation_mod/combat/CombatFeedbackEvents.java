@@ -73,7 +73,8 @@ public final class CombatFeedbackEvents {
         if (flags == 0) return;
         Vec3 direction = incomingDirection(target, source);
         send(target, Kind.HIT, contactPoint(target, source, direction), direction,
-                CombatFeedbackProfile.hitIntensity(event.getNewDamage(), target.getMaxHealth()), flags);
+                Math.max(CombatStateManager.isHeavyAttack(source) ? .72F : 0F,
+                        CombatFeedbackProfile.hitIntensity(event.getNewDamage(), target.getMaxHealth())), flags);
     }
 
     public static int injuryFlags(LivingEntity target, DamageSource source) {
@@ -192,6 +193,7 @@ public final class CombatFeedbackEvents {
 
     public static void blocked(LivingEntity target, DamageSource source, float preventedDamage) {
         if (!Float.isFinite(preventedDamage) || preventedDamage <= 0) return;
+        if (source.getEntity() instanceof LivingEntity actor) CombatExchange.reset(actor);
         Vec3 direction = incomingDirection(target, source);
         send(target, Kind.BLOCK, contactPoint(target, source, direction), direction,
                 CombatFeedbackProfile.hitIntensity(preventedDamage, target.getMaxHealth()), 0);

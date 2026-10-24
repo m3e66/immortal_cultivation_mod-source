@@ -33,6 +33,8 @@ public final class QiDomainSystem {
     public static final int GREAT_MASTERY=500,MAX_ACTORS=64,MOTES=12;
     public static final int MOTE=1,FIST=2,WEAPON=3,BODY=4;
     public static final int NPC_BLAST_TICKS=200,NPC_BLAST_COOLDOWN_TICKS=200;
+    public static final int NPC_BLAST_OPENING_TICKS=100;
+    public static final String NPC_COMBAT_READY_AT="ImmortalCultivationNpcQiCombatReadyAt";
     private static final String PERCENT="ImmortalCultivationQiReleasePercent";
     private static final String NPC_READY_AT="ImmortalCultivationNpcQiBlastReadyAt";
     private static final String DOMAIN_READY_AT="ImmortalCultivationDomainReadyAt";
@@ -223,18 +225,27 @@ public final class QiDomainSystem {
             return;
         }
         long now=mob.level().getGameTime();var a=ACTIVE.get(mob);
+        if(!npcCombatTarget(mob)) {
+            mob.getPersistentData().remove(NPC_COMBAT_READY_AT);
+            if(a!=null&&a.blasting)stop(mob);
+            return;
+        }
+        if(!mob.getPersistentData().contains(NPC_COMBAT_READY_AT)) {
+            mob.getPersistentData().putLong(NPC_COMBAT_READY_AT,now+NPC_BLAST_OPENING_TICKS);
+        }
         if(a!=null&&a.blasting&&(now>=a.npcBlastUntil||!npcCombatTarget(mob)
                 ||NpcProfile.qi(mob,npc.npcArchetype())<upkeep(mob,a.percent))) {
             stop(mob);return;
         }
-        // React as soon as a tracked NPC acquires a combat target, not only on one tick each second.
-        if(mob.tickCount<5||!npcCombatTarget(mob))return;
+        // Give the opening exchange to spells instead of automatically releasing Qi on target acquisition.
+        if(mob.tickCount<5||now<mob.getPersistentData().getLong(NPC_COMBAT_READY_AT))return;
         if(a==null||!a.blasting) {
-            if(now<mob.getPersistentData().getLong(NPC_READY_AT))return;
-            int reserve=Math.max(upkeep(mob,200)*3,(int)Math.ceil(NpcProfile.maxQi(mob,npc.npcArchetype())*.2));
-            if(NpcProfile.qi(mob,npc.npcArchetype())<reserve)return;
+            if(now<mob.getPersistentData().getLong(NPC_READY_AT)||mob.tickCount%20!=0)return;
+            int percent=mastery(mob)>=GREAT_MASTERY&&now>=mob.getPersistentData().getLong(DOMAIN_READY_AT)?200:100;
+            long required=(long)npcSpellReserve(mob,npc)+(long)upkeep(mob,percent)*(NPC_BLAST_TICKS/20);
+            if(NpcProfile.qi(mob,npc.npcArchetype())<required)return;
             a=state(mob);if(a==null)return;
-            a.blasting=true;a.percent=mastery(mob)>=GREAT_MASTERY&&now>=mob.getPersistentData().getLong(DOMAIN_READY_AT)?200:100;
+            a.blasting=true;a.percent=percent;
             a.method=method(mob);a.npcBlastUntil=now+NPC_BLAST_TICKS;
             // Reserve the cooldown immediately as well, so unloading/reloading cannot reset it.
             mob.getPersistentData().putLong(NPC_READY_AT,a.npcBlastUntil+NPC_BLAST_COOLDOWN_TICKS);
@@ -248,6 +259,16 @@ public final class QiDomainSystem {
         var target=mob.getTarget();
         return eligible(mob)&&target!=null&&target.level()==mob.level()&&canAffect(mob,target)
                 &&mob.distanceToSqr(target)<=32*32&&NpcProfile.isCombatEnemy(mob,target);
+    }
+    /** Protect a useful spell cast as well as a general reserve; only aura upkeep observes this floor. */
+    public static int npcSpellReserve(PathfinderMob mob,CultivationNpc npc) {
+        int max=NpcProfile.maxQi(mob,npc.npcArchetype());
+        int reserve=(int)Math.ceil(max*.40);
+        for(String id:NpcProfile.learnedSpellIds(mob,npc.npcArchetype())) {
+            int cost=NpcSpellcasting.qiCost(mob,id);
+            if(cost<=max)reserve=Math.max(reserve,cost);
+        }
+        return reserve;
     }
     @SubscribeEvent public static void serverTick(ServerTickEvent.Post event){tickAll();}
     @SubscribeEvent public static void logout(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent event){stop(event.getEntity());}
@@ -272,6 +293,11 @@ public final class QiDomainSystem {
             if(a.attackUntil<now)a.attackMode=0;
             if(a.blasting&&(a.lastUpkeep==Long.MIN_VALUE||now-a.lastUpkeep>=20)) {
                 a.lastUpkeep=now;int cost=upkeep(owner,a.percent);
+                if(owner instanceof PathfinderMob mob&&owner instanceof CultivationNpc npc
+                        &&!(owner instanceof TrainingDummyEntity)
+                        &&(long)NpcProfile.qi(mob,npc.npcArchetype())-cost<npcSpellReserve(mob,npc)) {
+                    stop(owner);continue;
+                }
                 boolean paid=owner instanceof ServerPlayer p?ServerEvents.spendSustainedQiOrBlood(p,ModAttachments.getData(p),cost):
                         owner instanceof PathfinderMob mob&&owner instanceof CultivationNpc npc&&NpcProfile.spendQi(mob,npc.npcArchetype(),cost);
                 if(!paid){stop(owner);if(owner instanceof ServerPlayer p)message(p,"empty");continue;}

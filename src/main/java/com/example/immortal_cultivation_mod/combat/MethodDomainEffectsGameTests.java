@@ -46,7 +46,7 @@ public final class MethodDomainEffectsGameTests {
                 }
                 second.setLastHurtByMob(caster);
                 h.getLevel().addFreshEntity(caster);caster.setTarget(first);caster.tickCount=21;
-                QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(caster));
+                caster.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(caster));
                 var aura=QiDomainSystem.view(caster);h.assertTrue(aura!=null&&aura.domain()&&aura.method.equals(style.method),"NPC opens correct 200-percent domain: "+style);
                 caster.setHealth(caster.getMaxHealth()/2);float ownHp=caster.getHealth();
                 first.setDeltaMovement(.1,.1,0);
@@ -109,7 +109,7 @@ public final class MethodDomainEffectsGameTests {
             profile.putString("Method",MethodDomainStyle.ICE.method);profile.getCompound("MethodProficiencies").putInt(MethodDomainStyle.ICE.method,500);profile.putInt("Qi",100000);
             target.setNoAi(true);target.setNoGravity(true);target.setPos(caster.position().add(3,0,0));target.setInvulnerable(true);
             h.getLevel().addFreshEntity(caster);h.getLevel().addFreshEntity(target);caster.setTarget(target);caster.tickCount=21;
-            QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(caster));
+            caster.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(caster));
             h.runAfterDelay(189,()->{try {
                 var aura=QiDomainSystem.view(caster);
                 h.assertTrue(aura!=null&&aura.blasting&&aura.domainExposure.getOrDefault(target.getUUID(),0)==8,"Natural NPC blast fully coats a twenty-max-HP target on the shared HP curve: aura="+(aura==null?"null":aura.blasting+"/"+aura.method+"/"+aura.domainExposure.getOrDefault(target.getUUID(),0)+"/"+aura.power)+", alive="+caster.isAlive()+", target="+(caster.getTarget()==target)+", Qi="+NpcProfile.qi(caster,caster.npcArchetype())+", distance="+caster.distanceTo(target)+", mastery="+QiDomainSystem.mastery(caster));
@@ -273,7 +273,7 @@ public final class MethodDomainEffectsGameTests {
             target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(fullHealth);target.setHealth(fullHealth);
             h.getLevel().addFreshEntity(caster);h.getLevel().addFreshEntity(target);
             caster.setTarget(target);caster.tickCount=20;
-            QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(caster));
+            caster.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(caster));
             var aura=QiDomainSystem.view(caster);
             h.assertTrue(aura!=null&&aura.domain()&&aura.method.equals(MethodDomainStyle.DEVOUR.method),"NPC opens its real Devouring domain");
             profile.putInt("Qi",1);long now=h.getLevel().getGameTime();
@@ -375,7 +375,7 @@ public final class MethodDomainEffectsGameTests {
             caster.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
             target.setNoAi(true);target.setNoGravity(true);target.setPos(caster.position().add(3,0,0));target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(10000);target.setHealth(10000);
             h.getLevel().addFreshEntity(caster);h.getLevel().addFreshEntity(target);caster.setTarget(target);caster.tickCount=21;
-            QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(caster));
+            caster.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(caster));
             target.hurt(caster.damageSources().mobAttack(caster),1);
             h.assertTrue(Math.abs(BloodLilyBloom.growthMultiplier(caster,target)-1.1)<.000001,"Actual NPC attack adds the same 0.1x bonus");
         }finally{QiDomainSystem.stop(caster);BloodLilyBloom.clear(target);caster.discard();target.discard();}h.succeed();
@@ -547,7 +547,7 @@ public final class MethodDomainEffectsGameTests {
                 profile.putString("Method",style.method);profile.putInt("MethodProficiency",500);profile.putInt("Qi",100000);
                 target.setNoAi(true);target.setNoGravity(true);target.setPos(caster.position().add(3,0,0));
                 h.getLevel().addFreshEntity(caster);h.getLevel().addFreshEntity(target);caster.setTarget(target);caster.tickCount=20;
-                QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(caster));
+                caster.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(caster));
                 var aura=QiDomainSystem.view(caster);h.assertTrue(aura!=null&&aura.domain(),"NPC activates domain: "+style);
                 long now=h.getLevel().getGameTime();now+=Math.floorMod(caster.getId()-now,20);
                 MethodDomainEffects.tick(aura,now,new Rolls(false));
@@ -780,7 +780,7 @@ public final class MethodDomainEffectsGameTests {
             profile.putString("Method",MethodDomainStyle.SOLAR.method);profile.putInt("MethodProficiency",500);profile.putInt("Qi",100000);profile.putFloat("SolarPower",25);
             target.setNoAi(true);target.setNoGravity(true);target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(10000);target.setHealth(10000);
             target.setPos(caster.position().add(3,0,0));h.getLevel().addFreshEntity(caster);h.getLevel().addFreshEntity(target);caster.setTarget(target);caster.tickCount=20;
-            QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(caster));
+            caster.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(caster));
             var aura=QiDomainSystem.view(caster);long now=h.getLevel().getGameTime();now+=Math.floorMod(caster.getId()-now,20);
             float casterMaxHp=caster.getMaxHealth();caster.setHealth(25);
             MethodDomainEffects.tick(aura,now,new Rolls(false));

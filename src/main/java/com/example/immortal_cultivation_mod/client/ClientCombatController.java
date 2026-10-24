@@ -22,6 +22,7 @@ public final class ClientCombatController {
     private static long targetBlockPos = Long.MIN_VALUE;
     private static boolean blocking;
     private static boolean registered;
+    private static boolean jumpHeld;
 
     private ClientCombatController() {
     }
@@ -86,6 +87,13 @@ public final class ClientCombatController {
     }
 
     public static void tick(Minecraft minecraft) {
+        boolean jump = minecraft.player != null && minecraft.screen == null && minecraft.options.keyJump.isDown();
+        if (jump && !jumpHeld && minecraft.options.keyDown.isDown() && ClientData.combatActive()) {
+            interruptHeavyAttack();
+            PacketDistributor.sendToServer(new CombatPayloads.ServerboundCombatAttackPayload(
+                    CombatPayloads.ATTACK_BACKSTEP, -1, Long.MIN_VALUE));
+        }
+        jumpHeld = jump;
         if (minecraft.screen instanceof PauseScreen pauseScreen) {
             updateDisconnectButtons(pauseScreen);
         }

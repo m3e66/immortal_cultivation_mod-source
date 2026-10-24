@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "immortal_cultivation_mod:qingling_grass_crop",
+    "immortal_cultivation_mod:chiyan_flower_crop",
+    "immortal_cultivation_mod:ninglu_zhi_crop",
+    "immortal_cultivation_mod:ziyun_vine_crop",
+    "immortal_cultivation_mod:xuanbing_lotus_crop",
+    "immortal_cultivation_mod:shihun_grass_crop",
+    "immortal_cultivation_mod:fugu_tai_crop",
+    "immortal_cultivation_mod:huanxia_si_crop"
+  ]
+}

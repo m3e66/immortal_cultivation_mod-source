@@ -28,11 +28,11 @@ public final class SpellDestructionGameTests {
         level.setBlock(bedrock, Blocks.BEDROCK.defaultBlockState(), Block.UPDATE_CLIENTS);
         level.setBlock(barrier, com.example.immortal_cultivation_mod.block.ModBlocks.SUOKONG_BARRIER.get().defaultBlockState(), Block.UPDATE_CLIENTS);
         h.assertTrue(!SpellDestruction.canBreakBlock(level, obsidian, player)
-                        && !SpellDestruction.canBreakBlock(level, ding, player),
-                "Other spells retain their original block restrictions");
+                        && SpellDestruction.canBreakBlock(level, ding, player),
+                "Spells can break machinery while retaining obsidian restrictions");
         h.assertTrue(SpellDestruction.canExternalQiBreakBlock(level, obsidian, player)
                         && SpellDestruction.canExternalQiBreakBlock(level, ding, player),
-                "External Qi accepts obsidian and destroyable mod block entities");
+                "External Qi accepts obsidian and mod machinery");
         h.assertTrue(!SpellDestruction.canExternalQiBreakBlock(level, bedrock, player)
                         && !SpellDestruction.canExternalQiBreakBlock(level, barrier, player),
                 "Bedrock and unbreakable mod barriers remain protected");
@@ -45,7 +45,7 @@ public final class SpellDestructionGameTests {
             probes.setInt(null, SpellDestruction.MAX_PROBES);
             h.assertTrue(SpellDestruction.breakExternalQiBlock(level, obsidian, false, player)
                             && SpellDestruction.breakExternalQiBlock(level, ding, false, player),
-                    "Qi block work is queued when the tick budget is spent");
+                    "Qi terrain and machinery cuts are queued");
             h.assertTrue(!level.getBlockState(obsidian).isAir() && !level.getBlockState(ding).isAir(),
                     "Queued blocks stay intact until work is processed");
         } finally {
@@ -53,7 +53,7 @@ public final class SpellDestructionGameTests {
         }
         h.runAfterDelay(3, () -> {
             h.assertTrue(level.getBlockState(obsidian).isAir() && level.getBlockState(ding).isAir(),
-                    "Deferred cuts retain the external-Qi policy");
+                    "Deferred cuts destroy terrain and machinery");
             h.assertTrue(level.getBlockState(bedrock).is(Blocks.BEDROCK), "Bedrock survives");
             player.discard(); h.succeed();
         });
@@ -111,7 +111,7 @@ public final class SpellDestructionGameTests {
                 for(BlockPos pos:BlockPos.betweenClosed(center.offset(-8,-6,-8),center.offset(8,6,8)))
                     if(level.getBlockState(pos).isAir())removed[i]++;
                 h.assertTrue(level.getBlockState(center).is(Blocks.BEDROCK),"Bedrock survives beast impacts");
-                h.assertTrue(level.getBlockState(center.offset(1,0,0)).is(Blocks.CHEST),"Inventory blocks survive beast impacts");
+                h.assertTrue(level.getBlockState(center.offset(1,0,0)).isAir(),"Beast impacts destroy containers");
                 h.assertTrue(level.getBlockState(center.offset(-1,0,0)).isAir(),"Water clears inside the enlarged impact");
             }
             h.assertTrue(removed[0]>200,"Golden Core impact removes hundreds of blocks instead of twenty-four: "+removed[0]);
@@ -193,7 +193,7 @@ public final class SpellDestructionGameTests {
             if(completed[0]<2)return;
             h.assertTrue(broken[0]>700 && broken[0]<1728,"Large solid volume clears without duplicate rewards");
             h.assertTrue(level.getBlockState(bedrock).is(Blocks.BEDROCK),"Unbreakable blocks survive");
-            h.assertTrue(level.getBlockState(chest).is(Blocks.CHEST),"Inventory blocks survive");
+            h.assertTrue(level.getBlockState(chest).isAir(),"Containers inside the impact break");
             System.out.println("Spell destruction dense-volume check: "+broken[0]+" blocks in "+(level.getGameTime()-started)+" ticks");
             h.succeed();
         });

@@ -10,6 +10,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Pose;
@@ -52,6 +53,11 @@ public class CultivatorCorpseEntity extends PathfinderMob {
         setPersistenceRequired();
         xpReward = 0;
         refreshDimensions();
+    }
+
+    @Override
+    public boolean causeFallDamage(float distance, float multiplier, DamageSource source) {
+        return false;
     }
 
     @Override
@@ -208,7 +214,7 @@ public class CultivatorCorpseEntity extends PathfinderMob {
         setNoGravity(false);
         super.tick();
         if (!isRaised() || isSealed()) {
-            applyPinnedGravity();
+            if (!level().isClientSide) applyPinnedGravity();
             lockFacing();
         }
     }
@@ -258,15 +264,13 @@ public class CultivatorCorpseEntity extends PathfinderMob {
     }
 
     private void applyPinnedGravity() {
-        if (onGround()) {
-            setDeltaMovement(Vec3.ZERO);
-            return;
-        }
+        // No-AI bodies do not run normal travel physics. Always probe downward:
+        // onGround may be stale after a block breaks, teleport, or save/load.
         double y = Math.max(-3.92D, getDeltaMovement().y - 0.08D);
         Vec3 falling = new Vec3(0.0D, y, 0.0D);
         setDeltaMovement(falling);
         move(MoverType.SELF, falling);
-        setDeltaMovement(0.0D, y * 0.98D, 0.0D);
+        setDeltaMovement(onGround() ? Vec3.ZERO : new Vec3(0.0D, y * 0.98D, 0.0D));
     }
 
     private void copyAttributesFrom(LivingEntity entity) {

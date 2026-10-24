@@ -40,10 +40,10 @@ public final class NpcMasteryGameTests {
         try {
             npc.setPos(Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(3,3000,3))));victim.setPos(npc.position().add(3,0,0));npc.setNoAi(true);npc.setNoGravity(true);NpcProfile.ensure(npc,npc.npcArchetype());
             var p=npc.getPersistentData().getCompound("ImmortalCultivationNpc");String method=p.getString("Method");p.getCompound("MethodProficiencies").putInt(method,123);npc.setTarget(victim);npc.tickCount=21;
-            QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
+            npc.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
             h.assertTrue(QiDomainSystem.blasting(npc)&&!QiDomainSystem.view(npc).domain()&&QiDomainSystem.percent(npc)==100,"Low-mastery Golden Core can blast body Qi without a domain");
             QiDomainSystem.stop(npc);npc.getPersistentData().remove("ImmortalCultivationNpcQiBlastReadyAt");p.getCompound("MethodProficiencies").putInt(method,750);
-            QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));h.assertTrue(QiDomainSystem.view(npc).domain(),"Mastered NPC opens its actual domain");
+            npc.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));h.assertTrue(QiDomainSystem.view(npc).domain(),"Mastered NPC opens its actual domain");
             p.getCompound("MethodProficiencies").putInt(method,499);QiDomainSystem.tickAll();h.assertTrue(QiDomainSystem.blasting(npc)&&!QiDomainSystem.view(npc).domain(),"Losing active-method mastery removes the domain while preserving body Qi");
         }finally{QiDomainSystem.stop(npc);npc.discard();victim.discard();}h.succeed();
     }

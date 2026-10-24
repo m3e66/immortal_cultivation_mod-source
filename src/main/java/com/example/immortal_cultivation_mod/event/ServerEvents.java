@@ -1257,7 +1257,9 @@ public class ServerEvents {
         boolean refiningSpiritSilk = event.getItemStack().is(
                 com.example.immortal_cultivation_mod.magicritual.item.ModItems.SPIRIT_SILKWORM_SILK.get())
                 && !player.isShiftKeyDown();
+        // Food starts eating immediately; a short release inspects purity instead.
         if (!refiningSpiritSilk
+                && event.getItemStack().get(net.minecraft.core.component.DataComponents.FOOD) == null
                 && ForgingSystem.isPurityMaterial(event.getItemStack())
                 && !ForgingSystem.hasFixedPurity(event.getItemStack())) {
             if (event.getItemStack().getCount() != 1) {
@@ -1317,6 +1319,23 @@ public class ServerEvents {
 
         event.setCancellationResult(InteractionResult.SUCCESS);
         event.setCanceled(true);
+    }
+
+    @SubscribeEvent
+    public static void onEdibleMaterialReleased(LivingEntityUseItemEvent.Stop event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        ItemStack stack = event.getItem();
+        if (stack.get(net.minecraft.core.component.DataComponents.FOOD) == null
+                || !ForgingSystem.isPurityMaterial(stack) || ForgingSystem.hasFixedPurity(stack)) return;
+        int heldTicks = stack.getUseDuration(player) - event.getDuration();
+        // Under 0.4 seconds is a tap. Longer holds retain normal eating/cancellation behavior.
+        if (heldTicks < 0 || heldTicks >= 8) return;
+        if (stack.getCount() != 1) {
+            player.displayClientMessage(Component.translatable("message." + ImmortalCultivationMod.MODID + ".material_purity_single"), true);
+            return;
+        }
+        ForgingSystem.ensurePurity(stack, player.tickCount + player.getId());
+        player.displayClientMessage(ForgingSystem.purityTooltip(stack), true);
     }
 
     @SubscribeEvent
@@ -2921,6 +2940,11 @@ public class ServerEvents {
 
     public static int ambientQiValue(Player player) {
         return getAmbientQi(player).value();
+    }
+
+    /** Position-based view of the same ambient source calculation, without personal player Qi. */
+    public static int ambientQiAt(Level level, BlockPos pos) {
+        return countSpiritVeinCenters(level,pos,AMBIENT_QI_SCAN_RADIUS)*AMBIENT_QI_PER_SPIRIT_VEIN_CENTER;
     }
 
     /** Ambient qi is a percentage bonus to natural regeneration, not a flat point bonus. */

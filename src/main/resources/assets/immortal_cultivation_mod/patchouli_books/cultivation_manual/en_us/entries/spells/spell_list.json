@@ -22,7 +22,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(br)Regeneration: Lianqi Middle, wood, costs 20 qi.$(br)Guide spiritual qi to nourish the body. For three breaths, vitality continuously flows through the flesh, steadily healing wounds."
+      "text": "$(br)Regeneration: Qi Refining Middle, wood, costs 24 qi.$(br)Heals yourself for one second. Wood Spirit Breath, Blood Return and Vitality Burst use the same self-healing behavior, without aiming or sneaking.$(br2)Base scale: 1.00. Each minor spell stage adds 0.01; each major spell realm adds 0.10. Wood Spirit Breath: 1.10. Blood Return and Vitality Burst: 1.11 each. Scaling uses the spell realm, not the caster realm."
     },
     {
       "type": "patchouli:text",

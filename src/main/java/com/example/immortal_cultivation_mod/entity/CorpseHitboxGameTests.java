@@ -22,6 +22,74 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @GameTestHolder("immortal_cultivation_corpse")
 @PrefixGameTestTemplate(false)
 public final class CorpseHitboxGameTests {
+    private static void floor(GameTestHelper h) {
+        for(int x=0;x<=8;x++)for(int z=0;z<=8;z++) {
+            h.setBlock(new net.minecraft.core.BlockPos(x,3,z),net.minecraft.world.level.block.Blocks.STONE);
+            for(int y=4;y<=12;y++)h.setBlock(new net.minecraft.core.BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.AIR);
+        }
+    }
+
+    @GameTest(template="fate_test",timeoutTicks=80)
+    public static void unsupportedCorpseFallsDespiteStaleGroundFlag(GameTestHelper h) {
+        floor(h);
+        var corpse=ModEntities.CULTIVATOR_CORPSE.get().create(h.getLevel());
+        corpse.setPos(h.absoluteVec(new Vec3(4.5,8,4.5)));corpse.setOnGround(true);
+        corpse.setHealth(1);
+        h.getLevel().addFreshEntity(corpse);
+        h.runAfterDelay(30,()->{try {
+            close(h,corpse.getY(),h.absolutePos(new net.minecraft.core.BlockPos(4,4,4)).getY(),"Corpse lands on real floor");
+            h.assertTrue(corpse.onGround() && !corpse.isNoGravity(),"Landed corpse has gravity and actual support");
+            h.assertTrue(corpse.isAlive() && corpse.getHealth() == 1, "Even a damaged corpse survives landing without losing HP");
+            close(h,corpse.getDeltaMovement().y,0,"Landing clears downward velocity");h.succeed();
+        }finally{corpse.discard();}});
+    }
+
+    @GameTest(template="fate_test",timeoutTicks=80)
+    public static void removingSupportMakesSealedCorpseFall(GameTestHelper h) {
+        floor(h);
+        var support=new net.minecraft.core.BlockPos(4,7,4);
+        h.setBlock(support,net.minecraft.world.level.block.Blocks.STONE);
+        var corpse=ModEntities.CULTIVATOR_CORPSE.get().create(h.getLevel());
+        corpse.setRaised(true);corpse.setSealed(true);
+        corpse.getAttribute(Attributes.MAX_HEALTH).setBaseValue(1000);corpse.setHealth(1000);
+        corpse.setPos(h.absoluteVec(new Vec3(4.5,8,4.5)));corpse.setOnGround(true);h.getLevel().addFreshEntity(corpse);
+        h.runAfterDelay(3,()->h.setBlock(support,net.minecraft.world.level.block.Blocks.AIR));
+        h.runAfterDelay(35,()->{try {
+            close(h,corpse.getY(),h.absolutePos(new net.minecraft.core.BlockPos(4,4,4)).getY(),"Sealed no-AI corpse falls when support breaks");
+            h.assertTrue(corpse.isSealed()&&corpse.isRaised()&&corpse.isNoAi(),"Falling preserves seal and standing pose");h.succeed();
+        }finally{corpse.discard();}});
+    }
+
+    @GameTest(template="fate_test",timeoutTicks=80)
+    public static void reloadedFloatingCorpseResumesGravity(GameTestHelper h) {
+        floor(h);
+        var source=ModEntities.CULTIVATOR_CORPSE.get().create(h.getLevel());
+        source.setPos(h.absoluteVec(new Vec3(4.5,8,4.5)));source.setOnGround(true);source.setNoGravity(true);
+        source.getAttribute(Attributes.MAX_HEALTH).setBaseValue(1000);source.setHealth(1000);
+        var restored=ModEntities.CULTIVATOR_CORPSE.get().create(h.getLevel());
+        restored.load(source.saveWithoutId(new CompoundTag()));source.discard();h.getLevel().addFreshEntity(restored);
+        h.runAfterDelay(30,()->{try {
+            close(h,restored.getY(),h.absolutePos(new net.minecraft.core.BlockPos(4,4,4)).getY(),"Loaded floating body settles");
+            h.assertTrue(!restored.isNoGravity()&&!restored.isRaised(),"Old save flags cannot suspend a prone body");h.succeed();
+        }finally{restored.discard();}});
+    }
+    @GameTest(template="fate_test")
+    public static void fallDamageImmunityCoversEveryCorpsePose(GameTestHelper h) {
+        for (int pose = 0; pose < 3; pose++) {
+            var corpse = ModEntities.CULTIVATOR_CORPSE.get().create(h.getLevel());
+            try {
+                corpse.setRaised(pose > 0);
+                corpse.setSealed(pose == 2);
+                float health = corpse.getHealth();
+                h.assertTrue(!corpse.causeFallDamage(100, 1, corpse.damageSources().fall()), "Long fall never damages corpse pose " + pose);
+                close(h, corpse.getHealth(), health, "Fall preserves corpse health");
+                h.assertTrue(corpse.hurt(corpse.damageSources().generic(), 1), "Corpse remains vulnerable to ordinary damage");
+                h.assertTrue(corpse.getHealth() < health, "Fall immunity does not grant general invulnerability");
+            } finally { corpse.discard(); }
+        }
+        h.succeed();
+    }
+
     private static FakePlayer player(GameTestHelper h) {
         var player = new FakePlayer(h.getLevel(),new GameProfile(UUID.randomUUID(),"corpse-hitbox"));
         player.setGameMode(GameType.SURVIVAL);

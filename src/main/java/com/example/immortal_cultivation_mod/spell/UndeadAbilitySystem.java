@@ -1490,8 +1490,6 @@ public final class UndeadAbilitySystem {
                 abilityDamage(caster, target, 120.0F);
                 target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN,
                         30, 0, false, false, true), caster);
-                target.addEffect(new MobEffectInstance(MobEffects.DARKNESS,
-                        35, 0, false, false, true), caster);
                 markPenalty(target, 0.40F, 0.35F, now + 30L);
             }
             case EARTH_CORRUPTION -> {

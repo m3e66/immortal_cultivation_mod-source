@@ -51,7 +51,7 @@ public class ModEntities {
             ENTITY_TYPES.register("fireball_projectile",
                     () -> EntityType.Builder.<FireballProjectileEntity>of(
                             FireballProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.5f, 0.5f)
+                            .sized(1.00F, 1.00F)
                             .clientTrackingRange(6)
                             .updateInterval(2)
                             .build("fireball_projectile"));
@@ -184,7 +184,7 @@ public class ModEntities {
             ENTITY_TYPES.register("ignite_flare_projectile",
                     () -> EntityType.Builder.<IgniteFlareProjectileEntity>of(
                             IgniteFlareProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.35f, 0.35f)
+                            .sized(0.80F, 0.80F)
                             .clientTrackingRange(8)
                             .updateInterval(1)
                             .build("ignite_flare_projectile"));
@@ -193,7 +193,7 @@ public class ModEntities {
             ENTITY_TYPES.register("light_beam_projectile",
                     () -> EntityType.Builder.<LightBeamProjectileEntity>of(
                             LightBeamProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.3f, 0.3f)
+                            .sized(0.80F, 0.80F)
                             .clientTrackingRange(10)
                             .updateInterval(1)
                             .build("light_beam_projectile"));
@@ -202,7 +202,7 @@ public class ModEntities {
             ENTITY_TYPES.register("lingzhi_bullet_projectile",
                     () -> EntityType.Builder.<LingzhiBulletProjectileEntity>of(
                             LingzhiBulletProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.25f, 0.25f)
+                            .sized(0.80F, 0.80F)
                             .clientTrackingRange(8)
                             .updateInterval(1)
                             .build("lingzhi_bullet_projectile"));
@@ -212,7 +212,7 @@ public class ModEntities {
             ENTITY_TYPES.register("jinmang_chuansha_projectile",
                     () -> EntityType.Builder.<JinmangChuanshaProjectileEntity>of(
                                     JinmangChuanshaProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.12F, 0.12F)
+                            .sized(0.80F, 0.80F)
                             .clientTrackingRange(12)
                             .updateInterval(1)
                             .build("jinmang_chuansha_projectile"));
@@ -222,7 +222,7 @@ public class ModEntities {
             ENTITY_TYPES.register("elemental_technique_projectile",
                     () -> EntityType.Builder.<ElementalTechniqueProjectileEntity>of(
                                     ElementalTechniqueProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.16F, 0.16F)
+                            .sized(0.80F, 0.80F)
                             .clientTrackingRange(12)
                             .updateInterval(1)
                             .build("elemental_technique_projectile"));
@@ -232,7 +232,7 @@ public class ModEntities {
             ENTITY_TYPES.register("spell_trigger_projectile",
                     () -> EntityType.Builder.<SpellTriggerProjectileEntity>of(
                                     SpellTriggerProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.16F, 0.16F)
+                            .sized(0.80F, 0.80F)
                             .clientTrackingRange(12)
                             .updateInterval(1)
                             .build("spell_trigger_projectile"));
@@ -301,7 +301,7 @@ public class ModEntities {
             ENTITY_TYPES.register("wind_blade_projectile",
                     () -> EntityType.Builder.<WindBladeProjectileEntity>of(
                             WindBladeProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.45f, 0.45f)
+                            .sized(0.90F, 0.90F)
                             .clientTrackingRange(8)
                             .updateInterval(1)
                             .build("wind_blade_projectile"));
@@ -310,7 +310,7 @@ public class ModEntities {
             ENTITY_TYPES.register("smoke_projectile",
                     () -> EntityType.Builder.<SmokeProjectileEntity>of(
                             SmokeProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.45f, 0.45f)
+                            .sized(0.90F, 0.90F)
                             .clientTrackingRange(8)
                             .updateInterval(1)
                             .build("smoke_projectile"));
@@ -319,7 +319,7 @@ public class ModEntities {
             ENTITY_TYPES.register("sliding_water_projectile",
                     () -> EntityType.Builder.<SlidingWaterProjectileEntity>of(
                             SlidingWaterProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.4f, 0.4f)
+                            .sized(0.80F, 0.80F)
                             .clientTrackingRange(8)
                             .updateInterval(1)
                             .build("sliding_water_projectile"));
@@ -328,7 +328,7 @@ public class ModEntities {
             ENTITY_TYPES.register("absorb_cultivation_projectile",
                     () -> EntityType.Builder.<AbsorbCultivationProjectileEntity>of(
                             AbsorbCultivationProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.35f, 0.35f)
+                            .sized(0.80F, 0.80F)
                             .clientTrackingRange(10)
                             .updateInterval(1)
                             .build("absorb_cultivation_projectile"));
@@ -337,7 +337,7 @@ public class ModEntities {
             ENTITY_TYPES.register("dingshen_projectile",
                     () -> EntityType.Builder.<DingshenProjectileEntity>of(
                             DingshenProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.35f, 0.35f)
+                            .sized(0.80F, 0.80F)
                             .clientTrackingRange(10)
                             .updateInterval(1)
                             .build("dingshen_projectile"));
@@ -346,7 +346,7 @@ public class ModEntities {
             ENTITY_TYPES.register("kongshi_projectile",
                     () -> EntityType.Builder.<KongshiProjectileEntity>of(
                             KongshiProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.35f, 0.35f)
+                            .sized(0.80F, 0.80F)
                             .clientTrackingRange(10)
                             .updateInterval(1)
                             .build("kongshi_projectile"));
@@ -355,7 +355,7 @@ public class ModEntities {
             ENTITY_TYPES.register("lightning_projectile",
                     () -> EntityType.Builder.<LightningProjectileEntity>of(
                             LightningProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.35f, 0.35f)
+                            .sized(0.80F, 0.80F)
                             .clientTrackingRange(12)
                             .updateInterval(1)
                             .build("lightning_projectile"));
@@ -364,7 +364,7 @@ public class ModEntities {
             ENTITY_TYPES.register("frost_cry_projectile",
                     () -> EntityType.Builder.<FrostCryProjectileEntity>of(
                             FrostCryProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.4f, 0.4f)
+                            .sized(0.80F, 0.80F)
                             .clientTrackingRange(12)
                             .updateInterval(1)
                             .build("frost_cry_projectile"));
@@ -373,7 +373,7 @@ public class ModEntities {
             ENTITY_TYPES.register("liuguang_jianying_projectile",
                     () -> EntityType.Builder.<LiuguangJianyingProjectileEntity>of(
                             LiuguangJianyingProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.35f, 0.35f)
+                            .sized(0.80F, 0.80F)
                             .clientTrackingRange(12)
                             .updateInterval(1)
                             .build("liuguang_jianying_projectile"));
@@ -382,7 +382,7 @@ public class ModEntities {
             ENTITY_TYPES.register("duanliu_kongdun_projectile",
                     () -> EntityType.Builder.<DuanliuKongdunProjectileEntity>of(
                             DuanliuKongdunProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.4f, 0.4f)
+                            .sized(0.80F, 0.80F)
                             .clientTrackingRange(12)
                             .updateInterval(1)
                             .build("duanliu_kongdun_projectile"));
@@ -391,7 +391,7 @@ public class ModEntities {
             ENTITY_TYPES.register("yihen_ci_projectile",
                     () -> EntityType.Builder.<YihenCiProjectileEntity>of(
                             YihenCiProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.35f, 0.35f)
+                            .sized(0.80F, 0.80F)
                             .clientTrackingRange(12)
                             .updateInterval(1)
                             .build("yihen_ci_projectile"));
@@ -400,7 +400,7 @@ public class ModEntities {
             ENTITY_TYPES.register("suokong_projectile",
                     () -> EntityType.Builder.<SuokongProjectileEntity>of(
                             SuokongProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.2f, 0.2f)
+                            .sized(0.80F, 0.80F)
                             .clientTrackingRange(12)
                             .updateInterval(1)
                             .build("suokong_projectile"));
@@ -409,7 +409,7 @@ public class ModEntities {
             ENTITY_TYPES.register("xinliao_fireball",
                     () -> EntityType.Builder.<XinliaoFireballEntity>of(
                             XinliaoFireballEntity::new, MobCategory.MISC)
-                            .sized(0.7f, 0.7f)
+                            .sized(1.40F, 1.40F)
                             .clientTrackingRange(16)
                             .updateInterval(1)
                             .build("xinliao_fireball"));
@@ -418,7 +418,7 @@ public class ModEntities {
             ENTITY_TYPES.register("starfall_projectile",
                     () -> EntityType.Builder.<StarfallProjectileEntity>of(
                             StarfallProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.7f, 0.7f)
+                            .sized(1.40F, 1.40F)
                             .clientTrackingRange(16)
                             .updateInterval(1)
                             .build("starfall_projectile"));
@@ -448,7 +448,7 @@ public class ModEntities {
             ENTITY_TYPES.register("sword_technique_projectile",
                     () -> EntityType.Builder.<SwordTechniqueProjectileEntity>of(
                             SwordTechniqueProjectileEntity::new, MobCategory.MISC)
-                            .sized(0.35F, 0.35F)
+                            .sized(0.80F, 0.80F)
                             .clientTrackingRange(24)
                             .updateInterval(1)
                             .build("sword_technique_projectile"));
@@ -663,6 +663,11 @@ public class ModEntities {
                             .clientTrackingRange(16)
                             .updateInterval(1)
                             .build("frostspine_cave_bear"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<SilverMistWolfEntity>> SILVER_MIST_WOLF =
+            ENTITY_TYPES.register("silver_mist_wolf", () -> EntityType.Builder.<SilverMistWolfEntity>of(
+                    SilverMistWolfEntity::new, MobCategory.CREATURE).sized(.9F,1.25F)
+                    .clientTrackingRange(12).updateInterval(1).build("silver_mist_wolf"));
 
     public static final DeferredHolder<EntityType<?>, EntityType<CultivationBestiaryBeastEntity>>
             GREEN_PATTERNED_SPIRIT_DEVOURING_RAT =

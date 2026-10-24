@@ -171,7 +171,7 @@ public class ModBlocks {
                     .noLootTable()));
 
     public static final DeferredBlock<Block> FUGU_TAI = registerBlock("fugu_tai",
-            () -> new CultivationVineBlock(BlockBehaviour.Properties.of()
+            () -> new com.example.immortal_cultivation_mod.farming.WildSpiritVineBlock(BlockBehaviour.Properties.of()
                     .strength(0.2F)
                     .sound(SoundType.VINE)
                     .noCollission()
@@ -179,7 +179,7 @@ public class ModBlocks {
                     .replaceable()));
 
     public static final DeferredBlock<Block> HUANXIA_SI = registerBlock("huanxia_si",
-            () -> new CultivationVineBlock(BlockBehaviour.Properties.of()
+            () -> new com.example.immortal_cultivation_mod.farming.WildSpiritVineBlock(BlockBehaviour.Properties.of()
                     .strength(0.2F)
                     .sound(SoundType.VINE)
                     .noCollission()
@@ -381,11 +381,15 @@ public class ModBlocks {
     }
 
     private static DeferredBlock<Block> registerPlant(String name) {
-        return registerBlock(name, () -> new CultivationPlantBlock(BlockBehaviour.Properties.of()
+        return registerBlock(name, () -> {
+            var properties=BlockBehaviour.Properties.of()
                 .strength(0.1F)
                 .sound(SoundType.GRASS)
                 .noCollission()
-                .noOcclusion()));
+                .noOcclusion();
+            return com.example.immortal_cultivation_mod.farming.SpiritPlantSpecies.find(name)==null
+                    ?new CultivationPlantBlock(properties):new com.example.immortal_cultivation_mod.farming.WildSpiritPlantBlock(properties);
+        });
     }
 
 

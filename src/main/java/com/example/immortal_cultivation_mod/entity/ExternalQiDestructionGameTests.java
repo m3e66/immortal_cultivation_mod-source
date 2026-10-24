@@ -40,23 +40,24 @@ public final class ExternalQiDestructionGameTests {
     }
 
     @GameTest(template = "npc_combat_arena")
-    public static void externalQiCutsObsidianAndModWorkstations(GameTestHelper helper) {
+    public static void externalQiCutsTerrainAndModWorkstations(GameTestHelper helper) {
         var slash = sectionedTestSlash(helper, true, 1600);
         var targets = new net.minecraft.world.level.block.Block[]{Blocks.OBSIDIAN, Blocks.CRYING_OBSIDIAN,
-                com.example.immortal_cultivation_mod.block.ModBlocks.CU_TIE_XIAODING.get(),
-                com.example.immortal_cultivation_mod.block.ModBlocks.LINGMU_LOG.get()};
+                com.example.immortal_cultivation_mod.block.ModBlocks.LINGMU_LOG.get(),
+                com.example.immortal_cultivation_mod.block.ModBlocks.CU_TIE_XIAODING.get()};
         for (int i = 0; i < targets.length; i++) helper.setBlock(new BlockPos(12, 6, 11 + i), targets[i]);
-        helper.assertTrue(helper.getLevel().getBlockEntity(helper.absolutePos(new BlockPos(12, 6, 13))) != null,
+        helper.assertTrue(helper.getLevel().getBlockEntity(helper.absolutePos(new BlockPos(12, 6, 14))) != null,
                 "Ding fixture includes its block entity");
         for (int i = 0; i < 5; i++) slash.tick();
         slash.discard();
         helper.runAfterDelay(3, () -> {
-            for (int i = 0; i < targets.length; i++) {
+            for (int i = 0; i < targets.length - 1; i++) {
                 helper.assertTrue(helper.getBlockState(new BlockPos(12, 6, 11 + i)).isAir(),
                         "External Qi cuts through " + targets[i]);
             }
-            helper.assertTrue(helper.getLevel().getBlockEntity(helper.absolutePos(new BlockPos(12, 6, 13))) == null,
-                    "Destroyed mod workstation leaves no stale block entity");
+            helper.assertTrue(helper.getBlockState(new BlockPos(12, 6, 14)).isAir()
+                            && helper.getLevel().getBlockEntity(helper.absolutePos(new BlockPos(12, 6, 14))) == null,
+                    "External Qi destroys the workstation without leaving a stale block entity");
             helper.succeed();
         });
     }
@@ -248,8 +249,8 @@ public final class ExternalQiDestructionGameTests {
                 helper.assertTrue(holes(helper) > weak, "Higher-damage slash removes more actual blocks from the same wall");
                 helper.assertTrue(level.getBlockState(helper.absolutePos(new BlockPos(8, 3, 10))).isAir(),
                         "Strong slash cuts outside the weak slash's width");
-                helper.assertTrue(level.getBlockState(helper.absolutePos(new BlockPos(10, 3, 11))).is(Blocks.CHEST),
-                        "Shared destruction still preserves block entities");
+                helper.assertTrue(level.getBlockState(helper.absolutePos(new BlockPos(10, 3, 11))).isAir(),
+                        "Shared destruction breaks containers in the blade path");
                 helper.assertTrue(level.getBlockState(helper.absolutePos(new BlockPos(12, 4, 10))).isAir(),
                         "Thick slash cuts blocks above its old single-block plane");
                 helper.assertTrue(level.getBlockState(helper.absolutePos(new BlockPos(12, 7, 10))).is(Blocks.STONE),

@@ -70,7 +70,7 @@ public final class FlameTerrainDestruction {
             for (int y = top; y >= floor; y--) {
                 BlockPos pos = new BlockPos(column.getX(), y, column.getZ());
                 BlockState state = level.getBlockState(pos);
-                if (!state.isAir() && !state.hasBlockEntity() && state.getDestroySpeed(level, pos) >= 0) {
+                if (!state.isAir() && state.getDestroySpeed(level, pos) >= 0) {
                     batch.add(new Candidate(pos, state));
                     if (batch.size() == BATCH_SIZE) eraseBatch(level, owner, explosion, batch);
                 }

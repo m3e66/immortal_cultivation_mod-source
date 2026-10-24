@@ -14,6 +14,9 @@ public class ModEffects {
     public static final DeferredHolder<MobEffect, MobEffect> NPC_WEAPON_GUARD =
             MOB_EFFECTS.register("npc_weapon_guard", NpcWeaponGuardEffect::new);
 
+    public static final DeferredHolder<MobEffect, MobEffect> SPRING_RECOVERY =
+            MOB_EFFECTS.register("spring_recovery", SpringRecoveryEffect::new);
+
     public static final DeferredHolder<MobEffect, MobEffect> LINGBENG =
             MOB_EFFECTS.register("lingbeng", LingbengEffect::new);
 

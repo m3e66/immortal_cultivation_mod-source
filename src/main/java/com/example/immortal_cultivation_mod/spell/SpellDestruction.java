@@ -97,7 +97,7 @@ public final class SpellDestruction {
         boolean modBlock = externalQi && net.minecraft.core.registries.BuiltInRegistries.BLOCK
                 .getKey(state.getBlock()).getNamespace().equals("immortal_cultivation_mod");
         boolean qiBreakable = externalQi && (modBlock || state.is(Blocks.OBSIDIAN) || state.is(Blocks.CRYING_OBSIDIAN));
-        if(state.isAir() || (state.hasBlockEntity() && !modBlock)
+        if(state.isAir()
                 || (state.is(BlockTags.DRAGON_IMMUNE) && !qiBreakable))return false;
         float strength=state.getDestroySpeed(level,pos);
         if((!state.is(Blocks.WATER) && (strength<0 || strength>hardness)) || SmallSectProtection.isLocked(level,pos) || DeadRuinProtection.isLocked(level,pos))return false;
@@ -135,7 +135,7 @@ public final class SpellDestruction {
                 && allowed(level, position, level.getBlockState(position), owner, owner.position(), Float.MAX_VALUE);
     }
 
-    /** External Qi can cut obsidian and destroyable mod machinery, while retaining world protections. */
+    /** External Qi can cut obsidian, mod ores and machinery, while retaining world protections. */
     public static boolean canExternalQiBreakBlock(ServerLevel level, BlockPos position, LivingEntity owner) {
         return level.hasChunkAt(position) && level.getWorldBorder().isWithinBounds(position)
                 && !level.isOutsideBuildHeight(position)
@@ -196,9 +196,10 @@ public final class SpellDestruction {
             if(player != null
                     && net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(
                             new net.neoforged.neoforge.event.level.BlockEvent.BreakEvent(level,pos,state,player)).isCanceled())return false;
+            var blockEntity = loot ? level.getBlockEntity(pos) : null;
             if(!level.setBlock(pos,replacement,Block.UPDATE_CLIENTS|Block.UPDATE_KNOWN_SHAPE|Block.UPDATE_SUPPRESS_DROPS))return false;
             changes++;
-            if(loot && !state.is(Blocks.WATER)){drops++;Block.dropResources(state,level,pos,null,owner,net.minecraft.world.item.ItemStack.EMPTY);}
+            if(loot && !state.is(Blocks.WATER)){drops++;Block.dropResources(state,level,pos,blockEntity,owner,net.minecraft.world.item.ItemStack.EMPTY);}
             work.neighbors.put(pos.asLong(),new Neighbor(pos.immutable(),state));
             if(!water && particles<8 && changes%32==1){particles++;level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK,state),
                     pos.getX()+.5,pos.getY()+.5,pos.getZ()+.5,4,.3,.25,.3,.08);}

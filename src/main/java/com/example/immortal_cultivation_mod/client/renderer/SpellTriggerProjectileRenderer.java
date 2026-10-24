@@ -28,6 +28,8 @@ public final class SpellTriggerProjectileRenderer extends EntityRenderer<SpellTr
    }
 
    public void render(SpellTriggerProjectileEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+      // The travelling carrier is invisible; activated solar impact animation remains visible.
+      if (!entity.activated()) return;
       String spellId = entity.spellId();
       if ("leixiao_guanyun".equals(spellId)) {
          renderLeixiao(entity, partialTick, poseStack, buffer);
@@ -36,6 +38,7 @@ public final class SpellTriggerProjectileRenderer extends EntityRenderer<SpellTr
          boolean fallingSun = "dari_zhen".equals(spellId);
          boolean sunWheel = "rilun".equals(spellId);
          if (!fallingSun && !sunWheel) {
+            if (!entity.activated()) TechniqueBoltRenderer.draw(entity,spellId,partialTick,poseStack,buffer);
             super.render(entity, entityYaw, partialTick, poseStack, buffer, packedLight);
          } else if (fallingSun && entity.activated() && entity.solarImpactTicks() > 4) {
             super.render(entity, entityYaw, partialTick, poseStack, buffer, packedLight);

@@ -25,7 +25,7 @@ public final class DaoGuidanceGameTests {
 
     @GameTest(template = "fate_test", templateNamespace = "immortal_cultivation_guidance")
     public static void allBranchesRegisteredWithUniqueIds(GameTestHelper helper) {
-        helper.assertTrue(DaoGuidanceContent.chapters().size() == 42, "All existing chapters and nine current-feature readings are registered");
+        helper.assertTrue(DaoGuidanceContent.chapters().size() == 44, "All existing chapters and eleven current-feature readings are registered");
         var ids = new HashSet<String>();
         for (var chapter : DaoGuidanceContent.chapters()) {
             helper.assertTrue(ids.add(chapter.id()) && DaoGuidanceContent.chapter(chapter.id()) == chapter,
@@ -129,7 +129,7 @@ public final class DaoGuidanceGameTests {
     @GameTest(template = "fate_test", templateNamespace = "immortal_cultivation_guidance")
     public static void everyCurrentReadingCanBeAcknowledgedInOrder(GameTestHelper helper) {
         var player = player(helper);
-        helper.assertTrue(DaoGuidanceUpdates.chapters().size() == 9, "All nine current topics are present");
+        helper.assertTrue(DaoGuidanceUpdates.chapters().size() == 11, "All eleven current topics are present");
         for (var chapter : DaoGuidanceUpdates.chapters()) {
             DaoGuidanceSystem.discover(player, chapter.id());
             for (var objective : chapter.objectives()) {

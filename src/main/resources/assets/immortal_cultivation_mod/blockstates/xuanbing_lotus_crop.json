@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "age=0": {
+      "model": "immortal_cultivation_mod:block/farming/xuanbing_lotus_0"
+    },
+    "age=1": {
+      "model": "immortal_cultivation_mod:block/farming/xuanbing_lotus_1"
+    },
+    "age=2": {
+      "model": "immortal_cultivation_mod:block/farming/xuanbing_lotus_2"
+    },
+    "age=3": {
+      "model": "immortal_cultivation_mod:block/farming/xuanbing_lotus_3"
+    },
+    "age=4": {
+      "model": "immortal_cultivation_mod:block/farming/xuanbing_lotus_4"
+    }
+  }
+}

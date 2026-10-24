@@ -185,7 +185,7 @@ public final class NpcSpellcasting {
             }
         }
         if (ModSpells.REGENERATION.equals(normalized)) {
-            return caster.getHealth() < caster.getMaxHealth();
+            return CultivatorSpellExecution.canApplyRegeneration(caster);
         }
         if (HealingTechniques.isTechnique(normalized)) {
             return HealingTechniques.canCast(caster, target, normalized);

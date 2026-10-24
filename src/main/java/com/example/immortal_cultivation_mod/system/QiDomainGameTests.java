@@ -554,28 +554,26 @@ public final class QiDomainGameTests {
             com.example.immortal_cultivation_mod.entity.NpcProfile.ensure(npc,npc.npcArchetype());
             npc.getPersistentData().getCompound("ImmortalCultivationNpc").getCompound("MethodProficiencies").putInt(QiDomainSystem.method(npc),500);
             npc.setTarget(victim);npc.tickCount=20;
-            QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
+            npc.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
             h.assertTrue(QiDomainSystem.blasting(npc)&&QiDomainSystem.percent(npc)==200,"Golden Core NPC opens domain during real combat");
             h.assertTrue(QiDomainSystem.mastery(npc)==501,"Experienced Golden Core NPC has saved Great mastery plus one combat use");
             var profile=npc.getPersistentData().getCompound("ImmortalCultivationNpc");
             var proficiencies=profile.getCompound("MethodProficiencies");proficiencies.putInt(QiDomainSystem.method(npc),499);profile.put("MethodProficiencies",proficiencies);
-            npc.tickCount=40;QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
+            npc.tickCount=40;npc.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
             h.assertTrue(QiDomainSystem.mastery(npc)==500,"Combat proficiency belongs to active NPC method");
-            npc.setTarget(null);npc.tickCount=60;QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
+            npc.setTarget(null);npc.tickCount=60;npc.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
             h.assertTrue(QiDomainSystem.view(npc)==null,"NPC stops domain when target lost");
         }finally{QiDomainSystem.stop(npc);npc.discard();victim.discard();}h.succeed();
     }
-    @GameTest(template="fate_test") public static void npcBlastsOnCombatEntryBetweenDecisionTicks(GameTestHelper h) {
+    @GameTest(template="fate_test") public static void npcKeepsOpeningExchangeForSpells(GameTestHelper h) {
         var npc=ModEntities.JINDAN_CULTIVATOR.get().create(h.getLevel());var victim=EntityType.COW.create(h.getLevel());
         try {
             NpcProfile.ensure(npc,npc.npcArchetype());int savedMastery=QiDomainSystem.mastery(npc);npc.tickCount=21;npc.setTarget(victim);
+            int qi=NpcProfile.qi(npc,npc.npcArchetype());
             QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
-            h.assertTrue(QiDomainSystem.blasting(npc),"Eligible NPC reacts on combat entry without waiting for the next second");
-            h.assertTrue(QiDomainSystem.mastery(npc)==savedMastery,"Combat entry preserves rolled mastery without extra training");
-            h.assertTrue(QiDomainSystem.percent(npc)==(savedMastery>=500?200:100),"Only Great mastery opens a natural NPC domain");
-            long end=QiDomainSystem.view(npc).npcBlastUntil;
-            npc.tickCount=22;QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
-            h.assertTrue(QiDomainSystem.view(npc).npcBlastUntil==end,"Repeated decisions cannot restart eruption");
+            h.assertTrue(!QiDomainSystem.blasting(npc),"Acquiring a target leaves the opening exchange for spells");
+            h.assertTrue(QiDomainSystem.mastery(npc)==savedMastery,"Waiting does not train method mastery");
+            h.assertTrue(NpcProfile.qi(npc,npc.npcArchetype())==qi,"No opening aura Qi drain");
         }finally{QiDomainSystem.stop(npc);npc.discard();victim.discard();}h.succeed();
     }
     @GameTest(template="fate_test",timeoutTicks=440) public static void npcBlastExpiresAndWaitsBeforeReusing(GameTestHelper h) {
@@ -585,24 +583,24 @@ public final class QiDomainGameTests {
         try {
             npc.setPos(h.absoluteVec(new Vec3(3,45,3)));victim.setPos(npc.position().add(1,0,0));
             NpcProfile.ensure(npc,npc.npcArchetype());npc.setTarget(victim);npc.tickCount=20;
-            QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
+            npc.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
             h.assertTrue(QiDomainSystem.blasting(npc),"NPC starts a real combat burst");
             long end=QiDomainSystem.view(npc).npcBlastUntil;
             h.runAfterDelay(80,()->{try {
-                npc.tickCount=40;QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
+                npc.tickCount=40;npc.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
                 h.assertTrue(QiDomainSystem.blasting(npc)&&QiDomainSystem.view(npc).npcBlastUntil==end,"Keeping combat target cannot extend burst duration");
             }catch(Throwable e){cleanup.run();throw e;}});
             h.runAfterDelay(201,()->{try {
                 h.assertTrue(!QiDomainSystem.blasting(npc),"Server upkeep stops release at ten seconds even without another NPC decision");
-                npc.tickCount=60;QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
+                npc.tickCount=60;npc.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
                 h.assertTrue(!QiDomainSystem.blasting(npc),"Still having a target cannot bypass cooldown");
             }catch(Throwable e){cleanup.run();throw e;}});
             h.runAfterDelay(350,()->{try {
-                npc.tickCount=80;QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
+                npc.tickCount=80;npc.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
                 h.assertTrue(!QiDomainSystem.blasting(npc),"NPC remains off throughout the ten-second cooldown");
             }catch(Throwable e){cleanup.run();throw e;}});
             h.runAfterDelay(402,()->{try {
-                npc.tickCount=100;QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
+                npc.tickCount=100;npc.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
                 h.assertTrue(QiDomainSystem.blasting(npc),"NPC may use a new burst after full cooldown");h.succeed();
             }finally{cleanup.run();}});
         }catch(Throwable e){cleanup.run();throw e;}
@@ -615,19 +613,19 @@ public final class QiDomainGameTests {
             npc.setPos(h.absoluteVec(new Vec3(3,70,3)));victim.setPos(npc.position().add(1,0,0));
             NpcProfile.ensure(npc,npc.npcArchetype());npc.setTarget(victim);npc.tickCount=20;
             var profile=npc.getPersistentData().getCompound("ImmortalCultivationNpc");profile.putInt("Qi",1);
-            QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
+            npc.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
             h.assertTrue(!QiDomainSystem.blasting(npc),"A tiny regenerating Qi reserve cannot repeatedly trigger activation");
             profile.putInt("Qi",profile.getInt("MaxQi"));
-            QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
+            npc.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
             h.assertTrue(QiDomainSystem.blasting(npc),"Sufficient reserve allows activation");
             npc.setTarget(null);npc.tickCount=21;
-            QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
+            npc.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
             h.assertTrue(!QiDomainSystem.blasting(npc),"Losing combat target stops activation immediately");
             npc.setTarget(victim);npc.tickCount=40;
-            QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
+            npc.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
             h.assertTrue(!QiDomainSystem.blasting(npc),"Target reacquisition cannot retrigger blast during cooldown");
             var saved=new net.minecraft.nbt.CompoundTag();npc.saveWithoutId(saved);copy.load(saved);copy.setTarget(victim);copy.tickCount=20;
-            QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(copy));
+            copy.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(copy));
             h.assertTrue(!QiDomainSystem.blasting(copy),"Serialized/reloaded NPC retains remaining cooldown");
         }finally{QiDomainSystem.stop(npc);QiDomainSystem.stop(copy);npc.discard();copy.discard();victim.discard();}h.succeed();
     }
@@ -706,12 +704,12 @@ public final class QiDomainGameTests {
             NpcProfile.ensure(npc,npc.npcArchetype());npc.setTarget(target);npc.tickCount=20;
             double speed=npc.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED);
             double jump=npc.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.JUMP_STRENGTH);
-            QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
+            npc.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
             h.assertTrue(QiDomainSystem.blasting(npc)
                             &&Math.abs(npc.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED)-speed*1.2)<1E-6
                             &&Math.abs(npc.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.JUMP_STRENGTH)-jump-.1)<1E-6,
                     "NPC activation grants the same particle-free mobility bonuses");
-            npc.setTarget(null);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
+            npc.setTarget(null);npc.getPersistentData().putLong(QiDomainSystem.NPC_COMBAT_READY_AT,0);QiDomainSystem.npcTick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(npc));
             h.assertTrue(!QiDomainSystem.blasting(npc)
                             &&Math.abs(npc.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED)-speed)<1E-6,
                     "NPC target loss removes its blast movement immediately");

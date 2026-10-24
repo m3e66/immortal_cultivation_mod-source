@@ -8,6 +8,7 @@ import com.example.immortal_cultivation_mod.entity.NpcProfile;
 import java.util.Map;
 import java.util.WeakHashMap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -32,8 +33,16 @@ public final class CombatKnockback {
         double launchStrength,lift;
         int blocks, age;
         boolean pending = true,blast;
+        Vec3 preHitMotion;
     }
     private CombatKnockback() {}
+    private record Before(DamageSource source, Vec3 motion) {}
+    private static final Map<LivingEntity, Before> BEFORE = new WeakHashMap<>();
+    @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.LOWEST)
+    public static void before(net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Pre event) {
+        if (event.getEntity().level() instanceof ServerLevel && CombatExchange.direct(event.getSource()))
+            BEFORE.put(event.getEntity(), new Before(event.getSource(), event.getEntity().getDeltaMovement()));
+    }
 
     public static double strength(float damage) {
         return Float.isFinite(damage) && damage > 0 ? Math.min(2.8, .35 + Math.sqrt(damage) * .075) : 0;
@@ -67,11 +76,18 @@ public final class CombatKnockback {
         double blastStrength=attacker instanceof LivingEntity living?blastStrength(living,target,event.getNewDamage()):0;
         if(attacker instanceof LivingEntity living&&QiDomainSystem.blasting(living)&&blastStrength<=0)return;
         boolean blast=blastStrength>0;
-        double launchStrength=blast?blastStrength:strength(event.getNewDamage());
+        boolean melee = CombatExchange.direct(source);
+        double contactStrength = melee ? CombatExchange.confirm((LivingEntity)attacker, target,
+                CombatStateManager.isHeavyAttack(source)) : strength(event.getNewDamage());
+        // Light Blast Qi punches retain their combo target; heavy releases still launch.
+        if (melee && !CombatStateManager.isHeavyAttack(source)) blast = false;
+        double launchStrength=blast?Math.max(blastStrength, contactStrength):contactStrength;
         Impact impact = IMPACTS.get(target);
         if (impact != null && impact.pending && impact.launchStrength>=launchStrength && (impact.blast||!blast)) return;
         impact = new Impact();
         impact.attacker = attacker;
+        Before before = BEFORE.remove(target);
+        if (melee && before != null && before.source == source) impact.preHitMotion = before.motion;
         impact.direction = direction.normalize();
         impact.previous = target.position();
         impact.level = level;
@@ -110,6 +126,7 @@ public final class CombatKnockback {
         }
         if (impact.pending) {
             // Apply after the attack finishes: vanilla player attacks can restore pre-hit motion.
+            if (impact.preHitMotion != null) target.setDeltaMovement(impact.preHitMotion);
             Vec3 before = target.getDeltaMovement();
             target.knockback(impact.launchStrength, -impact.direction.x, -impact.direction.z);
             if (target.getDeltaMovement().equals(before)) { IMPACTS.remove(target); return; }
@@ -235,5 +252,5 @@ public final class CombatKnockback {
             player.connection.send(new net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket(player));
     }
 
-    @SubscribeEvent public static void stop(ServerStoppedEvent event) { IMPACTS.clear(); }
+    @SubscribeEvent public static void stop(ServerStoppedEvent event) { IMPACTS.clear(); BEFORE.clear(); CombatExchange.clear(); }
 }

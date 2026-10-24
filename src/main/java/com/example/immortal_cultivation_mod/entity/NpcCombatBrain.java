@@ -82,6 +82,8 @@ public final class NpcCombatBrain {
     private final Deque<ActionKind> recentActions = new ArrayDeque<>();
     private final Deque<String> recentSpells = new ArrayDeque<>();
     private PendingCast pendingCast;
+    private record PendingWeapon(UUID target, ItemStack weapon, boolean heavy, long impactAt, double range) {}
+    private PendingWeapon pendingWeapon;
     private PendingPill pendingPill;
     private long nextThreatCheck;
     private Vec3 flightDestination;
@@ -123,6 +125,7 @@ public final class NpcCombatBrain {
             clearCoverPlan();
             battle.reset();
             rhythm.reset();
+            pendingWeapon = null;
             mob.removeEffect(ModEffects.NPC_WEAPON_GUARD);
             actionLockUntil = now;
             nextDecisionTick = now;
@@ -138,6 +141,7 @@ public final class NpcCombatBrain {
             clearFlightIntent();
             mob.removeEffect(ModEffects.NPC_WEAPON_GUARD);
             rhythm.reset();
+            pendingWeapon = null;
             return;
         }
         if (NpcCombatReactions.disabled(mob)) {
@@ -147,6 +151,11 @@ public final class NpcCombatBrain {
             mob.getNavigation().stop();
             mob.removeEffect(ModEffects.NPC_WEAPON_GUARD);
             rhythm.reset();
+            pendingWeapon = null;
+            return;
+        }
+        if (pendingWeapon != null) {
+            tickWeaponContact(now);
             return;
         }
         tickRecoveryAnchor();
@@ -201,6 +210,7 @@ public final class NpcCombatBrain {
         if (target == null) {
             battle.reset();
             rhythm.reset();
+            pendingWeapon = null;
             mob.removeEffect(ModEffects.NPC_WEAPON_GUARD);
             mob.setTarget(null);
             clearFlightIntent();
@@ -212,6 +222,7 @@ public final class NpcCombatBrain {
         }
         if (mob.getTarget() != target) {
             rhythm.reset();
+            pendingWeapon = null;
             mob.setTarget(target);
         }
         NpcCultivation.interrupt(mob, "combat");
@@ -305,6 +316,7 @@ public final class NpcCombatBrain {
             setReadyTick("Reaction",now+24+mob.getRandom().nextInt(13));
             counterUntil=now+32;
             rhythm.reset();
+            pendingWeapon = null;
             return true;
         }
         if (NpcCombatReactions.startGuard(mob)) {
@@ -317,12 +329,14 @@ public final class NpcCombatBrain {
             setReadyTick("Reaction",now+32);
             counterUntil=now+36;
             rhythm.reset();
+            pendingWeapon = null;
             return true;
         }
         if (!dodgeFirst && combatStep(context,true,threat)) {
             setReadyTick("Reaction",now+28);
             counterUntil=now+32;
             rhythm.reset();
+            pendingWeapon = null;
             return true;
         }
         return false;
@@ -335,6 +349,11 @@ public final class NpcCombatBrain {
     private boolean combatStep(Context context, boolean evasive, Vec3 threat) {
         if (!mob.onGround() && !NpcSpellcasting.canFly(mob)) return false;
         Vec3 radial=mob.position().subtract(threat).multiply(1,0,1).normalize();
+        if (evasive && com.example.immortal_cultivation_mod.combat.CombatFootwork.step(mob, radial, .66)) {
+            actionLockUntil = Math.max(actionLockUntil, mob.level().getGameTime()+8);
+            mob.lookAt(context.target(),60,60);
+            return true;
+        }
         if (radial.lengthSqr()<.01) radial=new Vec3(1,0,0);
         Vec3 side=new Vec3(-radial.z,0,radial.x).scale(strafeSign);
         // Try both sides, then a backstep. Validate the whole route before adding any impulse.
@@ -1251,22 +1270,35 @@ public final class NpcCombatBrain {
             remember(ActionKind.WEAPON_HEAVY, "fuchen_spin");
             return true;
         }
-        boolean hit = HeavyIronBracerItem.isRealStack(weapon)
-                ? HeavyIronBracerItem.punchNpc(mob, context.target(), heavy)
-                : heavy
-                ? CombatStateManager.performNpcHeavyAttack(mob, context.target())
-                : mob.doHurtTarget(context.target());
-        rhythm.strike(context.target().getUUID(),now,hit);
-        if (!HeavyIronBracerItem.isRealStack(weapon)) {
-            mob.swing(InteractionHand.MAIN_HAND, true);
-        }
+        pendingWeapon = new PendingWeapon(context.target().getUUID(), weapon.copy(), heavy,
+                now + (heavy ? 4 : 2), weaponRange(context.weaponStyle()));
+        mob.getNavigation().stop();
+        mob.swing(HeavyIronBracerItem.isRealStack(weapon) ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND, true);
         comboStep = (comboStep + 1) % 12;
-        if (hit && context.weaponStyle() == WeaponStyle.STAFF) {
-            Vec3 away = context.target().position().subtract(mob.position());
-            context.target().knockback(0.8D, -away.x, -away.z);
-        }
+        actionLockUntil = Math.max(actionLockUntil, now + (heavy ? 16 : 8));
         remember(heavy ? ActionKind.WEAPON_HEAVY : ActionKind.WEAPON_LIGHT, "");
         return true;
+    }
+
+    private void tickWeaponContact(long now) {
+        PendingWeapon strike = pendingWeapon;
+        LivingEntity target = resolvePendingTarget(strike.target());
+        if (target == null || !validTarget(target) || NpcCombatReactions.disabled(mob)
+                || !ItemStack.isSameItemSameComponents(strike.weapon(), mob.getMainHandItem())) {
+            pendingWeapon=null; rhythm.reset();
+            com.example.immortal_cultivation_mod.combat.CombatExchange.reset(mob);
+            return;
+        }
+        if (now < strike.impactAt()) return;
+        pendingWeapon=null;
+        float before=target.getHealth();
+        if (mob.hasLineOfSight(target) && mob.distanceTo(target) <= strike.range()) {
+            if (strike.heavy()) CombatStateManager.performNpcHeavyAttack(mob,target);
+            else mob.doHurtTarget(target);
+        }
+        boolean hit=target.getHealth()<before;
+        rhythm.strike(target.getUUID(),now,hit);
+        if(!hit)com.example.immortal_cultivation_mod.combat.CombatExchange.reset(mob);
     }
 
     private boolean tryExternalQi(Context context, boolean interrupt) {
@@ -1906,6 +1938,7 @@ public final class NpcCombatBrain {
 
     private boolean isRecovering(LivingEntity entity) {
         return entity.hasEffect(ModEffects.QI_GATHERING)
+                || entity.hasEffect(ModEffects.SPRING_RECOVERY)
                 || entity.hasEffect(MobEffects.REGENERATION)
                 || entity.hasEffect(ModEffects.MULING_SHENGXI)
                 || entity.hasEffect(ModEffects.XUE_GUIYUAN_RECOVERY);

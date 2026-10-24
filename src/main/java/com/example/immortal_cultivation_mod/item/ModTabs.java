@@ -335,6 +335,8 @@ public class ModTabs {
             com.example.immortal_cultivation_mod.alchemy.AlchemyContent.FORMULAS.values().forEach(formula -> output.accept(formula.get()));
             com.example.immortal_cultivation_mod.alchemy.AlchemyContent.LEGACY_FORMULAS.values().forEach(formula -> output.accept(formula.get()));
             output.accept((ItemLike)ModBlocks.QINGLING_GRASS.get());
+            com.example.immortal_cultivation_mod.farming.SpiritFarming.SEEDS.values().forEach(seed->output.accept(seed.get()));
+            output.accept(com.example.immortal_cultivation_mod.farming.SpiritFarming.FARMLAND_ITEM.get());
             output.accept((ItemLike)ModBlocks.CHIYAN_FLOWER.get());
             output.accept((ItemLike)ModBlocks.NINGLU_ZHI.get());
             output.accept((ItemLike)ModBlocks.XUANBING_LOTUS.get());
@@ -388,6 +390,7 @@ public class ModTabs {
          }).build());
       IMMORTAL_BLOCKS_TAB = CREATIVE_TABS.register("immortal_blocks_tab", () -> CreativeModeTab.builder().title(Component.translatable("itemGroup.immortal_cultivation_mod.blocks")).withTabsBefore(new ResourceLocation[]{tabId("immortal_magic_circle_tab")}).icon(() -> ((Block)ModBlocks.QINGLING_GRASS.get()).asItem().getDefaultInstance()).displayItems((parameters, output) -> {
             output.accept((ItemLike)ModBlocks.NUOMI_PLANT.get());
+            output.accept(com.example.immortal_cultivation_mod.farming.SpiritFarming.FARMLAND_ITEM.get());
             output.accept((ItemLike)ModBlocks.LINGMU.get());
             output.accept((ItemLike)ModBlocks.LINGMU_LOG.get());
             output.accept((ItemLike)ModBlocks.LINGMU_LEAVES.get());
@@ -469,6 +472,7 @@ public class ModTabs {
             output.accept((ItemLike)ModItems.KONGMING_BEETLE_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.THUNDERHORN_ROCK_BADGER_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.FROSTSPINE_CAVE_BEAR_SPAWN_EGG.get());
+            output.accept((ItemLike)ModItems.SILVER_MIST_WOLF_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.GREEN_PATTERNED_SPIRIT_DEVOURING_RAT_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.RED_BACKED_IRON_SCALE_SCORPION_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.WIND_FEATHER_CLIFF_DEER_SPAWN_EGG.get());

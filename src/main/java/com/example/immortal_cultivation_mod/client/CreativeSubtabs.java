@@ -87,10 +87,13 @@ public final class CreativeSubtabs {
     private static final Set<String> SPIRIT_STONES = Set.of(
             "spirit_stone", "medium_spirit_stone", "high_spirit_stone", "infinite_spirit_stone");
     private static final Set<String> HERBS = Set.of(
+            "qingling_grass_seeds", "chiyan_flower_seeds", "ninglu_zhi_seeds", "xuanbing_lotus_seeds",
+            "ziyun_vine_seeds", "shihun_grass_seeds", "fugu_tai_seeds", "huanxia_si_seeds", "spirit_farmland",
             "qingling_grass", "chiyan_flower", "ninglu_zhi", "xuanbing_lotus",
             "ziyun_vine", "jinwen_fruit", "shihun_grass", "jiuye_xianlan", "fugu_tai", "huanxia_si",
             "lingquan_leaf", "ningling_flower", "harmonizing_herb", "catalyst_blossom");
     private static final Set<String> BLOCK_PLANTS = Set.of(
+            "spirit_farmland",
             "nuomi_plant", "qingling_grass", "chiyan_flower", "ninglu_zhi", "xuanbing_lotus",
             "ziyun_vine", "jinwen_fruit", "shihun_grass", "jiuye_xianlan",
             "lingmu", "lingmu_log", "lingmu_leaves", "fugu_tai", "huanxia_si");

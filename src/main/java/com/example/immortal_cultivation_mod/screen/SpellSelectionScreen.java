@@ -10,6 +10,7 @@ import com.example.immortal_cultivation_mod.network.DaoGuidancePayloads;
 import com.example.immortal_cultivation_mod.effect.ModEffects;
 import com.example.immortal_cultivation_mod.network.ModPayloads;
 import com.example.immortal_cultivation_mod.spell.ModSpells;
+import com.example.immortal_cultivation_mod.shentong.ShentongRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -139,6 +140,8 @@ public class SpellSelectionScreen extends FittedMenuScreen {
                 .map(ModSpells::normalizeId)
                 .map(ModSpells::get)
                 .filter(spell -> spell != null)
+                // Registered shentong have their own controls, not ordinary spell-list rows.
+                .filter(spell -> ShentongRegistry.get(spell.id()) == null)
                 .distinct()
                 .toList();
     }

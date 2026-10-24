@@ -3697,7 +3697,7 @@ public class ModPayloads {
         }
 
         private static boolean castRegeneration(ServerPlayer sp, ModAttachments.CultivationData data, ModSpells.SpellDef spell) {
-            if (sp.getHealth() >= sp.getMaxHealth()) {
+            if (!com.example.immortal_cultivation_mod.spell.CultivatorSpellExecution.canApplyRegeneration(sp)) {
                 return false;
             }
             if (!com.example.immortal_cultivation_mod.event.ServerEvents.spendSpellQiOrBlood(sp, data, spell.qiCost())) {

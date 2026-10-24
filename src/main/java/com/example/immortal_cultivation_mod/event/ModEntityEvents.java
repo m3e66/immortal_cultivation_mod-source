@@ -41,6 +41,7 @@ import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 public class ModEntityEvents {
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event) {
+        event.put(ModEntities.SILVER_MIST_WOLF.get(), com.example.immortal_cultivation_mod.entity.SilverMistWolfEntity.createAttributes().build());
         event.put(ModEntities.XUANJIN_ZHENG.get(), com.example.immortal_cultivation_mod.entity.XuanjinZhengEntity.createAttributes().build());
         event.put(ModEntities.LIANQI_CULTIVATOR.get(), LianqiCultivatorEntity.createAttributes().build());
         event.put(ModEntities.ZHUJI_CULTIVATOR.get(), ZhujiCultivatorEntity.createAttributes().build());

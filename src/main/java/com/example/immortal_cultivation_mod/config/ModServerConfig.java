@@ -4,6 +4,8 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 public final class ModServerConfig {
     public static final ModConfigSpec SPEC;
+    public static final ModConfigSpec.IntValue SPIRIT_FARMLAND_QI;
+    public static final ModConfigSpec.ConfigValue<java.util.List<? extends Integer>> SPIRIT_PLANT_QI_THRESHOLDS;
     public static final ModConfigSpec.BooleanValue ZHENPAN_QI_FIRST;
     public static final ModConfigSpec.BooleanValue SHOW_QI_USE_PARTICLES;
     public static final ModConfigSpec.BooleanValue ENABLE_DROUGHT_ZOMBIE_DOMAIN;
@@ -12,6 +14,17 @@ public final class ModServerConfig {
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
+        builder.push("spiritFarming");
+        SPIRIT_FARMLAND_QI=builder.comment("Local Qi supplied once to the crop rooted in spirit farmland. A natural spirit vein contributes 25 ambient Qi.")
+                .defineInRange("farmlandQi",25,0,10000);
+        SPIRIT_PLANT_QI_THRESHOLDS=builder.comment("Four strictly increasing Qi thresholds for 0.5x / 0.75x / 1x / 1.5x / 2x crop growth. Normal growth durations assume 25-49 Qi and vanilla randomTickSpeed=3.")
+                .define("qiThresholds",java.util.List.of(10,25,50,75),value->{
+                    if(!(value instanceof java.util.List<?> list)||list.size()!=4)return false;
+                    int previous=-1;
+                    for(Object entry:list){if(!(entry instanceof Integer n)||n<=previous||n>100000)return false;previous=n;}
+                    return true;
+                });
+        builder.pop();
         builder.push("magicRitual");
         ZHENPAN_QI_FIRST = builder
                 .comment("When true, temporary Formation Plate centers spend player qi before inventory spirit stones. The default spends spirit stones first.")
