@@ -51,6 +51,7 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
 
     private final NonNullList<ItemStack> items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
     private final NonNullList<ItemStack> forgingSnapshot = NonNullList.withSize(MATERIAL_COUNT, ItemStack.EMPTY);
+    private CompoundTag refiningElementTotals = new CompoundTag();
     private final int[] initialMaterialCounts = new int[MATERIAL_COUNT];
     private final int[] meltedMaterialCounts = new int[MATERIAL_COUNT];
     private String activeRecipeId = "";
@@ -173,6 +174,7 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
             return;
         }
         // Loaded heat must obey the current flame catalog before it enters quality samples.
+        ding.activeFireType = ding.currentFireType();
         ding.temperature = Math.clamp(ding.temperature, ding.lowestFireTemp(), ding.highestFireTemp());
         if (level.getGameTime() % 20L == 0L) {
             ServerPlayer player = ding.nearestPlayer();
@@ -221,10 +223,19 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
                 || !getItem(RESULT_SLOT).isEmpty()) {
             return;
         }
+        CompoundTag elementTotals = new CompoundTag();
+        if (com.example.immortal_cultivation_mod.alchemy.AlchemyForgeRecipes.isAlchemyRecipe(recipe.id())) {
+            elementTotals = com.example.immortal_cultivation_mod.alchemy.FiveElementBalance.totals(materialStacks());
+            if (com.example.immortal_cultivation_mod.alchemy.FiveElementBalance.toxicity(elementTotals).isEmpty()) {
+                sp.displayClientMessage(Component.translatable("alchemy.invalid_element_balance"), true);
+                return;
+            }
+        }
         if (!chargeQi(sp, 100)) {
             return;
         }
         captureForgingSnapshot(recipe);
+        refiningElementTotals = elementTotals;
         forgingPlayerId = sp.getUUID();
         activeRecipeId = recipe.id();
         activeFireType = currentFireType();
@@ -252,6 +263,7 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
         if (!forging || level == null || level.isClientSide || !(player instanceof ServerPlayer sp)) {
             return;
         }
+        activeFireType = currentFireType();
         if (!chargeQi(sp, fireCost())) {
             return;
         }
@@ -296,19 +308,11 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
     private boolean canContinue() {
         ForgingSystem.ForgingRecipe recipe = ForgingSystem.recipeById(activeRecipeId);
         return recipe != null
-                && (!ForgingSystem.requiresHeavenlyFire(recipe, snapshotStacks())
-                    || FlameKind.fromId(currentFireType()) == FlameKind.HEAVENLY)
-                && (!com.example.immortal_cultivation_mod.item.WeaponShardSystem.REFORGE.equals(activeRecipeId)
-                    || targetTemperature <= highestFireTemp())
-                && (!FlameKind.fromId(activeFireType).special()
-                    || activeFireType.equals(currentFireType()) && targetTemperature <= highestFireTemp())
-                && (activeFireType.equals(currentFireType())
-                    || targetTemperature <= highestFireTemp()
-                        && ForgingSystem.canUseFire(recipe, currentFireType(), snapshotStacks()))
                 && getItem(RESULT_SLOT).isEmpty();
     }
 
     private void finishForging(boolean failedEarly) {
+        if (!forging || !(level instanceof ServerLevel)) return;
         ForgingSystem.ForgingRecipe recipe = ForgingSystem.recipeById(activeRecipeId);
         if (recipe == null) {
             stopForging();
@@ -329,6 +333,10 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
         boolean succeeded = !failedEarly && level != null
                 && level.random.nextDouble() * 100.0D < successChance;
         if (!succeeded) {
+            if (com.example.immortal_cultivation_mod.alchemy.AlchemyForgeRecipes.isAlchemyRecipe(recipe.id())) {
+                explodeFailedPills(recipe);
+                return;
+            }
             salvageWoodFlameMaterials(recipe);
             setItem(RESULT_SLOT, new ItemStack(ModItems.ASHES.get()));
             stopForging();
@@ -337,14 +345,41 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
         double avg = temperatureSamples <= 0 ? temperature : (double) temperatureTotal / (double) temperatureSamples;
         ItemStack result = ForgingSystem.createMold(
                 recipe, materials, avg, activeFireType, targetTemperature, level.random);
+        if (com.example.immortal_cultivation_mod.alchemy.AlchemyForgeRecipes.isAlchemyRecipe(recipe.id())
+                && result.is(ModItems.ASHES.get())) {
+            explodeFailedPills(recipe);
+            return;
+        }
         if (level instanceof ServerLevel serverLevel && forgingPlayerId != null) {
             ServerPlayer crafter = serverLevel.getServer().getPlayerList().getPlayer(forgingPlayerId);
             if (crafter != null) com.example.immortal_cultivation_mod.fate.FateCrafting.afterForge(
                     crafter, result, !recipe.directOutput());
         }
+        if (com.example.immortal_cultivation_mod.alchemy.AlchemyForgeRecipes.isAlchemyRecipe(recipe.id())) {
+            com.example.immortal_cultivation_mod.alchemy.FiveElementBalance.apply(result, refiningElementTotals);
+        }
         setItem(RESULT_SLOT, result);
         awardForgingProficiency();
         stopForging();
+    }
+
+    private void explodeFailedPills(ForgingSystem.ForgingRecipe recipe) {
+        ServerLevel server = (ServerLevel) level;
+        ServerPlayer crafter = forgingPlayerId == null ? null : server.getServer().getPlayerList().getPlayer(forgingPlayerId);
+        int count = 0;
+        for (int i = 0; i < materialSlotCount(); i++) {
+            if (com.example.immortal_cultivation_mod.alchemy.PillExplosion.isIngredient(recipe, forgingSnapshot.get(i)))
+                count += meltedMaterialCounts[i];
+            ItemStack remaining = items.get(MATERIAL_START + i);
+            if (com.example.immortal_cultivation_mod.alchemy.PillExplosion.isIngredient(recipe, remaining)) {
+                count += remaining.getCount();
+                items.set(MATERIAL_START + i, ItemStack.EMPTY);
+            }
+        }
+        setItem(RESULT_SLOT, new ItemStack(ModItems.ASHES.get()));
+        // End and save the batch before damage/removal can re-enter this block entity.
+        stopForging();
+        com.example.immortal_cultivation_mod.alchemy.PillExplosion.explode(server, worldPosition, crafter, count);
     }
 
     private void awardForgingProficiency() {
@@ -519,6 +554,7 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
     }
 
     private void clearForgingSnapshot() {
+        refiningElementTotals = new CompoundTag();
         for (int i = 0; i < MATERIAL_COUNT; i++) {
             forgingSnapshot.set(i, ItemStack.EMPTY);
             initialMaterialCounts[i] = 0;
@@ -769,6 +805,7 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
         CompoundTag snapshotTag = new CompoundTag();
         ContainerHelper.saveAllItems(snapshotTag, forgingSnapshot, registries);
         tag.put("forgingSnapshot", snapshotTag);
+        tag.put("refiningElementTotals", refiningElementTotals.copy());
         tag.putIntArray("initialMaterialCounts", initialMaterialCounts);
         tag.putIntArray("meltedMaterialCounts", meltedMaterialCounts);
     }
@@ -808,6 +845,15 @@ public class DingBlockEntity extends GeoRockBlockEntity implements Container, Me
         for (int i = 0; i < MATERIAL_COUNT; i++) {
             initialMaterialCounts[i] = i < initial.length ? initial[i] : 0;
             meltedMaterialCounts[i] = i < melted.length ? melted[i] : 0;
+        }
+        if (tag.contains("refiningElementTotals")) {
+            refiningElementTotals = tag.getCompound("refiningElementTotals").copy();
+        } else if (forging && com.example.immortal_cultivation_mod.alchemy.AlchemyForgeRecipes.isAlchemyRecipe(activeRecipeId)) {
+            // Upgrade an in-progress batch: remaining physical ingredients plus those already melted.
+            var originalMaterials = new java.util.ArrayList<>(materialStacks());
+            for (int i = 0; i < MATERIAL_COUNT; i++)
+                if (meltedMaterialCounts[i] > 0) originalMaterials.add(forgingSnapshot.get(i).copyWithCount(meltedMaterialCounts[i]));
+            refiningElementTotals = com.example.immortal_cultivation_mod.alchemy.FiveElementBalance.totals(originalMaterials);
         }
     }
 }

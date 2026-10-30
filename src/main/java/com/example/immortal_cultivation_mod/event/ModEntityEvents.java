@@ -7,6 +7,7 @@ import com.example.immortal_cultivation_mod.entity.BloodApeDemonGeneralEntity;
 import com.example.immortal_cultivation_mod.entity.CrimsonSkyFlameFloodDragonEntity;
 import com.example.immortal_cultivation_mod.entity.CrimsonScaleFlameLizardEntity;
 import com.example.immortal_cultivation_mod.entity.CultivatorCorpseEntity;
+import com.example.immortal_cultivation_mod.entity.CultivatorSpawnRules;
 import com.example.immortal_cultivation_mod.entity.EscapedYuanyingCoreEntity;
 import com.example.immortal_cultivation_mod.entity.FanrenNpcEntity;
 import com.example.immortal_cultivation_mod.entity.HotelNpcEntity;
@@ -29,7 +30,6 @@ import com.example.immortal_cultivation_mod.entity.XuyingShadowEntity;
 import com.example.immortal_cultivation_mod.entity.ZhujiCultivatorEntity;
 import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -42,6 +42,11 @@ public class ModEntityEvents {
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(ModEntities.SILVER_MIST_WOLF.get(), com.example.immortal_cultivation_mod.entity.SilverMistWolfEntity.createAttributes().build());
+        event.put(ModEntities.MOONSHADE_HORSE.get(), com.example.immortal_cultivation_mod.entity.MoonshadeHorseEntity.attributes().build());
+        event.put(ModEntities.RUSSET_SPIRIT_DEER.get(), com.example.immortal_cultivation_mod.entity.MortalAnimalEntity.createAttributes(com.example.immortal_cultivation_mod.entity.MortalAnimalEntity.Kind.DEER).build());
+        event.put(ModEntities.CHESTNUT_SPIRIT_COW.get(), com.example.immortal_cultivation_mod.entity.MortalAnimalEntity.createAttributes(com.example.immortal_cultivation_mod.entity.MortalAnimalEntity.Kind.COW).build());
+        event.put(ModEntities.FIELD_MOUSE.get(), com.example.immortal_cultivation_mod.entity.MortalAnimalEntity.createAttributes(com.example.immortal_cultivation_mod.entity.MortalAnimalEntity.Kind.MOUSE).build());
+        event.put(ModEntities.JADECOIL_SNAKE.get(), com.example.immortal_cultivation_mod.entity.JadecoilSnakeEntity.createAttributes().build());
         event.put(ModEntities.XUANJIN_ZHENG.get(), com.example.immortal_cultivation_mod.entity.XuanjinZhengEntity.createAttributes().build());
         event.put(ModEntities.LIANQI_CULTIVATOR.get(), LianqiCultivatorEntity.createAttributes().build());
         event.put(ModEntities.ZHUJI_CULTIVATOR.get(), ZhujiCultivatorEntity.createAttributes().build());
@@ -98,28 +103,28 @@ public class ModEntityEvents {
                 ModEntities.LIANQI_CULTIVATOR.get(),
                 SpawnPlacementTypes.ON_GROUND,
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                Mob::checkMobSpawnRules,
+                CultivatorSpawnRules::checkSpawnRules,
                 RegisterSpawnPlacementsEvent.Operation.REPLACE
         );
         event.register(
                 ModEntities.ZHUJI_CULTIVATOR.get(),
                 SpawnPlacementTypes.ON_GROUND,
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                Mob::checkMobSpawnRules,
+                CultivatorSpawnRules::checkSpawnRules,
                 RegisterSpawnPlacementsEvent.Operation.REPLACE
         );
         event.register(
                 ModEntities.JINDAN_CULTIVATOR.get(),
                 SpawnPlacementTypes.ON_GROUND,
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                Mob::checkMobSpawnRules,
+                CultivatorSpawnRules::checkSpawnRules,
                 RegisterSpawnPlacementsEvent.Operation.REPLACE
         );
         event.register(
                 ModEntities.FANREN_NPC.get(),
                 SpawnPlacementTypes.ON_GROUND,
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                (type, level, spawnType, pos, random) -> true,
+                CultivatorSpawnRules::checkSpawnRules,
                 RegisterSpawnPlacementsEvent.Operation.REPLACE
         );
         event.register(
@@ -131,10 +136,10 @@ public class ModEntityEvents {
         );
         com.example.immortal_cultivation_mod.entity.BeastSpawnRules.register(event);
         event.register(ModEntities.RECIPE_MERCHANT.get(), SpawnPlacementTypes.ON_GROUND,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Mob::checkMobSpawnRules,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, CultivatorSpawnRules::checkSpawnRules,
                 RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(ModEntities.SPELL_MERCHANT.get(), SpawnPlacementTypes.ON_GROUND,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Mob::checkMobSpawnRules,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, CultivatorSpawnRules::checkSpawnRules,
                 RegisterSpawnPlacementsEvent.Operation.REPLACE);
     }
 

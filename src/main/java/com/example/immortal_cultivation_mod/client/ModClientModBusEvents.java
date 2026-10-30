@@ -256,6 +256,12 @@ public class ModClientModBusEvents {
                 FrostspineCaveBearRenderer::new);
         event.registerEntityRenderer(ModEntities.SILVER_MIST_WOLF.get(),
                 com.example.immortal_cultivation_mod.client.renderer.SilverMistWolfRenderer::new);
+        event.registerEntityRenderer(ModEntities.MOONSHADE_HORSE.get(), com.example.immortal_cultivation_mod.client.renderer.MoonshadeHorseRenderer::new);
+        event.registerEntityRenderer(ModEntities.RUSSET_SPIRIT_DEER.get(), com.example.immortal_cultivation_mod.client.renderer.MortalAnimalRenderer::new);
+        event.registerEntityRenderer(ModEntities.CHESTNUT_SPIRIT_COW.get(), com.example.immortal_cultivation_mod.client.renderer.MortalAnimalRenderer::new);
+        event.registerEntityRenderer(ModEntities.FIELD_MOUSE.get(), com.example.immortal_cultivation_mod.client.renderer.MortalAnimalRenderer::new);
+        event.registerEntityRenderer(ModEntities.JADECOIL_SNAKE.get(),
+                com.example.immortal_cultivation_mod.client.renderer.JadecoilSnakeRenderer::new);
         event.registerEntityRenderer(ModEntities.GREEN_PATTERNED_SPIRIT_DEVOURING_RAT.get(),
                 CultivationBestiaryBeastRenderer::new);
         event.registerEntityRenderer(ModEntities.RED_BACKED_IRON_SCALE_SCORPION.get(),

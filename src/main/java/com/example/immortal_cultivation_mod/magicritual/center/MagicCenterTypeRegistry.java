@@ -6,6 +6,7 @@ import com.example.immortal_cultivation_mod.magicritual.center.behavior.Detectio
 import com.example.immortal_cultivation_mod.magicritual.center.behavior.FogCenterBehavior;
 import com.example.immortal_cultivation_mod.magicritual.center.behavior.ForcefieldCenterBehavior;
 import com.example.immortal_cultivation_mod.magicritual.center.behavior.FrostCenterBehavior;
+import com.example.immortal_cultivation_mod.magicritual.center.behavior.GrowthCenterBehavior;
 import com.example.immortal_cultivation_mod.magicritual.center.behavior.InvertedCenterBehavior;
 import com.example.immortal_cultivation_mod.magicritual.center.behavior.ReforgeBladeCenterBehavior;
 import com.example.immortal_cultivation_mod.magicritual.center.behavior.SanctuaryCenterBehavior;
@@ -25,6 +26,7 @@ public final class MagicCenterTypeRegistry {
    public static final ResourceLocation INVERTED = id("inverted");
    public static final ResourceLocation SCORCHING = id("scorching");
    public static final ResourceLocation SANCTUARY = id("sanctuary");
+   public static final ResourceLocation GROWTH = id("growth");
    public static final ResourceLocation FROST = id("frost");
    public static final ResourceLocation DECAY = id("decay");
    public static final ResourceLocation THUNDER = id("thunder");
@@ -68,6 +70,7 @@ public final class MagicCenterTypeRegistry {
       register(INVERTED, "inverted", new InvertedCenterBehavior());
       register(SCORCHING, "normal", new ScorchingCenterBehavior());
       register(SANCTUARY, "normal", new SanctuaryCenterBehavior());
+      register(GROWTH, "normal", new GrowthCenterBehavior());
       register(FROST, "normal", new FrostCenterBehavior());
       register(DECAY, "normal", new DecayCenterBehavior());
       register(THUNDER, "normal", new ThunderCenterBehavior());

@@ -46,6 +46,7 @@ public final class CombatStateManager {
     private static final int DUPLICATE_ATTACK_WINDOW_TICKS = 3;
 
     private static final String ENABLED_TAG = "ImmortalCultivationCombatStateEnabled";
+    private static final String AUTO_COMBAT_ON_HIT_TAG = "ImmortalCultivationAutoCombatOnHit";
     private static final String COMBAT_UNTIL_TAG = "ImmortalCultivationCombatUntil";
     private static final String MANUAL_COMBAT_TAG = "ImmortalCultivationManualCombat";
     private static final String POSTURE_TAG = "ImmortalCultivationPosture";
@@ -83,6 +84,19 @@ public final class CombatStateManager {
                 && (isManualCombat(player)
                 || player.getPersistentData().getLong(COMBAT_UNTIL_TAG)
                 > player.serverLevel().getGameTime());
+    }
+
+    public static boolean autoCombatOnHit(ServerPlayer player) {
+        return !player.getPersistentData().contains(AUTO_COMBAT_ON_HIT_TAG)
+                || player.getPersistentData().getBoolean(AUTO_COMBAT_ON_HIT_TAG);
+    }
+
+    public static void setAutoCombatOnHit(ServerPlayer player, boolean enabled) {
+        boolean changed = autoCombatOnHit(player) != enabled;
+        player.getPersistentData().putBoolean(AUTO_COMBAT_ON_HIT_TAG, enabled);
+        if (changed && !enabled && !isManualCombat(player) && isInCombat(player)) {
+            clear(player, false);
+        }
     }
 
     public static boolean isManualCombat(ServerPlayer player) {
@@ -147,7 +161,7 @@ public final class CombatStateManager {
         if (attacker instanceof ServerPlayer player) {
             enterCombat(player);
         }
-        if (target instanceof ServerPlayer player) {
+        if (target instanceof ServerPlayer player && autoCombatOnHit(player)) {
             enterCombat(player);
         }
     }

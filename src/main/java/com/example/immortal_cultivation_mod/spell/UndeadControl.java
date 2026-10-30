@@ -404,6 +404,7 @@ public final class UndeadControl {
         if (!canControl(player, target)) {
             return false;
         }
+        boolean newlyControlled = !isOwnedBy(target, player);
         releaseSealForControl(target);
         setOwner(target, player.getUUID());
         if (target instanceof CultivatorCorpseEntity corpse) {
@@ -416,6 +417,9 @@ public final class UndeadControl {
             mob.getNavigation().stop();
         }
         ensureActiveServantStats(target);
+        if (newlyControlled)
+            com.example.immortal_cultivation_mod.network.ModPayloads.ModPayloadsHandler
+                    .addSpellProficiency(player, com.example.immortal_cultivation_mod.spell.ModSpells.KONGSHI_SHU, 1);
         return true;
     }
 

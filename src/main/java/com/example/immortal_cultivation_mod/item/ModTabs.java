@@ -334,9 +334,9 @@ public class ModTabs {
             output.accept(com.example.immortal_cultivation_mod.alchemy.AlchemyContent.BOTTLE_SLIP.get());
             com.example.immortal_cultivation_mod.alchemy.AlchemyContent.FORMULAS.values().forEach(formula -> output.accept(formula.get()));
             com.example.immortal_cultivation_mod.alchemy.AlchemyContent.LEGACY_FORMULAS.values().forEach(formula -> output.accept(formula.get()));
-            output.accept((ItemLike)ModBlocks.QINGLING_GRASS.get());
             com.example.immortal_cultivation_mod.farming.SpiritFarming.SEEDS.values().forEach(seed->output.accept(seed.get()));
             output.accept(com.example.immortal_cultivation_mod.farming.SpiritFarming.FARMLAND_ITEM.get());
+            output.accept((ItemLike)ModBlocks.QINGLING_GRASS.get());
             output.accept((ItemLike)ModBlocks.CHIYAN_FLOWER.get());
             output.accept((ItemLike)ModBlocks.NINGLU_ZHI.get());
             output.accept((ItemLike)ModBlocks.XUANBING_LOTUS.get());
@@ -473,6 +473,11 @@ public class ModTabs {
             output.accept((ItemLike)ModItems.THUNDERHORN_ROCK_BADGER_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.FROSTSPINE_CAVE_BEAR_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.SILVER_MIST_WOLF_SPAWN_EGG.get());
+            output.accept((ItemLike)ModItems.MOONSHADE_HORSE_SPAWN_EGG.get());
+            output.accept((ItemLike)ModItems.RUSSET_SPIRIT_DEER_SPAWN_EGG.get());
+            output.accept((ItemLike)ModItems.CHESTNUT_SPIRIT_COW_SPAWN_EGG.get());
+            output.accept((ItemLike)ModItems.FIELD_MOUSE_SPAWN_EGG.get());
+            output.accept((ItemLike)ModItems.JADECOIL_SNAKE_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.GREEN_PATTERNED_SPIRIT_DEVOURING_RAT_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.RED_BACKED_IRON_SCALE_SCORPION_SPAWN_EGG.get());
             output.accept((ItemLike)ModItems.WIND_FEATHER_CLIFF_DEER_SPAWN_EGG.get());

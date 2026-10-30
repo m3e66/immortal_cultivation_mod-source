@@ -37,7 +37,7 @@
     {
       "type": "patchouli:text",
       "title": "Recovering safely",
-      "text": "Online play removes 0.01 points/second. Meditation adds 0.04 points/second. Leaving meditation stops the bonus; damage interrupts meditation and blocks its bonus for 5 seconds. No offline detox. Death clears toxicity and repeat records; logout and changing dimensions do not. Qingdu Pill removes 25 points, adds no toxicity, requires Qi Refining or higher, and has a server-enforced 300-second ONLINE cooldown."
+      "text": "Online play removes 0.01 points/second. Meditation adds 0.04 points/second. Leaving meditation stops the bonus; damage leaves meditation active but blocks its detox bonus for 5 seconds. No offline detox. Death clears toxicity and repeat records; logout and changing dimensions do not. Qingdu Pill removes 25 points, adds no toxicity, requires Qi Refining or higher, and has a server-enforced 300-second ONLINE cooldown."
     },
     {
       "type": "patchouli:text",

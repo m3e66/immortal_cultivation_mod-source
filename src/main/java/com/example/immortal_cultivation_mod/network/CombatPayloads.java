@@ -146,6 +146,17 @@ public final class CombatPayloads {
         }
     }
 
+    public record ServerboundSetAutoCombatOnHitPayload(boolean enabled) implements CustomPacketPayload {
+        public static final Type<ServerboundSetAutoCombatOnHitPayload> TYPE = new Type<>(
+                ResourceLocation.fromNamespaceAndPath(ImmortalCultivationMod.MODID, "set_auto_combat_on_hit"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundSetAutoCombatOnHitPayload> STREAM_CODEC =
+                StreamCodec.composite(ByteBufCodecs.BOOL,
+                        ServerboundSetAutoCombatOnHitPayload::enabled, ServerboundSetAutoCombatOnHitPayload::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
     public record ServerboundToggleManualCombatPayload() implements CustomPacketPayload {
         public static final Type<ServerboundToggleManualCombatPayload> TYPE = new Type<>(
                 ResourceLocation.fromNamespaceAndPath(
@@ -246,6 +257,10 @@ public final class CombatPayloads {
                     ServerboundSetCombatEnabledPayload.STREAM_CODEC,
                     Handler::handleCombatEnabledServer);
             registrar.playToServer(
+                    ServerboundSetAutoCombatOnHitPayload.TYPE,
+                    ServerboundSetAutoCombatOnHitPayload.STREAM_CODEC,
+                    Handler::handleAutoCombatOnHitServer);
+            registrar.playToServer(
                     ServerboundToggleManualCombatPayload.TYPE,
                     ServerboundToggleManualCombatPayload.STREAM_CODEC,
                     Handler::handleToggleManualCombatServer);
@@ -311,6 +326,15 @@ public final class CombatPayloads {
             context.enqueueWork(() -> {
                 if (context.player() instanceof ServerPlayer player) {
                     CombatStateManager.setEnabled(player, payload.enabled());
+                }
+            });
+        }
+
+        private static void handleAutoCombatOnHitServer(
+                ServerboundSetAutoCombatOnHitPayload payload, IPayloadContext context) {
+            context.enqueueWork(() -> {
+                if (context.player() instanceof ServerPlayer player) {
+                    CombatStateManager.setAutoCombatOnHit(player, payload.enabled());
                 }
             });
         }

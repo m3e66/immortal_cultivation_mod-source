@@ -4,6 +4,7 @@
   "package": "com.example.immortal_cultivation_mod.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "GrowthFormationRandomTickMixin",
     "SpellProjectileCollisionMixin",
     "ColdTidePlayerActionsMixin",
     "ColdTidePlayerPayloadMixin",
@@ -40,6 +41,7 @@
     "CurseHealingMixin"
   ],
   "client": [
+    "QiMiningContinuityMixin",
     "QiHandViewMixin",
     "QiHeldItemMixin",
     "QiBufferSourceAccessor",

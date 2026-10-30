@@ -120,15 +120,16 @@ public final class PillToxicityGameTests {
         var p=player(h);PillToxicity.setValue(p,90);p.setHealth(2);PillToxicity.state(p).putLong("DamageAt",1);PillToxicity.onlineSecond(p);
         h.assertTrue(p.isAlive()&&p.getHealth()>=1,"Scheduled server damage nonlethal");p.discard();h.succeed();
     }
-    @GameTest(template="fate_test") public static void recoveryMeditationAndDamageInterruption(GameTestHelper h) {
+    @GameTest(template="fate_test") public static void damagePausesDetoxWithoutStoppingMeditation(GameTestHelper h) {
         var p=player(h);PillToxicity.setValue(p,50);PillToxicity.onlineSecond(p);near(h,PillToxicity.value(p),49.99,"Normal online recovery");
         ModAttachments.setData(p,ModAttachments.getData(p).withMeditating(true));PillToxicity.onlineSecond(p);near(h,PillToxicity.value(p),49.94,"Meditation bonus");
-        PillToxicity.interruptMeditation(p);h.assertTrue(!ModAttachments.getData(p).isMeditating(),"Damage uses existing meditation stop lifecycle");
-        ModAttachments.setData(p,ModAttachments.getData(p).withMeditating(true));PillToxicity.onlineSecond(p);near(h,PillToxicity.value(p),49.93,"Damage pause blocks immediate meditation restart bonus");
+        float before=p.getHealth();PillToxicity.damageNonlethal(p,1);
+        h.assertTrue(p.getHealth()<before&&ModAttachments.getData(p).isMeditating(),"Toxicity damage reduces health while meditation continues");
+        PillToxicity.onlineSecond(p);near(h,PillToxicity.value(p),49.93,"Damage pauses only the extra detox bonus");
         ModAttachments.setData(p,ModAttachments.getData(p).withMeditating(false));PillToxicity.onlineSecond(p);near(h,PillToxicity.value(p),49.92,"Leaving stops bonus");p.discard();h.succeed();
     }
     @GameTest(template="fate_test") public static void damagePauseExpiresWhileClean(GameTestHelper h) {
-        var p=player(h);PillToxicity.interruptMeditation(p);for(int i=0;i<6;i++)PillToxicity.onlineSecond(p);
+        var p=player(h);PillToxicity.pauseMeditationDetox(p);for(int i=0;i<6;i++)PillToxicity.onlineSecond(p);
         PillToxicity.setValue(p,10);ModAttachments.setData(p,ModAttachments.getData(p).withMeditating(true));PillToxicity.onlineSecond(p);near(h,PillToxicity.value(p),9.95,"A past damage pause cannot remain frozen while clean");p.discard();h.succeed();
     }
     @GameTest(template="fate_test") public static void detoxRealmCooldownAndActualConsumption(GameTestHelper h) {

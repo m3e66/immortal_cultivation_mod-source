@@ -36,6 +36,7 @@ public final class AlchemyChemistry {
     }
     public static final Map<String, Plant> PLANTS = new LinkedHashMap<>();
     public static final List<Formula> FORMULAS = new ArrayList<>();
+    private static final double PLANT_MEDICINAL_EFFECT_SCALE = 0.20;
     static {
         plant("qingling_grass", Map.of(WOOD,70., WATER,20.), Map.of(QI,35., CULTIVATION,8.),100,82);
         plant("chiyan_flower", Map.of(FIRE,80., WOOD,15.), Map.of(FIRE_DAMAGE,12., COLD_RESIST,25.),105,70,KINDLE);
@@ -71,7 +72,14 @@ public final class AlchemyChemistry {
     }
     private static void plant(String id, Map<Element,Double> elements, Map<Effect,Double> effects,
                               double strength, double stability, Trait... traits) {
-        PLANTS.put(id,new Plant(elements,effects,strength,stability,Set.of(traits)));
+        var reducedEffects = new EnumMap<Effect, Double>(Effect.class);
+        // Plant effects use percentage points directly, capped per ingredient, including chemistry effects.
+        effects.forEach((effect, amount) -> reducedEffects.put(effect, Math.min(1.0, percentAmount(effect,
+                switch (effect) {
+                    case STABILITY, DETOX, TOXICITY -> amount;
+                    default -> amount * PLANT_MEDICINAL_EFFECT_SCALE;
+                }))));
+        PLANTS.put(id,new Plant(elements,reducedEffects,strength,stability,Set.of(traits)));
     }
     private static void formula(String id, Map<String,Integer> required, Map<Effect,Dose> effects, int yield, double reduction) {
         formula(id,required,effects,yield,reduction,0);
@@ -94,6 +102,7 @@ public final class AlchemyChemistry {
         if (!matches(formula,ingredients)) throw new IllegalArgumentException("Missing recipe ingredients or invalid additives");
         var elements = new EnumMap<Element,Double>(Element.class);
         var additions = new EnumMap<Effect,Double>(Effect.class);
+        var additionLimits = new EnumMap<Effect,Double>(Effect.class);
         var traits = new EnumMap<Trait,Integer>(Trait.class);
         int count = ingredients.values().stream().mapToInt(Integer::intValue).sum();
         double stability = 0, toxicity = 0, stabilization = 0;
@@ -110,7 +119,10 @@ public final class AlchemyChemistry {
                 if (!compatibleAdditive(formula,plant))
                     incompatibleAdditive = true;
                 plant.effects.forEach((e,v)->{
-                    if(allowedAdditive(formula,e))additions.merge(e,percentAmount(e,v)*extra*plant.strength/100.,Double::sum);
+                    if(allowedAdditive(formula,e)) {
+                        additions.merge(e,Math.min(1.0,v*plant.strength/100.)*extra,Double::sum);
+                        additionLimits.merge(e,(double)extra,Double::sum);
+                    }
                 });
             }
         }
@@ -134,7 +146,7 @@ public final class AlchemyChemistry {
             Effect e=addition.getKey();
             if(e==STABILITY||e==TOXICITY||e==DETOX||e==QI_MULTIPLIER||e==DURATION || !formula.effects.containsKey(e)) continue;
             Dose base=effects.get(e);
-            double gain=addition.getValue()*(1+compatibility);
+            double gain=Math.min(additionLimits.get(e),addition.getValue()*(1+compatibility));
             effects.put(e,new Dose(base.amount+gain,base.ticks));
         }
         double qiMultiplier=1+Math.min(3,additions.getOrDefault(QI_MULTIPLIER,0.)/100);

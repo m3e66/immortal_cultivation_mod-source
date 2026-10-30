@@ -125,12 +125,8 @@ public final class FlameForgingGameTests {
             if (!kind.special()) continue;
             h.assertTrue(ForgingSystem.canUseFire(foundation,kind.id()),
                     "Every catalog spirit flame reaches Foundation forging heat");
-            boolean goldenCoreEligible = switch (kind) {
-                case WOOD, SOLAR, NETHER, THUNDER, DRAGON, HEAVENLY -> true;
-                default -> false;
-            };
-            h.assertTrue(ForgingSystem.canUseFire(goldenCore,kind.id())==goldenCoreEligible,
-                    "Only flames reaching Golden Core heat qualify for its weapon recipe");
+            h.assertTrue(ForgingSystem.canUseFire(goldenCore,kind.id()),
+                    "Every flame can refine Golden Core weapons regardless of heat ceiling");
         }
         var original = new ItemStack(ModItems.SEVEN_STAR_SWORD.get());
         WeaponRestrictionSystem.debugSetTier(original,7);
@@ -138,21 +134,22 @@ public final class FlameForgingGameTests {
         shards.add(new ItemStack(com.example.immortal_cultivation_mod.magicritual.item.ModItems.HIGH_SPIRIT_STONE.get(),64));
         shards.add(new ItemStack(com.example.immortal_cultivation_mod.magicritual.item.ModItems.HIGH_SPIRIT_STONE.get(),64));
         var reforge = ForgingSystem.recipeById(WeaponShardSystem.REFORGE);
-        h.assertTrue(!ForgingSystem.canUseFire(reforge,FlameKind.EARTH.id(),shards)
-                        && !ForgingSystem.canUseFire(reforge,FlameKind.CRIMSON.id(),shards)
-                        && !ForgingSystem.canUseFire(reforge,"normal_fire",shards)
-                        && !ForgingSystem.canUseFire(reforge,"ling_fire",shards)
+        h.assertTrue(ForgingSystem.canUseFire(reforge,FlameKind.EARTH.id(),shards)
+                        && ForgingSystem.canUseFire(reforge,FlameKind.CRIMSON.id(),shards)
+                        && ForgingSystem.canUseFire(reforge,"normal_fire",shards)
+                        && ForgingSystem.canUseFire(reforge,"ling_fire",shards)
                         && ForgingSystem.canUseFire(reforge,"zhen_fire",shards)
                         && ForgingSystem.canUseFire(reforge,FlameKind.WOOD.id(),shards),
-                "Shard reforging cannot bypass its native Golden Core heat with ordinary or weaker flames");
+                "Shard reforging accepts every fire without changing native target temperature");
         try (var p = new Forger(h)) {
+            h.getLevel().addNewPlayer(p.player);
             var ding = forge(h);
             fill(ding,goldenCore,materials(goldenCore));
             h.setBlock(FORGE.below(),FlameKind.EARTH.block());
             int qi = ModAttachments.getData(p.player).qi();
             ding.startForging(p.player);
-            h.assertTrue(ding.data(4)==0 && ModAttachments.getData(p.player).qi()==qi,
-                    "An insufficient flame cannot start the forge or spend player Qi");
+            h.assertTrue(ding.data(4)==1 && ModAttachments.getData(p.player).qi()==qi-100,
+                    "A lower-temperature flame starts the batch and spends normal starting Qi");
             h.setBlock(FORGE.below(),FlameKind.WOOD.block());
             ding.startForging(p.player);
             for (int i=0;i<26;i++) ding.heatPulse(p.player);
@@ -181,8 +178,8 @@ public final class FlameForgingGameTests {
             var weak = new DingBlockEntity(reforging.getBlockPos(),reforging.getBlockState());
             weak.loadWithComponents(oldReforge,h.getLevel().registryAccess()); weak.setLevel(h.getLevel());
             DingBlockEntity.serverTick(h.getLevel(),weak.getBlockPos(),weak.getBlockState(),weak);
-            h.assertTrue(weak.data(4)==0 && weak.getItem(DingBlockEntity.RESULT_SLOT).isEmpty(),
-                    "An old ordinary-fire reforge cannot bypass the serialized Golden Core heat requirement");
+            h.assertTrue(weak.data(4)==1 && weak.getItem(DingBlockEntity.RESULT_SLOT).isEmpty(),
+                    "A saved reforge continues on ordinary fire without losing its shards");
             for (int i=0;i<shards.size();i++) {
                 h.assertTrue(ItemStack.matches(weak.getItem(DingBlockEntity.MATERIAL_START+i),
                                 reforging.getItem(DingBlockEntity.MATERIAL_START+i)),
@@ -235,8 +232,8 @@ public final class FlameForgingGameTests {
             rejected.loadWithComponents(oldCrimson,h.getLevel().registryAccess());
             rejected.setLevel(h.getLevel());
             DingBlockEntity.serverTick(h.getLevel(),rejected.getBlockPos(),rejected.getBlockState(),rejected);
-            h.assertTrue(rejected.data(4)==0,
-                    "An old Crimson Golden Core target cannot continue after its flame ceiling is reduced");
+            h.assertTrue(rejected.data(4)==1,
+                    "A saved Golden Core batch continues on Crimson fire despite its lower ceiling");
         }
         h.succeed();
     }
@@ -489,11 +486,11 @@ public final class FlameForgingGameTests {
         } finally { target.discard(); }
         var highGrade = new ForgingSystem.ForgingRecipe("test_native_huashen", ModItems.WEAPON_MOLD.get(), 10500,
                 java.util.Map.of(Items.IRON_INGOT, 1), false, 64, "zhen_fire");
-        h.assertTrue(ForgingSystem.requiresHeavenlyFire(highGrade, materials(highGrade))
-                        && !ForgingSystem.canUseFire(highGrade, "zhen_fire")
-                        && !ForgingSystem.canUseFire(highGrade, FlameKind.DRAGON.id())
+        h.assertTrue(!ForgingSystem.requiresHeavenlyFire(highGrade, materials(highGrade))
+                        && ForgingSystem.canUseFire(highGrade, "zhen_fire")
+                        && ForgingSystem.canUseFire(highGrade, FlameKind.DRAGON.id())
                         && ForgingSystem.canUseFire(highGrade, FlameKind.HEAVENLY.id()),
-                "Native Hua Shen heat requires the new Heavenly flame rather than bypassing the old ceiling");
+                "Native Hua Shen weapons accept all flames; Heavenly quality bonus remains separate");
         h.succeed();
     }
 

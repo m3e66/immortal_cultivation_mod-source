@@ -168,18 +168,20 @@ public final class CombatImpactVfx {
         if (IMPACTS.size() >= MAX_IMPACTS) IMPACTS.removeFirst();
         Impact impact = new Impact(packet, now, quality);
         IMPACTS.add(impact);
-        if (packet.kind() == Kind.HIT) spawnCombatSmoke(impact, quality);
+        if ((packet.kind() == Kind.HIT || packet.kind() == Kind.LANDING)
+                && (packet.injuryFlags() & CombatFeedbackPayloads.HIGH_DAMAGE) != 0) spawnCombatSmoke(impact, quality);
         admittedCount++;
     }
 
     private static void spawnCombatSmoke(Impact impact, int quality) {
         SMOKE.removeIf(particle -> !particle.isAlive());
         float strength = Mth.clamp(impact.data.intensity(), 0, 1);
-        boolean heavy = com.example.immortal_cultivation_mod.combat.CombatFeedbackProfile.heavy(strength);
-        double plumeScale = heavy ? 1.25 : 1;
+        boolean landing = impact.data.kind() == Kind.LANDING;
+        double plumeScale = landing ? 1.6 + strength * .8 : 1.25;
         int liveLimit = quality == 0 ? 24 : quality == 1 ? 64 : 128;
-        int tickLimit = quality == 0 ? 4 : quality == 1 ? 12 : 24;
-        int count = quality == 0 ? 2 : (int) ((5 + strength * 11) * (quality == 1 ? .6F : 1));
+        int tickLimit = quality == 0 ? 6 : quality == 1 ? 24 : 48;
+        int count = quality == 0 ? (landing ? 4 : 2)
+                : (int) ((landing ? 12 + strength * 32 : 5 + strength * 11) * (quality == 1 ? .6F : 1));
         count = Math.min(count, Math.min(liveLimit - SMOKE.size(), tickLimit - smokeThisTick));
         Vec3 origin = impact.floor == null ? impact.data.position() : impact.floor.add(0, .15, 0);
         Vec3 push = impact.data.direction().multiply(.025, 0, .025);
@@ -192,12 +194,13 @@ public final class CombatImpactVfx {
                     ParticleTypes.CAMPFIRE_COSY_SMOKE,
                     origin.x + dx * radius, origin.y + impact.random(780 + i) * (.35 + strength * 2.3) * plumeScale,
                     origin.z + dz * radius, push.x + dx * .012,
-                    .025 + strength * .035 + impact.random(820 + i) * .015, push.z + dz * .012);
+                    (landing ? .10 + strength * .12 : .025 + strength * .035)
+                            + impact.random(820 + i) * .025, push.z + dz * .012);
             if (particle == null) continue;
             float gray = (float) (.55 + impact.random(860 + i) * .18);
             particle.setColor(gray, gray, gray);
-            particle.scale((float) ((1 + strength * 1.2 + impact.random(900 + i) * .4) * (heavy ? 1.5 : 1)));
-            particle.setLifetime(70 + (int) (strength * 20 + impact.random(940 + i) * 10) + (heavy ? 30 : 0));
+            particle.scale((float) ((1 + strength * 1.2 + impact.random(900 + i) * .4) * (landing ? 2 : 1.5)));
+            particle.setLifetime((landing ? 120 : 100) + (int) (strength * 25 + impact.random(940 + i) * 10));
             SMOKE.add(particle);
             smokeThisTick++;
         }

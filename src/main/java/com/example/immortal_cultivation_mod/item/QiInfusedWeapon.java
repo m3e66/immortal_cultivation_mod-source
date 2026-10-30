@@ -21,6 +21,7 @@ import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.component.CustomData;
 
 import java.util.Locale;
+import java.util.Objects;
 
 public final class QiInfusedWeapon {
     public static final double QI_PER_BONUS_DAMAGE = 20.0D;
@@ -346,6 +347,25 @@ public final class QiInfusedWeapon {
                 format(qi),
                 format(damage)
         ).withStyle(ChatFormatting.AQUA);
+    }
+
+    /** Comparison-only snapshot: stored Qi changes do not mean the held mining tool changed. */
+    public static ItemStack forMiningComparison(ItemStack previous, ItemStack current) {
+        if (previous.isEmpty() || current.isEmpty() || !ItemStack.isSameItem(previous, current)) return current;
+        CustomData previousData = previous.get(DataComponents.CUSTOM_DATA);
+        CustomData currentData = current.get(DataComponents.CUSTOM_DATA);
+        if (Objects.equals(previousData, currentData)) return current;
+        CompoundTag previousTag = previousData == null ? new CompoundTag() : previousData.copyTag();
+        CompoundTag currentTag = currentData == null ? new CompoundTag() : currentData.copyTag();
+        var previousQi = previousTag.get(TAG_QI);
+        if (Objects.equals(previousQi, currentTag.get(TAG_QI))) return current;
+
+        ItemStack comparison = current.copy();
+        if (previousQi == null) currentTag.remove(TAG_QI);
+        else currentTag.put(TAG_QI, previousQi.copy());
+        if (currentTag.isEmpty() && previousData == null) comparison.remove(DataComponents.CUSTOM_DATA);
+        else comparison.set(DataComponents.CUSTOM_DATA, CustomData.of(currentTag));
+        return comparison;
     }
 
     static void setQi(ItemStack stack, double qi) {

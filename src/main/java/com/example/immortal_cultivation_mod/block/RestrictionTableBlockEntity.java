@@ -162,6 +162,7 @@ public class RestrictionTableBlockEntity extends BlockEntity
                 return;
             }
             com.example.immortal_cultivation_mod.guidance.DaoGuidanceObservations.record(player, "restriction_added");
+            com.example.immortal_cultivation_mod.item.IdentityItems.recordSuccessfulForging(player);
             setChanged();
             playSuccessEffects();
             sendState(player, RestrictionPayloads.RESULT_SOLVED,

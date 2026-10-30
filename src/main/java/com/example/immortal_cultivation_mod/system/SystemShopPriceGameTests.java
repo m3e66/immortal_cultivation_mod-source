@@ -2,20 +2,76 @@ package com.example.immortal_cultivation_mod.system;
 
 import com.example.immortal_cultivation_mod.alchemy.AlchemyChemistry;
 import com.example.immortal_cultivation_mod.alchemy.AlchemyForgeRecipes;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 @GameTestHolder("immortal_cultivation_system_prices")
 @PrefixGameTestTemplate(false)
 public final class SystemShopPriceGameTests {
+    private static final class DisplayRecipe extends ShapelessRecipe {
+        private final Supplier<ItemStack> displayResult;
+
+        private DisplayRecipe(Supplier<ItemStack> displayResult) {
+            super("", CraftingBookCategory.MISC, new ItemStack(Items.SPYGLASS, 2),
+                    NonNullList.of(Ingredient.EMPTY, Ingredient.of(Items.COBBLESTONE)));
+            this.displayResult = displayResult;
+        }
+
+        @Override
+        public ItemStack getResultItem(HolderLookup.Provider registries) {
+            return displayResult.get();
+        }
+    }
+
+    @GameTest(template = "fate_test")
+    public static void customRecipesWithoutStaticOutputsDoNotCrashShop(GameTestHelper helper) {
+        var manager = helper.getLevel().getServer().getRecipeManager();
+        var original = new ArrayList<>(manager.getRecipes());
+        var recipes = new ArrayList<RecipeHolder<?>>(original);
+        var reads = new AtomicInteger();
+        recipes.add(new RecipeHolder<>(ResourceLocation.fromNamespaceAndPath("shop_test", "null_result"),
+                new DisplayRecipe(() -> null)));
+        recipes.add(new RecipeHolder<>(ResourceLocation.fromNamespaceAndPath("shop_test", "empty_result"),
+                new DisplayRecipe(() -> ItemStack.EMPTY)));
+        recipes.add(new RecipeHolder<>(ResourceLocation.fromNamespaceAndPath("shop_test", "throwing_result"),
+                new DisplayRecipe(() -> { throw new IllegalStateException("No static result"); })));
+        recipes.add(new RecipeHolder<>(ResourceLocation.fromNamespaceAndPath("shop_test", "dynamic_result"),
+                new DisplayRecipe(() -> reads.getAndIncrement() == 0 ? new ItemStack(Items.SPYGLASS) : null)));
+        recipes.add(new RecipeHolder<>(ResourceLocation.fromNamespaceAndPath("shop_test", "valid_result"),
+                new DisplayRecipe(() -> new ItemStack(Items.SPYGLASS, 2))));
+        try {
+            manager.replaceRecipes(recipes);
+            SystemShopPrices.invalidate();
+            helper.assertTrue(SystemShopPrices.price(new ItemStack(Items.SPYGLASS)) == 1,
+                    "Valid recipe keeps ingredient/count pricing despite custom recipes without results");
+            helper.assertTrue(reads.get() >= 2, "Rechecked dynamic output is safely skipped during valuation");
+            helper.assertTrue(!SystemShop.catalog().isEmpty(), "Daily shop catalog builds with custom recipes");
+            helper.assertTrue(SystemShopPrices.price(new ItemStack(Items.DIAMOND)) > 0,
+                    "Other items retain prices");
+        } finally {
+            manager.replaceRecipes(original);
+            SystemShopPrices.invalidate();
+        }
+        helper.succeed();
+    }
+
     private static ItemStack stack(GameTestHelper helper, String path) {
         var id = ResourceLocation.fromNamespaceAndPath("immortal_cultivation_mod", path);
         var item = BuiltInRegistries.ITEM.get(id);

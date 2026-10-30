@@ -34,6 +34,7 @@ public class CultivationSettingsScreen extends FittedMenuScreen {
     private CultivationGuiButton outwardQiSizeScrollButton;
     private CultivationGuiButton creativeFlightButton;
     private CultivationGuiButton combatStateButton;
+    private CultivationGuiButton autoCombatOnHitButton;
     private CultivationGuiButton chinesePoemButton;
     private CultivationGuiButton formationPlatePaymentButton;
     private CultivationGuiButton qiUseParticlesButton;
@@ -95,27 +96,35 @@ public class CultivationSettingsScreen extends FittedMenuScreen {
                     ClientData.setCombatStateEnabled(!ClientData.combatStateEnabled());
                     combatStateButton.setMessage(combatStateLabel());
                 }));
-        chinesePoemButton = addRenderableWidget(new CultivationGuiButton(
+        autoCombatOnHitButton = addRenderableWidget(new CultivationGuiButton(
                 buttonX, buttonY(6, showCreativeFlight), buttonWidth, rowButtonHeight,
+                autoCombatOnHitLabel(), () -> {
+                    ClientData.setAutoCombatOnHit(!ClientData.autoCombatOnHit());
+                    autoCombatOnHitButton.setMessage(autoCombatOnHitLabel());
+                }));
+        autoCombatOnHitButton.setTooltip(net.minecraft.client.gui.components.Tooltip.create(
+                Component.translatable(TRANSLATION_PREFIX + "auto_combat_on_hit.description")));
+        chinesePoemButton = addRenderableWidget(new CultivationGuiButton(
+                buttonX, buttonY(7, showCreativeFlight), buttonWidth, rowButtonHeight,
                 chinesePoemLabel(), () -> {
                     ClientData.setChinesePoemDescriptions(!ClientData.chinesePoemDescriptions());
                     chinesePoemButton.setMessage(chinesePoemLabel());
                 }));
         formationPlatePaymentButton = addRenderableWidget(new CultivationGuiButton(
-                buttonX, buttonY(7, showCreativeFlight), buttonWidth, rowButtonHeight,
+                buttonX, buttonY(8, showCreativeFlight), buttonWidth, rowButtonHeight,
                 formationPlatePaymentLabel(), () -> {
                     ClientData.setFormationPlateQiFirst(!ClientData.formationPlateQiFirst());
                     formationPlatePaymentButton.setMessage(formationPlatePaymentLabel());
                 }));
         qiUseParticlesButton = addRenderableWidget(new CultivationGuiButton(
-                buttonX, buttonY(8, showCreativeFlight), buttonWidth, rowButtonHeight,
+                buttonX, buttonY(9, showCreativeFlight), buttonWidth, rowButtonHeight,
                 qiUseParticlesLabel(), () -> {
                     ClientData.setShowQiUseParticles(!ClientData.showQiUseParticles());
                     qiUseParticlesButton.setMessage(qiUseParticlesLabel());
                 }));
         spiritualSenseQiCurrentsButton = addRenderableWidget(
                 new CultivationGuiButton(
-                        buttonX, buttonY(9, showCreativeFlight),
+                        buttonX, buttonY(10, showCreativeFlight),
                         buttonWidth, rowButtonHeight,
                         spiritualSenseQiCurrentsLabel(), () -> {
                             ClientData.setShowSpiritualSenseQiCurrents(
@@ -124,7 +133,7 @@ public class CultivationSettingsScreen extends FittedMenuScreen {
                                     spiritualSenseQiCurrentsLabel());
                         }));
         droughtDomainButton = addRenderableWidget(new CultivationGuiButton(
-                buttonX, buttonY(10, showCreativeFlight), buttonWidth, rowButtonHeight,
+                buttonX, buttonY(11, showCreativeFlight), buttonWidth, rowButtonHeight,
                 droughtDomainLabel(), () -> {
                     ClientData.setDroughtZombieDomainEnabled(
                             !ClientData.droughtZombieDomainEnabled());
@@ -133,13 +142,13 @@ public class CultivationSettingsScreen extends FittedMenuScreen {
         creativeFlightButton = null;
         if (showCreativeFlight) {
             creativeFlightButton = addRenderableWidget(new CultivationGuiButton(
-                    buttonX, buttonY(11, true), buttonWidth, rowButtonHeight,
+                    buttonX, buttonY(12, true), buttonWidth, rowButtonHeight,
                     creativeFlightLabel(), () -> {
                         ClientData.setJindanCreativeFlight(!ClientData.jindanCreativeFlight());
                         creativeFlightButton.setMessage(creativeFlightLabel());
                     }));
         }
-        int next = showCreativeFlight ? 12 : 11;
+        int next = showCreativeFlight ? 13 : 12;
         var recallButton=addRenderableWidget(new CultivationGuiButton(buttonX,buttonY(next,showCreativeFlight),buttonWidth,rowButtonHeight,
                 swordRecallLabel(),()->{ClientData.setFlyingSwordAutoRecall(!ClientData.flyingSwordAutoRecall());rebuildWidgets();}));
         recallButton.setTooltip(net.minecraft.client.gui.components.Tooltip.create(Component.translatable(TRANSLATION_PREFIX+"flying_sword_auto_recall.description")));
@@ -223,6 +232,11 @@ public class CultivationSettingsScreen extends FittedMenuScreen {
                 "screen." + ImmortalCultivationMod.MODID + ".settings.combat_state",
                 Component.translatable("screen." + ImmortalCultivationMod.MODID + ".settings."
                         + (ClientData.combatStateEnabled() ? "on" : "off")));
+    }
+
+    private Component autoCombatOnHitLabel() {
+        return Component.translatable(TRANSLATION_PREFIX + "auto_combat_on_hit",
+                Component.translatable(TRANSLATION_PREFIX + (ClientData.autoCombatOnHit() ? "on" : "off")));
     }
 
     private Component chinesePoemLabel() {
@@ -351,7 +365,7 @@ public class CultivationSettingsScreen extends FittedMenuScreen {
     }
 
     private int rowCount(boolean showCreativeFlight) {
-        return (showCreativeFlight ? 18 : 17) + (showModSky ? 1 : 0);
+        return (showCreativeFlight ? 19 : 18) + (showModSky ? 1 : 0);
     }
     private Component modSkyLabel() {
         return Component.translatable(TRANSLATION_PREFIX + "mod_sky",

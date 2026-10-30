@@ -12,6 +12,11 @@ final class ClientWorldSpellStorage {
     private ClientWorldSpellStorage() {
     }
 
+    static boolean ready() {
+        Minecraft minecraft = Minecraft.getInstance();
+        return minecraft.player != null && minecraft.level != null && minecraft.getConnection() != null;
+    }
+
     static String storageKey() {
         Minecraft minecraft = Minecraft.getInstance();
         String worldIdentity;

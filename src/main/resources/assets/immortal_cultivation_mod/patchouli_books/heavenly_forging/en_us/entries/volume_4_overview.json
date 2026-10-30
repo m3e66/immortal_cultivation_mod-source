@@ -7,7 +7,7 @@
     {
       "type": "patchouli:text",
       "title": "Realm Temperatures",
-      "text": "Higher-grade weapons demand greater temperatures. A flame powerful enough for one realm may be insufficient for the next. Mastery lies in selecting the appropriate fire rather than simply pursuing the hottest flame available."
+      "text": "These are quality target temperatures, not requirements to start refining. Every weapon and shard recipe accepts any fire. The listed flames are suggestions for reaching the target, not mandatory ingredients."
     },
     {
       "type": "patchouli:text",

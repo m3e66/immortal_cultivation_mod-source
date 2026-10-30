@@ -4,6 +4,9 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 public final class ModServerConfig {
     public static final ModConfigSpec SPEC;
+    public static final ModConfigSpec.DoubleValue PILL_EXPLOSION_BASE_DAMAGE;
+    public static final ModConfigSpec.BooleanValue CULTIVATOR_NATURAL_SPAWNING;
+    public static final ModConfigSpec.IntValue CULTIVATOR_LOCAL_CAP;
     public static final ModConfigSpec.IntValue SPIRIT_FARMLAND_QI;
     public static final ModConfigSpec.ConfigValue<java.util.List<? extends Integer>> SPIRIT_PLANT_QI_THRESHOLDS;
     public static final ModConfigSpec.BooleanValue ZHENPAN_QI_FIRST;
@@ -14,6 +17,16 @@ public final class ModServerConfig {
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
+        builder.push("cultivatorSpawning");
+        CULTIVATOR_NATURAL_SPAWNING = builder.comment("Allow ambient village residents, cultivators and wandering merchants, including small parties. Eggs, commands and fixed structure NPCs are unaffected.")
+                .define("enabled", true);
+        CULTIVATOR_LOCAL_CAP = builder.comment("Stop ambient NPC spawning when this many living mod residents/cultivators/merchants already occupy a horizontal 128-block radius, across all heights. Every party member counts, including persistent and previously spawned NPCs. Zero disables natural spawning; existing NPCs are not removed.")
+                .defineInRange("localCap", 4, 0, 32);
+        builder.pop();
+        builder.push("alchemy");
+        PILL_EXPLOSION_BASE_DAMAGE = builder.comment("Pill explosion maximum HP damage per block of radius; linear falloff to zero at the edge.")
+                .defineInRange("pillExplosionBaseDamage", 10D, 0D, 1000000D);
+        builder.pop();
         builder.push("spiritFarming");
         SPIRIT_FARMLAND_QI=builder.comment("Local Qi supplied once to the crop rooted in spirit farmland. A natural spirit vein contributes 25 ambient Qi.")
                 .defineInRange("farmlandQi",25,0,10000);

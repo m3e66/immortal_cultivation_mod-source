@@ -15,6 +15,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 /** One compact event drives deterministic local particles, injuries and short camera impulses. */
 public final class CombatFeedbackPayloads {
     public static final int PHYSICAL = 1, FIRE = 2, FROST = 4, LIGHTNING = 8, AURA = 16, SPATIAL = 32, LOW_QI = 64;
+    public static final int HIGH_DAMAGE = 128;
     public enum Kind { HIT, BLOCK, DASH_START, DASH_STOP, LANDING, SHIELD_BREAK }
     private CombatFeedbackPayloads() {}
 
@@ -24,7 +25,7 @@ public final class CombatFeedbackPayloads {
                 ImmortalCultivationMod.MODID, "combat_feedback"));
         public Effect {
             intensity = Float.isFinite(intensity) ? Mth.clamp(intensity, 0, 1) : 0;
-            injuryFlags &= PHYSICAL | FIRE | FROST | LIGHTNING | AURA | SPATIAL | LOW_QI;
+            injuryFlags &= PHYSICAL | FIRE | FROST | LIGHTNING | AURA | SPATIAL | LOW_QI | HIGH_DAMAGE;
         }
         public static final StreamCodec<RegistryFriendlyByteBuf, Effect> STREAM_CODEC = StreamCodec.of(
                 (buf, value) -> {

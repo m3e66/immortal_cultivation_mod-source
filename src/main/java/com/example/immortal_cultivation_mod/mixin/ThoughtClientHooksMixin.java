@@ -34,6 +34,7 @@ public abstract class ThoughtClientHooksMixin {
     }
     @Inject(method="onMouseButtonPre",at=@At("RETURN"),cancellable=true)
     private static void immortalCultivation$restoreMouse(int button,int action,int mods,CallbackInfoReturnable<Boolean> ci) {
+        ThoughtInputGuard.onKeyEvent(com.mojang.blaze3d.platform.InputConstants.Type.MOUSE.getOrCreate(button), action);
         if(ci.getReturnValue() && action==1 && ThoughtInputGuard.resist())ci.setReturnValue(false);
     }
 }

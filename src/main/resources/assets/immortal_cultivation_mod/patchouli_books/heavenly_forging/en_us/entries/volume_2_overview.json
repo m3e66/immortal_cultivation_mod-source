@@ -7,7 +7,7 @@
     {
       "type": "patchouli:text",
       "title": "Nine Flames",
-      "text": "Ordinary flames melt metal, spiritual flames refine essence, true flames temper the soul, and heavenly flames forge divine artifacts. Each flame possesses its own limits, spiritual properties, and energy requirements."
+      "text": "Every recipe accepts every fire type, including ordinary fire. A burning heat source is still required beneath the Ding. Temperature affects quality; each flame keeps its own heat range, Qi cost and bonuses."
     }
   ]
 }

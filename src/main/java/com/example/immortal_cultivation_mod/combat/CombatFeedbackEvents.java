@@ -52,6 +52,8 @@ public final class CombatFeedbackEvents {
         boolean onGround, dash;
         double peakY, downwardSpeed;
         float dashIntensity;
+        float launchDamage;
+        long launchUntil;
     }
     private CombatFeedbackEvents() {}
     private static State state(LivingEntity entity) { return STATES.computeIfAbsent(entity, ignored -> new State()); }
@@ -72,9 +74,23 @@ public final class CombatFeedbackEvents {
         int flags = injuryFlags(target, source);
         if (flags == 0) return;
         Vec3 direction = incomingDirection(target, source);
+        boolean strong = source.getEntity() != null && source.getEntity() != target
+                && CombatFeedbackProfile.damagingImpact(event.getNewDamage());
+        if (strong) flags |= CombatFeedbackPayloads.HIGH_DAMAGE;
         send(target, Kind.HIT, contactPoint(target, source, direction), direction,
-                Math.max(CombatStateManager.isHeavyAttack(source) ? .72F : 0F,
-                        CombatFeedbackProfile.hitIntensity(event.getNewDamage(), target.getMaxHealth())), flags);
+                strong ? CombatFeedbackProfile.launchIntensity(event.getNewDamage())
+                        : CombatFeedbackProfile.hitIntensity(event.getNewDamage(), target.getMaxHealth()), flags);
+    }
+
+    /** Arm landing feedback only after the server has actually applied a damage-driven launch. */
+    static void launched(LivingEntity entity, float damage) {
+        if (!(entity.level() instanceof ServerLevel level) || !CombatFeedbackProfile.damagingImpact(damage)) return;
+        State state = state(entity);
+        state.launchDamage = damage;
+        state.launchUntil = level.getGameTime() + 200;
+        state.previous = entity.position(); state.previousStep = Vec3.ZERO;
+        state.dimension = level.dimension().location();
+        state.onGround = false; state.peakY = entity.getY(); state.airTicks = 0; state.downwardSpeed = 0;
     }
 
     public static int injuryFlags(LivingEntity target, DamageSource source) {
@@ -265,8 +281,10 @@ public final class CombatFeedbackEvents {
                 || entity.isInLava() || entity.isSpectator();
         boolean discontinuity = stale || state.previous == null || state.dimension == null
                 || !state.dimension.equals(level.dimension().location()) || step.lengthSqr() > 64
-                || (step.lengthSqr() > 9 && step.subtract(state.previousStep).lengthSqr() > 9);
+                || (step.lengthSqr() > 9 && step.subtract(state.previousStep).lengthSqr() > 9
+                    && !(state.launchDamage > 0 && now <= state.launchUntil));
         if (skip || discontinuity) {
+            state.launchDamage = 0;
             state.airTicks = 0; state.downwardSpeed = 0; state.peakY = position.y;
             state.dash = false;
         } else {
@@ -277,11 +295,14 @@ public final class CombatFeedbackEvents {
                 state.downwardSpeed = Math.max(state.downwardSpeed,
                         Math.max(state.previous.y - position.y, -entity.getDeltaMovement().y));
             } else if (!state.onGround) {
-                float intensity = CombatFeedbackProfile.landingIntensity(state.peakY - position.y,
-                        state.downwardSpeed, state.airTicks);
+                boolean combatLanding = state.launchDamage > 0 && now <= state.launchUntil && state.airTicks > 0;
+                float intensity = combatLanding ? CombatFeedbackProfile.launchIntensity(state.launchDamage)
+                        : CombatFeedbackProfile.landingIntensity(state.peakY - position.y, state.downwardSpeed, state.airTicks);
                 // Gravity is not an attack. Keep landing feedback visual for players, NPCs and
                 // beasts alike; removing their support here can drop them into another fall.
-                if (intensity > 0) send(entity, Kind.LANDING, position, new Vec3(0, -1, 0), intensity, 0);
+                if (intensity > 0) send(entity, Kind.LANDING, position, new Vec3(0, -1, 0), intensity,
+                        combatLanding ? CombatFeedbackPayloads.HIGH_DAMAGE : 0);
+                state.launchDamage = 0;
                 state.airTicks = 0; state.downwardSpeed = 0; state.peakY = position.y;
             }
             if (state.dash && (now >= state.dashUntil || entity.horizontalCollision

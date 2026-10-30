@@ -33,6 +33,13 @@ public abstract class FittedMenuScreen extends Screen {
         return viewport.toMenu(coordinate);
     }
 
+    /** Scissor rectangles use screen coordinates, unlike vertices transformed by the pose stack. */
+    protected final void enableMenuScissor(GuiGraphics graphics, int left, int top, int right, int bottom) {
+        double scale = viewport.scale();
+        graphics.enableScissor((int)Math.floor(left * scale), (int)Math.floor(top * scale),
+                (int)Math.ceil(right * scale), (int)Math.ceil(bottom * scale));
+    }
+
     @Override
     public final void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         graphics.pose().pushPose();

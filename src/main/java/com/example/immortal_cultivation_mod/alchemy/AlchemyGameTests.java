@@ -116,7 +116,7 @@ public final class AlchemyGameTests {
             h.assertTrue(b.count()==(f.id().equals("juling")?6:5),"Batch yield");
         }
         var herbs=new HashMap<>(formula("huiling").required());herbs.put("ningling_flower",1);
-        h.assertTrue(brew(formula("huiling"),herbs).effects().get(Effect.QI).amount()==6.25,"25 percent multiplier strengthens 5 percent Qi recovery to 6.25 percent");
+        h.assertTrue(brew(formula("huiling"),herbs).effects().get(Effect.QI).amount()==5.05,"Capped 1 percent herb multiplier strengthens 5 percent Qi recovery to 5.05 percent");
         h.assertTrue(!matches(formula("qingling"),Map.of("qingling_grass",2)),"Missing ingredients rejected");
         h.assertTrue(!matches(formula("qingling"),Map.of("qingling_grass",64,"ninglu_zhi",1)),"Over-limit inputs rejected");
         h.succeed();

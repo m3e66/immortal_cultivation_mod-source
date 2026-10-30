@@ -7,17 +7,47 @@
     {
       "type": "patchouli:text",
       "title": "Scripture Account",
-      "text": "A batch fails and produces ashes if it contains incompatible additives, its conflict score reaches 35 or more, its stability falls below 20, or its toxicity reaches 60 or more."
+      "text": "A batch fails and produces ashes if it contains incompatible additives, its conflict score reaches 35 or more, its stability falls below 20, or its medicinal-poison score reaches 60 or more. These original chemistry failure rules remain separate from five-element pill toxicity."
     },
     {
       "type": "patchouli:text",
       "title": "Scripture Account",
-      "text": "Pills that retain nonzero toxicity after successful refinement inflict Poison for 10 seconds when consumed."
+      "text": "Medicinal poison retained by the original chemistry effects still inflicts Poison for 10 seconds. Five-element pill toxicity governs the saved toxicity base for consumption; it does not change those original medicinal effects."
     },
     {
       "type": "patchouli:text",
       "title": "Scripture Account",
       "text": "Ordinary material-purity and forging-success rules also apply to alchemy."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Pill Explosion",
+      "text": "When a pill batch fails—through lost fire, poor purity, or clashing medicines—the Ding erupts in spiritual fire. Every refining ingredient is consumed. Count individual items, not slots; formula slips, fuel stones, and unrelated objects add no force."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Measure of the Blast",
+      "text": "One ingredient reaches 1 block; each additional ingredient adds 2. At 64 ingredients the radius is 127 blocks. Default damage at the center is radius × 10 HP, fading linearly to zero at the edge. Larger blasts throw creatures farther."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "The Ding’s Fate",
+      "text": "Each failed batch makes one 5% roll to shatter its Ding, independent of batch size. Otherwise the Ding survives its own blast and can be used again. Nearby terrain may break; large craters unfold over time. World protections still apply."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Five Elements in Balance",
+      "text": "Count the Wood, Fire, Earth, Metal and Water of every ingredient in the Ding, multiplied by its item quantity. Fuel and formula slips add nothing. Preserve these original totals throughout the calculation."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "The Restraining Cycle",
+      "text": "Subtract Wood − Earth, Earth − Water, Water − Fire, Fire − Metal, Metal − Wood. Keep negative results. Imbalance is the highest difference minus the lowest. Pill toxicity = 100 × imbalance ÷ (2 × total elemental strength), rounded to the nearest integer within 0–100."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Clear Medicine",
+      "text": "Equal elemental totals yield 0 toxicity; Fire alone yields 100. Wood 10, Earth 8, Water 6, Fire 4 and Metal 2 yield 17. Ingredients with no five-element strength cannot be refined. This saved pill value supplies the base for existing quality, realm and repeated-use modifiers; the cultivator’s existing toxicity is never reset. Detox pills retain their cleansing role."
     }
   ]
 }

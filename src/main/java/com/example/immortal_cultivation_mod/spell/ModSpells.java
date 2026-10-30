@@ -1027,9 +1027,9 @@ public class ModSpells {
             case HANYU_FENGDI -> 16;
             case TIANGUANG_GUANSHA -> 14;
             case TIANFENG_ZHUI -> 13;
-            case MULING_SHENGXI -> 12;
-            case XUE_GUIYUAN_SHU -> 14;
-            case SHENGXI_BAOFA -> 18;
+            case MULING_SHENGXI -> 6;
+            case XUE_GUIYUAN_SHU -> 7;
+            case SHENGXI_BAOFA -> 9;
             case YANGYAN_FUTI -> 8;
             case DARI_ZHEN -> 12;
             case LIEYANG_BU -> 7;

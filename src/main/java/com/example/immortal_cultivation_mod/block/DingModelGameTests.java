@@ -307,8 +307,8 @@ public final class DingModelGameTests {
                         && recipe.moldItem() == ModBlocks.CHI_JIN_SANYANG_DING.get()
                         && recipe.ingredientSlotCount() == DingBlockEntity.LARGE_FORGE_SLOTS,
                 "Upgrade uses the existing slip system and fits the bronze ding");
-        h.assertTrue(recipe.requiredFireType().equals("zhen_fire") && recipe.averageTemp() == 6500,
-                "Golden Core upgrade requires true fire at 6500 degrees");
+        h.assertTrue(recipe.requiredFireType().isEmpty() && recipe.averageTemp() == 6500,
+                "Golden Core upgrade accepts any fire and retains its quality target temperature");
         for (int slots = 15; slots <= 20; slots++) {
             var largeRecipe = new ForgingSystem.ForgingRecipe("test_golden_core_" + slots,
                     ModBlocks.CHI_JIN_SANYANG_DING.get(), 6500,

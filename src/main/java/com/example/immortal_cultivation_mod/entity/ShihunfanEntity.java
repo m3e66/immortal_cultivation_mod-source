@@ -144,6 +144,7 @@ public class ShihunfanEntity extends Entity implements GeoEntity {
         if (total >= capacity) {
             return;
         }
+        int captured = 0;
         triggerAnim("main", "suck");
         for (SoulEntity soul : souls) {
             if (total >= capacity) {
@@ -152,9 +153,13 @@ public class ShihunfanEntity extends Entity implements GeoEntity {
             total = Math.min(capacity, total + soul.soulValue());
             renderSoulTrail(level, soul.position().add(0.0D, 0.9D, 0.0D));
             soul.discard();
+            captured++;
         }
         entityData.set(SOUL_AMOUNT, (float) total);
         ShihunfanItem.setSoulAmount(storedStack, total);
+        var owner = entityData.get(OWNER_UUID).map(level.getServer().getPlayerList()::getPlayer).orElse(null);
+        if (owner != null && captured > 0)
+            com.example.immortal_cultivation_mod.event.CraftProficiency.award(owner, com.example.immortal_cultivation_mod.event.CraftProficiency.Skill.GHOST_CONTROL, captured);
     }
 
     private void renderSoulTrail(ServerLevel level, Vec3 start) {

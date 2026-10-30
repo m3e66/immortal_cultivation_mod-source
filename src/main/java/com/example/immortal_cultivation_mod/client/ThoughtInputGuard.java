@@ -27,7 +27,6 @@ import org.lwjgl.glfw.GLFW;
 public final class ThoughtInputGuard {
     private static ClientLevel world;
     private static int lastAttempt=-1000, sequence, pendingSequence=-1, predicted=-1;
-    private static boolean wasActive;
     private static boolean restoringBindings;
     private static final Map<KeyMapping,InputConstants.Key> UNBOUND=new IdentityHashMap<>();
     private static final Map<KeyMapping, Press> PRESSES=new IdentityHashMap<>();
@@ -35,7 +34,7 @@ public final class ThoughtInputGuard {
             Collections.newSetFromMap(new IdentityHashMap<>());
     // Package access permits the isolated client harness to supply physical key transitions.
     static Predicate<InputConstants.Key> physicalInput=ThoughtInputGuard::readPhysical;
-    private static final class Press { boolean down, consumed; }
+    private static final class Press { boolean down, consumed, recovered; }
     public record Movement(float left, float forward, boolean up, boolean down, boolean leftKey,
                            boolean rightKey, boolean jump, boolean shift) {
         public static Movement capture(Input input) {
@@ -114,17 +113,39 @@ public final class ThoughtInputGuard {
         UNBOUND.putIfAbsent(key,key.getKey());
         return false;
     }
+    /** Track discrete input events; virtual keyboard polling can lag behind these callbacks. */
+    public static void onKeyEvent(InputConstants.Key input, int action) {
+        var mc = Minecraft.getInstance();
+        if (mc.options == null || input.getValue() < 0) return;
+        boolean worldInput = active();
+        for (KeyMapping key : mc.options.keyMappings) {
+            if (!key.getKey().equals(input)) continue;
+            Press state = PRESSES.computeIfAbsent(key, ignored -> new Press());
+            if (action == GLFW.GLFW_RELEASE) {
+                state.down = false;
+            } else if (action == GLFW.GLFW_PRESS && !state.down) {
+                state.down = true;
+                // A key used inside a GUI must not become a world action when that GUI closes.
+                state.consumed = !worldInput;
+                state.recovered = false;
+            }
+        }
+    }
     public static boolean finishClick(KeyMapping key, boolean consumed) {
-        if(!active())return consumed;
-        if(key.isUnbound() || !key.getKeyConflictContext().isActive()
-                || !key.getKeyModifier().isActive(key.getKeyConflictContext()))return consumed;
         Press state=PRESSES.computeIfAbsent(key,ignored->new Press());
-        boolean down=physicalInput.test(key.getKey());
-        if(!down) {state.down=false;state.consumed=false;return consumed;}
-        if(!state.down) {state.down=true;state.consumed=false;}
-        if(consumed) {state.consumed=true;return true;}
-        if(!state.consumed && !toggleEnabled(key) && resist()) {
+        if(consumed) {
+            // If protection already recovered this press, discard its delayed native click.
+            boolean deliver=!state.recovered;
+            state.recovered=false;
             state.consumed=true;
+            return deliver;
+        }
+        if(!active())return false;
+        if(key.isUnbound() || !key.getKeyConflictContext().isActive()
+                || !key.getKeyModifier().isActive(key.getKeyConflictContext()))return false;
+        if(state.down && !state.consumed && !toggleEnabled(key) && resist()) {
+            state.consumed=true;
+            state.recovered=true;
             return true;
         }
         return false;
@@ -170,17 +191,12 @@ public final class ThoughtInputGuard {
         var mc=Minecraft.getInstance();
         if(world!=mc.level) {
             restoreBindings();
-            world=mc.level;PRESSES.clear();HANDLED.clear();lastAttempt=-1000;predicted=-1;pendingSequence=-1;wasActive=false;
+            world=mc.level;PRESSES.clear();HANDLED.clear();lastAttempt=-1000;predicted=-1;pendingSequence=-1;
         }
         if(availableThoughts()>0)restoreBindings();
-        boolean enabled=active();
-        for(KeyMapping key:mc.options.keyMappings) {
-            Press state=PRESSES.computeIfAbsent(key,ignored->new Press());
-            boolean down=enabled&&physicalInput.test(key.getKey());
-            if(!down || !state.down)state.consumed=!wasActive;
-            state.down=down;
-        }
-        wasActive=enabled;
+        // Losing focus or opening a screen consumes pending world presses. Physical polling
+        // must never reset click delivery: Android launchers may update it after the event.
+        if(!active())for(Press state:PRESSES.values())state.consumed=true;
         // Marker entries are normally removed at the end of onClickInput; do not retain abandoned events.
         HANDLED.clear();
     }

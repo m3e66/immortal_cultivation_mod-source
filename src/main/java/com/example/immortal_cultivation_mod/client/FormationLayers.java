@@ -55,6 +55,7 @@ public final class FormationLayers {
                 "decay", "thunder", "detection", "reforge_blade", "teleport")) {
             result.put(type, textures("particle/magic_center_" + type));
         }
+        result.put("growth", textures("particle/magic_circle_regeneration_glyph"));
         return Map.copyOf(result);
     }
 

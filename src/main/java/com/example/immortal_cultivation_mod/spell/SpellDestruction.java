@@ -116,6 +116,13 @@ public final class SpellDestruction {
         Entity owner=caster(entity);
         return remove(level,position,loot,owner,owner==null?Vec3.atCenterOf(position):owner.position(),Float.MAX_VALUE,null,false);
     }
+    /** For bounded explosion batches; caller limits work, while this retains all block/world checks. */
+    public static boolean breakExplosionBlockNow(ServerLevel level, BlockPos pos, boolean loot, Entity owner, Vec3 center) {
+        boolean previous = completingImpact;
+        completingImpact = true;
+        try { return remove(level, pos, loot, owner, center, Float.MAX_VALUE, null, false); }
+        finally { completingImpact = previous; }
+    }
     public static boolean eraseNow(ServerLevel level, BlockPos pos, Entity entity) {
         Entity owner=caster(entity);
         return remove(level,pos,false,owner,owner==null?Vec3.atCenterOf(pos):owner.position(),Float.MAX_VALUE,null,true);
@@ -173,7 +180,7 @@ public final class SpellDestruction {
     }
     private static boolean remove(ServerLevel level, BlockPos pos, boolean loot, Entity owner, Vec3 origin,
             float hardness, BlockState expected, boolean erase, boolean drainOnly, boolean externalQi) {
-        if(!hasBudget(level) || (loot && drops>=24))return false;
+        if(!hasBudget(level) || (loot && drops>=24 && !completingImpact))return false;
         long start=System.nanoTime();
         probes++;
         try {

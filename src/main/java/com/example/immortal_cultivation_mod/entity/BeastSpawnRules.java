@@ -82,6 +82,21 @@ public final class BeastSpawnRules {
     }
 
     public static void register(RegisterSpawnPlacementsEvent event) {
+        event.register(ModEntities.MOONSHADE_HORSE.get(), SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (type, level, reason, pos, random) -> net.minecraft.world.entity.animal.Animal.checkAnimalSpawnRules(type, level, reason, pos, random),
+                RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(ModEntities.RUSSET_SPIRIT_DEER.get(), SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, MortalAnimalEntity::checkSpawnRules,
+                RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(ModEntities.CHESTNUT_SPIRIT_COW.get(), SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, MortalAnimalEntity::checkSpawnRules,
+                RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(ModEntities.FIELD_MOUSE.get(), SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, MortalAnimalEntity::checkSpawnRules,
+                RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(ModEntities.JADECOIL_SNAKE.get(), SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, JadecoilSnakeEntity::checkSpawnRules,
+                RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(ModEntities.SILVER_MIST_WOLF.get(), SpawnPlacementTypes.ON_GROUND,
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 (type, level, reason, pos, random) -> net.minecraft.world.entity.animal.Wolf.checkWolfSpawnRules(

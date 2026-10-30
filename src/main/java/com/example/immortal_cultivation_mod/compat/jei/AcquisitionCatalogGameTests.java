@@ -20,6 +20,10 @@ public final class AcquisitionCatalogGameTests {
     @GameTest(template = "fate_test", timeoutTicks = 100)
     public static void shippedCatalogCoversEveryWildBeastOresPlantsAndChestSources(GameTestHelper h) {
         var recipes = AcquisitionCatalog.collect();
+        h.assertTrue(recipes.stream().noneMatch(recipe -> recipe.kind() == AcquisitionRecipe.Kind.BLOCK
+                        && recipe.sourceIcon().is(com.example.immortal_cultivation_mod.farming.SpiritFarming.FARMLAND.get().asItem())
+                        && recipe.result().is(recipe.sourceIcon().getItem())),
+                "Redundant spirit farmland self-drop is hidden from JEI");
         h.assertTrue(recipes.size() > 250, "Shipped loot and bonus tables generate a substantial acquisition catalog");
         h.assertTrue(new HashSet<>(recipes.stream().map(AcquisitionRecipe::id).toList()).size() == recipes.size(),
                 "Every acquisition recipe has a unique registry ID");

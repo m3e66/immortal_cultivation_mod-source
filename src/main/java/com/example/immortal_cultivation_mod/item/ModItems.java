@@ -352,6 +352,31 @@ public class ModItems {
                                     .FROSTSPINE_CAVE_BEAR.get(),
                             0x1C2631, 0x8FDFFF, new Item.Properties()));
 
+    public static final DeferredItem<Item> MOONSHADE_HORSE_SPAWN_EGG = registerItem("moonshade_horse_spawn_egg",
+            () -> new net.minecraft.world.item.SpawnEggItem(
+                    com.example.immortal_cultivation_mod.entity.ModEntities.MOONSHADE_HORSE.get(),
+                    0x9B5838, 0x35251D, new Item.Properties()));
+
+    public static final DeferredItem<Item> RUSSET_SPIRIT_DEER_SPAWN_EGG = registerItem("russet_spirit_deer_spawn_egg",
+            () -> new net.minecraft.world.item.SpawnEggItem(
+                    com.example.immortal_cultivation_mod.entity.ModEntities.RUSSET_SPIRIT_DEER.get(),
+                    0x985633, 0xDCC99D, new Item.Properties()));
+
+    public static final DeferredItem<Item> CHESTNUT_SPIRIT_COW_SPAWN_EGG = registerItem("chestnut_spirit_cow_spawn_egg",
+            () -> new net.minecraft.world.item.SpawnEggItem(
+                    com.example.immortal_cultivation_mod.entity.ModEntities.CHESTNUT_SPIRIT_COW.get(),
+                    0x79452E, 0xC9A77B, new Item.Properties()));
+
+    public static final DeferredItem<Item> FIELD_MOUSE_SPAWN_EGG = registerItem("field_mouse_spawn_egg",
+            () -> new net.minecraft.world.item.SpawnEggItem(
+                    com.example.immortal_cultivation_mod.entity.ModEntities.FIELD_MOUSE.get(),
+                    0x746B61, 0xC39487, new Item.Properties()));
+
+    public static final DeferredItem<Item> JADECOIL_SNAKE_SPAWN_EGG = registerItem("jadecoil_snake_spawn_egg",
+            () -> new net.minecraft.world.item.SpawnEggItem(
+                    com.example.immortal_cultivation_mod.entity.ModEntities.JADECOIL_SNAKE.get(),
+                    0x275B48, 0xB9AA75, new Item.Properties()));
+
     public static final DeferredItem<Item> SILVER_MIST_WOLF_SPAWN_EGG = registerItem("silver_mist_wolf_spawn_egg",
             () -> new net.minecraft.world.item.SpawnEggItem(
                     com.example.immortal_cultivation_mod.entity.ModEntities.SILVER_MIST_WOLF.get(),

@@ -267,10 +267,10 @@ public final class TalismanDrawingTableBlockEntity extends BlockEntity
                 paper.shrink(1);
                 ink.shrink(1);
             }
-            updated = updated.withQi(data.qi() - recipe.qiCost())
-                    .withAddedMethodProficiency(TalismanRecipes.DRAWING_PROFICIENCY,
-                            Math.max(1, recipe.strengthTier() * 4 + accuracy / 20));
+            updated = updated.withQi(data.qi() - recipe.qiCost());
         }
+        updated = updated.withAddedMethodProficiency(TalismanRecipes.DRAWING_PROFICIENCY,
+                Math.max(1, recipe.strengthTier() * 4 + accuracy / 20));
         int successesBefore = TalismanRecipes.successCount(data, recipe.id());
         int masterySuccesses = TalismanRecipes.masterySuccesses(recipe);
         if (!instant) {

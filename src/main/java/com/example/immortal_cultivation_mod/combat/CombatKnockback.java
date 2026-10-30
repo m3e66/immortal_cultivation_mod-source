@@ -32,7 +32,7 @@ public final class CombatKnockback {
         float damage;
         double launchStrength,lift;
         int blocks, age;
-        boolean pending = true,blast;
+        boolean pending = true,blast,strong;
         Vec3 preHitMotion;
     }
     private CombatKnockback() {}
@@ -45,6 +45,8 @@ public final class CombatKnockback {
     }
 
     public static double strength(float damage) {
+        if (CombatFeedbackProfile.damagingImpact(damage))
+            return 2.6 + 1.2 * (CombatFeedbackProfile.launchIntensity(damage) - .45) / .55;
         return Float.isFinite(damage) && damage > 0 ? Math.min(2.8, .35 + Math.sqrt(damage) * .075) : 0;
     }
     public static int blockBudget(float damage) {
@@ -82,6 +84,8 @@ public final class CombatKnockback {
         // Light Blast Qi punches retain their combo target; heavy releases still launch.
         if (melee && !CombatStateManager.isHeavyAttack(source)) blast = false;
         double launchStrength=blast?Math.max(blastStrength, contactStrength):contactStrength;
+        boolean strong = CombatFeedbackProfile.damagingImpact(event.getNewDamage());
+        if (strong) launchStrength = Math.min(3.8, Math.max(launchStrength, strength(event.getNewDamage())));
         Impact impact = IMPACTS.get(target);
         if (impact != null && impact.pending && impact.launchStrength>=launchStrength && (impact.blast||!blast)) return;
         impact = new Impact();
@@ -92,8 +96,9 @@ public final class CombatKnockback {
         impact.previous = target.position();
         impact.level = level;
         impact.damage = event.getNewDamage();
-        impact.blast=blast;impact.launchStrength=launchStrength;
-        impact.lift=blast?Math.min(.95,.28+launchStrength*.19):0;
+        impact.blast=blast;impact.strong=strong;impact.launchStrength=launchStrength;
+        impact.lift=strong ? .95 + (CombatFeedbackProfile.launchIntensity(impact.damage) - .45)
+                : blast?Math.min(.95,.28+launchStrength*.19):0;
         impact.blocks = blast?(int)Math.min(256,64+launchStrength*32+Math.sqrt(impact.damage)*4):blockBudget(impact.damage);
         if (!BlockBreakingSettings.enabled(attacker,
                 BlockBreakingSettings.Category.COMBAT_IMPACTS)) impact.blocks = 0;
@@ -115,7 +120,7 @@ public final class CombatKnockback {
         if (!(event.getEntity() instanceof LivingEntity target) || !(target.level() instanceof ServerLevel)) return;
         Impact impact = IMPACTS.get(target);
         if (impact == null) return;
-        if (!target.isAlive() || target.isRemoved() || target.level() != impact.level || ++impact.age > (impact.blast?35:20)
+        if (!target.isAlive() || target.isRemoved() || target.level() != impact.level || ++impact.age > (impact.strong?80:impact.blast?35:20)
                 || target.position().distanceToSqr(impact.previous) > 64
                 || impact.attacker.isRemoved() || impact.attacker.level() != impact.level) {
             IMPACTS.remove(target); return;
@@ -130,13 +135,22 @@ public final class CombatKnockback {
             Vec3 before = target.getDeltaMovement();
             target.knockback(impact.launchStrength, -impact.direction.x, -impact.direction.z);
             if (target.getDeltaMovement().equals(before)) { IMPACTS.remove(target); return; }
-            if(impact.blast) {
+            if(impact.blast || impact.strong) {
                 // Respect knockback resistance/events while giving even airborne targets a real upward launch.
                 Vec3 after=target.getDeltaMovement();
                 double response=Math.clamp(after.subtract(before.scale(.5)).horizontalDistance()/impact.launchStrength,0,1);
+                if (impact.strong && after.horizontalDistance() > 3.8) {
+                    // Repeated impacts must stay within vanilla's motion-packet range on both sides.
+                    double scale=3.8/after.horizontalDistance();
+                    after=new Vec3(after.x*scale,Math.min(3.8,after.y),after.z*scale);
+                }
                 target.setDeltaMovement(after.x,Math.max(after.y,impact.lift*response),after.z);
+                if (impact.strong && response > 0) {
+                    target.setOnGround(false);
+                    CombatFeedbackEvents.launched(target, impact.damage);
+                }
                 impact.momentum=target.getDeltaMovement();
-                visualMotion(target,impact,target.position(),impact.momentum,
+                if (impact.blast) visualMotion(target,impact,target.position(),impact.momentum,
                         impact.level.getBlockState(target.blockPosition().below()),false);
             }
             impact.pending = false;

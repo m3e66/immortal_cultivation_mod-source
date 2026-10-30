@@ -63,6 +63,7 @@ public final class CenterTransformationService {
                   }
 
                   center.completeTransformation(output);
+                  com.example.immortal_cultivation_mod.event.CraftProficiency.award(player, com.example.immortal_cultivation_mod.event.CraftProficiency.Skill.FORMATION, 1);
                   dagger.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
                   level.playSound((Player)null, centerPos, SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.BLOCKS, 1.3F, 0.7F);
                   level.sendParticles(ParticleTypes.END_ROD, (double)centerPos.getX() + (double)0.5F, (double)centerPos.getY() + (double)0.75F, (double)centerPos.getZ() + (double)0.5F, 70, 0.8, (double)0.5F, 0.8, 0.08);

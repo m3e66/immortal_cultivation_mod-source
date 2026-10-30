@@ -293,7 +293,7 @@ public final class NpcProfile {
         if (!initialized) {
             NpcSkinCatalog.Skin skin = selectSkin(archetype, seed);
             String realm = defaultRealm(archetype, seed);
-            String identity = selectIdentity(archetype, seed);
+            String identity = NpcEncounters.identityFor(mob, selectIdentity(archetype, seed));
             List<String> roots = defaultRoots(archetype);
             String method = selectRandomMethod(archetype, realm, roots, seed);
             List<String> spells = selectRandomSpells(archetype, realm, roots, identity, method, seed);
@@ -338,7 +338,7 @@ public final class NpcProfile {
                     : "village_mortal";
         } else if (mob instanceof StockedCultivationMerchant) {
             normalizedIdentity = archetype;
-        } else if (!CULTIVATOR_IDENTITIES.contains(normalizedIdentity)) {
+        } else if (!CULTIVATOR_IDENTITIES.contains(normalizedIdentity) && !NpcEncounters.isContextIdentity(normalizedIdentity)) {
             normalizedIdentity = selectIdentity(archetype, seed);
         }
         profile.putString("Identity", normalizedIdentity);
@@ -444,7 +444,7 @@ public final class NpcProfile {
         }
         profile.putString("Personality", normalizePersonality(profile.getString("Personality")));
         String existingIdentity = normalizeIdentity(profile.getString("Identity"));
-        profile.putString("Identity", CULTIVATOR_IDENTITIES.contains(existingIdentity)
+        profile.putString("Identity", (CULTIVATOR_IDENTITIES.contains(existingIdentity) || NpcEncounters.isContextIdentity(existingIdentity))
                 ? existingIdentity
                 : selectIdentity(archetype, seed));
         if (!profile.contains("BodyType")) {
@@ -534,6 +534,7 @@ public final class NpcProfile {
         if (!mob.isAlive()) {
             return;
         }
+        NpcEncounters.completePending(mob);
         tickThoughts(mob, profile);
         // Keep the art already driving an active fight, including long buildup effects.
         // Re-evaluate the best training method once combat ends.
@@ -1287,7 +1288,7 @@ public final class NpcProfile {
         }
         npcProfile.putInt(lastTag, index);
         String dialogueIdentity = switch (identity) {
-            case "talisman_cultivator", "formation_cultivator" -> "wandering_cultivator";
+            case "talisman_cultivator", "formation_cultivator", "sect_disciple", "sect_elder", "temple_cultivator" -> "wandering_cultivator";
             default -> identity;
         };
         return "npc.dialogue.identity." + dialogueIdentity + "." + index;
@@ -1610,6 +1611,7 @@ public final class NpcProfile {
     }
 
     public static boolean areCombatAllies(LivingEntity first, LivingEntity second) {
+        if (NpcEncounters.allies(first, second)) return true;
         if (first == second || first.isAlliedTo(second) || second.isAlliedTo(first)) {
             return true;
         }
@@ -1725,6 +1727,7 @@ public final class NpcProfile {
     }
 
     private static boolean isSocialAlly(PathfinderMob first, PathfinderMob second) {
+        if (NpcEncounters.allies(first, second)) return true;
         ensure(second, archetypeOf(second));
         return isSocialAlly(profile(first), profile(second));
     }
@@ -3493,7 +3496,7 @@ public final class NpcProfile {
         String saberStone = tieredItemId("saber_grindstone", tier);
 
         switch (identity) {
-            case "wandering_cultivator" -> {
+            case "wandering_cultivator", "sect_disciple", "sect_elder", "temple_cultivator" -> {
                 insertInventory(inventory, new ItemStack(item(spiritStone), 8 * amount));
                 insertInventory(inventory, new ItemStack(item(ImmortalCultivationMod.MODID + ":bigu_pill"), 2 * amount));
                 insertInventory(inventory, new ItemStack(item(qiPill), amount));
@@ -4359,6 +4362,7 @@ public final class NpcProfile {
             case "商人", "游商", "配方商人", "merchant", "recipe_merchant" -> MERCHANT;
             case "术法商人", "法术商人", "spell_merchant", "spell_trader" -> SPELL_MERCHANT;
             case "sect_zhuji", "wandering_jindan" -> normalized;
+            case "sect_disciple", "sect_elder", "temple_cultivator" -> normalized;
             default -> "";
         };
     }

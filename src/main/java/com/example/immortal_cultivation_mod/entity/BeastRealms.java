@@ -27,6 +27,7 @@ public final class BeastRealms {
 
     public static int baseRealm(EntityType<?> type) {
         return switch (BuiltInRegistries.ENTITY_TYPE.getKey(type).getPath()) {
+            case "jadecoil_snake", "moonshade_horse", "russet_spirit_deer", "chestnut_spirit_cow", "field_mouse" -> 0;
             case "azure_spirit_silkworm", "green_patterned_spirit_devouring_rat", "red_backed_iron_scale_scorpion" -> 1;
             case "kongming_beetle", "thunderhorn_rock_badger", "frostspine_cave_bear",
                     "wind_feather_cliff_deer", "ink_armored_stone_devouring_tortoise" -> 2;
@@ -36,6 +37,7 @@ public final class BeastRealms {
         };
     }
     public static List<Integer> variants(EntityType<?> type) {
+        if (baseRealm(type) == 0) return List.of(0);
         if (type == ModEntities.VAULT_GUARDIAN.get()) return List.of(2, 3);
         if (type == ModEntities.PHANTOM_VEIL_FOX.get()) return List.of(2, 3, 4);
         int base = baseRealm(type);

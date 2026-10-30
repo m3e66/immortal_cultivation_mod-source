@@ -109,6 +109,7 @@ public final class FateTechniques {
             ModAttachments.setData(player, stats.withQi(stats.qi() - 100));
             LuckSystem.inspect(player, target == null ? player : target, true);
             cooldown(player, id, 100);
+            com.example.immortal_cultivation_mod.event.CraftProficiency.award(player, com.example.immortal_cultivation_mod.event.CraftProficiency.Skill.DIVINATION, 1);
             ServerEvents.syncPlayerData(player);
             return true;
         }

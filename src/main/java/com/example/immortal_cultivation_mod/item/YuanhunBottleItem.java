@@ -56,6 +56,8 @@ public class YuanhunBottleItem extends Item {
             }
             return InteractionResultHolder.fail(stack);
         }
+        com.example.immortal_cultivation_mod.event.CraftProficiency.award(serverPlayer,
+                com.example.immortal_cultivation_mod.event.CraftProficiency.Skill.GHOST_CONTROL, absorbed);
         return InteractionResultHolder.success(stack);
     }
 

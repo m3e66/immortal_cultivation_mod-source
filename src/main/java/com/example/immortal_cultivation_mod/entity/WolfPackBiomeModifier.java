@@ -36,7 +36,7 @@ public record WolfPackBiomeModifier() implements BiomeModifier {
             }
             if (wolfWeight > 0 && spawns.stream().noneMatch(s -> s.type == ModEntities.SILVER_MIST_WOLF.get()))
                 spawns.add(new MobSpawnSettings.SpawnerData(ModEntities.SILVER_MIST_WOLF.get(),
-                        wolfWeight, WolfPackBehavior.NATURAL_PACK_SIZE, WolfPackBehavior.NATURAL_PACK_SIZE));
+                        wolfWeight, 2, 5));
         }
     }
 }

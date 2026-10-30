@@ -196,6 +196,7 @@ public class ShihunfanItem extends Item implements GeoItem, SoulStorageWeapon {
         setSoulAmount(stack, souls * 0.95D);
         player.serverLevel().addFreshEntity(wave);
         spawnHundredGhosts(player.serverLevel(), player, ghostTarget);
+        com.example.immortal_cultivation_mod.event.CraftProficiency.award(player, com.example.immortal_cultivation_mod.event.CraftProficiency.Skill.GHOST_CONTROL, 1);
         player.getCooldowns().addCooldown(stack.getItem(), HUNDRED_GHOST_COOLDOWN_TICKS);
         return true;
     }
@@ -444,7 +445,10 @@ public class ShihunfanItem extends Item implements GeoItem, SoulStorageWeapon {
         if (banner.isEmpty()) {
             return;
         }
-        setSoulAmount(banner, getSoulAmount(banner) + amount);
+        double before = getSoulAmount(banner);
+        setSoulAmount(banner, before + amount);
+        if (getSoulAmount(banner) > before)
+            com.example.immortal_cultivation_mod.event.CraftProficiency.award(player, com.example.immortal_cultivation_mod.event.CraftProficiency.Skill.GHOST_CONTROL, 1);
     }
 
     private static ItemStack findBanner(ServerPlayer player) {

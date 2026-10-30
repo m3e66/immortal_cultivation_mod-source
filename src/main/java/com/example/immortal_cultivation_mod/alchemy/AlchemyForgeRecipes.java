@@ -63,6 +63,11 @@ public final class AlchemyForgeRecipes {
         return counts;
     }
     public static ItemStack output(String id,List<ItemStack> materials){
-        return PillData.create(AlchemyChemistry.brew(AlchemyChemistry.formula(id.substring(8)),herbs(materials)));
+        var totals = FiveElementBalance.totals(materials);
+        if (FiveElementBalance.toxicity(totals).isEmpty())
+            throw new IllegalArgumentException("Pill ingredients have no valid five-element strength");
+        ItemStack output = PillData.create(AlchemyChemistry.brew(AlchemyChemistry.formula(id.substring(8)),herbs(materials)));
+        if (output.getItem() instanceof AlchemyPillItem) FiveElementBalance.apply(output, totals);
+        return output;
     }
 }

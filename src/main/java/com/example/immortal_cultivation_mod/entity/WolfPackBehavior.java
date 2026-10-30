@@ -95,6 +95,10 @@ public final class WolfPackBehavior {
         for (Wolf other : nearby.stream().sorted(LEADER_ORDER).toList()) {
             if (count >= MAX_COMBAT_PACK_SIZE) break;
             if (other.getTarget() != null && other.getTarget().isAlive()) continue;
+            // Neutral Silver Mist wolves answer defense calls, never another species' hunt.
+            if (other instanceof SilverMistWolfEntity && caller.getLastHurtByMob()!=target
+                    && !(caller instanceof SilverMistWolfEntity silver && silver.activity()==WildlifeBrain.DEFEND)) continue;
+            if (other instanceof WildlifeAnimal animal) animal.wildlife().alarm(target,false);
             other.setTarget(target);
             if (target instanceof Player) {
                 other.setPersistentAngerTarget(target.getUUID());
@@ -126,7 +130,7 @@ public final class WolfPackBehavior {
         if (wolf.goalSelector.getAvailableGoals().stream().anyMatch(g -> g.getGoal() instanceof WolfPackGoal)) return;
         wolf.goalSelector.addGoal(3, new WolfPackGoal(wolf));
         wolf.goalSelector.addGoal(7, new WolfPackFollowGoal(wolf));
-        wolf.targetSelector.addGoal(4, new WolfPackHuntGoal(wolf));
+        if (!(wolf instanceof SilverMistWolfEntity)) wolf.targetSelector.addGoal(4, new WolfPackHuntGoal(wolf));
     }
 
     @SubscribeEvent public static void cluster(SpawnClusterSizeEvent event) {

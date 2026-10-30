@@ -73,6 +73,7 @@ public class ProficiencyMenuScreen extends FittedMenuScreen {
     protected void renderMenu(GuiGraphics g, int mx, int my, float pt) {
         int x = left();
         int y = top();
+        g.fill(0, 0, width, height, 0xA0101716);
         g.blit(TEXTURE, x, y, WINDOW_W, WINDOW_H,
                 0.0F, 0.0F, TEXTURE_W, TEXTURE_H, TEXTURE_W, TEXTURE_H);
 

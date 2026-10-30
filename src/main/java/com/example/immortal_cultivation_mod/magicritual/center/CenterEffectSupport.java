@@ -68,6 +68,24 @@ public final class CenterEffectSupport {
       return findCenter(entity, type, (center) -> center.isAffectedByCircle(entity)) != null;
    }
 
+   /** Query the ticking-center index, never scan terrain or load chunks for plant growth. */
+   public static boolean isPlantGrowthBoosted(ServerLevel level, BlockPos pos) {
+      Map<Long, ActiveCenter> centers = ACTIVE_CENTERS.get(level);
+      if (centers == null) return false;
+      for (ActiveCenter entry : centers.values()) {
+         if (!MagicCenterTypeRegistry.GROWTH.equals(entry.type())
+               || entry.lastSeen() < level.getGameTime() - 2L
+               || !level.hasChunkAt(entry.pos())) continue;
+         if (level.getBlockEntity(entry.pos()) instanceof MagicCenterBlockEntity center
+               && !center.isRemoved() && center.isActive() && center.isEnabled()
+               && MagicCenterTypeRegistry.GROWTH.equals(center.getCenterTypeId())
+               && pos.distSqr(center.getBlockPos()) <= (double)center.getRadius() * center.getRadius()) {
+            return true;
+         }
+      }
+      return false;
+   }
+
    public static boolean isInsideHarmful(LivingEntity entity, ResourceLocation type) {
       return findCenter(entity, type, (center) -> CenterTargetPolicy.receivesHarmfulEffect(center, entity)) != null;
    }

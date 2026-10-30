@@ -664,6 +664,32 @@ public class ModEntities {
                             .updateInterval(1)
                             .build("frostspine_cave_bear"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<MoonshadeHorseEntity>> MOONSHADE_HORSE =
+            ENTITY_TYPES.register("moonshade_horse", () -> EntityType.Builder.<MoonshadeHorseEntity>of(
+                    MoonshadeHorseEntity::new, MobCategory.CREATURE).sized(1.05F,1.85F)
+                    .passengerAttachments(MoonshadeHorseEntity.RIDER_SEAT_HEIGHT)
+                    .clientTrackingRange(12).updateInterval(1).build("moonshade_horse"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<MortalAnimalEntity>> RUSSET_SPIRIT_DEER =
+            ENTITY_TYPES.register("russet_spirit_deer", () -> EntityType.Builder.<MortalAnimalEntity>of(
+                    MortalAnimalEntity::new, MobCategory.CREATURE).sized(0.8F,1.7F)
+                    .clientTrackingRange(12).updateInterval(1).build("russet_spirit_deer"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<MortalAnimalEntity>> CHESTNUT_SPIRIT_COW =
+            ENTITY_TYPES.register("chestnut_spirit_cow", () -> EntityType.Builder.<MortalAnimalEntity>of(
+                    MortalAnimalEntity::new, MobCategory.CREATURE).sized(1.05F,1.4F)
+                    .clientTrackingRange(12).updateInterval(1).build("chestnut_spirit_cow"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<MortalAnimalEntity>> FIELD_MOUSE =
+            ENTITY_TYPES.register("field_mouse", () -> EntityType.Builder.<MortalAnimalEntity>of(
+                    MortalAnimalEntity::new, MobCategory.CREATURE).sized(0.35F,0.28F)
+                    .clientTrackingRange(12).updateInterval(1).build("field_mouse"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<JadecoilSnakeEntity>> JADECOIL_SNAKE =
+            ENTITY_TYPES.register("jadecoil_snake", () -> EntityType.Builder.<JadecoilSnakeEntity>of(
+                    JadecoilSnakeEntity::new, MobCategory.CREATURE).sized(.65F,.3F)
+                    .clientTrackingRange(12).updateInterval(1).build("jadecoil_snake"));
+
     public static final DeferredHolder<EntityType<?>, EntityType<SilverMistWolfEntity>> SILVER_MIST_WOLF =
             ENTITY_TYPES.register("silver_mist_wolf", () -> EntityType.Builder.<SilverMistWolfEntity>of(
                     SilverMistWolfEntity::new, MobCategory.CREATURE).sized(.9F,1.25F)

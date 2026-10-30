@@ -844,7 +844,8 @@ public final class SystemShopPrices {
                 } catch (RuntimeException exception) {
                     continue;
                 }
-                if (output.isEmpty() || output.getCount() <= 0) {
+                // Some mod recipes have no static display result (for example mob-drop recipes).
+                if (output == null || output.isEmpty() || output.getCount() <= 0) {
                     continue;
                 }
                 recipesByOutput
@@ -895,7 +896,8 @@ public final class SystemShopPrices {
             } catch (RuntimeException exception) {
                 return 0;
             }
-            if (output.isEmpty() || output.getCount() <= 0 || ingredients.isEmpty()) {
+            if (output == null || output.isEmpty() || output.getCount() <= 0
+                    || ingredients == null || ingredients.isEmpty()) {
                 return 0;
             }
             long total = 0L;

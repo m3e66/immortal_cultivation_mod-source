@@ -74,13 +74,13 @@ public final class CombatFeedbackGameTests {
         h.assertTrue((CombatFeedbackEvents.injuryFlags(npc, source) & CombatFeedbackPayloads.LOW_QI) == 0,
                 "Restored NPC Qi stops weak feedback");
         var packet = new CombatFeedbackPayloads.Effect(h.getLevel().dimension().location(), Kind.HIT,
-                player.getId(), Vec3.ZERO, new Vec3(0,0,1), .5F, CombatFeedbackPayloads.LOW_QI | 128, 5);
+                player.getId(), Vec3.ZERO, new Vec3(0,0,1), .5F, CombatFeedbackPayloads.LOW_QI | CombatFeedbackPayloads.HIGH_DAMAGE | 256, 5);
         var buffer = new net.minecraft.network.RegistryFriendlyByteBuf(io.netty.buffer.Unpooled.buffer(), h.getLevel().registryAccess());
         try {
             CombatFeedbackPayloads.Effect.STREAM_CODEC.encode(buffer, packet);
             var decoded = CombatFeedbackPayloads.Effect.STREAM_CODEC.decode(buffer);
-            h.assertTrue(decoded.injuryFlags() == CombatFeedbackPayloads.LOW_QI,
-                    "Weak-Qi bit survives packet round trip while unknown bits are discarded");
+            h.assertTrue(decoded.injuryFlags() == (CombatFeedbackPayloads.LOW_QI | CombatFeedbackPayloads.HIGH_DAMAGE),
+                    "Weak-Qi and confirmed high-damage bits survive packet round trip while unknown bits are discarded");
         } finally { buffer.release(); player.discard(); npc.discard(); }
         h.succeed();
     }

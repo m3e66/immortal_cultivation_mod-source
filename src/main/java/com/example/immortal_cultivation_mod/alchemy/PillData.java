@@ -91,6 +91,8 @@ public final class PillData {
         return true;
     }
     public static void tooltip(ItemStack stack,List<Component> lines) {
+        FiveElementBalance.savedToxicity(stack).ifPresent(value -> lines.add(
+                Component.translatable("alchemy.five_element_toxicity", value).withStyle(value == 0 ? ChatFormatting.GREEN : ChatFormatting.GOLD)));
         if (stack.getItem() instanceof LegacyPillItem) {
             legacyTooltip(stack, lines);
             qualityLine("common", lines);

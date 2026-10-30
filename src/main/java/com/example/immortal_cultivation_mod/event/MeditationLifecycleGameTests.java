@@ -118,6 +118,31 @@ public final class MeditationLifecycleGameTests {
     }
 
     @GameTest(template = "fate_test")
+    public static void repeatedDamageKeepsMeditationActive(GameTestHelper helper) throws ReflectiveOperationException {
+        try (Fixture fixture = new Fixture(helper, UUID.randomUUID())) {
+            var spawnImmunity = ServerPlayer.class.getDeclaredField("spawnInvulnerableTime");
+            spawnImmunity.setAccessible(true);
+            spawnImmunity.setInt(fixture.player, 0);
+            fixture.meditate();
+            for (int hit = 0; hit < 3; hit++) {
+                fixture.player.invulnerableTime = 0;
+                float before = fixture.player.getHealth();
+                fixture.player.hurt(fixture.player.damageSources().generic(), 1);
+                helper.assertTrue(fixture.player.getHealth() < before, "Each hit must deal real damage");
+                fixture.tick();
+                helper.assertTrue(ModAttachments.getData(fixture.player).isMeditating()
+                                && fixture.player.getPose() == Pose.SITTING
+                                && anchors().containsKey(fixture.player.getUUID()),
+                        "Repeated damage keeps the meditation session, pose and anchor active");
+            }
+            fixture.meditate();
+            helper.assertTrue(!ModAttachments.getData(fixture.player).isMeditating(),
+                    "Player can still stop meditation manually after taking damage");
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = "fate_test")
     public static void livingMeditationStillResistsKnockbackAndCanRestartAfterRespawn(GameTestHelper helper) {
         try (Fixture fixture = new Fixture(helper, UUID.randomUUID())) {
             ServerEvents.onPlayerRespawn(new PlayerEvent.PlayerRespawnEvent(fixture.player, false));

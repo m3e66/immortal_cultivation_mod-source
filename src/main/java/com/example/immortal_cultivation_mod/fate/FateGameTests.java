@@ -152,10 +152,10 @@ public final class FateGameTests {
             helper.assertTrue(recipe != null && recipe.directOutput() && recipe.ingredientSlotCount() == slots[i], "Expensive forge slip: " + ids[i]);
             helper.assertTrue(ForgingSystem.resultItem(recipe).asItem() == net.minecraft.core.registries.BuiltInRegistries.ITEM.get(id), "Correct artifact output");
             helper.assertTrue(recipe.spiritStoneCount() == 64
-                            && !ForgingSystem.canUseFire(recipe, "normal_fire")
-                            && !ForgingSystem.canUseFire(recipe, "ling_fire")
+                            && ForgingSystem.canUseFire(recipe, "normal_fire")
+                            && ForgingSystem.canUseFire(recipe, "ling_fire")
                             && ForgingSystem.canUseFire(recipe, "zhen_fire"),
-                    "Spirit stones and a flame reaching the artifact's target heat are required");
+                    "Spirit stone cost remains while every fire is accepted");
             helper.assertTrue(helper.getLevel().getRecipeManager().byKey(id).isEmpty(), "No crafting-table artifact recipe");
         }
         for (String tier : java.util.List.of("low", "middle", "high")) {

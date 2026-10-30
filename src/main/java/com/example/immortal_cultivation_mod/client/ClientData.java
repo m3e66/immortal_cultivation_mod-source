@@ -35,6 +35,8 @@ public class ClientData {
     private static String wheelSelectionStorageKey = "";
     private static String wheelAvailabilityStorageKey = "";
     private static Set<String> availableWheelSpells = Set.of();
+    private static ModAttachments.CultivationData authoritativeWheelData;
+    private static String authoritativeWheelStorageKey = "";
     private static float shieldAmount = 0.0F;
     private static float shieldMax = 0.0F;
     private static List<ShieldDisplay.Layer> shieldLayers=List.of();
@@ -48,6 +50,7 @@ public class ClientData {
     private static boolean jindanCreativeFlight = false;
     private static boolean jindanFlightControlActive = false;
     private static boolean combatStateEnabled = true;
+    private static boolean autoCombatOnHit = true;
     private static boolean chinesePoemDescriptions = false;
     private static boolean formationPlateQiFirst = false;
     private static boolean showQiUseParticles = true;
@@ -88,6 +91,8 @@ public class ClientData {
             wheelSelectionStorageKey = "";
             wheelAvailabilityStorageKey = "";
             availableWheelSpells = Set.of();
+            authoritativeWheelData = null;
+            authoritativeWheelStorageKey = "";
         }
         preparedSpellId = "";
         preparedSpellStorageKey = "";
@@ -265,6 +270,7 @@ public class ClientData {
     }
 
     public static void setPreparedSpellId(String spellId) {
+        if (!ClientWorldSpellStorage.ready()) return;
         ensurePreparedSpellLoaded();
         String normalized = normalizeWheelId(spellId);
         preparedSpellId = isValidWheelId(normalized) ? normalized : "";
@@ -454,6 +460,17 @@ public class ClientData {
         saveClientToggles();
     }
 
+    public static boolean autoCombatOnHit() {
+        ensureClientTogglesLoaded();
+        return autoCombatOnHit;
+    }
+
+    public static void setAutoCombatOnHit(boolean enabled) {
+        ensureClientTogglesLoaded();
+        autoCombatOnHit = enabled;
+        saveClientToggles();
+    }
+
     public static boolean chinesePoemDescriptions() {
         ensureClientTogglesLoaded();
         return chinesePoemDescriptions;
@@ -519,6 +536,7 @@ public class ClientData {
     }
 
     public static void toggleSpellVisibleInWheel(String spellId) {
+        if (!ClientWorldSpellStorage.ready()) return;
         ensureWheelSelectionLoaded();
         String normalized = normalizeWheelId(spellId);
         if (!isValidWheelId(normalized)) {
@@ -573,6 +591,7 @@ public class ClientData {
     }
 
     public static void moveWheelSpell(String spellId, int offset) {
+        if (!ClientWorldSpellStorage.ready()) return;
         ensureWheelSelectionLoaded();
         String normalized = normalizeWheelId(spellId);
         if (offset == 0) {
@@ -596,7 +615,18 @@ public class ClientData {
         }
     }
 
+    /** Only a local-player server sync can authorize pruning saved preferences. */
+    public static void reconcileWheelSelectionFromServer() {
+        if (!ClientWorldSpellStorage.ready()) return;
+        authoritativeWheelData = cultivationData;
+        authoritativeWheelStorageKey = ClientWorldSpellStorage.storageKey();
+        reconcileWheelSelection(cultivationData.knownSpells());
+    }
+
     public static void reconcileWheelSelection(List<String> knownSpells) {
+        // Login defaults and another player's debug preview are not a spell-forgetting event.
+        if (!ClientWorldSpellStorage.ready() || cultivationData != authoritativeWheelData
+                || !ClientWorldSpellStorage.storageKey().equals(authoritativeWheelStorageKey)) return;
         ensureWheelSelectionLoaded();
         synchronized (SELECTED_WHEEL_SPELLS) {
             Set<String> known = ConcurrentHashMap.newKeySet();
@@ -642,6 +672,7 @@ public class ClientData {
     }
 
     private static void ensureWheelSelectionLoaded() {
+        if (!ClientWorldSpellStorage.ready()) return;
         String storageKey = ClientWorldSpellStorage.storageKey();
         if (wheelSelectionLoaded && storageKey.equals(wheelSelectionStorageKey)) {
             return;
@@ -690,6 +721,7 @@ public class ClientData {
     }
 
     private static void saveWheelSelection() {
+        if (!ClientWorldSpellStorage.ready()) return;
         Path path = wheelSelectionPath();
         try {
             Files.createDirectories(path.getParent());
@@ -704,6 +736,7 @@ public class ClientData {
     }
 
     private static void ensurePreparedSpellLoaded() {
+        if (!ClientWorldSpellStorage.ready()) return;
         ensureClientTogglesLoaded();
         String storageKey = ClientWorldSpellStorage.storageKey();
         if (storageKey.equals(preparedSpellStorageKey)) {
@@ -729,6 +762,7 @@ public class ClientData {
     }
 
     private static void savePreparedSpell() {
+        if (!ClientWorldSpellStorage.ready()) return;
         Path path = ClientWorldSpellStorage.directory().resolve("prepared_spell.txt");
         try {
             Files.createDirectories(path.getParent());
@@ -769,6 +803,7 @@ public class ClientData {
                         properties.getProperty("jindanCreativeFlight", "false"));
                 combatStateEnabled = Boolean.parseBoolean(
                         properties.getProperty("combatStateEnabled", "true"));
+                autoCombatOnHit = Boolean.parseBoolean(properties.getProperty("autoCombatOnHit", "true"));
                 chinesePoemDescriptions = Boolean.parseBoolean(
                         properties.getProperty("chinesePoemDescriptions", "false"));
                 formationPlateQiFirst = Boolean.parseBoolean(
@@ -800,6 +835,7 @@ public class ClientData {
         properties.setProperty("blockBreakingDisabledMask", Integer.toString(blockBreakingDisabledMask));
         properties.setProperty("jindanCreativeFlight", Boolean.toString(jindanCreativeFlight));
         properties.setProperty("combatStateEnabled", Boolean.toString(combatStateEnabled));
+        properties.setProperty("autoCombatOnHit", Boolean.toString(autoCombatOnHit));
         properties.setProperty("chinesePoemDescriptions", Boolean.toString(chinesePoemDescriptions));
         properties.setProperty("formationPlateQiFirst", Boolean.toString(formationPlateQiFirst));
         properties.setProperty("showQiUseParticles", Boolean.toString(showQiUseParticles));

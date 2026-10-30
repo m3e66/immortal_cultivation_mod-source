@@ -215,6 +215,12 @@ public final class AcquisitionCatalog {
                 default -> notes.add(text("function", string(function, "function", "")));
             }
         }
+        // Picking up an ordinary placed block is not an acquisition recipe. Keep meaningful
+        // tool requirements, chances, extra quantities, and modifier-provided bonus drops.
+        if (kind == AcquisitionRecipe.Kind.BLOCK && source.equals(data)
+                && icon.getItem() instanceof net.minecraft.world.item.BlockItem && icon.is(item)
+                && "1".equals(count) && notes.stream().allMatch(note -> note.equals(text("rolls", "1"))
+                    || note.equals(text("survives_explosion")) || note.equals(text("explosion_decay")))) return;
         notes.addFirst(text("count", count));
         notes.add(text("shipped_loot"));
         notes.add(text("loot_table", data.toString()));

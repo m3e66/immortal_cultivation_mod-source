@@ -70,7 +70,10 @@ public final class PillToxicity {
             }
             if(measured>0)batchPotency=Math.max(.1,Math.min(25,ratios/measured));
         }
-        double gain=clamp(rules.getDouble("Base")*profile.getDouble("Potency")*batchPotency*qualityFactor*realmFactor*(1+Math.min(count,rules.getInt("Cap"))*rules.getDouble("Repeat")));
+        // Newly refined pills carry their exact elemental base; old/uncrafted pills keep existing defaults.
+        var balance = FiveElementBalance.savedToxicity(stack);
+        double base = balance.isPresent() ? balance.getAsInt() : rules.getDouble("Base")*profile.getDouble("Potency")*batchPotency;
+        double gain=clamp(base*qualityFactor*realmFactor*(1+Math.min(count,rules.getInt("Cap"))*rules.getDouble("Repeat")));
         return Math.min(100-clamp(state.getDouble("Value")),gain);
     }
     /** Called at the committed consumption point only. Does not shrink stacks or apply pill effects. */
@@ -141,14 +144,14 @@ public final class PillToxicity {
     public static void damageNonlethal(ServerPlayer p,double percent) {
         // Direct, capped health loss: armor cannot defeat toxicity and no hurt hook can turn it lethal.
         float next=nonlethalHealth(p.getHealth(),p.getMaxHealth(),percent);
-        if(next<p.getHealth()){p.setHealth(next);interruptMeditation(p);}
+        if(next<p.getHealth()){p.setHealth(next);pauseMeditationDetox(p);}
     }
-    public static void interruptMeditation(ServerPlayer p) {
+    /** Damage pauses only bonus detoxification, never the player's meditation session. */
+    public static void pauseMeditationDetox(ServerPlayer p) {
         state(p).putLong("MeditationAfter",state(p).getLong("Seconds")+PillToxicityConfig.DAMAGE_PAUSE.get());
-        if(ModAttachments.getData(p).isMeditating()) com.example.immortal_cultivation_mod.event.ServerEvents.stopMeditation(p);
     }
     @SubscribeEvent public static void damage(LivingDamageEvent.Post e) {
-        if(e.getNewDamage()>0 && e.getEntity() instanceof ServerPlayer p)interruptMeditation(p);
+        if(e.getNewDamage()>0 && e.getEntity() instanceof ServerPlayer p)pauseMeditationDetox(p);
     }
     @SubscribeEvent(priority=net.neoforged.bus.api.EventPriority.LOWEST) public static void death(LivingDeathEvent e) {if(e.getEntity() instanceof ServerPlayer p){p.setData(ModAttachments.PILL_TOXICITY,new CompoundTag());sync(p,true);}}
     @SubscribeEvent public static void clone(PlayerEvent.Clone e) {

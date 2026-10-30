@@ -281,7 +281,7 @@ public final class AlchemyEffects {
         }
         for(Effect effect:Effect.values()){
             double value=plant.effects().getOrDefault(effect,0.);
-            if(value!=0)lines.add(plantLine(Component.translatable("alchemy.effect."+effect.name()).append(": +"+PillData.number(percentAmount(effect,value))+"%"),tinted,effect==Effect.TOXICITY?0xCC9C88:0xA7BFA0));
+            if(value!=0)lines.add(plantLine(Component.translatable("alchemy.effect."+effect.name()).append(": +"+PillData.number(value)+"%"),tinted,effect==Effect.TOXICITY?0xCC9C88:0xA7BFA0));
         }
         lines.add(plantLine(Component.translatable("alchemy.strength").append(": "+PillData.number(plant.strength())),tinted,0xADB4BC));
         lines.add(plantLine(Component.translatable("alchemy.stability").append(": "+PillData.number(plant.stability())),tinted,0xADB4BC));

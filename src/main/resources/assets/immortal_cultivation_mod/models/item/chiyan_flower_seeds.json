@@ -1,229 +1,120 @@
 {
   "parent": "minecraft:block/block",
+  "loader": "neoforge:obj",
+  "model": "immortal_cultivation_mod:models/item/spirit_seeds/chiyan_flower.obj",
+  "automatic_culling": false,
+  "shade_quads": true,
+  "flip_v": false,
+  "emissive_ambient": false,
+  "ambientocclusion": false,
+  "gui_light": "front",
   "textures": {
-    "seed": "minecraft:block/orange_terracotta",
     "particle": "minecraft:block/orange_terracotta"
   },
-  "elements": [
-    {
-      "from": [
-        4,
-        4,
-        5
-      ],
-      "to": [
-        7,
-        6,
-        7
-      ],
-      "faces": {
-        "up": {
-          "texture": "#seed",
-          "uv": [
-            2,
-            2,
-            5,
-            4
-          ]
-        },
-        "down": {
-          "texture": "#seed",
-          "uv": [
-            2,
-            2,
-            5,
-            4
-          ]
-        },
-        "north": {
-          "texture": "#seed",
-          "uv": [
-            2,
-            2,
-            5,
-            4
-          ]
-        },
-        "south": {
-          "texture": "#seed",
-          "uv": [
-            2,
-            2,
-            5,
-            4
-          ]
-        },
-        "east": {
-          "texture": "#seed",
-          "uv": [
-            2,
-            2,
-            5,
-            4
-          ]
-        },
-        "west": {
-          "texture": "#seed",
-          "uv": [
-            2,
-            2,
-            5,
-            4
-          ]
-        }
-      }
-    },
-    {
-      "from": [
-        9,
-        4,
-        8
-      ],
-      "to": [
-        12,
-        6,
-        10
-      ],
-      "faces": {
-        "up": {
-          "texture": "#seed",
-          "uv": [
-            2,
-            2,
-            5,
-            4
-          ]
-        },
-        "down": {
-          "texture": "#seed",
-          "uv": [
-            2,
-            2,
-            5,
-            4
-          ]
-        },
-        "north": {
-          "texture": "#seed",
-          "uv": [
-            2,
-            2,
-            5,
-            4
-          ]
-        },
-        "south": {
-          "texture": "#seed",
-          "uv": [
-            2,
-            2,
-            5,
-            4
-          ]
-        },
-        "east": {
-          "texture": "#seed",
-          "uv": [
-            2,
-            2,
-            5,
-            4
-          ]
-        },
-        "west": {
-          "texture": "#seed",
-          "uv": [
-            2,
-            2,
-            5,
-            4
-          ]
-        }
-      }
-    },
-    {
-      "from": [
-        6,
-        8,
-        9
-      ],
-      "to": [
-        9,
-        10,
-        11
-      ],
-      "faces": {
-        "up": {
-          "texture": "#seed",
-          "uv": [
-            2,
-            2,
-            5,
-            4
-          ]
-        },
-        "down": {
-          "texture": "#seed",
-          "uv": [
-            2,
-            2,
-            5,
-            4
-          ]
-        },
-        "north": {
-          "texture": "#seed",
-          "uv": [
-            2,
-            2,
-            5,
-            4
-          ]
-        },
-        "south": {
-          "texture": "#seed",
-          "uv": [
-            2,
-            2,
-            5,
-            4
-          ]
-        },
-        "east": {
-          "texture": "#seed",
-          "uv": [
-            2,
-            2,
-            5,
-            4
-          ]
-        },
-        "west": {
-          "texture": "#seed",
-          "uv": [
-            2,
-            2,
-            5,
-            4
-          ]
-        }
-      }
-    }
-  ],
   "display": {
     "gui": {
       "rotation": [
+        65,
         25,
-        35,
+        0
+      ],
+      "translation": [
+        0,
+        0.5,
         0
       ],
       "scale": [
-        1.25,
-        1.25,
-        1.25
+        1.3,
+        1.3,
+        1.3
       ]
     },
     "ground": {
+      "translation": [
+        0,
+        2.8,
+        0
+      ],
+      "scale": [
+        0.55,
+        0.55,
+        0.55
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        90,
+        0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        -45,
+        25
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        45,
+        -25
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        65,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        3,
+        0
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        65,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        3,
+        0
+      ],
       "scale": [
         0.5,
         0.5,

@@ -189,7 +189,7 @@ public final class HigherWeaponGameTests {
             int minimumSlots = spec.realm == 3 ? 15 : 10;
             helper.assertTrue(recipe.ingredientSlotCount() >= minimumSlots
                     && recipe.ingredientSlotCount() <= 15
-                    && recipe.averageTemp() > 3500 && recipe.requiredFireType().equals("zhen_fire"),
+                    && recipe.averageTemp() > 3500 && recipe.requiredFireType().isEmpty(),
                     "Recipe fits its realm budget and the bronze forge: " + spec.id);
             var realmCore = spec.realm == 3 ? ModItems.JINDAN_YAODAN.get() : ModItems.ZHUJI_YAODAN.get();
             helper.assertTrue(recipe.required().containsKey(realmCore), "Weapon uses its own realm's core");

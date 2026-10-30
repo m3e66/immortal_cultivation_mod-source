@@ -126,6 +126,7 @@ public class ModClientEvents {
     private static double jindanFlightScrollAccumulator = 0.0D;
     private static UUID combatSettingSyncedPlayer = null;
     private static Boolean combatSettingSyncedValue = null;
+    private static Boolean autoCombatOnHitSyncedValue = null;
     private static UUID formationPlatePaymentSyncedPlayer = null;
     private static Boolean formationPlatePaymentSyncedValue = null;
     private static UUID qiUseParticlesSyncedPlayer = null;
@@ -319,6 +320,7 @@ public class ModClientEvents {
             ClientData.setJindanFlightControlActive(false);
             combatSettingSyncedPlayer = null;
             combatSettingSyncedValue = null;
+            autoCombatOnHitSyncedValue = null;
             formationPlatePaymentSyncedPlayer = null;
             formationPlatePaymentSyncedValue = null;
             qiUseParticlesSyncedPlayer = null;
@@ -623,15 +625,22 @@ public class ModClientEvents {
             return;
         }
         boolean enabled = ClientData.combatStateEnabled();
+        boolean autoOnHit = ClientData.autoCombatOnHit();
         UUID playerId = mc.player.getUUID();
-        if (!playerId.equals(combatSettingSyncedPlayer)
+        boolean newPlayer = !playerId.equals(combatSettingSyncedPlayer);
+        if (newPlayer
                 || combatSettingSyncedValue == null
                 || combatSettingSyncedValue != enabled) {
             PacketDistributor.sendToServer(
                     new CombatPayloads.ServerboundSetCombatEnabledPayload(enabled));
-            combatSettingSyncedPlayer = playerId;
             combatSettingSyncedValue = enabled;
         }
+        if (newPlayer || autoCombatOnHitSyncedValue == null || autoCombatOnHitSyncedValue != autoOnHit) {
+            PacketDistributor.sendToServer(
+                    new CombatPayloads.ServerboundSetAutoCombatOnHitPayload(autoOnHit));
+            autoCombatOnHitSyncedValue = autoOnHit;
+        }
+        combatSettingSyncedPlayer = playerId;
     }
 
     private static void syncFormationPlatePaymentSetting(Minecraft mc) {

@@ -279,9 +279,9 @@ public final class ForgingTemperatureGameTests {
                 recipe.required(), recipe.directOutput(), recipe.spiritStoneCount(), recipe.requiredFireType());
         helper.assertTrue(rebuilt.averageTemp() == temperature, "Native heat is centralized for reconstructed recipes: " + id);
         helper.assertTrue(ForgingSystem.canUseFire(recipe, "zhen_fire")
-                        && !ForgingSystem.canUseFire(recipe, "ling_fire")
-                        && !ForgingSystem.canUseFire(recipe, "normal_fire"),
-                "Fresh higher-realm weapons require true fire: " + id);
+                        && ForgingSystem.canUseFire(recipe, "ling_fire")
+                        && ForgingSystem.canUseFire(recipe, "normal_fire"),
+                "Fresh higher-realm weapons accept every fire: " + id);
     }
 
     private static List<ItemStack> materials(ForgingSystem.ForgingRecipe recipe) {

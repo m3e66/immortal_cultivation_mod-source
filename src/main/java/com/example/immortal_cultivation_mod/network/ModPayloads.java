@@ -2816,7 +2816,8 @@ public class ModPayloads {
                                 .handlesOwnCooldown(spellId)) {
                             startSpellCooldown(sp, spellId);
                         }
-                        addSpellProficiency(sp, spellId, 1);
+                        // Control proficiency is awarded on a successful projectile hit, not a missed cast.
+                        if (!ModSpells.KONGSHI_SHU.equals(spellId)) addSpellProficiency(sp, spellId, 1);
                         com.example.immortal_cultivation_mod.guidance.DaoGuidanceSystem.record(
                                 sp, com.example.immortal_cultivation_mod.guidance.DaoGuidanceContent.CAST_SPELL);
                         if (chargeScale >= 1.5F) {
@@ -2999,7 +3000,7 @@ public class ModPayloads {
             return Math.max(1.0F, Math.min(2.0F, chargeScale));
         }
 
-        private static void addSpellProficiency(ServerPlayer player, String spellId, int amount) {
+        public static void addSpellProficiency(ServerPlayer player, String spellId, int amount) {
             var data = ModAttachments.getData(player);
             int oldValue = data.spellProficiencies().getOrDefault(spellId, 0);
             int adjustedAmount = amount

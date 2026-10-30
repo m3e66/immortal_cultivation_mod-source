@@ -908,25 +908,14 @@ public final class ForgingSystem {
         return canUseFire(recipe, fireType, List.of());
     }
 
-    /** Every fire must reach the original weapon's heat, including shard reforging. */
+    /** Every recipe accepts every supported heat source; temperature still determines quality. */
     public static boolean canUseFire(ForgingRecipe recipe, String fireType, List<ItemStack> materials) {
-        if (recipe == null) return false;
-        String fire = normalizedFire(fireType);
-        if (FlameKind.temperatureCeiling(fire) < targetTemperature(recipe, materials)) return false;
-        FlameKind kind = FlameKind.fromId(fire);
-        if (requiresHeavenlyFire(recipe, materials) && kind != FlameKind.HEAVENLY) return false;
-        if (kind.special()) {
-            return recipe.requiredFireType().isBlank() || "ling_fire".equals(recipe.requiredFireType())
-                    || "zhen_fire".equals(recipe.requiredFireType()) || recipe.requiredFireType().equals(fire);
-        }
-        if (recipe.requiredFireType().isBlank()) return true;
-        return recipe.requiredFireType().equals(fire)
-                || ("ling_fire".equals(recipe.requiredFireType()) && "zhen_fire".equals(fire));
+        return recipe != null;
     }
 
-    /** Native Hua Shen heat and higher require heavenly fire, including complete shard reforges. */
+    /** Compatibility accessor: no recipe or shard rank requires a particular flame anymore. */
     public static boolean requiresHeavenlyFire(ForgingRecipe recipe, List<ItemStack> materials) {
-        return recipe != null && targetTemperature(recipe, materials) >= 10500;
+        return false;
     }
 
     public static int qualityCeiling(String fireType) {
@@ -1091,6 +1080,10 @@ public final class ForgingSystem {
                     mold, weakestPhantomVeilFurRealm(materials));
         }
         WeaponShardSystem.inherit(mold,materials);
+        if (recipe.id().startsWith("legacy_alchemy/")) {
+            com.example.immortal_cultivation_mod.alchemy.FiveElementBalance.apply(mold,
+                    com.example.immortal_cultivation_mod.alchemy.FiveElementBalance.totals(materials));
+        }
         return mold;
     }
 
@@ -1344,10 +1337,13 @@ public final class ForgingSystem {
                 FlameKind.fromId(fire).special() ? FlameKind.fromId(fire).displayName()
                         : Component.translatable("tooltip." + ImmortalCultivationMod.MODID + ".forged.fire." + fire))
                 .withStyle(ChatFormatting.RED));
-        String tempering = normalizedTempering(forging.getString("tempering"));
-        tooltips.add(Component.translatable("tooltip." + ImmortalCultivationMod.MODID + ".forged.tempering",
-                Component.translatable("tooltip." + ImmortalCultivationMod.MODID + ".forged.tempering." + tempering))
-                .withStyle(ChatFormatting.BLUE));
+        if (!(stack.getItem() instanceof com.example.immortal_cultivation_mod.alchemy.AlchemyPillItem)
+                && !(stack.getItem() instanceof com.example.immortal_cultivation_mod.alchemy.LegacyPillItem)) {
+            String tempering = normalizedTempering(forging.getString("tempering"));
+            tooltips.add(Component.translatable("tooltip." + ImmortalCultivationMod.MODID + ".forged.tempering",
+                    Component.translatable("tooltip." + ImmortalCultivationMod.MODID + ".forged.tempering." + tempering))
+                    .withStyle(ChatFormatting.BLUE));
+        }
         tooltips.add(Component.translatable("tooltip." + ImmortalCultivationMod.MODID + ".forged.average_temp",
                 format(forging.getDouble("average_temp"))).withStyle(ChatFormatting.GRAY));
         tooltips.add(Component.translatable("tooltip." + ImmortalCultivationMod.MODID + ".forged.average_purity",
@@ -1694,7 +1690,8 @@ public final class ForgingSystem {
                                 int spiritStoneCount, String requiredFireType) {
         public ForgingRecipe {
             averageTemp = originalWeaponTemperature(id, averageTemp);
-            // Heat capacity is checked by canUseFire; only explicit recipes require a fire type.
+            // Clear legacy recipe fire locks, including those shown by slips and JEI.
+            requiredFireType = "";
             Map<Item, Integer> materialRequirements = new LinkedHashMap<>();
             for (Map.Entry<Item, Integer> ingredient : required.entrySet()) {
                 if (!isRecipeSpiritStone(new ItemStack(ingredient.getKey()))) {

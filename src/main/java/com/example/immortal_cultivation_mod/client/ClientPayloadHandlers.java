@@ -111,7 +111,7 @@ public class ClientPayloadHandlers {
             if (!previewingOtherPlayer) {
                 ClientData.setLivingCorpse(payload.livingCorpse());
                 ClientData.setYuqiControlAllMode(payload.yuqiControlAllMode());
-                ClientData.reconcileWheelSelection(payload.knownSpells());
+                ClientData.reconcileWheelSelectionFromServer();
                 if (player != null) {
                     ClientData.updateMeditationState(player.getUUID(), payload.isMeditating());
                 }

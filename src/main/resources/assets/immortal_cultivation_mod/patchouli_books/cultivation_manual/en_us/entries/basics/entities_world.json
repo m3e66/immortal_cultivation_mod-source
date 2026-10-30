@@ -10,6 +10,22 @@
     },
     {
       "type": "patchouli:text",
+      "text": "$(bold)People and Places$()$(br)Real villages and occupied settlements favor mortal residents, with occasional Qi Refining travelers and recipe or spell merchants. Strong combat cultivators do not spawn naturally there.$(br2)Small sects host disciples and rare elders. Temples, shrines and cultivation caves attract resident cultivators. Structure habitats include a 16-block fringe at the structure elevation; floating platforms above them do not qualify."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Traveling Together$()$(br)Qi Refining and Foundation encounters at sects have a 25% chance of a two- or three-person party. Wilderness encounters have a 20% chance of a pair; most wander alone. Additional companions are always Qi Refining.$(br2)Companions recognize allies and follow when separated. Combat, breakthroughs and player orders take precedence. Failed placements are not refilled; saving and reloading cannot duplicate a party."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Sparse Encounters$()$(br)Residents, cultivators and merchants share a four-NPC cap within 128 horizontal blocks, across all floors. Separate encounters need 32 blocks of spacing; Foundation or stronger need 96, Golden Core or stronger 192. Party members may stand together but each consumes a cap slot.$(br2)Beyond biome weights, wilderness candidate odds are 1/4 Qi, 1/12 Foundation and 1/40 Golden Core. Sect odds are 1/2, 1/10 and 1/60 respectively."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Ground and Persistence$()$(br)Natural soil, sand, gravel or snow requires four solid natural layers below. Building materials, bare stone, thin platforms and dark caves are excluded. Block light 8+ protects wilderness builds; suitable village and cultivation-site visitors may spawn in light.$(br2)Horizontal player buffers: mortal 32, Qi 48, Foundation/merchant 64, Golden Core 96. New chunks do not prefill NPC crowds. Existing acquaintances, merchants, innkeepers and guardians stay persistent. Server settings: cultivatorSpawning.enabled and localCap (default 4). Explicit spawns and fixed structure NPCs remain available."
+    },
+    {
+      "type": "patchouli:text",
       "text": "Cultivators keep their valid opponent when beasts arrive. Afterward, nearby hostile beasts take priority over another player or NPC. Golden Core and stronger cultivators have Great mastery of their own art and use its domain effects with sufficient Qi. Release lasts up to ten seconds, then recovers for ten seconds. Cultivators may grow stronger between meetings."
     },
     {
